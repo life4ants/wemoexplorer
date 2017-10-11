@@ -13,18 +13,27 @@ function Canoe(imgs, x, y) {
   }
 
   this.move = function(x, y) {
-    this.x += x
-    this.y += y
+    if (this.x + x >= 0 && this.x + x < cols &&
+      this.y + y >= 0 && this.y + y < rows) {
+      if (board.cells[this.x+x][this.y+y].type === "water" ||
+          (["shore1", "shore3", "shore5", "shore7"].includes(board.cells[canoe.x+x][canoe.y+y].type) &&
+           board.cells[this.x][this.y].type === "water")
+        ) {
 
-    this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
+        this.x += x
+        this.y += y
 
-    for (let i=-1; i<=1; i++){
-      for (let j = -1; j <= 1; j++){
-        let a = this.x+i
-        let b = this.y+j
+        this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
 
-        if (a >= 0 && a < 60 && b >= 0 && b < 45 && !board.cells[a][b].revealed)
-          board.cells[a][b].revealed = true
+        for (let i=-1; i<=1; i++){
+          for (let j = -1; j <= 1; j++){
+            let a = this.x+i
+            let b = this.y+j
+
+            if (a >= 0 && a < cols && b >= 0 && b < rows && !board.cells[a][b].revealed)
+              board.cells[a][b].revealed = true
+          }
+        }
       }
     }
   }
