@@ -3,10 +3,11 @@ function Canoe(imgs, x, y) {
   this.y = y
   this.imgs = imgs
   this.index = 0
+  this.landed = false
 
   this.display = function() {
-    let x = [0,1].includes(this.index) ? (this.x-1)*25 : this.x*25
-    let y = [0,1].includes(this.index) ? this.y*25 : (this.y-1)*25
+    let x = [0,1,4].includes(this.index) ? (this.x-1)*25 : this.x*25
+    let y = [0,1,4].includes(this.index) ? this.y*25 : (this.y-1)*25
 
     image(this.imgs[this.index], x, y)
 
@@ -16,12 +17,13 @@ function Canoe(imgs, x, y) {
     if (this.x + x >= 0 && this.x + x < cols &&
       this.y + y >= 0 && this.y + y < rows) {
       if (board.cells[this.x+x][this.y+y].type === "water" ||
-          (["shore1", "shore3", "shore5", "shore7"].includes(board.cells[canoe.x+x][canoe.y+y].type) &&
+          (board.cells[this.x+x][this.y+y].type === "beach" &&
            board.cells[this.x][this.y].type === "water")
         ) {
 
         this.x += x
         this.y += y
+        this.landed = board.cells[this.x][this.y].type === "beach"
 
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
 

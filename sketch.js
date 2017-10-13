@@ -54,19 +54,19 @@ function preload(){
     river5: loadImage("images/river5.png"),
     river6: loadImage("images/river6.png"),
     rock: loadImage("images/rock.png"),
-    rock1: loadImage("images/rock1.png"),
-    rock2: loadImage("images/rock2.png"),
-    rock3: loadImage("images/rock3.png"),
-    rock4: loadImage("images/rock4.png"),
-    rock5: loadImage("images/rock5.png"),
-    rock6: loadImage("images/rock6.png"),
-    rock7: loadImage("images/rock7.png"),
-    rock8: loadImage("images/rock8.png"),
-    rock9: loadImage("images/rock9.png"),
-    rock10: loadImage("images/rock10.png"),
-    rock11: loadImage("images/rock11.png"),
-    rock12: loadImage("images/rock12.png"),
-    rock13: loadImage("images/rock13.png"),
+    rockEdge1: loadImage("images/rock1.png"),
+    rockEdge2: loadImage("images/rock2.png"),
+    rockEdge3: loadImage("images/rock3.png"),
+    rockEdge4: loadImage("images/rock4.png"),
+    rockEdge5: loadImage("images/rock5.png"),
+    rockEdge6: loadImage("images/rock6.png"),
+    rockEdge7: loadImage("images/rock7.png"),
+    rockEdge8: loadImage("images/rock8.png"),
+    rockEdge9: loadImage("images/rock9.png"),
+    rockEdge10: loadImage("images/rock10.png"),
+    rockEdge11: loadImage("images/rock11.png"),
+    rockEdge12: loadImage("images/rock12.png"),
+    rockMiddle: loadImage("images/rock13.png"),
     sand: loadImage("images/sand.png"),
     sandpit: loadImage("images/sandpit.png"),
     stump: loadImage("images/stump.png"),
@@ -84,7 +84,8 @@ function preload(){
     treeShore10: loadImage("images/treeShore10.png"),
     treeShore11: loadImage("images/treeShore11.png"),
     treeShore12: loadImage("images/treeShore12.png"),
-    water: loadImage("images/water.png")
+    water: loadImage("images/water.png"),
+    cross: loadImage("images/cross.png")
   }
 
   players = [
@@ -98,16 +99,20 @@ function preload(){
   ]
 
   canoes = [
+    loadImage("images/canoe0.png"),
     loadImage("images/canoe1.png"),
     loadImage("images/canoe2.png"),
-    loadImage("images/canoe3.png"),
-    loadImage("images/canoe4.png")
+    loadImage("images/canoe2.png"),
+    loadImage("images/canoe4.png"),
+    loadImage("images/canoe5.png")
   ]
 }
 
 function setup(){
   let cvs = createCanvas(worldWidth, worldHeight)
   cvs.parent("board")
+  cvs.mousePressed(clickHandler)
+  cvs.mouseReleased(mouseReleaseHandler)
   // frameRate(15)
   loadBoard()
   man = new Man(players, board.startX, board.startY)
@@ -120,7 +125,8 @@ function draw(){
   background(255)
   displayBoard()
   if (game.mode === "play") {
-    active.display()
+    canoe.display()
+    man.display()
     follow(active)
   }
 }
@@ -136,8 +142,8 @@ function loadBoard(){
 function displayBoard() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j<rows; j++){
-      let img = tiles[board.cells[i][j].tile]
-      // let img = board.cells[i][j].revealed ? tiles[board.cells[i][j].tile] : tiles["clouds"]
+      let img = game.mode === "edit" ? tiles[board.cells[i][j].tile]:
+                  board.cells[i][j].revealed ? tiles[board.cells[i][j].tile] : tiles["clouds"]
       image(img, i*25, j*25)
     }
   }
@@ -174,4 +180,19 @@ function centerOn(object) {
   $("#board").css("left", left +"px")
   $("#board").css("top", top +"px")
 
+}
+
+$("#board").contextmenu(function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+});
+
+function isNextTo(x1, y1, x2, y2){
+  for (let x = x1-1; x <= x1+1; x++){
+    for (let y = y1-1; y <= y1+1; y++){
+      if (x === x2 && y === y2)
+        return true
+    }
+  }
+  return false
 }

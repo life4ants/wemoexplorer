@@ -18,6 +18,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: flex-start;
   position: fixed;
   top: 0;
   left: 0;
@@ -39,4 +40,10 @@ body {
 .selected {
   border: solid 2px red;
   margin: 1px;
+}
+
+.tileBox {
+  display: flex;
+  flex-wrap: wrap;
+  width: 434px;
 }
