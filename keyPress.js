@@ -1,29 +1,26 @@
 function keyPressed(){
-  if (game.mode === "play"){
+  if (game.mode === "play" && !paused && game.started){
     playKeys()
   }
-  else
-    console.log("not playing")
 }
 
 function playKeys() {
-  if (keyCode === LEFT_ARROW){
-    move(-1, 0)
-  }
-  else if (keyCode === RIGHT_ARROW){
-    move(1,0)
-  }
-  else if (keyCode === UP_ARROW){
-    move(0,-1)
-  }
-  else if (keyCode === DOWN_ARROW){
-    move(0,1)
-  }
-  else if (keyCode === 188) {
-    man.change(-1)
-  }
-  else if (keyCode === 190) {
-    man.change(1)
+  switch(keyCode){
+    case LEFT_ARROW:
+      move(-1, 0)
+      break
+    case RIGHT_ARROW:
+      move(1,0)
+      break
+    case UP_ARROW:
+      move(0,-1)
+      break
+    case DOWN_ARROW:
+      move(0,1)
+      break
+    case ENTER:
+      cellAction()
+      break
   }
 
   switch(key){
@@ -60,6 +57,26 @@ function playKeys() {
   }
 
   return false
+}
+
+function cellAction(){
+  if (game.availableActions === "tree"){
+    board.cells[active.x][active.y] = {tile: "stump", type: "stump", revealed: true}
+    man.hasBackpack = true
+    game.availableActions = "default"
+  }
+  else if (game.availableActions === "logs"){
+    man.hasBackpack = false
+    game.logs++
+    if (game.logs === 25){
+      message = "You win!"
+      showCount = 30
+    }
+    else if (game.logs > 25){
+      message = "You win some more!!"
+      showCount = 15
+    }
+  }
 }
 
 function clickHandler(){

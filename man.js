@@ -4,34 +4,41 @@ function Man(imgs, x, y) {
   this.imgs = imgs
   this.index = 0
   this.isRidingCanoe = true
+  this.hasBackpack = false
 
   this.display = function() {
-    if (!this.isRidingCanoe)
-      image(this.imgs[this.index], this.x*25, this.y*25)
+    if (!this.isRidingCanoe){
+      let offset = this.hasBackpack ? 4 : 0
+      image(this.imgs[this.index+offset], this.x*25, this.y*25)
+    }
   }
 
   this.move = function(x, y) {
+    //check for edge case
     if (this.x + x >= 0 && this.x + x < cols &&
       this.y + y >= 0 && this.y + y < rows){
+       //check for forbidden cells
       if (!["water", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type)){
+        //move and set image index
         this.x += x
         this.y += y
+        this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
+        // reveal cell
         if (!board.cells[this.x][this.y].revealed)
           board.cells[this.x][this.y].revealed = true
+        //check for available actions
+        if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
+            paused = true
+            showCount = 30
+            message = "You died in a " + board.cells[this.x][this.y].type + "!!!!"
+        }
       }
+      //reveal rockEdge cells
       else if (board.cells[this.x+x][this.y+y].type === "rockEdge"){
         if (!board.cells[this.x+x][this.y+y].revealed)
           board.cells[this.x+x][this.y+y].revealed = true
       }
     }
-  }
-
-  this.change = function(i) {
-    this.index += i
-    if (this.index >= this.imgs.length)
-      this.index = 0
-    if (this.index < 0)
-      this.index = this.imgs.length -1
   }
 
   this.dismount = function(){
@@ -54,6 +61,7 @@ function Man(imgs, x, y) {
       }
       this.x = x
       this.y = y
+      this.index = canoe.index
       this.isRidingCanoe = false
       active = man
       canoe.index = [0,1].includes(canoe.index) ? 4 : 5

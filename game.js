@@ -2,23 +2,42 @@ let game = new Vue({
   el: '#topBar',
   template: `
     <div class="topBar">
-      <button type='button' @click='changeMode'>{{mode === "edit" ? "play" : "edit"}}</button>
-      <div class="tileBox" v-if="mode === 'edit'">
-        <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
-        height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
-      </div>
-      <div class="tileBox" v-if="mode === 'edit'">
-        <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
-        height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
-      </div>
-      <img v-if="mode === 'edit'" v-for="pic in tiles3" :key="pic.id" :src="pic.src"
-        height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
-      <p v-if="mode === 'play'">Welcome to Wemo Explorer</p>
-      <div v-if="mode === 'edit'">
+      <div v-if="mode === 'edit'" class="flex">
+        <button type='button' @click='exit'>exit</button>
+        <div class="tileBox" v-if="mode === 'edit'">
+          <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
+          height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+        </div>
+        <div class="tileBox" v-if="mode === 'edit'">
+          <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
+          height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+        </div>
+        <img v-if="mode === 'edit'" v-for="pic in tiles3" :key="pic.id" :src="pic.src"
+          height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
         <button type="button" @click="saveBoard" title="save the current board">Save</button>
         <button type="button" @click="generateBoard" title="generate new board">New</button>
         <button type="button" @click="loadBoard" title="load a saved board">Load</button>
         <button type="button" @click="fillBoard" title="fill board with trees and grass">Fill</button>
+      </div>
+      <div v-else>
+        <div class="dropdown">
+          <span>Menu</span>
+          <div class="dropdown-content">
+            <span @click="startGame">Board One</span>
+            <hr>
+            <span @click="loadBoard">Custom Board</span>
+            <hr>
+            <span @click="edit">Edit</span>
+          </div>
+        </div>
+        <div v-if="started" class="topBar-content">
+          <div class="infobox" v-text="info"></div>
+          <div class="score">
+            <img src="images/logs.png" height="25" width="25">
+            x {{logs}}
+          </div>
+          <div class="timer">{{min+":"+sec}}</div>
+        </div>
       </div>
     </div>
     `,
@@ -110,19 +129,28 @@ let game = new Vue({
     ],
     currentTile: "water",
     currentType: "water",
-    auto: false
+    auto: false,
+    availableActions: "default",
+    started: false,
+    secounds: 0,
+    sec: "00",
+    min: "00",
+    logs: 0
   },
   methods: {
-    changeMode() {
-      if (this.mode === "edit"){
-        this.mode = "play"
-        $("body").addClass("full-screen")
-      }
-      else {
-        this.mode = "edit"
-        $("body").removeClass("full-screen")
-        $("#board").css("top", topOffset+"px").css("left", "0px")
-      }
+    exit() {
+      this.mode = "play"
+      topOffset = 30
+      $(".topBar").css("height", "30px")
+      $("body").addClass("full-screen")
+    },
+    edit(){
+      this.mode = "edit"
+      topOffset = 100
+      $(".topBar").css("height", "100px")
+      $("body").removeClass("full-screen")
+      $("#board").css("top", topOffset+"px").css("left", "0px")
+      loadBoard()
     },
     setCurrent(id, type){
       this.currentTile = id
@@ -139,9 +167,61 @@ let game = new Vue({
     loadBoard(){
       let id = prompt("enter id of game to load")
       board = JSON.parse(localStorage["board"+id])
+      if (this.mode === "play"){
+        this.started = true
+        this.timer = setInterval(this.updateTimer, 1000)
+        startGame()
+      }
     },
     fillBoard(){
       console.log("not yet")
+    },
+    startGame(){
+      board = gameBoards[0]
+      this.started = true
+      this.timer = setInterval(this.updateTimer, 1000)
+      startGame()
+    },
+    updateTimer(){
+      this.secounds++
+      this.sec = this.secounds%60 < 10 ? "0"+this.secounds%60 : this.secounds % 60
+      this.min = Math.floor(this.secounds/60)
+      this.min = this.min < 10 ? "0"+this.min : this.min
+      if (this.secounds%360 === 300){
+        timeOfDay = "dusk"
+        nightTimer = 0
+        console.log("dusk")
+      }
+      else if (this.secounds%360 === 320){
+        timeOfDay = "night"
+        console.log("night")
+      }
+      else if (this.secounds%360 === 340){
+        timeOfDay = "dawn"
+        nightTimer = 0
+        console.log("dawn")
+      }
+      else if (this.secounds%360 === 0){
+        timeOfDay = "day"
+        nightTimer = 0
+        console.log("day")
+      }
+    }
+  },
+  computed: {
+    info(){
+      let output
+      if (this.availableActions === "default")
+        output= "use arrow keys to move"
+      else if (this.availableActions === "dismount")
+        output= "press J to get out of canoe"
+      else if (this.availableActions === "mount")
+        output= "press J to get into canoe"
+      else if (this.availableActions === "tree")
+        output= "press enter to chop down the tree"
+      else if (this.availableActions === "logs")
+        output= "press enter to put the log in canoe"
+      return output
     }
   }
 })

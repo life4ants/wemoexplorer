@@ -1,11 +1,15 @@
-let tiles, man, players, canoe, active, mode
+let tiles, players, man, canoe, active, mask
 let cols = 80
 let rows = 50
 let worldWidth = cols * 25
 let worldHeight = rows * 25
-let topOffset = 100
-
+let topOffset = 30
 let path = []
+let showCount = 0
+let message = ""
+let paused = false
+let timeOfDay = "day"
+let nightTimer = 0
 
 function preload(){
   tiles = {
@@ -88,23 +92,35 @@ function preload(){
     cross: loadImage("images/cross.png")
   }
 
-  players = [
-    loadImage("images/plaere 2.png"),
-    loadImage("images/plaere 8.png"),
-    loadImage("images/plaere 9.png"),
-    loadImage("images/plaere 10.png"),
-    loadImage("images/plaere 11.png"),
-    loadImage("images/plaere 12.png"),
-    loadImage("images/plaere 13.png")
+  player1 = [
+    loadImage("images/player0.png"),
+    loadImage("images/player1.png"),
+    loadImage("images/player2.png"),
+    loadImage("images/player3.png"),
+    loadImage("images/player4.png"),
+    loadImage("images/player5.png"),
+    loadImage("images/player6.png"),
+    loadImage("images/player7.png")
   ]
 
-  canoes = [
-    loadImage("images/canoe0.png"),
-    loadImage("images/canoe1.png"),
-    loadImage("images/canoe2.png"),
-    loadImage("images/canoe2.png"),
-    loadImage("images/canoe4.png"),
-    loadImage("images/canoe5.png")
+  canoe1 = [
+    loadImage("images/canoe1_0.png"),
+    loadImage("images/canoe1_1.png"),
+    loadImage("images/canoe1_2.png"),
+    loadImage("images/canoe1_3.png"),
+    loadImage("images/canoe0_4.png"),
+    loadImage("images/canoe0_5.png")
+  ]
+
+  mask = [
+    loadImage("images/mask6.png"),
+    loadImage("images/mask0.png"),
+    loadImage("images/mask1.png"),
+    loadImage("images/mask2.png"),
+    loadImage("images/mask3.png"),
+    loadImage("images/mask4.png"),
+    loadImage("images/mask5.png")
+
   ]
 }
 
@@ -113,22 +129,79 @@ function setup(){
   cvs.parent("board")
   cvs.mousePressed(clickHandler)
   cvs.mouseReleased(mouseReleaseHandler)
-  // frameRate(15)
-  loadBoard()
-  man = new Man(players, board.startX, board.startY)
-  canoe = new Canoe(canoes, 1, 0)
-  active = canoe
-  centerOn(active)
+  frameRate(12)
+  noLoop()
+  $("#board").css("top", topOffset)
+  // startGame()
 }
 
 function draw(){
-  background(255)
-  displayBoard()
-  if (game.mode === "play") {
-    canoe.display()
-    man.display()
-    follow(active)
+  if (game.started){
+    background(255)
+    displayBoard()
+    if (game.mode === "play") {
+      canoe.display()
+      man.display()
+      follow(active)
+      showMessage()
+      checkActive()
+      if (timeOfDay === "dusk"){
+        let alpha = nightTimer > 240 ? 240 : nightTimer
+        fill(0,0,0,alpha)
+        rect(0,0,2000,1625)
+        nightTimer++
+      }
+      else if (timeOfDay === "night"){
+        fill(0,0,0,240)
+        rect(0,0,2000,1625)
+        nightTimer++
+      }
+      else if (timeOfDay === "dawn"){
+        let alpha = nightTimer > 240 ? 0 : 240 - nightTimer
+        fill(0,0,0,alpha)
+        rect(0,0,2000,1625)
+        nightTimer++
+      }
+    }
   }
+  else {
+    background(255)
+    fill(0)
+    textSize(45)
+    textAlign(CENTER, CENTER)
+    text("Welcome to Wemo", window.innerWidth/2, window.innerHeight/2)
+  }
+}
+
+function showMessage(){
+  if (showCount > 0){
+    text(message, window.innerWidth/2+abs($("#board").position().left), window.innerHeight/2+abs($("#board").position().top))
+    showCount--
+    if (showCount === 0)
+      paused = false
+  }
+}
+
+function checkActive(){
+  // check for mounting canoe
+  if (["tree", "treeShore"].includes(board.cells[man.x][man.y].type) && !man.hasBackpack){
+    game.availableActions = "tree"
+  }
+  else if (!man.isRidingCanoe && isNextTo(man.x, man.y, canoe.x, canoe.y)){
+    game.availableActions = man.hasBackpack ? "logs" : "mount"
+  }
+  else if (man.isRidingCanoe && canoe.landed)
+    game.availableActions = "dismount"
+  else
+    game.availableActions = "default"
+}
+
+function startGame(){
+  man = new Man(player1, board.startX, board.startY)
+  canoe = new Canoe(canoe1, board.startX, board.startY)
+  active = canoe
+  centerOn(active)
+  loop()
 }
 
 function loadBoard(){
@@ -153,15 +226,15 @@ function follow(object) {
   let left = $("#board").position().left
   let top = $("#board").position().top
 
-  if ((object.x*25) + left < 75 && left <= 0) // left
-    $("#board").css("left", (left+15)+"px")
-  else if ((object.x*25) + left > window.innerWidth - 100. && left >= window.innerWidth - worldWidth) //right
-    $("#board").css("left", (left-15)+"px")
+  if ((object.x*25) + left < 75 && left < 0) // left
+    $("#board").css("left", (left+16)+"px")
+  else if ((object.x*25) + left > window.innerWidth - 100. && left > window.innerWidth - worldWidth) //right
+    $("#board").css("left", (left-16)+"px")
 
-  if ((object.y*25) + top < 75 + topOffset && top <= topOffset) //top
-    $("#board").css("top", (top+15)+"px")
-  else if ((object.y*25) + top > window.innerHeight - 100 && top >= window.innerHeight - worldHeight) //bottom
-    $("#board").css("top", (top-15)+"px")
+  if ((object.y*25) + top < 75 + topOffset && top < topOffset) //top
+    $("#board").css("top", (top+16)+"px")
+  else if ((object.y*25) + top > window.innerHeight - 100 && top > window.innerHeight - worldHeight) //bottom
+    $("#board").css("top", (top-16)+"px")
 
 }
 

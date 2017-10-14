@@ -37,6 +37,10 @@ function Canoe(imgs, x, y) {
           }
         }
       }
+      // else if (board.cells[this.x][this.y].type === "beach" &&
+      //        board.cells[this.x+x][this.y+y].type != "water"){
+      //   man.dismount()
+      // }
     }
   }
 }
