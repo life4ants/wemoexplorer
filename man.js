@@ -42,7 +42,7 @@ function Man(imgs, x, y) {
   }
 
   this.dismount = function(){
-    if (this.isRidingCanoe && canoe.landed){
+    if (this.isRidingCanoe && (canoe.landed || isNearType(canoe.x, canoe.y, "dock"))){
       let x = canoe.x
       let y = canoe.y
       switch(canoe.index){

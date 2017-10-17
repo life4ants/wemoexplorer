@@ -15,8 +15,8 @@ let popup = new Vue({
             </div>
 
             <div v-if="'yesno' === type" class="modal-footer">
-              <button type="button" class="btn btn-default" id="esc" @click="close">No</button>
-              <button type="button" class="btn btn-primary" id="etr" @click="action">Yes</button>
+              <button type="button" id="esc" @click="close">No</button>
+              <button type="button" class=" button-primary" id="etr" @click="action">Yes</button>
             </div>
             <div v-else class="modal-footer">
               <button type="button" @click="close">Ok</button>

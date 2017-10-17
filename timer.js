@@ -35,24 +35,16 @@ function updateTimer(){
 
   let mins = wemoMins%1440
 
-  if (mins >= 57 && mins <= 60){
-    timeOfDay = "dawn"
-    nightTimer = nightTimer > 20 ? 0 : nightTimer
-  }
-  else if (mins >= 117 && mins <= 120){
-    timeOfDay = "day"
-  }
-  else if (mins >= 1287 && mins <= 1290){
+  timeOfDay = mins >= 60 && mins <= 119 ? "dawn" :
+                mins >= 1320 && mins <= 1379 ? "dusk" :
+                  mins >= 1380 || mins <= 59 ? "night" :
+                    "day"
+
+  if (mins >= 1290 && mins <= 1300){
     message = "Night is Coming!!"
-    showCount = showCount < 5 ? 40 : showCount
+    showCount = showCount = 8
   }
-  else if (mins >= 1317 && mins <= 1320){
-    timeOfDay = "dusk"
-    nightTimer = nightTimer > 20 ? 0 : nightTimer
-  }
-  else if (mins >= 1377 && mins <= 1380){
-    timeOfDay = "night"
-  }
+
 }
 
 function showNight(){
@@ -60,18 +52,17 @@ function showNight(){
     case "day":
       return
     case "dusk":
-      alpha = nightTimer > 180 ? 240 :
-        nightTimer > 150 ? nightTimer+60 : Math.floor(nightTimer*1.4)
+      time = wemoMins%1440-1320
+      alpha = Math.round(243-pow((60-time)*.26, 2))
       break
     case "night":
       alpha = 240
       break
     case "dawn":
-      alpha = nightTimer > 180 ? 0 :
-        nightTimer < 30 ? 240 - nightTimer : Math.floor((180 - nightTimer)*1.4)
+      time = wemoMins%1440-60
+      alpha = Math.round(243-pow((time+1)*.26, 2))
       break
   }
   fill(0,0,0,alpha)
   rect(0,0,2000,1625)
-  nightTimer++
 }

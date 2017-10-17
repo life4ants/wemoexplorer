@@ -5,7 +5,7 @@ const rows = 50
 const worldWidth = cols * 25
 const worldHeight = rows * 25 + topbarHeight
 let topOffset = 30
-let path, showCount, message, paused, timeOfDay, nightTimer, startTime
+let path, showCount, message, paused, timeOfDay, startTime
 
 function initializeVars(){
   path = []
@@ -13,7 +13,6 @@ function initializeVars(){
   message = ""
   paused = false
   timeOfDay = "day"
-  nightTimer = 0
   startTime = Date.now()
 }
 
@@ -100,6 +99,7 @@ function preload(){
     night: loadImage("images/moon.png"),
     dawn: loadImage("images/dawn.png"),
     dusk: loadImage("images/dusk.png"),
+    logpile: loadImage("images/logs.png")
   }
 
   player1 = [
@@ -138,6 +138,7 @@ function draw(){
     background(255)
     displayBoard()
     if (game.mode === "play") {
+      showObjects()
       canoe.display()
       man.display()
       follow(active)
@@ -170,14 +171,19 @@ function showMessage(){
 }
 
 function checkActive(){
-  // check for mounting canoe
-  if (["tree", "treeShore"].includes(board.cells[man.x][man.y].type) && !man.hasBackpack){
+  if (!man.hasBackpack && ["tree", "treeShore"].includes(board.cells[man.x][man.y].type)){
     game.availableActions = "tree"
   }
-  else if (!man.isRidingCanoe && isNextTo(man.x, man.y, canoe.x, canoe.y)){
-    game.availableActions = man.hasBackpack ? "logs" : "mount"
+  else if (man.hasBackpack && ["sand", "grass", "stump", "logpile"].includes(board.cells[man.x][man.y].type)){
+    game.availableActions = "log"
   }
-  else if (man.isRidingCanoe && canoe.landed)
+  else if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
+    game.availableActions = "logpile"
+  }
+  else if (!man.isRidingCanoe && isNextTo(man.x, man.y, canoe.x, canoe.y)){
+    game.availableActions = "mount"
+  }
+  else if (man.isRidingCanoe && (canoe.landed || isNearType(canoe.x, canoe.y, "dock")))
     game.availableActions = "dismount"
   else
     game.availableActions = "default"
@@ -202,10 +208,10 @@ function loadBoard(){
 
 function displayBoard() {
   let left = Math.floor(abs($("#board").position().left)/25)
-  let right = left + Math.round(window.innerWidth/25)
+  let right = left + Math.floor(window.innerWidth/25)+1
   right = right > cols ? cols : right
   let top = Math.floor(abs($("#board").position().top-topOffset)/25)
-  let bottom = top + Math.round(window.innerHeight/25)
+  let bottom = top + Math.floor(window.innerHeight/25)+1
   bottom = bottom > rows ? rows : bottom
 
   if (game.mode === "edit"){
@@ -273,4 +279,39 @@ function isNextTo(x1, y1, x2, y2){
     }
   }
   return false
+}
+
+function isNearType(x,y, type){
+  for (let i = x-1; i <= x+1; i++){
+    for (let j = y-1; j <= y+1; j++){
+      if (i >= 0 && i < cols && j >= 0 && j < rows){
+        if (board.cells[i][j].type === type)
+          return true
+      }
+    }
+  }
+  return false
+}
+
+function showObjects(){
+  //right now cheats and only shows logpiles
+  let logpiles = board.objectsToShow.logpiles
+  for (let i = 0; i< logpiles.length; i++){
+    image(tiles.logpile, logpiles[i].x*25, logpiles[i].y*25+topbarHeight)
+    drawBadge(logpiles[i].x, logpiles[i].y, logpiles[i].quantity)
+  }
+}
+
+function drawBadge(i,j,num){
+  num = num+""
+  let x = i*25+20
+  let y = j*25+topbarHeight+5
+  noStroke()
+  fill(0)
+  ellipseMode(CENTER)
+  ellipse(x,y,10+(num.length*3),13)
+  textAlign(CENTER, CENTER)
+  fill(255)
+  textSize(10)
+  text(num,x,y)
 }

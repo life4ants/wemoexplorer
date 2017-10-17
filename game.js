@@ -34,13 +34,10 @@ let game = new Vue({
         </div>
         <div v-if="started" class="topBar-content">
           <div class="infobox" v-text="info"></div>
-          <div class="score">
-            <img src="images/logs.png" height="25" width="25">
-            x {{logs}}
-          </div>
         </div>
         <div v-else class="topBar-content">
           <button type="button" @click="listGames">List Games</button>
+          <button class="button-primary">Primary Button</button>
         </div>
       </div>
     </div>
@@ -136,9 +133,7 @@ let game = new Vue({
     currentType: "water",
     auto: false,
     availableActions: "default",
-    started: false,
-    logs: 0,
-    startTime: 0
+    started: false
   },
   methods: {
     exit() {
@@ -146,7 +141,9 @@ let game = new Vue({
       topOffset = 30
       $(".topBar").css("height", "30px")
       $("body").addClass("full-screen")
-      this.restartGame()
+      $("#board").css("top", topOffset+"px").css("left", "0px")
+      $(window).scrollTop(0).scrollLeft(0)
+      initializeVars()
     },
     edit(){
       this.mode = "edit"
@@ -173,13 +170,16 @@ let game = new Vue({
     loadBoard(){
       let id = prompt("enter id of game to load")
       board = JSON.parse(localStorage["board"+id])
+      if (!board.objectsToShow){
+        board.objectsToShow = {logpiles: []}
+      }
       if (this.mode === "welcome"){
         this.mode = "play"
         this.started = true
         startGame()
       }
       else if (this.mode === "play"){
-        this.restartGame()
+        initializeVars()
         startGame()
       }
     },
@@ -207,12 +207,6 @@ let game = new Vue({
       this.mode = "play"
       this.started = true
       startGame()
-    },
-    restartGame(){
-      this.started = false
-      this.mode = "welcome"
-      this.logs = 0
-      initializeVars()
     }
   },
   computed: {
@@ -226,8 +220,10 @@ let game = new Vue({
         output= "press J to get into canoe"
       else if (this.availableActions === "tree")
         output= "press enter to chop down the tree"
-      else if (this.availableActions === "logs")
-        output= "press enter to put the log in canoe"
+      else if (this.availableActions === "log")
+        output= "press d to dump the log"
+      else if (this.availableActions === "logpile")
+        output = "press g to grab a log"
       return output
     }
   }

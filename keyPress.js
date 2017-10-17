@@ -19,13 +19,22 @@ function playKeys() {
       move(0,1)
       break
     case ENTER:
-      cellAction()
+      if (popup.show)
+        $('#etr').click()
+      else
+        cellAction()
       break
   }
 
   switch(key){
     case "B":
       popup.show = true
+      break
+    case "D":
+      dumpLog()
+      break
+    case "G":
+      grabLog()
       break
     case "X":
       centerOn(active)
@@ -68,16 +77,42 @@ function cellAction(){
     man.hasBackpack = true
     game.availableActions = "default"
   }
-  else if (game.availableActions === "logs"){
-    man.hasBackpack = false
-    game.logs++
-    if (game.logs === 25){
-      message = "You win!"
-      showCount = 30
+}
+
+function dumpLog(){
+  if (game.availableActions === "log"){
+    let cell = board.cells[active.x][active.y]
+    let logpiles = board.objectsToShow.logpiles
+    if (cell.type === "stump"){
+      let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
+      cell.tile = "grass"
+      cell.type = "logpile"
+      cell.id = id
+      logpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
     }
-    else if (game.logs > 25){
-      message = "You win some more!!"
-      showCount = 15
+    else if (cell.type === "logpile"){
+      let index = logpiles.findIndex((e) => e.id === cell.id)
+      logpiles[index].quantity++
+    }
+    else {
+      let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
+      cell.type = "logpile"
+      cell.id = id
+      logpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
+    }
+    man.hasBackpack = false
+  }
+}
+
+function grabLog(){
+  if (game.availableActions === "logpile"){
+    let cell = board.cells[active.x][active.y]
+    let logpiles = board.objectsToShow.logpiles
+    let index = logpiles.findIndex((e) => e.id === cell.id)
+    logpiles[index].quantity--
+    man.hasBackpack = true
+    if (logpiles[index].quantity === 0){
+      logpiles.splice(index, 1)
     }
   }
 }
