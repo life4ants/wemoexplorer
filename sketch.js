@@ -1,15 +1,21 @@
-let tiles, players, man, canoe, active, mask
-let cols = 80
-let rows = 50
-let worldWidth = cols * 25
-let worldHeight = rows * 25
+let tiles, players, man, canoe, active
+const topbarHeight = 40
+const cols = 80
+const rows = 50
+const worldWidth = cols * 25
+const worldHeight = rows * 25 + topbarHeight
 let topOffset = 30
-let path = []
-let showCount = 0
-let message = ""
-let paused = false
-let timeOfDay = "day"
-let nightTimer = 0
+let path, showCount, message, paused, timeOfDay, nightTimer, startTime
+
+function initializeVars(){
+  path = []
+  showCount = 0
+  message = ""
+  paused = false
+  timeOfDay = "day"
+  nightTimer = 0
+  startTime = Date.now()
+}
 
 function preload(){
   tiles = {
@@ -89,7 +95,11 @@ function preload(){
     treeShore11: loadImage("images/treeShore11.png"),
     treeShore12: loadImage("images/treeShore12.png"),
     water: loadImage("images/water.png"),
-    cross: loadImage("images/cross.png")
+    cross: loadImage("images/cross.png"),
+    day: loadImage("images/sun.png"),
+    night: loadImage("images/moon.png"),
+    dawn: loadImage("images/dawn.png"),
+    dusk: loadImage("images/dusk.png"),
   }
 
   player1 = [
@@ -111,17 +121,6 @@ function preload(){
     loadImage("images/canoe0_4.png"),
     loadImage("images/canoe0_5.png")
   ]
-
-  mask = [
-    loadImage("images/mask6.png"),
-    loadImage("images/mask0.png"),
-    loadImage("images/mask1.png"),
-    loadImage("images/mask2.png"),
-    loadImage("images/mask3.png"),
-    loadImage("images/mask4.png"),
-    loadImage("images/mask5.png")
-
-  ]
 }
 
 function setup(){
@@ -132,7 +131,6 @@ function setup(){
   frameRate(12)
   noLoop()
   $("#board").css("top", topOffset)
-  // startGame()
 }
 
 function draw(){
@@ -145,23 +143,8 @@ function draw(){
       follow(active)
       showMessage()
       checkActive()
-      if (timeOfDay === "dusk"){
-        let alpha = nightTimer > 240 ? 240 : nightTimer
-        fill(0,0,0,alpha)
-        rect(0,0,2000,1625)
-        nightTimer++
-      }
-      else if (timeOfDay === "night"){
-        fill(0,0,0,240)
-        rect(0,0,2000,1625)
-        nightTimer++
-      }
-      else if (timeOfDay === "dawn"){
-        let alpha = nightTimer > 240 ? 0 : 240 - nightTimer
-        fill(0,0,0,alpha)
-        rect(0,0,2000,1625)
-        nightTimer++
-      }
+      showNight()
+      showTopbar()
     }
   }
   else {
@@ -175,7 +158,11 @@ function draw(){
 
 function showMessage(){
   if (showCount > 0){
-    text(message, window.innerWidth/2+abs($("#board").position().left), window.innerHeight/2+abs($("#board").position().top))
+    textAlign(CENTER, CENTER)
+    let f = timeOfDay === "night" ? 255 : 10
+    fill(f)
+    textSize(45)
+    text(message, (window.innerWidth/2)+abs($("#board").position().left), (window.innerHeight/2)+abs($("#board").position().top))
     showCount--
     if (showCount === 0)
       paused = false
@@ -201,6 +188,7 @@ function startGame(){
   canoe = new Canoe(canoe1, board.startX, board.startY)
   active = canoe
   centerOn(active)
+  initializeVars()
   loop()
 }
 
@@ -213,13 +201,30 @@ function loadBoard(){
 }
 
 function displayBoard() {
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j<rows; j++){
+  let left = Math.floor(abs($("#board").position().left)/25)
+  let right = left + Math.round(window.innerWidth/25)
+  right = right > cols ? cols : right
+  let top = Math.floor(abs($("#board").position().top-topOffset)/25)
+  let bottom = top + Math.round(window.innerHeight/25)
+  bottom = bottom > rows ? rows : bottom
+
+  if (game.mode === "edit"){
+    left = 0
+    right = cols
+    top = 0
+    bottom = rows
+  }
+
+  for (let i = left; i < right; i++) {
+    for (let j = top; j< bottom; j++){
       let img = game.mode === "edit" ? tiles[board.cells[i][j].tile]:
                   board.cells[i][j].revealed ? tiles[board.cells[i][j].tile] : tiles["clouds"]
-      image(img, i*25, j*25)
+      let offset = game.mode === "play" ? topbarHeight : 0
+      image(img, i*25, j*25+offset)
     }
   }
+  if (game.mode === "edit")
+    image(canoe1[4], (board.startX-1)*25, board.startY*25)
 }
 
 function follow(object) {
@@ -231,9 +236,9 @@ function follow(object) {
   else if ((object.x*25) + left > window.innerWidth - 100. && left > window.innerWidth - worldWidth) //right
     $("#board").css("left", (left-16)+"px")
 
-  if ((object.y*25) + top < 75 + topOffset && top < topOffset) //top
+  if ((object.y*25+topbarHeight) + top < 75 + topOffset && top < topOffset) //top
     $("#board").css("top", (top+16)+"px")
-  else if ((object.y*25) + top > window.innerHeight - 100 && top > window.innerHeight - worldHeight) //bottom
+  else if ((object.y*25+topbarHeight) + top > window.innerHeight - 100 && top > window.innerHeight - worldHeight) //bottom
     $("#board").css("top", (top-16)+"px")
 
 }
@@ -246,7 +251,7 @@ function centerOn(object) {
   left = left > 0 ? 0 : left
   left = left < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left
 
-  let top = y-object.y*25
+  let top = y-object.y*25+topbarHeight
   top = top > topOffset ? topOffset : top
   top = top < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top
 

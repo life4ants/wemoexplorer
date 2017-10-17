@@ -9,7 +9,7 @@ function Man(imgs, x, y) {
   this.display = function() {
     if (!this.isRidingCanoe){
       let offset = this.hasBackpack ? 4 : 0
-      image(this.imgs[this.index+offset], this.x*25, this.y*25)
+      image(this.imgs[this.index+offset], this.x*25, this.y*25+topbarHeight)
     }
   }
 

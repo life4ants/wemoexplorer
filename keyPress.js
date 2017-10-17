@@ -24,6 +24,9 @@ function playKeys() {
   }
 
   switch(key){
+    case "B":
+      popup.show = true
+      break
     case "X":
       centerOn(active)
       break
@@ -33,24 +36,24 @@ function playKeys() {
     case "1":
       move(-1, 1)
       break
-    case "2":
-      move(0,2)
-      break
+    // case "2":
+    //   move(0,2)
+    //   break
     case "3":
       move(1,1)
       break
-    case "4":
-      move(-2,0)
-      break
-    case "6":
-      move(2,0)
-      break
+    // case "4":
+    //   move(-2,0)
+    //   break
+    // case "6":
+    //   move(2,0)
+    //   break
     case "7":
       move(-1,-1)
       break
-    case "8":
-      move(0,-2)
-      break
+    // case "8":
+    //   move(0,-2)
+    //   break
     case "9":
       move(1,-1)
       break
@@ -84,14 +87,22 @@ function clickHandler(){
   let y = Math.floor(mouseY/25)
   let id = x+"_"+y
   if (game.mode === "edit" && mouseButton === LEFT){
-    if (game.auto)
+    if (game.auto){
       path = [id]
+      changeTile(x,y, "cross", "cross")
+    }
+    else if (game.currentType === "canoe"){
+      board.startX = x
+      board.startY = y
+    }
     else
       changeTile(x,y, game.currentTile, game.currentType)
   }
-  else if (game.mode === "edit" && mouseButton === RIGHT){
-    let cell = board.cells[x][y]
-    floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
+  else if (game.mode === "edit" && mouseButton === RIGHT && !game.auto){
+    if (confirm("are you sure you want to flood fill?")){
+      let cell = board.cells[x][y]
+      floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
+    }
   }
   return false
 }
@@ -106,7 +117,7 @@ function mouseDragged(){
         path.push(id)
       }
     }
-    else {
+    else if (game.currentType !== "canoe"){
       changeTile(x,y, game.currentTile, game.currentType)
     }
   }

@@ -28,6 +28,8 @@ let game = new Vue({
             <span @click="loadBoard">Custom Board</span>
             <hr>
             <span @click="edit">Edit</span>
+            <hr v-if="mode ==='play'">
+            <span v-if="mode === 'play'" @click="exit">Exit</span>
           </div>
         </div>
         <div v-if="started" class="topBar-content">
@@ -36,13 +38,15 @@ let game = new Vue({
             <img src="images/logs.png" height="25" width="25">
             x {{logs}}
           </div>
-          <div class="timer">{{min+":"+sec}}</div>
+        </div>
+        <div v-else class="topBar-content">
+          <button type="button" @click="listGames">List Games</button>
         </div>
       </div>
     </div>
     `,
   data: {
-    mode: "play",
+    mode: "welcome",
     tiles1: [
       { id: "beach1", src: "images/beach1.png", type: "beach"},
       { id: "beach2", src: "images/beach2.png", type: "beach"},
@@ -125,24 +129,24 @@ let game = new Vue({
       {id: "beach", src: "images/beachX.png", type: "auto"},
       {id: "treeShore", src: "images/treeShoreX.png", type: "auto"},
       {id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
-      {id: "rockEdge", src: "images/rockX.png", type: "auto"}
+      {id: "rockEdge", src: "images/rockX.png", type: "auto"},
+      {id: "canoe", src: "images/canoe0_4.png", type: "canoe"}
     ],
     currentTile: "water",
     currentType: "water",
     auto: false,
     availableActions: "default",
     started: false,
-    secounds: 0,
-    sec: "00",
-    min: "00",
-    logs: 0
+    logs: 0,
+    startTime: 0
   },
   methods: {
     exit() {
-      this.mode = "play"
+      this.mode = "welcome"
       topOffset = 30
       $(".topBar").css("height", "30px")
       $("body").addClass("full-screen")
+      this.restartGame()
     },
     edit(){
       this.mode = "edit"
@@ -151,6 +155,8 @@ let game = new Vue({
       $("body").removeClass("full-screen")
       $("#board").css("top", topOffset+"px").css("left", "0px")
       loadBoard()
+      this.started = true
+      loop()
     },
     setCurrent(id, type){
       this.currentTile = id
@@ -158,7 +164,7 @@ let game = new Vue({
       this.auto = type === "auto" ? true : false
     },
     generateBoard(){
-      window.generateBoard()
+      generateBoard()
     },
     saveBoard(){
       let id = prompt("enter id for game")
@@ -167,45 +173,46 @@ let game = new Vue({
     loadBoard(){
       let id = prompt("enter id of game to load")
       board = JSON.parse(localStorage["board"+id])
-      if (this.mode === "play"){
+      if (this.mode === "welcome"){
+        this.mode = "play"
         this.started = true
-        this.timer = setInterval(this.updateTimer, 1000)
+        startGame()
+      }
+      else if (this.mode === "play"){
+        this.restartGame()
         startGame()
       }
     },
+    listGames(){
+      let saved = Object.keys(localStorage)
+      let games = []
+      for (let i = 0; i < saved.length; i++){
+        if (saved[i].substr(0, 5) === "board")
+          games.push(saved[i].substring(5, saved[i].length))
+      }
+      alert(games)
+    },
     fillBoard(){
-      console.log("not yet")
+      for (let i=0; i<cols; i++){
+        for (let j =0; j<rows; j++){
+          let type = (i%8 + j%8 > Math.random()*5 && i%8 + j%8 < Math.random()*14) ?
+                "tree" : "grass"
+          if (board.cells[i][j].type === "random")
+            board.cells[i][j] = {tile: type, type, revealed: false}
+        }
+      }
     },
     startGame(){
       board = gameBoards[0]
+      this.mode = "play"
       this.started = true
-      this.timer = setInterval(this.updateTimer, 1000)
       startGame()
     },
-    updateTimer(){
-      this.secounds++
-      this.sec = this.secounds%60 < 10 ? "0"+this.secounds%60 : this.secounds % 60
-      this.min = Math.floor(this.secounds/60)
-      this.min = this.min < 10 ? "0"+this.min : this.min
-      if (this.secounds%360 === 300){
-        timeOfDay = "dusk"
-        nightTimer = 0
-        console.log("dusk")
-      }
-      else if (this.secounds%360 === 320){
-        timeOfDay = "night"
-        console.log("night")
-      }
-      else if (this.secounds%360 === 340){
-        timeOfDay = "dawn"
-        nightTimer = 0
-        console.log("dawn")
-      }
-      else if (this.secounds%360 === 0){
-        timeOfDay = "day"
-        nightTimer = 0
-        console.log("day")
-      }
+    restartGame(){
+      this.started = false
+      this.mode = "welcome"
+      this.logs = 0
+      initializeVars()
     }
   },
   computed: {
