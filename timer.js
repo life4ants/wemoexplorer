@@ -29,7 +29,7 @@ function showTimer(){
 
 function updateTimer(){
   milisecounds = Date.now() - startTime
-  wemoMins = Math.floor(milisecounds/250)+120//shift time 2 hours from 0
+  wemoMins = Math.floor(milisecounds/250)+1200//shift time 2 hours from 0
   wemoHours = Math.floor(wemoMins/60)
   wemoDays = Math.floor(wemoMins/1440)+1
 
@@ -64,5 +64,23 @@ function showNight(){
       break
   }
   fill(0,0,0,alpha)
-  rect(0,0,2000,1625)
+  noStroke()
+  beginShape()
+  vertex(0,0)
+  vertex(2000,0)
+  vertex(2000,1625)
+  vertex(0,1624)
+  let fires = board.objectsToShow.fires
+  for (let i =0; i<fires.length; i++){
+    if (fires[i].value > 0){
+      let x = fires[i].x
+      let y = fires[i].y
+      beginContour()
+      vertex(x*25+12,y*25-25+topbarHeight)
+      bezierVertex(x*25-38,y*25-25+topbarHeight,x*25-38,y*25+50+topbarHeight,x*25+12,y*25+50+topbarHeight)
+      bezierVertex(x*25+62,y*25+50+topbarHeight,x*25+62,y*25-25+topbarHeight,x*25+12,y*25-25+topbarHeight)
+      endContour()
+    }
+  }
+  endShape(CLOSE)
 }

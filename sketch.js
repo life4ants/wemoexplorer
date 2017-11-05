@@ -38,7 +38,7 @@ function preload(){
     dock1: loadImage("images/dock1.png"),
     dock2: loadImage("images/dock2.png"),
     dock3: loadImage("images/dock3.png"),
-    fire: loadImage("images/fire.png"),
+    fire: loadImage("images/fire1.png"),
     firepit: loadImage("images/firepit.png"),
     grass: loadImage("images/grass.png"),
     grassBeach1: loadImage("images/grassBeach1.png"),
@@ -138,12 +138,12 @@ function draw(){
     background(255)
     displayBoard()
     if (game.mode === "play") {
+      follow(active)
+      checkActive()
       showObjects()
+      showMessage()
       canoe.display()
       man.display()
-      follow(active)
-      showMessage()
-      checkActive()
       showNight()
       showTopbar()
     }
@@ -174,7 +174,13 @@ function checkActive(){
   if (!man.hasBackpack && ["tree", "treeShore"].includes(board.cells[man.x][man.y].type)){
     game.availableActions = "tree"
   }
-  else if (man.hasBackpack && ["sand", "grass", "stump", "logpile"].includes(board.cells[man.x][man.y].type)){
+  else if (man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
+    game.availableActions = "log"
+  }
+  else if (man.hasBackpack && man.isNextToFire){
+    game.availableActions = "lightFire"
+  }
+  else if (man.hasBackpack && ["sand", "grass", "stump"].includes(board.cells[man.x][man.y].type)){
     game.availableActions = "log"
   }
   else if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
@@ -183,7 +189,7 @@ function checkActive(){
   else if (!man.isRidingCanoe && isNextTo(man.x, man.y, canoe.x, canoe.y)){
     game.availableActions = "mount"
   }
-  else if (man.isRidingCanoe && (canoe.landed || isNearType(canoe.x, canoe.y, "dock")))
+  else if (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock")))
     game.availableActions = "dismount"
   else
     game.availableActions = "default"
@@ -294,11 +300,18 @@ function isNearType(x,y, type){
 }
 
 function showObjects(){
-  //right now cheats and only shows logpiles
-  let logpiles = board.objectsToShow.logpiles
-  for (let i = 0; i< logpiles.length; i++){
-    image(tiles.logpile, logpiles[i].x*25, logpiles[i].y*25+topbarHeight)
-    drawBadge(logpiles[i].x, logpiles[i].y, logpiles[i].quantity)
+  for (x in board.objectsToShow){
+    let items = board.objectsToShow[x]
+    for (let i=0; i<items.length; i++){
+      if (x === "logpiles"){
+        image(tiles.logpile, items[i].x*25, items[i].y*25+topbarHeight)
+        drawBadge(items[i].x, items[i].y, items[i].quantity)
+      }
+      else if (x === "fires"){
+        let tile = items[i].value > 0 ? tiles.fire : tiles.firepit
+        image(tile, items[i].x*25, items[i].y*25+topbarHeight)
+      }
+    }
   }
 }
 
@@ -315,3 +328,4 @@ function drawBadge(i,j,num){
   textSize(10)
   text(num,x,y)
 }
+

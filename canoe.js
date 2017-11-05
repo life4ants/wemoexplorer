@@ -37,10 +37,41 @@ function Canoe(imgs, x, y) {
           }
         }
       }
-      // else if (board.cells[this.x][this.y].type === "beach" &&
-      //        board.cells[this.x+x][this.y+y].type != "water"){
-      //   man.dismount()
-      // }
     }
+  }
+
+  this.isNextTo = function(type){ //checks horizonaly and verticaly but not diagonally
+    for (let x = -1; x <= 1; x++){
+      for (let y = x !== 0 ? 0 : -1; y<=1; y+=2){
+        let i = this.x+x, j = this.y+y;
+        if (i >= 0 && i < cols && j >= 0 && j < rows){
+          if (board.cells[i][j].type === type)
+            return true
+        }
+      }
+    }
+    return false
+  }
+
+  this.isBeside = function(type){
+    if ([0,1].includes(this.index)){
+      for (let x=0, y= -1; y<2; y+=2){
+        let i = this.x+x, j = this.y+y;
+        if (i >= 0 && i < cols && j >= 0 && j < rows){
+          if (board.cells[i][j].type === type)
+            return true
+        }
+      }
+    }
+    else {
+      for (let x= -1, y=0; x<2; x+=2){
+        let i = this.x+x, j = this.y+y;
+        if (i >= 0 && i < cols && j >= 0 && j < rows){
+          if (board.cells[i][j].type === type)
+            return true
+        }
+      }
+    }
+    return false
   }
 }

@@ -138,6 +138,7 @@ let game = new Vue({
   methods: {
     exit() {
       this.mode = "welcome"
+      this.started = false
       topOffset = 30
       $(".topBar").css("height", "30px")
       $("body").addClass("full-screen")
@@ -171,7 +172,7 @@ let game = new Vue({
       let id = prompt("enter id of game to load")
       board = JSON.parse(localStorage["board"+id])
       if (!board.objectsToShow){
-        board.objectsToShow = {logpiles: []}
+        board.objectsToShow = {logpiles: [], fires: []}
       }
       if (this.mode === "welcome"){
         this.mode = "play"
@@ -224,6 +225,8 @@ let game = new Vue({
         output= "press d to dump the log"
       else if (this.availableActions === "logpile")
         output = "press g to grab a log"
+      else if (this.availableActions === "lightFire")
+        output = "press d to add a log to the fire"+man.fireId
       return output
     }
   }

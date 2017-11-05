@@ -28,7 +28,7 @@ function playKeys() {
 
   switch(key){
     case "B":
-      popup.show = true
+      popup.buildMenu()
       break
     case "D":
       dumpLog()
@@ -72,7 +72,7 @@ function playKeys() {
 }
 
 function cellAction(){
-  if (game.availableActions === "tree"){
+  if (!man.hasBackpack && ["tree", "treeShore"].includes(board.cells[active.x][active.y].type)){
     board.cells[active.x][active.y] = {tile: "stump", type: "stump", revealed: true}
     man.hasBackpack = true
     game.availableActions = "default"
@@ -80,21 +80,18 @@ function cellAction(){
 }
 
 function dumpLog(){
-  if (game.availableActions === "log"){
+  if (man.hasBackpack){
     let cell = board.cells[active.x][active.y]
     let logpiles = board.objectsToShow.logpiles
-    if (cell.type === "stump"){
-      let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
-      cell.tile = "grass"
-      cell.type = "logpile"
-      cell.id = id
-      logpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
-    }
-    else if (cell.type === "logpile"){
+    if (cell.type === "logpile"){
       let index = logpiles.findIndex((e) => e.id === cell.id)
       logpiles[index].quantity++
     }
-    else {
+    else if (man.isNextToFire){
+      board.objectsToShow.fires[man.fireId].value = 10
+      //board.litCells
+    }
+    else if (["sand", "grass", "stump"].includes(cell.type)){
       let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
       cell.type = "logpile"
       cell.id = id
@@ -105,7 +102,7 @@ function dumpLog(){
 }
 
 function grabLog(){
-  if (game.availableActions === "logpile"){
+  if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
     let cell = board.cells[active.x][active.y]
     let logpiles = board.objectsToShow.logpiles
     let index = logpiles.findIndex((e) => e.id === cell.id)
@@ -113,7 +110,25 @@ function grabLog(){
     man.hasBackpack = true
     if (logpiles[index].quantity === 0){
       logpiles.splice(index, 1)
+      cell.type = cell.tile
+      delete cell.id
     }
+  }
+}
+
+function build(type){
+  let cell = board.cells[active.x][active.y]
+  if (type === "firepit"){
+    let fires = board.objectsToShow.fires
+    if (["grass", "sand", "stump", "beach"].includes(cell.type)){
+      let id = fires.length > 0 ? fires[fires.length-1].id+1 : 0
+      cell.type = "firepit"
+      cell.id = id
+      fires.push({id: id, x: active.x, y: active.y, value: 0})
+      return false
+    }
+    else
+      return "Opps! Firepits can only be built on grass, beach, sand, or stumps"
   }
 }
 
