@@ -141,9 +141,9 @@ function draw(){
       follow(active)
       checkActive()
       showObjects()
-      showMessage()
       canoe.display()
       man.display()
+      showMessage()
       showNight()
       showTopbar()
     }
@@ -310,6 +310,8 @@ function showObjects(){
       else if (x === "fires"){
         let tile = items[i].value > 0 ? tiles.fire : tiles.firepit
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
+        if (items[i].value > 0)
+          progressBar(items[i].x, items[i].y, items[i].value)
       }
     }
   }
@@ -329,3 +331,13 @@ function drawBadge(i,j,num){
   text(num,x,y)
 }
 
+function progressBar(i,j,value){
+  fill(255)
+  stroke(80)
+  rect(i*25+2,j*25+15+topbarHeight, 20, 7)
+  let color = value > 12 ? "green" :
+               value > 6 ? "#e90" : "red"
+  fill(color)
+  noStroke()
+  rect(i*25+3, j*25+16+topbarHeight, value, 6)
+}

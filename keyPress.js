@@ -88,8 +88,8 @@ function dumpLog(){
       logpiles[index].quantity++
     }
     else if (man.isNextToFire){
-      board.objectsToShow.fires[man.fireId].value = 10
-      //board.litCells
+      let fire = board.objectsToShow.fires[man.fireId]
+      fire.value = fire.value < 8 ? fire.value+13 : 20
     }
     else if (["sand", "grass", "stump"].includes(cell.type)){
       let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0

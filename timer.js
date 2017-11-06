@@ -10,6 +10,9 @@ function showTopbar(){
   if (frameCount%3 === 0){
     updateTimer()
   }
+  if(frameCount%40 === 0){
+    updateFires()
+  }
   showTimer()
 }
 
@@ -29,7 +32,7 @@ function showTimer(){
 
 function updateTimer(){
   milisecounds = Date.now() - startTime
-  wemoMins = Math.floor(milisecounds/250)+1200//shift time 2 hours from 0
+  wemoMins = Math.floor(milisecounds/250)+120//shift time 2 hours from 0
   wemoHours = Math.floor(wemoMins/60)
   wemoDays = Math.floor(wemoMins/1440)+1
 
@@ -53,14 +56,14 @@ function showNight(){
       return
     case "dusk":
       time = wemoMins%1440-1320
-      alpha = Math.round(243-pow((60-time)*.26, 2))
+      alpha = Math.floor(255-pow((60-time)*.266, 2))
       break
     case "night":
-      alpha = 240
+      alpha = 255
       break
     case "dawn":
       time = wemoMins%1440-60
-      alpha = Math.round(243-pow((time+1)*.26, 2))
+      alpha = Math.round(255-pow((time+1)*.266, 2))
       break
   }
   fill(0,0,0,alpha)
@@ -76,11 +79,29 @@ function showNight(){
       let x = fires[i].x
       let y = fires[i].y
       beginContour()
-      vertex(x*25+12,y*25-25+topbarHeight)
-      bezierVertex(x*25-38,y*25-25+topbarHeight,x*25-38,y*25+50+topbarHeight,x*25+12,y*25+50+topbarHeight)
-      bezierVertex(x*25+62,y*25+50+topbarHeight,x*25+62,y*25-25+topbarHeight,x*25+12,y*25-25+topbarHeight)
+      vertex(x*25+12.5,y*25-25+topbarHeight)
+      bezierVertex(x*25-8,y*25-25+topbarHeight,x*25-25,y*25-8+topbarHeight,x*25-25,y*25+12.5+topbarHeight)
+      bezierVertex(x*25-25,y*25+33+topbarHeight,x*25-8,y*25+50+topbarHeight,x*25+12.5,y*25+50+topbarHeight)
+      bezierVertex(x*25+33,y*25+50+topbarHeight,x*25+50,y*25+33+topbarHeight,x*25+50,y*25+12.5+topbarHeight)
+      bezierVertex(x*25+50,y*25-8+topbarHeight,x*25+33,y*25-25+topbarHeight,x*25+12.5,y*25-25+topbarHeight)
       endContour()
     }
   }
   endShape(CLOSE)
+  for (let i =0; i<fires.length; i++){
+    if (fires[i].value > 0){
+      fill(0,0,0,Math.floor(alpha/1.5))
+      ellipseMode(CENTER)
+      ellipse(fires[i].x*25+12.5,fires[i].y*25+12.5+topbarHeight, 75,75)
+    }
+  }
+}
+
+function updateFires(){
+  let fires = board.objectsToShow.fires
+  for (let i =0; i<fires.length; i++){
+    if (fires[i].value > 0){
+      fires[i].value--
+    }
+  }
 }
