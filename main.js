@@ -1,13 +1,14 @@
-let tiles, players, man, canoe, active
+let tiles, players, man, canoe, active, berryCount
 const topbarHeight = 40
 const cols = 80
 const rows = 50
 const worldWidth = cols * 25
 const worldHeight = rows * 25 + topbarHeight
-let topOffset = 30
+let topOffset = 0
 let path, showCount, message, paused, timeOfDay, startTime
 
 function initializeVars(){
+  berryCount = 0
   path = []
   showCount = 0
   message = ""
@@ -34,6 +35,7 @@ function preload(){
     beachEdge2: loadImage("images/beachEdge2.png"),
     beachEdge3: loadImage("images/beachEdge3.png"),
     beachEdge4: loadImage("images/beachEdge4.png"),
+    berryTree: loadImage("images/berryTree.png"),
     clouds: loadImage("images/clouds.png"),
     dock1: loadImage("images/dock1.png"),
     dock2: loadImage("images/dock2.png"),
@@ -149,11 +151,8 @@ function draw(){
     }
   }
   else {
-    background(255)
-    fill(0)
-    textSize(45)
-    textAlign(CENTER, CENTER)
-    text("Welcome to Wemo", window.innerWidth/2, window.innerHeight/2)
+    background('green')
+    popup.welcomeMenu()
   }
 }
 
@@ -189,8 +188,12 @@ function checkActive(){
   else if (!man.isRidingCanoe && isNextTo(man.x, man.y, canoe.x, canoe.y)){
     game.availableActions = "mount"
   }
-  else if (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock")))
+  else if (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock"))){
     game.availableActions = "dismount"
+  }
+  else if ("berryTree" === board.cells[man.x][man.y].type){
+    game.availableActions = "berryTree"
+  }
   else
     game.availableActions = "default"
 }
@@ -202,14 +205,6 @@ function startGame(){
   centerOn(active)
   initializeVars()
   loop()
-}
-
-function loadBoard(){
-  if (localStorage.board1){
-    board = JSON.parse(localStorage.board1)
-  }
-  else
-    generateBoard()
 }
 
 function displayBoard() {
@@ -245,7 +240,7 @@ function follow(object) {
 
   if ((object.x*25) + left < 75 && left < 0) // left
     $("#board").css("left", (left+16)+"px")
-  else if ((object.x*25) + left > window.innerWidth - 100. && left > window.innerWidth - worldWidth) //right
+  else if ((object.x*25) + left > window.innerWidth - 100 && left > window.innerWidth - worldWidth) //right
     $("#board").css("left", (left-16)+"px")
 
   if ((object.y*25+topbarHeight) + top < 75 + topOffset && top < topOffset) //top
@@ -253,6 +248,8 @@ function follow(object) {
   else if ((object.y*25+topbarHeight) + top > window.innerHeight - 100 && top > window.innerHeight - worldHeight) //bottom
     $("#board").css("top", (top-16)+"px")
 
+  if (left < window.innerWidth - worldWidth || top < window.innerHeight - worldHeight)
+    centerOn(object)
 }
 
 function centerOn(object) {
@@ -312,6 +309,15 @@ function showObjects(){
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
         if (items[i].value > 0)
           progressBar(items[i].x, items[i].y, items[i].value)
+      }
+      else if (x === "berryTrees" && board.cells[items[i].x][items[i].y].revealed){
+        let berries = items[i].berries
+        noStroke()
+        fill(128,0,128)
+        ellipseMode(CORNER)
+        for (let j = 0; j< berries.length; j++){
+          ellipse(items[i].x*25+berries[j].x, items[i].y*25+berries[j].y+topbarHeight, 5, 5)
+        }
       }
     }
   }

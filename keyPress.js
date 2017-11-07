@@ -21,8 +21,6 @@ function playKeys() {
     case ENTER:
       if (popup.show)
         $('#etr').click()
-      else
-        cellAction()
       break
   }
 
@@ -33,6 +31,12 @@ function playKeys() {
     case "D":
       dumpLog()
       break
+    case "E":
+      eatBerry()
+      break
+    case "F":
+      feedFire()
+      break
     case "G":
       grabLog()
       break
@@ -42,37 +46,25 @@ function playKeys() {
     case "J":
       man.dismount()
       break
-    case "1":
-      move(-1, 1)
-      break
-    // case "2":
-    //   move(0,2)
-    //   break
-    case "3":
-      move(1,1)
-      break
-    // case "4":
-    //   move(-2,0)
-    //   break
-    // case "6":
-    //   move(2,0)
-    //   break
-    case "7":
-      move(-1,-1)
-      break
-    // case "8":
-    //   move(0,-2)
-    //   break
-    case "9":
-      move(1,-1)
-      break
   }
 
   return false
 }
 
-function cellAction(){
-  if (!man.hasBackpack && ["tree", "treeShore"].includes(board.cells[active.x][active.y].type)){
+function grabLog(){
+  if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
+    let cell = board.cells[active.x][active.y]
+    let logpiles = board.objectsToShow.logpiles
+    let index = logpiles.findIndex((e) => e.id === cell.id)
+    logpiles[index].quantity--
+    man.hasBackpack = true
+    if (logpiles[index].quantity === 0){
+      logpiles.splice(index, 1)
+      cell.type = cell.tile
+      delete cell.id
+    }
+  }
+  else if (!man.hasBackpack && ["tree", "treeShore"].includes(board.cells[active.x][active.y].type)){
     board.cells[active.x][active.y] = {tile: "stump", type: "stump", revealed: true}
     man.hasBackpack = true
     game.availableActions = "default"
@@ -87,31 +79,35 @@ function dumpLog(){
       let index = logpiles.findIndex((e) => e.id === cell.id)
       logpiles[index].quantity++
     }
-    else if (man.isNextToFire){
-      let fire = board.objectsToShow.fires[man.fireId]
-      fire.value = fire.value < 8 ? fire.value+13 : 20
-    }
     else if (["sand", "grass", "stump"].includes(cell.type)){
       let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
       cell.type = "logpile"
       cell.id = id
       logpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
     }
+    else
+      return
     man.hasBackpack = false
   }
 }
 
-function grabLog(){
-  if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
-    let cell = board.cells[active.x][active.y]
-    let logpiles = board.objectsToShow.logpiles
-    let index = logpiles.findIndex((e) => e.id === cell.id)
-    logpiles[index].quantity--
-    man.hasBackpack = true
-    if (logpiles[index].quantity === 0){
-      logpiles.splice(index, 1)
-      cell.type = cell.tile
-      delete cell.id
+function feedFire(){
+  if (man.hasBackpack && man.isNextToFire){
+    let fire = board.objectsToShow.fires[man.fireId]
+    fire.value = fire.value < 8 ? fire.value+13 : 20
+    man.hasBackpack = false
+  }
+}
+
+function eatBerry(){
+  let cell = board.cells[man.x][man.y]
+  if (cell.type === "berryTree"){
+    let tree = board.objectsToShow.berryTrees[cell.id]
+    if (tree.berries.length > 0){
+      let p = Math.floor(Math.random()*tree.berries.length)
+      tree.berries.splice(p, 1)
+      man.health += 50
+      berryCount++
     }
   }
 }

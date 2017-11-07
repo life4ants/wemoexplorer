@@ -10,10 +10,14 @@ function showTopbar(){
   if (frameCount%3 === 0){
     updateTimer()
   }
-  if(frameCount%40 === 0){
+  if (frameCount%40 === 0){
     updateFires()
   }
+  if (frameCount % 300 === 20){
+    growBerries()
+  }
   showTimer()
+  showStepCount()
 }
 
 function showTimer(){
@@ -30,6 +34,16 @@ function showTimer(){
   image(tiles[timeOfDay], right-35, top)
 }
 
+function showStepCount(){
+  let left = abs($("#board").position().left)
+  let top = abs($("#board").position().top-topOffset)
+  textAlign(LEFT, TOP)
+  textSize(18)
+  fill(0)
+  text("Man dist: "+man.stepCount+" Canoe dist: "+canoe.stepCount+" berries eaten: "+berryCount+" HEALTH: "+man.health, left+5, top+10)
+
+}
+
 function updateTimer(){
   milisecounds = Date.now() - startTime
   wemoMins = Math.floor(milisecounds/250)+120//shift time 2 hours from 0
@@ -43,9 +57,9 @@ function updateTimer(){
                   mins >= 1380 || mins <= 59 ? "night" :
                     "day"
 
-  if (mins >= 1290 && mins <= 1300){
+  if (mins >= 1260 && mins <= 1290){
     message = "Night is Coming!!"
-    showCount = showCount = 8
+    showCount = 8
   }
 
 }
@@ -104,4 +118,27 @@ function updateFires(){
       fires[i].value--
     }
   }
+}
+
+function growBerries(){
+  let trees = board.objectsToShow.berryTrees
+  for (let i=0; i<trees.length; i++){
+    addBerry(trees[i])
+  }
+}
+
+function addBerry(berryTree){
+  if (berryTree.berries.length >= 5)
+    return
+  let p = Math.floor(Math.random()*5)
+  for (let i=0; i<berryTree.berries.length; i++){
+    if (p === berryTree.berries[i].id){
+      p = Math.floor(Math.random()*5)
+      i = -1
+      console.log("pick again")
+    }
+  }
+  let x = p === 3 ? 3 : p === 1 ? 9 : p === 0 ? 2 : 18
+  let y = p === 2 ? 3 : p === 1 ? 0 : p === 0 ? 3 : 14
+  berryTree.berries.push({id: p, x, y})
 }

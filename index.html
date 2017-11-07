@@ -11,13 +11,26 @@
     <div id="topBar"></div>
     <div id="board"></div>
     <div id="popup"></div>
+
+        <!-- <div class="dropdown">
+          <span>Menu</span>
+          <div class="dropdown-content">
+            <span @click="startGame">Board One</span>
+            <hr>
+            <span @click="loadBoard">Custom Board</span>
+            <hr>
+            <span @click="edit">Edit</span>
+            <hr v-if="mode ==='play'">
+            <span v-if="mode === 'play'" @click="exit">Exit</span>
+          </div>
+        </div> -->
   </body>
     <script src="vue2.2.10.js"></script>
     <script src="jquery-3.1.1.min.js"></script>
-    <script src="game.js"></script>
-    <script src="sketch.js"></script>
+    <script src="main.js"></script>
     <script src="timer.js"></script>
     <script src="keyPress.js"></script>
+    <script src="game.js"></script>
     <script src="popup.js"></script>
     <script src="boards.js"></script>
     <script src="man.js"></script>

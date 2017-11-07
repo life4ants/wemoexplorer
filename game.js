@@ -1,7 +1,7 @@
 let game = new Vue({
   el: '#topBar',
   template: `
-    <div class="topBar">
+    <div class="topBar" :style="{height: mode === 'edit' ? '100px' : mode === 'play' ? '30px' : '0px'}">
       <div v-if="mode === 'edit'" class="flex">
         <button type='button' @click='exit'>exit</button>
         <div class="tileBox" v-if="mode === 'edit'">
@@ -19,26 +19,9 @@ let game = new Vue({
         <button type="button" @click="loadBoard" title="load a saved board">Load</button>
         <button type="button" @click="fillBoard" title="fill board with trees and grass">Fill</button>
       </div>
-      <div v-else>
-        <div class="dropdown">
-          <span>Menu</span>
-          <div class="dropdown-content">
-            <span @click="startGame">Board One</span>
-            <hr>
-            <span @click="loadBoard">Custom Board</span>
-            <hr>
-            <span @click="edit">Edit</span>
-            <hr v-if="mode ==='play'">
-            <span v-if="mode === 'play'" @click="exit">Exit</span>
-          </div>
-        </div>
-        <div v-if="started" class="topBar-content">
-          <div class="infobox" v-text="info"></div>
-        </div>
-        <div v-else class="topBar-content">
-          <button type="button" @click="listGames">List Games</button>
-          <button class="button-primary">Primary Button</button>
-        </div>
+      <div v-else-if="mode === 'play'" class="topBar-content">
+        <button type="button" @click="exit">Exit</button>
+        <div class="infobox" v-text="info"></div>
       </div>
     </div>
     `,
@@ -108,6 +91,7 @@ let game = new Vue({
     tiles3: [
       { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
       { id: "stump", src: "images/stump.png", type: "stump"},
+      { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
       { id: "rock", src: "images/rock.png", type: "rock"},
       { id: "dock1", src: "images/dock1.png", type: "dock"},
       { id: "dock2", src: "images/dock2.png", type: "dock"},
@@ -139,20 +123,20 @@ let game = new Vue({
     exit() {
       this.mode = "welcome"
       this.started = false
-      topOffset = 30
-      $(".topBar").css("height", "30px")
       $("body").addClass("full-screen")
+      topOffset = 0
       $("#board").css("top", topOffset+"px").css("left", "0px")
       $(window).scrollTop(0).scrollLeft(0)
       initializeVars()
+      noLoop()
+      popup.welcomeMenu()
     },
     edit(){
       this.mode = "edit"
-      topOffset = 100
-      $(".topBar").css("height", "100px")
       $("body").removeClass("full-screen")
+      topOffset = 100
       $("#board").css("top", topOffset+"px").css("left", "0px")
-      loadBoard()
+      generateBoard()
       this.started = true
       loop()
     },
@@ -165,6 +149,15 @@ let game = new Vue({
       generateBoard()
     },
     saveBoard(){
+      board.objectsToShow = {logpiles: [], fires: [], berryTrees: []}
+      for (let i = 0; i < cols; i++){
+        for (let j = 0; j< rows; j++){
+          if (board.cells[i][j].type === "berryTree"){
+            board.cells[i][j].id = board.objectsToShow.berryTrees.length
+            board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
+          }
+        }
+      }
       let id = prompt("enter id for game")
       localStorage.setItem("board"+id, JSON.stringify(board))
     },
@@ -172,10 +165,11 @@ let game = new Vue({
       let id = prompt("enter id of game to load")
       board = JSON.parse(localStorage["board"+id])
       if (!board.objectsToShow){
-        board.objectsToShow = {logpiles: [], fires: []}
+        board.objectsToShow = {logpiles: [], fires: [], berryTrees: []}
       }
       if (this.mode === "welcome"){
         this.mode = "play"
+        topOffset = 30
         this.started = true
         startGame()
       }
@@ -207,6 +201,7 @@ let game = new Vue({
       board = gameBoards[0]
       this.mode = "play"
       this.started = true
+      topOffset = 30
       startGame()
     }
   },
@@ -220,13 +215,15 @@ let game = new Vue({
       else if (this.availableActions === "mount")
         output= "press J to get into canoe"
       else if (this.availableActions === "tree")
-        output= "press enter to chop down the tree"
+        output= "press g to chop down the tree"
       else if (this.availableActions === "log")
         output= "press d to dump the log"
       else if (this.availableActions === "logpile")
         output = "press g to grab a log"
       else if (this.availableActions === "lightFire")
-        output = "press d to add a log to the fire"+man.fireId
+        output = "press f to add a log to the fire"
+      else if (this.availableActions === "berryTree")
+        output = "press e to eat a berry"
       return output
     }
   }

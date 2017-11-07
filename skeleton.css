@@ -337,27 +337,6 @@ td:last-child {
   padding-right: 0; }
 
 
-/* Spacing
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-button,
-.button {
-  margin-bottom: 1rem; }
-input,
-textarea,
-select,
-fieldset {
-  margin-bottom: 1.5rem; }
-pre,
-blockquote,
-dl,
-figure,
-table,
-p,
-ul,
-ol,
-form {
-  margin-bottom: 2.5rem; }
-
 
 /* Utilities
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -376,8 +355,8 @@ form {
 /* Misc
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 hr {
-  margin-top: 3rem;
-  margin-bottom: 3.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
   border-width: 0;
   border-top: 1px solid #E1E1E1; }
 

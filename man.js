@@ -7,6 +7,8 @@ function Man(imgs, x, y) {
   this.hasBackpack = false
   this.isNextToFire = false
   this.fireId = null
+  this.stepCount = 0
+  this.health = 1000
 
   this.display = function() {
     if (!this.isRidingCanoe){
@@ -25,6 +27,9 @@ function Man(imgs, x, y) {
         this.x += x
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
+        this.stepCount++
+        let cost = this.hasBackpack ? 5 : 3
+        this.health -= cost
         // reveal cell
         if (!board.cells[this.x][this.y].revealed)
           board.cells[this.x][this.y].revealed = true

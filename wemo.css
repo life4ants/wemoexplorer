@@ -1,7 +1,7 @@
 body {
   padding: 0;
   margin: 0;
-  background-color: #24D8FC;
+  background-color: green;
 }
 
 .full-screen {
@@ -31,9 +31,7 @@ body {
   align-items: flex-start;
 }
 .topBar-content{
-  margin-left: 100px;
   display: flex;
-  justify-content: space-between;
   font-size: 22px;
 }
 
@@ -104,6 +102,7 @@ body {
 }
 
 .infobox {
+  margin-left: 10px;
   padding: 1px;
 }
 
@@ -152,7 +151,7 @@ body {
 }
 
 @media (min-width: 500px) {
-  #popup .modal-dialog{
+  #popup-small .modal-dialog{
     width: 400px;
     margin: 30px auto;
   }
@@ -204,4 +203,22 @@ body {
 .disabled {
   cursor: not-allowed;
   opacity: .65;
+}
+
+.button-tiles {
+  margin: 5px;
+  border: 1px solid #999;
+}
+.button-tiles span {
+  display: block;
+  padding: 10px;
+  background-color: #ffa;
+  cursor: pointer;
+}
+
+.button-tiles span:hover {
+  background-color: #ffc;
+}
+.button-tiles hr {
+  margin: 0;
 }
