@@ -8,12 +8,25 @@ function Man(imgs, x, y) {
   this.isNextToFire = false
   this.fireId = null
   this.stepCount = 0
-  this.health = 1000
+  this.energy = 5000
+  this.inPit = false
+  this.vomit = false
 
   this.display = function() {
     if (!this.isRidingCanoe){
       let offset = this.hasBackpack ? 4 : 0
-      image(this.imgs[this.index+offset], this.x*25, this.y*25+topbarHeight)
+      if (this.inPit){
+        let size = showCount-25
+        if (size > 0){
+          imageMode(CENTER)
+          image(this.imgs[this.index+offset], this.x*25+12.5, this.y*25+topbarHeight+12.5, size, size)
+          imageMode(CORNER)
+        }
+      }
+      else {
+        let id = this.vomit ? 8 : this.index+offset
+        image(this.imgs[id], this.x*25, this.y*25+topbarHeight)
+      }
     }
   }
 
@@ -29,15 +42,17 @@ function Man(imgs, x, y) {
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
         let cost = this.hasBackpack ? 5 : 3
-        this.health -= cost
+        this.energy -= cost
         // reveal cell
         if (!board.cells[this.x][this.y].revealed)
           board.cells[this.x][this.y].revealed = true
         //check for available actions
         if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-            paused = true
-            showCount = 30
-            message = "You died in a " + board.cells[this.x][this.y].type + "!!!!"
+            this.inPit = true
+            this.energy -= 800
+            showCount = 50
+            let name = board.cells[this.x][this.y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
+            message = "You fell in "+name
         }
       }
       //reveal rockEdge cells
@@ -48,7 +63,7 @@ function Man(imgs, x, y) {
       //check if next to fires
       let fires = board.objectsToShow.fires
       for (let i=0; i<fires.length; i++){
-        if (isNextTo(this.x, this.y, fires[i].x, fires[i].y)){
+        if (isNearSquare(this.x, this.y, fires[i].x, fires[i].y)){
           this.isNextToFire = true
           this.fireId = i
           return
@@ -68,7 +83,7 @@ function Man(imgs, x, y) {
       if (!this.dismountDirection(false, dirs[0]) && !this.dismountDirection(false, dirs[1]))
         this.dismountDirection(true, dirs[2])
     }
-    else if (!this.isRidingCanoe && isNextTo(this.x, this.y, canoe.x, canoe.y)){
+    else if (!this.isRidingCanoe && isNearSquare(this.x, this.y, canoe.x, canoe.y)){
       active = canoe
       this.isRidingCanoe = true
       canoe.index = canoe.index === 4 ? 0 : 2

@@ -21,6 +21,7 @@ let game = new Vue({
       </div>
       <div v-else-if="mode === 'play'" class="topBar-content">
         <button type="button" @click="exit">Exit</button>
+        <button type="button" id='pauseBtn' @click="pauseGame" title="shortcut key: space">{{paused ? 'Resume' : 'Pause'}} Game</button>
         <div class="infobox" v-text="info"></div>
       </div>
     </div>
@@ -117,12 +118,14 @@ let game = new Vue({
     currentType: "water",
     auto: false,
     availableActions: "default",
-    started: false
+    started: false,
+    paused: false
   },
   methods: {
     exit() {
       this.mode = "welcome"
       this.started = false
+      draw()
       $("body").addClass("full-screen")
       topOffset = 0
       $("#board").css("top", topOffset+"px").css("left", "0px")
@@ -156,16 +159,29 @@ let game = new Vue({
             board.cells[i][j].id = board.objectsToShow.berryTrees.length
             board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
           }
+          if (isNextToType(i,j, ["pit", "sandpit"]))
+            board.cells[i][j].byPit = true
+          else
+            delete board.cells[i][j].byPit
         }
       }
       let id = prompt("enter id for game")
-      localStorage.setItem("board"+id, JSON.stringify(board))
+      if (id !== null){
+        board.id = id
+        localStorage.setItem("board"+id, JSON.stringify(board))
+        alert("Game "+id+" was saved.")
+      }
     },
     loadBoard(){
       let id = prompt("enter id of game to load")
+      if (id === null)
+        return
       board = JSON.parse(localStorage["board"+id])
       if (!board.objectsToShow){
         board.objectsToShow = {logpiles: [], fires: [], berryTrees: []}
+      }
+      if (board.id === undefined){
+        board.in = id
       }
       if (this.mode === "welcome"){
         this.mode = "play"
@@ -178,15 +194,6 @@ let game = new Vue({
         startGame()
       }
     },
-    listGames(){
-      let saved = Object.keys(localStorage)
-      let games = []
-      for (let i = 0; i < saved.length; i++){
-        if (saved[i].substr(0, 5) === "board")
-          games.push(saved[i].substring(5, saved[i].length))
-      }
-      alert(games)
-    },
     fillBoard(){
       for (let i=0; i<cols; i++){
         for (let j =0; j<rows; j++){
@@ -198,11 +205,26 @@ let game = new Vue({
       }
     },
     startGame(){
-      board = gameBoards[0]
+      board = JSON.parse(JSON.stringify(gameBoards[0]))
       this.mode = "play"
       this.started = true
       topOffset = 30
       startGame()
+    },
+    pauseGame(){
+      if (this.paused){
+        showCount = 0
+        resumeTimer()
+        loop()
+        this.paused = false
+      }
+      else {
+        message = "Game Paused"
+        showCount = 2
+        this.paused = true
+        noLoop()
+      }
+      $("#pauseBtn").blur()
     }
   },
   computed: {

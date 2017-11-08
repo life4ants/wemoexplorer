@@ -1,20 +1,21 @@
-let tiles, players, man, canoe, active, berryCount
+let tiles, players, man, canoe, active, berryCount, wemoMins, noKeys
 const topbarHeight = 40
 const cols = 80
 const rows = 50
 const worldWidth = cols * 25
 const worldHeight = rows * 25 + topbarHeight
 let topOffset = 0
-let path, showCount, message, paused, timeOfDay, startTime
+let path, showCount, message, timeOfDay, startTime
 
 function initializeVars(){
+  noKeys = false
   berryCount = 0
   path = []
   showCount = 0
   message = ""
-  paused = false
   timeOfDay = "day"
   startTime = Date.now()
+  wemoMins = 120
 }
 
 function preload(){
@@ -112,7 +113,8 @@ function preload(){
     loadImage("images/player4.png"),
     loadImage("images/player5.png"),
     loadImage("images/player6.png"),
-    loadImage("images/player7.png")
+    loadImage("images/player7.png"),
+    loadImage("images/player8.png")
   ]
 
   canoe1 = [
@@ -145,9 +147,11 @@ function draw(){
       showObjects()
       canoe.display()
       man.display()
-      showMessage()
       showNight()
+      showMessage()
       showTopbar()
+      if (man.energy < 0 && showCount === 0)
+        popup.gameOver()
     }
   }
   else {
@@ -159,13 +163,22 @@ function draw(){
 function showMessage(){
   if (showCount > 0){
     textAlign(CENTER, CENTER)
-    let f = timeOfDay === "night" ? 255 : 10
+    let f = timeOfDay === "night" || game.paused ? 255 : ["dusk", "dawn"].includes(timeOfDay) ? 80 : 20
     fill(f)
+    stroke(255)
     textSize(45)
     text(message, (window.innerWidth/2)+abs($("#board").position().left), (window.innerHeight/2)+abs($("#board").position().top))
     showCount--
-    if (showCount === 0)
-      paused = false
+    if (showCount === 0) {
+      man.inPit = false
+      man.vomit = false
+    }
+    if (board.cells[man.x][man.y].type === "firepit" && board.objectsToShow.fires[man.fireId].value > 0){
+      showCount++
+      man.energy -= 25
+      if (man.energy < 0)
+        popup.gameOver()
+    }
   }
 }
 
@@ -185,7 +198,7 @@ function checkActive(){
   else if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
     game.availableActions = "logpile"
   }
-  else if (!man.isRidingCanoe && isNextTo(man.x, man.y, canoe.x, canoe.y)){
+  else if (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)){
     game.availableActions = "mount"
   }
   else if (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock"))){
@@ -224,10 +237,13 @@ function displayBoard() {
 
   for (let i = left; i < right; i++) {
     for (let j = top; j< bottom; j++){
-      let img = game.mode === "edit" ? tiles[board.cells[i][j].tile]:
-                  board.cells[i][j].revealed ? tiles[board.cells[i][j].tile] : tiles["clouds"]
+      let cell = board.cells[i][j]
+      let img = game.mode === "edit" ? tiles[cell.tile]:
+                  cell.revealed ? tiles[cell.tile] : tiles["clouds"]
       let offset = game.mode === "play" ? topbarHeight : 0
       image(img, i*25, j*25+offset)
+      if (cell.byPit && (cell.revealed || game.mode === 'edit'))
+        drawRing(i,j)
     }
   }
   if (game.mode === "edit")
@@ -238,32 +254,30 @@ function follow(object) {
   let left = $("#board").position().left
   let top = $("#board").position().top
 
-  if ((object.x*25) + left < 75 && left < 0) // left
-    $("#board").css("left", (left+16)+"px")
-  else if ((object.x*25) + left > window.innerWidth - 100 && left > window.innerWidth - worldWidth) //right
-    $("#board").css("left", (left-16)+"px")
+  if ((object.x*25) + left < 75) // left
+    left = left+16 < 0 ? left+16 : 0
+  else if ((object.x*25) + left > window.innerWidth - 100) //right
+    left = left-16 < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left-16
 
-  if ((object.y*25+topbarHeight) + top < 75 + topOffset && top < topOffset) //top
-    $("#board").css("top", (top+16)+"px")
-  else if ((object.y*25+topbarHeight) + top > window.innerHeight - 100 && top > window.innerHeight - worldHeight) //bottom
-    $("#board").css("top", (top-16)+"px")
+  if ((object.y*25+topbarHeight) + top < 75 + topOffset) //top
+    top = top+16 > topOffset ? topOffset : top+16
+  else if ((object.y*25+topbarHeight) + top > window.innerHeight - 100) //bottom
+    top = top-16 < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top-16
 
-  if (left < window.innerWidth - worldWidth || top < window.innerHeight - worldHeight)
-    centerOn(object)
+  $("#board").css("top", top+"px")
+  $("#board").css("left", left+"px")
 }
 
 function centerOn(object) {
   let x = Math.floor(window.innerWidth/2)
   let y = Math.floor(window.innerHeight/2)
-
   let left = x-object.x*25
   left = left > 0 ? 0 : left
   left = left < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left
 
-  let top = y-object.y*25+topbarHeight
+  let top = y-object.y*25
   top = top > topOffset ? topOffset : top
   top = top < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top
-
   $("#board").css("left", left +"px")
   $("#board").css("top", top +"px")
 
@@ -274,7 +288,31 @@ $("#board").contextmenu(function(e) {
     e.stopPropagation();
 });
 
-function isNextTo(x1, y1, x2, y2){
+function isNextToSquare(x1, y1, x2, y2){ //no diagonals
+  for (let i = -1; i <= 1; i++){
+    for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
+      let a = x1+i, b = y1+j;
+      if (a === x2 && b === y2)
+        return true
+    }
+  }
+  return false
+}
+
+function isNextToType(x, y, type){ //accepts a string or array as type
+  for (let i = -1; i <= 1; i++){
+    for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
+      let a = x+i, b = y+j;
+      if (a >= 0 && a < cols && b >= 0 && b < rows){
+        if (type.includes(board.cells[a][b].type))
+          return true
+      }
+    }
+  }
+  return false
+}
+
+function isNearSquare(x1, y1, x2, y2){ //with diagonals
   for (let x = x1-1; x <= x1+1; x++){
     for (let y = y1-1; y <= y1+1; y++){
       if (x === x2 && y === y2)
@@ -284,17 +322,17 @@ function isNextTo(x1, y1, x2, y2){
   return false
 }
 
-function isNearType(x,y, type){
-  for (let i = x-1; i <= x+1; i++){
-    for (let j = y-1; j <= y+1; j++){
-      if (i >= 0 && i < cols && j >= 0 && j < rows){
-        if (board.cells[i][j].type === type)
-          return true
-      }
-    }
-  }
-  return false
-}
+// function isNearType(x,y, type){ //with diagonals
+//   for (let i = x-1; i <= x+1; i++){
+//     for (let j = y-1; j <= y+1; j++){
+//       if (i >= 0 && i < cols && j >= 0 && j < rows){
+//         if (board.cells[i][j].type === type)
+//           return true
+//       }
+//     }
+//   }
+//   return false
+// }
 
 function showObjects(){
   for (x in board.objectsToShow){
@@ -340,10 +378,21 @@ function drawBadge(i,j,num){
 function progressBar(i,j,value){
   fill(255)
   stroke(80)
+  strokeWeight(1)
   rect(i*25+2,j*25+15+topbarHeight, 20, 7)
   let color = value > 12 ? "green" :
                value > 6 ? "#e90" : "red"
   fill(color)
   noStroke()
   rect(i*25+3, j*25+16+topbarHeight, value, 6)
+}
+
+function drawRing(x,y){
+  noFill()
+  stroke(255,0,0)
+  strokeWeight(5)
+  let offset = game.mode === 'play' ? topbarHeight : 0
+  ellipseMode(CENTER)
+  ellipse(x*25+12.5, y*25+offset+12.5,20,20)
+  strokeWeight(1)
 }

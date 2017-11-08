@@ -1,4 +1,3 @@
-let milisecounds, wemoMins, wemoHours, wemoDays
 
 function showTopbar(){
   let left = abs($("#board").position().left)
@@ -17,41 +16,45 @@ function showTopbar(){
     growBerries()
   }
   showTimer()
-  showStepCount()
+  showEnergyBar()
 }
 
 function showTimer(){
   let showMins = wemoMins%60 < 10 ? "0"+wemoMins%60 : wemoMins%60
-  let showHours = wemoHours%12 === 0 ? 12 : wemoHours%12
-  let suffix = Math.floor(wemoHours/12)%2 === 0 ? " AM" : " PM"
+  let showHours = Math.floor(wemoMins/60)%12 === 0 ? 12 : Math.floor(wemoMins/60)%12
+  let suffix = wemoMins%1440 < 720 ? " AM" : " PM"
   let right = abs($("#board").position().left)+window.innerWidth
   let top = abs($("#board").position().top-topOffset)+5
 
   textAlign(RIGHT, TOP)
   textSize(26)
   fill(0)
-  text(" Day "+ wemoDays + ", "+showHours+":"+showMins+suffix, right-40, top)
+  text(" Day "+ (Math.floor(wemoMins/1440)+1) + ", "+showHours+":"+showMins+suffix, right-40, top)
   image(tiles[timeOfDay], right-35, top)
 }
 
-function showStepCount(){
+function showEnergyBar(){
   let left = abs($("#board").position().left)
   let top = abs($("#board").position().top-topOffset)
-  textAlign(LEFT, TOP)
-  textSize(18)
-  fill(0)
-  text("Man dist: "+man.stepCount+" Canoe dist: "+canoe.stepCount+" berries eaten: "+berryCount+" HEALTH: "+man.health, left+5, top+10)
-
+  fill(255)
+  stroke(80)
+  strokeWeight(4)
+  rect(left+10, top+5, 504, 26)
+  let color = man.energy > 3333 ? "green" :
+               man.energy > 1666 ? "#e90" : "red"
+  fill(color)
+  noStroke()
+  rect(left+12, top+7, Math.floor(man.energy/10), 22)
 }
 
 function updateTimer(){
-  milisecounds = Date.now() - startTime
-  wemoMins = Math.floor(milisecounds/250)+120//shift time 2 hours from 0
-  wemoHours = Math.floor(wemoMins/60)
-  wemoDays = Math.floor(wemoMins/1440)+1
+  let newMins = Math.floor((Date.now() - startTime)/250)+120//shift time 2 hours from 0
+  if (newMins - wemoMins > 10)
+    resumeTimer()
+  else
+    wemoMins = newMins
 
   let mins = wemoMins%1440
-
   timeOfDay = mins >= 60 && mins <= 119 ? "dawn" :
                 mins >= 1320 && mins <= 1379 ? "dusk" :
                   mins >= 1380 || mins <= 59 ? "night" :
@@ -61,13 +64,21 @@ function updateTimer(){
     message = "Night is Coming!!"
     showCount = 8
   }
+}
 
+function resumeTimer(){
+  let newMins = Math.floor((Date.now() - startTime)/250)+120
+  startTime += (newMins-wemoMins-1)*250
+  wemoMins = Math.floor((Date.now() - startTime)/250)+120
 }
 
 function showNight(){
   switch(timeOfDay){
     case "day":
-      return
+      if (!game.paused)
+        return
+      alpha = 220
+      break
     case "dusk":
       time = wemoMins%1440-1320
       alpha = Math.floor(255-pow((60-time)*.266, 2))

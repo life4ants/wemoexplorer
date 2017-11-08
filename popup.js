@@ -15,12 +15,17 @@ let popup = new Vue({
             </div>
             <div v-else-if="type === 'welcome'" class="modal-body">
               <div class="button-tiles">
-                <span @click="startGame">Board One</span>
+                <span @click="startGame">Default Board</span>
                 <hr>
                 <span @click="loadBoard">Custom Board</span>
                 <hr>
                 <span @click="edit">Edit</span>
+                <hr>
+                <span @click="listGames">List Games</span>
               </div>
+            </div>
+            <div v-else-if="type === 'gameOver'" class="modal-body">
+              <p>Your energy got below 0, and you died.</p>
             </div>
 
             <div v-if="'build' === type" class="modal-footer">
@@ -28,7 +33,10 @@ let popup = new Vue({
               <button type="button" class="button-primary" :class="{disabled: selected === null}" id="etr" @click="build">Build</button>
             </div>
             <div v-else-if="type === 'alert'" class="modal-footer">
-              <button type="button" @click="close">Ok</button>
+              <button type="button" id="etr" @click="close">Ok</button>
+            </div>
+            <div v-else-if="type === 'gameOver'" class="modal-footer">
+              <button type="button" id="etr" @click="exit">Ok</button>
             </div>
           </div>
         </div>
@@ -61,8 +69,11 @@ let popup = new Vue({
     buildMenu(){
       this.title = "Build Menu"
       this.type = "build"
+      this.size = "popup-center"
       this.selected = null
       this.show = true
+      noKeys = true
+      noLoop()
     },
     welcomeMenu(){
       this.show = true
@@ -72,6 +83,8 @@ let popup = new Vue({
     },
     close(){
       this.show = false
+      noKeys = false
+      loop()
     },
     build(){
       if (this.selected !== null){
@@ -84,8 +97,29 @@ let popup = new Vue({
         }
       }
     },
+    listGames(){
+      let saved = Object.keys(localStorage)
+      let games = []
+      for (let i = 0; i < saved.length; i++){
+        if (saved[i].substr(0, 5) === "board")
+          games.push(saved[i].substring(5, saved[i].length))
+      }
+      alert(games)
+    },
     select(){
       this.selected = "firepit"
+    },
+    gameOver(){
+      this.show = true
+      this.title = "Game Over!!"
+      this.size = "popup-center"
+      this.type = "gameOver"
+      noKeys = true
+      noLoop()
+    },
+    exit(){
+      this.close()
+      game.exit()
     }
   }
 })

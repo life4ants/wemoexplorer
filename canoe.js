@@ -27,7 +27,7 @@ function Canoe(imgs, x, y) {
         this.landed = board.cells[this.x][this.y].type === "beach"
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        man.health -= 2
+        man.energy -= 2
 
         for (let i=-1; i<=1; i++){
           for (let j = -1; j <= 1; j++){
@@ -40,19 +40,6 @@ function Canoe(imgs, x, y) {
         }
       }
     }
-  }
-
-  this.isNextTo = function(type){ //checks horizonaly and verticaly but not diagonally
-    for (let x = -1; x <= 1; x++){
-      for (let y = x !== 0 ? 0 : -1; y<=1; y+=2){
-        let i = this.x+x, j = this.y+y;
-        if (i >= 0 && i < cols && j >= 0 && j < rows){
-          if (board.cells[i][j].type === type)
-            return true
-        }
-      }
-    }
-    return false
   }
 
   this.isBeside = function(type){
