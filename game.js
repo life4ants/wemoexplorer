@@ -22,7 +22,9 @@ let game = new Vue({
       <div v-else-if="mode === 'play'" class="topBar-content">
         <button type="button" @click="exit">Exit</button>
         <button type="button" id='pauseBtn' @click="pauseGame" title="shortcut key: space">{{paused ? 'Resume' : 'Pause'}} Game</button>
-        <div class="infobox" v-text="info"></div>
+        <!--<div class="infobox" v-text="info"></div>-->
+        <img v-for="icon in icons" :key="icon.id" :src="icon.src"
+          height="25" width="25" class="tile" :style="{display: icon.active ? 'block' : 'none' }" @click="() => action(icon.code)">
       </div>
     </div>
     `,
@@ -100,12 +102,28 @@ let game = new Vue({
       { id: "palm", src: "images/palm.png", type: "palm"},
       { id: "pit", src: "images/pit.png", type: "pit"},
       { id: "random", src: "images/random.png", type: "random"},
-      { id: "river1", src: "images/river1.png", type: "river"},
-      { id: "river2", src: "images/river2.png", type: "river"},
-      { id: "river3", src: "images/river3.png", type: "river"},
-      { id: "river4", src: "images/river4.png", type: "river"},
-      { id: "river5", src: "images/river5.png", type: "river"},
-      { id: "river6", src: "images/river6.png", type: "river"},
+      { id: "river1", src: "images/grassRiver1.png", type: "river"},
+      { id: "river2", src: "images/grassRiver2.png", type: "river"},
+      { id: "river3", src: "images/grassRiver3.png", type: "river"},
+      { id: "river4", src: "images/grassRiver4.png", type: "river"},
+      { id: "river5", src: "images/grassRiver5.png", type: "river"},
+      { id: "river6", src: "images/grassRiver6.png", type: "river"},
+      { id: "river7", src: "images/beachRiver1.png", type: "river"},
+      { id: "river8", src: "images/beachRiver2.png", type: "river"},
+      { id: "river9", src: "images/beachRiver3.png", type: "river"},
+      { id: "river10", src: "images/beachRiver4.png", type: "river"},
+      { id: "river11", src: "images/beachRiver5.png", type: "river"},
+      { id: "river12", src: "images/beachRiver6.png", type: "river"},
+      { id: "river13", src: "images/rockRiver1.png", type: "river"},
+      { id: "river14", src: "images/rockRiver2.png", type: "river"},
+      { id: "river15", src: "images/rockRiver3.png", type: "river"},
+      { id: "river16", src: "images/rockRiver4.png", type: "river"},
+      { id: "river17", src: "images/rockRiver5.png", type: "river"},
+      { id: "river18", src: "images/rockRiver6.png", type: "river"},
+      { id: "river19", src: "images/rockRiver7.png", type: "river"},
+      { id: "river20", src: "images/rockRiver8.png", type: "river"},
+      { id: "river21", src: "images/rockRiver9.png", type: "river"},
+      { id: "river22", src: "images/rockRiver10.png", type: "river"},
       { id: "tent", src: "images/tent.png", type: "tent"},
       { id: "water", src: "images/water.png", type: "water"},
       {id: "beach", src: "images/beachX.png", type: "auto"},
@@ -113,6 +131,14 @@ let game = new Vue({
       {id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
       {id: "rockEdge", src: "images/rockX.png", type: "auto"},
       {id: "canoe", src: "images/canoe0_4.png", type: "canoe"}
+    ],
+    icons: [
+      {code: "X", active: true, id: "centerScreen", src: "images/centerScreen.png", title: "Center Screen (X)"},
+      {code: "B", active: true, id: "build", src: "images/build.png", title: "Build (B)"},
+      {code: "D", active: true, id: "dump", src: "images/dump.png", title: "Dump (D)"},
+      {code: "G", active: true, id: "grab", src: "images/grab.png", title: "Grab/Gather (G)"},
+      {code: "F", active: true, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
+      {code: "E", active: true, id: "eat", src: "images/eat.png", title: "Eat (E)"}
     ],
     currentTile: "water",
     currentType: "water",
@@ -122,6 +148,52 @@ let game = new Vue({
     paused: false
   },
   methods: {
+    action(key){
+      switch(key){
+        case "B":
+          popup.buildMenu()
+          break
+        case "D":
+          dump()
+          break
+        case "E":
+          eat()
+          break
+        case "F":
+          feedFire()
+          break
+        case "G":
+          grab()
+          break
+        case "X":
+          centerOn(active)
+          break
+        case "J":
+          man.dismount()
+          break
+      }
+    },
+    checkActive(){
+      //build:
+      this.icons[1].active = active === man
+      //dump:
+      this.icons[2].active = (man.backpack.items.findIndex((i) => i.type === "log") >= 0 &&
+              ["sand", "grass", "stump", "logpile"].includes(board.cells[man.x][man.y].type))
+      //grab:
+      this.icons[3].active = ((man.backpack.weight === 0 && ["tree", "treeShore", "logpile"].includes(board.cells[man.x][man.y].type)) ||
+        (man.backpack.weight < 10 && "berryTree" === board.cells[man.x][man.y].type &&
+        board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0))
+      //feed fire:
+      this.icons[4].active = (man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire)
+      //eat:
+      this.icons[5].active = (("berryTree" === board.cells[man.x][man.y].type &&
+              board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)) ||
+              (man.backpack.items.findIndex((e) => e.type === "berries") >= 0 )
+      //jump in:
+      // icons[?].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y))
+      //jump out:
+      // icons[?].active = (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock")))
+    },
     exit() {
       this.mode = "welcome"
       this.started = false
@@ -225,28 +297,6 @@ let game = new Vue({
         noLoop()
       }
       $("#pauseBtn").blur()
-    }
-  },
-  computed: {
-    info(){
-      let output
-      if (this.availableActions === "default")
-        output= "use arrow keys to move"
-      else if (this.availableActions === "dismount")
-        output= "press J to get out of canoe"
-      else if (this.availableActions === "mount")
-        output= "press J to get into canoe"
-      else if (this.availableActions === "tree")
-        output= "press g to chop down the tree"
-      else if (this.availableActions === "log")
-        output= "press d to dump the log"
-      else if (this.availableActions === "logpile")
-        output = "press g to grab a log"
-      else if (this.availableActions === "lightFire")
-        output = "press f to add a log to the fire"
-      else if (this.availableActions === "berryTree")
-        output = "press e to eat a berry"
-      return output
     }
   }
 })

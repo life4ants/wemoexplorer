@@ -59,12 +59,28 @@ function preload(){
     palm: loadImage("images/palm.png"),
     pit: loadImage("images/pit.png"),
     random: loadImage("images/random.png"),
-    river1: loadImage("images/river1.png"),
-    river2: loadImage("images/river2.png"),
-    river3: loadImage("images/river3.png"),
-    river4: loadImage("images/river4.png"),
-    river5: loadImage("images/river5.png"),
-    river6: loadImage("images/river6.png"),
+    river1: loadImage("images/grassRiver1.png"),
+    river2: loadImage("images/grassRiver2.png"),
+    river3: loadImage("images/grassRiver3.png"),
+    river4: loadImage("images/grassRiver4.png"),
+    river5: loadImage("images/grassRiver5.png"),
+    river6: loadImage("images/grassRiver6.png"),
+    river7: loadImage("images/beachRiver1.png"),
+    river8: loadImage("images/beachRiver2.png"),
+    river9: loadImage("images/beachRiver3.png"),
+    river10: loadImage("images/beachRiver4.png"),
+    river11: loadImage("images/beachRiver5.png"),
+    river12: loadImage("images/beachRiver6.png"),
+    river13: loadImage("images/rockRiver1.png"),
+    river14: loadImage("images/rockRiver2.png"),
+    river15: loadImage("images/rockRiver3.png"),
+    river16: loadImage("images/rockRiver4.png"),
+    river17: loadImage("images/rockRiver5.png"),
+    river18: loadImage("images/rockRiver6.png"),
+    river19: loadImage("images/rockRiver7.png"),
+    river20: loadImage("images/rockRiver8.png"),
+    river21: loadImage("images/rockRiver9.png"),
+    river22: loadImage("images/rockRiver10.png"),
     rock: loadImage("images/rock.png"),
     rockEdge1: loadImage("images/rock1.png"),
     rockEdge2: loadImage("images/rock2.png"),
@@ -102,7 +118,10 @@ function preload(){
     night: loadImage("images/moon.png"),
     dawn: loadImage("images/dawn.png"),
     dusk: loadImage("images/dusk.png"),
-    logpile: loadImage("images/logs.png")
+    logpile: loadImage("images/logs.png"),
+    log: loadImage("images/log.png"),
+    backpack: loadImage("images/backpack.png"),
+    berries: loadImage("images/berries.png")
   }
 
   player1 = [
@@ -143,7 +162,7 @@ function draw(){
     displayBoard()
     if (game.mode === "play") {
       follow(active)
-      checkActive()
+      game.checkActive()
       showObjects()
       canoe.display()
       man.display()
@@ -170,8 +189,8 @@ function showMessage(){
     text(message, (window.innerWidth/2)+abs($("#board").position().left), (window.innerHeight/2)+abs($("#board").position().top))
     showCount--
     if (showCount === 0) {
-      man.inPit = false
       man.vomit = false
+      noKeys = false
     }
     if (board.cells[man.x][man.y].type === "firepit" && board.objectsToShow.fires[man.fireId].value > 0){
       showCount++
@@ -180,35 +199,6 @@ function showMessage(){
         popup.gameOver()
     }
   }
-}
-
-function checkActive(){
-  if (!man.hasBackpack && ["tree", "treeShore"].includes(board.cells[man.x][man.y].type)){
-    game.availableActions = "tree"
-  }
-  else if (man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
-    game.availableActions = "log"
-  }
-  else if (man.hasBackpack && man.isNextToFire){
-    game.availableActions = "lightFire"
-  }
-  else if (man.hasBackpack && ["sand", "grass", "stump"].includes(board.cells[man.x][man.y].type)){
-    game.availableActions = "log"
-  }
-  else if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
-    game.availableActions = "logpile"
-  }
-  else if (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)){
-    game.availableActions = "mount"
-  }
-  else if (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock"))){
-    game.availableActions = "dismount"
-  }
-  else if ("berryTree" === board.cells[man.x][man.y].type){
-    game.availableActions = "berryTree"
-  }
-  else
-    game.availableActions = "default"
 }
 
 function startGame(){
@@ -339,8 +329,9 @@ function showObjects(){
     let items = board.objectsToShow[x]
     for (let i=0; i<items.length; i++){
       if (x === "logpiles"){
-        image(tiles.logpile, items[i].x*25, items[i].y*25+topbarHeight)
-        drawBadge(items[i].x, items[i].y, items[i].quantity)
+        let tile = items[i].quantity > 1 ? tiles.logpile : tiles.log
+        image(tile, items[i].x*25, items[i].y*25+topbarHeight)
+        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
       }
       else if (x === "fires"){
         let tile = items[i].value > 0 ? tiles.fire : tiles.firepit
@@ -361,10 +352,8 @@ function showObjects(){
   }
 }
 
-function drawBadge(i,j,num){
+function drawBadge(x,y,num){
   num = num+""
-  let x = i*25+20
-  let y = j*25+topbarHeight+5
   noStroke()
   fill(0)
   ellipseMode(CENTER)
@@ -379,12 +368,12 @@ function progressBar(i,j,value){
   fill(255)
   stroke(80)
   strokeWeight(1)
-  rect(i*25+2,j*25+15+topbarHeight, 20, 7)
+  rect(i*25+2,j*25+19+topbarHeight, 21, 4)
   let color = value > 12 ? "green" :
                value > 6 ? "#e90" : "red"
   fill(color)
   noStroke()
-  rect(i*25+3, j*25+16+topbarHeight, value, 6)
+  rect(i*25+3, j*25+20+topbarHeight, value, 3)
 }
 
 function drawRing(x,y){

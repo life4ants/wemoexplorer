@@ -17,7 +17,7 @@ function Canoe(imgs, x, y) {
   this.move = function(x, y) {
     if (this.x + x >= 0 && this.x + x < cols &&
       this.y + y >= 0 && this.y + y < rows) {
-      if (board.cells[this.x+x][this.y+y].type === "water" ||
+      if (["water", "river"].includes(board.cells[this.x+x][this.y+y].type) ||
           (board.cells[this.x+x][this.y+y].type === "beach" &&
            board.cells[this.x][this.y].type === "water")
         ) {

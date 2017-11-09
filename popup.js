@@ -67,13 +67,15 @@ let popup = new Vue({
       this.close()
     },
     buildMenu(){
-      this.title = "Build Menu"
-      this.type = "build"
-      this.size = "popup-center"
-      this.selected = null
-      this.show = true
-      noKeys = true
-      noLoop()
+      if (active === man){
+         this.title = "Build Menu"
+        this.type = "build"
+        this.size = "popup-center"
+        this.selected = null
+        this.show = true
+        noKeys = true
+        noLoop()
+      }
     },
     welcomeMenu(){
       this.show = true

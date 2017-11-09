@@ -1,26 +1,46 @@
 function Man(imgs, x, y) {
   this.x = x
   this.y = y
+  this.oldX = 0
+  this.oldY = 0
   this.imgs = imgs
   this.index = 0
   this.isRidingCanoe = true
-  this.hasBackpack = false
+  this.backpack = {
+    weight: 0,
+    items: []
+  }
   this.isNextToFire = false
   this.fireId = null
   this.stepCount = 0
   this.energy = 5000
-  this.inPit = false
+  this.isInPit = false
+  this.isClimbingOutOfPit = false
+  this.isFallingIntoPit
   this.vomit = false
 
   this.display = function() {
     if (!this.isRidingCanoe){
-      let offset = this.hasBackpack ? 4 : 0
-      if (this.inPit){
-        let size = showCount-25
-        if (size > 0){
-          imageMode(CENTER)
-          image(this.imgs[this.index+offset], this.x*25+12.5, this.y*25+topbarHeight+12.5, size, size)
-          imageMode(CORNER)
+      let offset = this.backpack.weight > 0 ? 4 : 0
+      if (this.isInPit){
+        imageMode(CENTER)
+        image(this.imgs[this.index+offset], this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
+        imageMode(CORNER)
+      }
+      else if (this.isClimbingOutOfPit || this.isFallingIntoPit){
+        let num = 30-Math.round(this.energy/200)
+        let size = this.isClimbingOutOfPit ? (num-showCount)*(15/num)+10 : showCount*3+10
+        let speed = this.isClimbingOutOfPit ? (num-showCount)*25/num : Math.floor((5-showCount)*5)
+        let x = (this.x-this.oldX)*speed
+        let y = (this.y-this.oldY)*speed
+        imageMode(CENTER)
+        image(this.imgs[this.index+offset], this.oldX*25+12.5+x, this.oldY*25+topbarHeight+12.5+y, size, size)
+        imageMode(CORNER)
+        if (showCount === 0){
+          this.isInPit = this.isFallingIntoPit ? true : false
+          this.isFallingIntoPit = false
+          this.isClimbingOutOfPit = false
+          showCount = 30
         }
       }
       else {
@@ -31,34 +51,50 @@ function Man(imgs, x, y) {
   }
 
   this.move = function(x, y) {
+    if (this.isClimbingOutOfPit || this.isFallingIntoPit)
+      return
     //check for edge case
     if (this.x + x >= 0 && this.x + x < cols &&
       this.y + y >= 0 && this.y + y < rows){
        //check for forbidden cells
-      if (!["water", "rockEdge", "firepit"].includes(board.cells[this.x+x][this.y+y].type)){
+      if (!["water", "rockEdge", "firepit", "river"].includes(board.cells[this.x+x][this.y+y].type)){
+        if (this.isInPit){
+          this.oldX = this.x
+          this.oldY = this.y
+          this.energy -= 800
+          message = ""
+          showCount = 30-Math.round(this.energy/200)
+          this.isClimbingOutOfPit = true
+          this.isInPit = false
+        }
+        if (["pit", "sandpit"].includes(board.cells[this.x+x][this.y+y].type)){
+            this.isFallingIntoPit = true
+            this.oldX = this.x
+            this.oldY = this.y
+            showCount = 5
+            let name = board.cells[this.x+x][this.y+y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
+            message = "You fell in "+name
+        }
         //move and set image index
         this.x += x
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        let cost = this.hasBackpack ? 5 : 3
+        let cost = 3+Math.round(this.backpack.weight/5)
         this.energy -= cost
+
         // reveal cell
-        if (!board.cells[this.x][this.y].revealed)
+        if (!board.cells[this.x][this.y].revealed){
           board.cells[this.x][this.y].revealed = true
-        //check for available actions
-        if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-            this.inPit = true
-            this.energy -= 800
-            showCount = 50
-            let name = board.cells[this.x][this.y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
-            message = "You fell in "+name
+          this.energy--
         }
       }
       //reveal rockEdge cells
-      else if (board.cells[this.x+x][this.y+y].type === "rockEdge"){
-        if (!board.cells[this.x+x][this.y+y].revealed)
+      else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type)){
+        if (!board.cells[this.x+x][this.y+y].revealed){
           board.cells[this.x+x][this.y+y].revealed = true
+          this.energy--
+        }
       }
       //check if next to fires
       let fires = board.objectsToShow.fires
@@ -75,13 +111,13 @@ function Man(imgs, x, y) {
   }
 
   this.dismount = function(){
-    if (this.isRidingCanoe && (canoe.landed || canoe.isBeside("dock"))){
+    if (this.isRidingCanoe && (canoe.landed || canoe.isBeside("dock") || board.cells[canoe.x][canoe.y].type === "river")){
       let dirs = canoe.index === 0 ? [3,2,0] :
                    canoe.index === 1 ? [2,3,1] :
                      canoe.index === 2 ? [0,1,2] :
                                            [1,0,3]
-      if (!this.dismountDirection(false, dirs[0]) && !this.dismountDirection(false, dirs[1]))
-        this.dismountDirection(true, dirs[2])
+      if (!this.dismountDirection(dirs[0]))
+        this.dismountDirection(dirs[1])
     }
     else if (!this.isRidingCanoe && isNearSquare(this.x, this.y, canoe.x, canoe.y)){
       active = canoe
@@ -90,7 +126,7 @@ function Man(imgs, x, y) {
     }
   }
 
-  this.dismountDirection = function(force, dir){
+  this.dismountDirection = function(dir){
     let x = canoe.x
     let y = canoe.y
     switch(dir){
@@ -107,7 +143,7 @@ function Man(imgs, x, y) {
         y++
         break
     }
-    if ((x >= 0 && x < cols && y >= 0 && y < rows) && (["beach", "dock"].includes(board.cells[x][y].type) || force)){
+    if ((x >= 0 && x < cols && y >= 0 && y < rows) && (!["water", "river", "rockEdge", "firepit"].includes(board.cells[x][y].type))){
       this.x = x
       this.y = y
       this.index = dir

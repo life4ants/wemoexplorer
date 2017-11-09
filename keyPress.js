@@ -1,5 +1,5 @@
 function keyPressed(){
-  if (game.mode === "play" && game.started && !game.paused && !noKeys && !man.inPit && !man.vomit){
+  if (game.mode === "play" && game.started && !game.paused && !noKeys){
     playKeys()
   }
   switch(keyCode){
@@ -37,16 +37,16 @@ function playKeys() {
       popup.buildMenu()
       break
     case "D":
-      dumpLog()
+      dump()
       break
     case "E":
-      eatBerry()
+      eat()
       break
     case "F":
       feedFire()
       break
     case "G":
-      grabLog()
+      grab()
       break
     case "X":
       centerOn(active)
@@ -59,30 +59,47 @@ function playKeys() {
   return false
 }
 
-function grabLog(){
+function grab(){
   let cell = board.cells[active.x][active.y]
-  if (!man.hasBackpack && "logpile" === board.cells[man.x][man.y].type){
+  //grab log from pile:
+  if (man.backpack.weight === 0 && "logpile" === board.cells[man.x][man.y].type){
     let logpiles = board.objectsToShow.logpiles
     let index = logpiles.findIndex((e) => e.id === cell.id)
     logpiles[index].quantity--
-    man.hasBackpack = true
+    man.backpack.items.push({type: "log"})
+    man.backpack.weight = 10
     if (logpiles[index].quantity === 0){
       logpiles.splice(index, 1)
       cell.type = cell.tile
       delete cell.id
     }
   }
-  else if (!man.hasBackpack && ["tree", "treeShore"].includes(board.cells[active.x][active.y].type)){
+  //cut down tree:
+  else if (man.backpack.weight === 0 && ["tree", "treeShore"].includes(board.cells[active.x][active.y].type)){
     cell.tile = "stump"
     cell.type = "stump"
-    man.hasBackpack = true
+    man.backpack.items.push({type: "log"})
+    man.backpack.weight = 10
     game.availableActions = "default"
     man.energy -= 20
   }
+  //gather berry:
+  else if (man.backpack.weight < 10 && "berryTree" === cell.type && board.objectsToShow.berryTrees[cell.id].berries.length > 0){
+    let tree = board.objectsToShow.berryTrees[cell.id]
+    let p = Math.floor(Math.random()*tree.berries.length)
+    tree.berries.splice(p, 1)
+    man.backpack.weight++
+    let id = man.backpack.items.findIndex((e) => e.type === "berries")
+    if (id === -1)
+      man.backpack.items.push({type: "berries", quantity: 1})
+    else
+      man.backpack.items[id].quantity++
+  }
 }
 
-function dumpLog(){
-  if (man.hasBackpack){
+function dump(){
+  //dump a log:
+  if (man.backpack.items.findIndex((i) => i.type === "log") >= 0){
     let cell = board.cells[active.x][active.y]
     let logpiles = board.objectsToShow.logpiles
     if (cell.type === "logpile"){
@@ -97,15 +114,17 @@ function dumpLog(){
     }
     else
       return
-    man.hasBackpack = false
+    man.backpack.weight = 0
+    man.backpack.items = []
   }
 }
 
 function feedFire(){
-  if (man.hasBackpack && (man.isNextToFire)){
+  if (man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire){
     let fire = board.objectsToShow.fires[man.fireId]
     fire.value = fire.value < 8 ? fire.value+13 : 20
-    man.hasBackpack = false
+    man.backpack.weight = 0
+    man.backpack.items = []
     if (board.cells[man.x][man.y].type === "firepit"){
       showCount = 3
       message = "Get off the fire! You're burning!"
@@ -114,24 +133,31 @@ function feedFire(){
   }
 }
 
-function eatBerry(){
+function eat(){
   let cell = board.cells[man.x][man.y]
-  if (cell.type === "berryTree"){
-    let tree = board.objectsToShow.berryTrees[cell.id]
-    if (tree.berries.length > 0){
-      if (man.energy > 5000){
-        man.energy -= Math.floor((Math.random()*5+1)*100)
-        message = "You ate too much!!!"
-        showCount = 40
-        man.vomit = true
-      }
-      else {
-        let p = Math.floor(Math.random()*tree.berries.length)
-        tree.berries.splice(p, 1)
-        man.energy += 50
-        berryCount++
-      }
-    }
+  let bowlId = man.backpack.items.findIndex((e) => e.type === "berries")
+  let tree = board.objectsToShow.berryTrees[cell.id]
+  if (cell.type === "berryTree" && tree.berries.length > 0){
+    let p = Math.floor(Math.random()*tree.berries.length)
+    tree.berries.splice(p, 1)
+    man.energy += 35
+    berryCount++
+  }
+  else if (bowlId >= 0){
+    let bowl = man.backpack.items[bowlId]
+    bowl.quantity--
+    man.backpack.weight--
+    man.energy += 35
+    berryCount++
+    if (bowl.quantity === 0)
+      man.backpack.items.splice(bowlId, 1)
+  }
+  if (man.energy > 5000){
+    man.energy -= Math.floor((Math.random()*5+1)*100)
+    message = "You ate too much!!!"
+    showCount = 40
+    man.vomit = true
+    noKeys = true
   }
 }
 
@@ -146,6 +172,7 @@ function build(type){
       fires.push({id: id, x: active.x, y: active.y, value: 0})
       man.isNextToFire = true
       man.fireId = id
+      man.energy -= 20
       return false
     }
     else
@@ -174,6 +201,10 @@ function clickHandler(){
       let cell = board.cells[x][y]
       floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
     }
+  }
+  else if (mouseY > abs($("#board").position().top-topOffset)+topbarHeight){
+    y = Math.floor((mouseY-topbarHeight)/25)
+    console.log(x, y)
   }
   return false
 }

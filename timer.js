@@ -9,14 +9,15 @@ function showTopbar(){
   if (frameCount%3 === 0){
     updateTimer()
   }
-  if (frameCount%40 === 0){
+  if (frameCount%20 === 0){
     updateFires()
   }
-  if (frameCount % 300 === 20){
+  if (frameCount % 75 === 0){
     growBerries()
   }
-  showTimer()
+  showBackpack()
   showEnergyBar()
+  showTimer()
 }
 
 function showTimer(){
@@ -39,12 +40,26 @@ function showEnergyBar(){
   fill(255)
   stroke(80)
   strokeWeight(4)
-  rect(left+10, top+5, 504, 26)
+  rect(left+10, top+7, 504, 26)
   let color = man.energy > 3333 ? "green" :
                man.energy > 1666 ? "#e90" : "red"
   fill(color)
   noStroke()
-  rect(left+12, top+7, Math.floor(man.energy/10), 22)
+  rect(left+12, top+9, Math.floor(man.energy/10), 22)
+}
+
+function showBackpack(){
+  let left = abs($("#board").position().left)
+  let top = abs($("#board").position().top-topOffset)
+  image(tiles.backpack, left+530, top)
+  if (man.backpack.weight > 0){
+    let items = man.backpack.items
+    for (let i = 0; i<items.length; i++){
+      image(tiles[items[i].type], i*25+left+535, top+14)
+      if (items[i].type !== "log")
+        drawBadge(i*25+left+555, top+19, items[i].quantity)
+    }
+  }
 }
 
 function updateTimer(){
@@ -73,6 +88,7 @@ function resumeTimer(){
 }
 
 function showNight(){
+  let alpha, time
   switch(timeOfDay){
     case "day":
       if (!game.paused)
@@ -95,36 +111,57 @@ function showNight(){
   noStroke()
   beginShape()
   vertex(0,0)
-  vertex(2000,0)
-  vertex(2000,1625)
-  vertex(0,1624)
+  vertex(worldWidth,0)
+  vertex(worldWidth,worldHeight)
+  vertex(0,worldHeight)
   let fires = board.objectsToShow.fires
   for (let i =0; i<fires.length; i++){
     if (fires[i].value > 0){
-      let x = fires[i].x
-      let y = fires[i].y
+      let size = (fires[i].value/3)+2
+      let x = fires[i].x*25+12.5
+      let y = fires[i].y*25+12.5+topbarHeight
+      let r = size*25/2
+      let arm = r*0.54666
       beginContour()
-      vertex(x*25+12.5,y*25-25+topbarHeight)
-      bezierVertex(x*25-8,y*25-25+topbarHeight,x*25-25,y*25-8+topbarHeight,x*25-25,y*25+12.5+topbarHeight)
-      bezierVertex(x*25-25,y*25+33+topbarHeight,x*25-8,y*25+50+topbarHeight,x*25+12.5,y*25+50+topbarHeight)
-      bezierVertex(x*25+33,y*25+50+topbarHeight,x*25+50,y*25+33+topbarHeight,x*25+50,y*25+12.5+topbarHeight)
-      bezierVertex(x*25+50,y*25-8+topbarHeight,x*25+33,y*25-25+topbarHeight,x*25+12.5,y*25-25+topbarHeight)
+      vertex(x,y-r)
+      bezierVertex(x-arm,y-r,x-r,y-arm,x-r,y)
+      bezierVertex(x-r,y+arm,x-arm,y+r,x,y+r)
+      bezierVertex(x+arm,y+r,x+r,y+arm,x+r,y)
+      bezierVertex(x+r,y-arm,x+arm,y-r,x,y-r)
       endContour()
     }
   }
   endShape(CLOSE)
   for (let i =0; i<fires.length; i++){
     if (fires[i].value > 0){
-      fill(0,0,0,Math.floor(alpha/1.5))
-      ellipseMode(CENTER)
-      ellipse(fires[i].x*25+12.5,fires[i].y*25+12.5+topbarHeight, 75,75)
+      let size = (fires[i].value/3)+2
+      drawFireCircle(fires[i].x,fires[i].y,size,alpha)
+    }
+  }
+}
+
+function drawFireCircle(x,y,size,alpha){
+  ellipseMode(CENTER)
+  if (alpha < 20){
+    fill(0,0,0,Math.floor(alpha/2))
+    noStroke()
+    ellipse(x*25+12.5,y*25+12.5+topbarHeight,size*25,size*25)
+  }
+  else {
+    noFill()
+    strokeWeight(2)
+    for (let i = size*25-1; i > 1; i-=3){
+      let d = alpha < 40 ? alpha-20 : (alpha-40)/(size*25)*i+20
+      stroke(0,0,0,d)
+      ellipse(x*25+12.5,y*25+12.5+topbarHeight,i,i)
     }
   }
 }
 
 function updateFires(){
   let fires = board.objectsToShow.fires
-  for (let i =0; i<fires.length; i++){
+  let x = Math.round(frameCount%40/20)
+  for (let i =x; i<fires.length; i+=2){
     if (fires[i].value > 0){
       fires[i].value--
     }
@@ -133,7 +170,8 @@ function updateFires(){
 
 function growBerries(){
   let trees = board.objectsToShow.berryTrees
-  for (let i=0; i<trees.length; i++){
+  let x = Math.round(frameCount%300/75)
+  for (let i=x; i<trees.length; i+=4){
     addBerry(trees[i])
   }
 }
@@ -146,7 +184,6 @@ function addBerry(berryTree){
     if (p === berryTree.berries[i].id){
       p = Math.floor(Math.random()*5)
       i = -1
-      console.log("pick again")
     }
   }
   let x = p === 3 ? 3 : p === 1 ? 9 : p === 0 ? 2 : 18
