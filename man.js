@@ -14,6 +14,7 @@ function Man(imgs, x, y) {
   this.fireId = null
   this.stepCount = 0
   this.energy = 5000
+  this.health = 5000
   this.isInPit = false
   this.isClimbingOutOfPit = false
   this.isFallingIntoPit
@@ -61,7 +62,7 @@ function Man(imgs, x, y) {
         if (this.isInPit){
           this.oldX = this.x
           this.oldY = this.y
-          this.energy -= 800
+          this.health -= 800
           message = ""
           showCount = 30-Math.round(this.energy/200)
           this.isClimbingOutOfPit = true
@@ -107,46 +108,52 @@ function Man(imgs, x, y) {
       }
       this.isNextToFire = false
       this.fireId = null
+      if (autoCenter)
+        centerOn(this)
+      else
+        follow(this)
     }
   }
 
   this.dismount = function(){
     if (this.isRidingCanoe && (canoe.landed || canoe.isBeside("dock") || board.cells[canoe.x][canoe.y].type === "river")){
-      let dirs = canoe.index === 0 ? [3,2,0] :
-                   canoe.index === 1 ? [2,3,1] :
-                     canoe.index === 2 ? [0,1,2] :
-                                           [1,0,3]
-      if (!this.dismountDirection(dirs[0]))
-        this.dismountDirection(dirs[1])
+      let dirs = canoe.index === 0 ? [4,0,2,3,1,5,7,6] :
+                   canoe.index === 1 ? [0,4,6,7,5,3,1,2] :
+                     canoe.index === 2 ? [2,6,0,1,7,3,5,4] :
+                                           [6,2,4,5,3,7,1,0]
+      for (let i = 0; i < dirs.length; i++){
+        if (this.dismountDirection(dirs[i]))
+          break
+      }
     }
     else if (!this.isRidingCanoe && isNearSquare(this.x, this.y, canoe.x, canoe.y)){
       active = canoe
       this.isRidingCanoe = true
-      canoe.index = canoe.index === 4 ? 0 : 2
+      canoe.index = canoe.index === 4 ? 0 : 3
     }
+    if (autoCenter)
+      centerOn(this)
+    else
+      follow(this)
   }
 
   this.dismountDirection = function(dir){
     let x = canoe.x
     let y = canoe.y
     switch(dir){
-      case 0:
-        x++
-        break
-      case 1:
-        x--
-        break
-      case 2:
-        y--
-        break
-      case 3:
-        y++
-        break
+      case 0: y--;      break;
+      case 1: x++; y--; break;
+      case 2: x++;      break;
+      case 3: y++; x++; break;
+      case 4: y++;      break;
+      case 5: y++; x--; break;
+      case 6: x--;      break;
+      case 7: x--; y--;
     }
     if ((x >= 0 && x < cols && y >= 0 && y < rows) && (!["water", "river", "rockEdge", "firepit"].includes(board.cells[x][y].type))){
       this.x = x
       this.y = y
-      this.index = dir
+      this.index = dir === 0 ? 2 : [1,2,3].includes(dir) ? 0 : 4 === dir ? 3 : 1
       this.isRidingCanoe = false
       active = man
       canoe.index = [0,1].includes(canoe.index) ? 4 : 5

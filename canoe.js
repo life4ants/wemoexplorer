@@ -9,9 +9,7 @@ function Canoe(imgs, x, y) {
   this.display = function() {
     let x = [0,1,4].includes(this.index) ? (this.x-1)*25 : this.x*25
     let y = [0,1,4].includes(this.index) ? this.y*25+topbarHeight : (this.y-1)*25+topbarHeight
-
     image(this.imgs[this.index], x, y)
-
   }
 
   this.move = function(x, y) {
@@ -34,11 +32,17 @@ function Canoe(imgs, x, y) {
             let a = this.x+i
             let b = this.y+j
 
-            if (a >= 0 && a < cols && b >= 0 && b < rows && !board.cells[a][b].revealed)
+            if (a >= 0 && a < cols && b >= 0 && b < rows && !board.cells[a][b].revealed){
               board.cells[a][b].revealed = true
+              man.energy--
+            }
           }
         }
       }
+      if (autoCenter)
+        centerOn(this)
+      else
+        follow(this)
     }
   }
 

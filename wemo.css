@@ -18,10 +18,26 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 30px;
+  height: 100px;
   width: 100%;
   background-color: #e0ffe0;
   z-index: 1;
+}
+
+.sideBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 35px;
+  background-color: #e0ffe0;
+  border: solid #B7CBBA;
+  border-width: 0 2px 0 0;
+  z-index: 1;
+}
+
+.hidden {
+  display: hidden
 }
 
 .flex {
@@ -35,6 +51,10 @@ body {
   font-size: 22px;
 }
 
+.sideBar-content {
+  padding: 4px 2px 3px 3px;
+}
+
 .topBar p {
   margin: 0 10px;
 }
@@ -43,9 +63,40 @@ body {
  margin: 3px;
 }
 
+.icon {
+  margin: 4px 0;
+}
+
 .selected {
+  height: 25px;
+  width: 25px;
   border: solid 2px red;
   margin: 1px;
+}
+
+.build-option-container {
+  border: 1px solid #666;
+  border-bottom-width: 0;
+}
+
+.build-option {
+  cursor: pointer;
+  background-color: #ffe;
+  border-bottom: 2px solid #888;
+  min-height: 100px;
+}
+
+.build-option:hover {
+  background-color: #eeeed0;
+}
+
+.build-option img {
+  float: left;
+  margin-right: 8px;
+}
+
+.build-option-selected {
+  border: solid 2px red;
 }
 
 .tileBox {

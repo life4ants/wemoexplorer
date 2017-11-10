@@ -1,13 +1,14 @@
-let tiles, players, man, canoe, active, berryCount, wemoMins, noKeys
-const topbarHeight = 40
+let tiles, players, man, canoe, active, berryCount, wemoMins, noKeys, centerX, centerY, autoCenter
+const topbarHeight = 55
 const cols = 80
 const rows = 50
 const worldWidth = cols * 25
 const worldHeight = rows * 25 + topbarHeight
-let topOffset = 0
+let topOffset = 0, leftOffset = 37
 let path, showCount, message, timeOfDay, startTime
 
 function initializeVars(){
+  autoCenter = false
   noKeys = false
   berryCount = 0
   path = []
@@ -81,20 +82,23 @@ function preload(){
     river20: loadImage("images/rockRiver8.png"),
     river21: loadImage("images/rockRiver9.png"),
     river22: loadImage("images/rockRiver10.png"),
-    rock: loadImage("images/rock.png"),
-    rockEdge1: loadImage("images/rock1.png"),
-    rockEdge2: loadImage("images/rock2.png"),
-    rockEdge3: loadImage("images/rock3.png"),
-    rockEdge4: loadImage("images/rock4.png"),
-    rockEdge5: loadImage("images/rock5.png"),
-    rockEdge6: loadImage("images/rock6.png"),
-    rockEdge7: loadImage("images/rock7.png"),
-    rockEdge8: loadImage("images/rock8.png"),
-    rockEdge9: loadImage("images/rock9.png"),
-    rockEdge10: loadImage("images/rock10.png"),
-    rockEdge11: loadImage("images/rock11.png"),
-    rockEdge12: loadImage("images/rock12.png"),
-    rockMiddle: loadImage("images/rock13.png"),
+    rock1: loadImage("images/rock1.png"),
+    rock2: loadImage("images/rock2.png"),
+    rock3: loadImage("images/rock3.png"),
+    rock: loadImage("images/rock4.png"),
+    rockEdge1: loadImage("images/rockEdge1.png"),
+    rockEdge2: loadImage("images/rockEdge2.png"),
+    rockEdge3: loadImage("images/rockEdge3.png"),
+    rockEdge4: loadImage("images/rockEdge4.png"),
+    rockEdge5: loadImage("images/rockEdge5.png"),
+    rockEdge6: loadImage("images/rockEdge6.png"),
+    rockEdge7: loadImage("images/rockEdge7.png"),
+    rockEdge8: loadImage("images/rockEdge8.png"),
+    rockEdge9: loadImage("images/rockEdge9.png"),
+    rockEdge10: loadImage("images/rockEdge10.png"),
+    rockEdge11: loadImage("images/rockEdge11.png"),
+    rockEdge12: loadImage("images/rockEdge12.png"),
+    rockMiddle: loadImage("images/rockEdge13.png"),
     sand: loadImage("images/sand.png"),
     sandpit: loadImage("images/sandpit.png"),
     stump: loadImage("images/stump.png"),
@@ -120,7 +124,7 @@ function preload(){
     dusk: loadImage("images/dusk.png"),
     logpile: loadImage("images/logs.png"),
     log: loadImage("images/log.png"),
-    backpack: loadImage("images/backpack.png"),
+    backpack: loadImage("images/carrying.png"),
     berries: loadImage("images/berries.png")
   }
 
@@ -151,9 +155,10 @@ function setup(){
   cvs.parent("board")
   cvs.mousePressed(clickHandler)
   cvs.mouseReleased(mouseReleaseHandler)
+  $("#board").css("top", topOffset).css("left", leftOffset)
   frameRate(12)
+  strokeJoin(ROUND)
   noLoop()
-  $("#board").css("top", topOffset)
 }
 
 function draw(){
@@ -161,13 +166,13 @@ function draw(){
     background(255)
     displayBoard()
     if (game.mode === "play") {
-      follow(active)
       game.checkActive()
       showObjects()
       canoe.display()
       man.display()
       showNight()
       showMessage()
+      centerScreen()
       showTopbar()
       if (man.energy < 0 && showCount === 0)
         popup.gameOver()
@@ -195,7 +200,7 @@ function showMessage(){
     if (board.cells[man.x][man.y].type === "firepit" && board.objectsToShow.fires[man.fireId].value > 0){
       showCount++
       man.energy -= 25
-      if (man.energy < 0)
+      if (man.energy < 0 || man.health < 0)
         popup.gameOver()
     }
   }
@@ -208,10 +213,11 @@ function startGame(){
   centerOn(active)
   initializeVars()
   loop()
+  $("#board").css("top", centerY+"px").css("left", centerX+"px")
 }
 
 function displayBoard() {
-  let left = Math.floor(abs($("#board").position().left)/25)
+  let left = Math.floor(abs($("#board").position().left-leftOffset)/25)
   let right = left + Math.floor(window.innerWidth/25)+1
   right = right > cols ? cols : right
   let top = Math.floor(abs($("#board").position().top-topOffset)/25)
@@ -240,37 +246,50 @@ function displayBoard() {
     image(canoe1[4], (board.startX-1)*25, board.startY*25)
 }
 
-function follow(object) {
-  let left = $("#board").position().left
-  let top = $("#board").position().top
+function centerScreen(){
+  let pos = flyTo($("#board").position().left, $("#board").position().top, centerX, centerY)
+  $("#board").css("top", pos.y+"px").css("left", pos.x+"px")
+}
 
-  if ((object.x*25) + left < 75) // left
-    left = left+16 < 0 ? left+16 : 0
+function flyTo(curX, curY, toX, toY){
+  let leftDiff = toX-curX
+  let topDiff = toY-curY
+  let left = leftDiff <= -5 ? curX+Math.floor(leftDiff/5)-4 : leftDiff >= 5 ? curX+Math.floor(leftDiff/5)+4 : toX
+  let top = topDiff <= -5 ? curY+Math.floor(topDiff/5)-4 : topDiff >= 5 ? curY+Math.floor(topDiff/5)+4 : toY
+  return {x: left, y: top}
+}
+
+function follow(object) {
+  let left = centerX
+  let top = centerY
+
+  if ((object.x*25) + left < 75 + leftOffset) // left
+    left = left+25 > leftOffset ? leftOffset : left+25
   else if ((object.x*25) + left > window.innerWidth - 100) //right
-    left = left-16 < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left-16
+    left = left-25 < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left-25
 
   if ((object.y*25+topbarHeight) + top < 75 + topOffset) //top
-    top = top+16 > topOffset ? topOffset : top+16
+    top = top+25 > topOffset ? topOffset : top+25
   else if ((object.y*25+topbarHeight) + top > window.innerHeight - 100) //bottom
-    top = top-16 < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top-16
+    top = top-25 < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top-25
 
-  $("#board").css("top", top+"px")
-  $("#board").css("left", left+"px")
+  centerX = left
+  centerY = top
 }
 
 function centerOn(object) {
   let x = Math.floor(window.innerWidth/2)
   let y = Math.floor(window.innerHeight/2)
-  let left = x-object.x*25
-  left = left > 0 ? 0 : left
+  let left = x-object.x*25+13
+  left = left > leftOffset ? leftOffset : left
   left = left < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left
 
-  let top = y-object.y*25
+  let top = y-object.y*25+13-topbarHeight
   top = top > topOffset ? topOffset : top
   top = top < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top
-  $("#board").css("left", left +"px")
-  $("#board").css("top", top +"px")
 
+  centerX = left
+  centerY = top
 }
 
 $("#board").contextmenu(function(e) {

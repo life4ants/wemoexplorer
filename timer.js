@@ -1,11 +1,13 @@
+let timeJump = false
+let showEnergy, showHealth
 
 function showTopbar(){
-  let left = abs($("#board").position().left)
+  let left = abs($("#board").position().left-leftOffset)
   let top = abs($("#board").position().top-topOffset)
   let width = window.innerWidth
   noStroke()
   fill(255)
-  rect (left, top, width, 40)
+  rect (left, top, width, topbarHeight)
   if (frameCount%3 === 0){
     updateTimer()
   }
@@ -16,7 +18,11 @@ function showTopbar(){
     growBerries()
   }
   showBackpack()
-  showEnergyBar()
+  let EH = flyTo(showEnergy, showHealth, man.energy, man.health)
+  showEnergy = EH.x
+  showHealth = EH.y
+  showEnergyBar("Energy: ", showEnergy, 3)
+  showEnergyBar("Health: ", showHealth, 30)
   showTimer()
 }
 
@@ -24,8 +30,8 @@ function showTimer(){
   let showMins = wemoMins%60 < 10 ? "0"+wemoMins%60 : wemoMins%60
   let showHours = Math.floor(wemoMins/60)%12 === 0 ? 12 : Math.floor(wemoMins/60)%12
   let suffix = wemoMins%1440 < 720 ? " AM" : " PM"
-  let right = abs($("#board").position().left)+window.innerWidth
-  let top = abs($("#board").position().top-topOffset)+5
+  let right = abs($("#board").position().left-leftOffset)+window.innerWidth-leftOffset
+  let top = abs($("#board").position().top-topOffset)+20
 
   textAlign(RIGHT, TOP)
   textSize(26)
@@ -34,37 +40,59 @@ function showTimer(){
   image(tiles[timeOfDay], right-35, top)
 }
 
-function showEnergyBar(){
-  let left = abs($("#board").position().left)
-  let top = abs($("#board").position().top-topOffset)
+function showEnergyBar(title, value, offset){
+  let left = abs($("#board").position().left-leftOffset)
+  let top = abs($("#board").position().top-topOffset)+offset
+  let widthFactor = window.innerWidth > 1000 ? 10 : 16
   fill(255)
   stroke(80)
-  strokeWeight(4)
-  rect(left+10, top+7, 504, 26)
-  let color = man.energy > 3333 ? "green" :
-               man.energy > 1666 ? "#e90" : "red"
+  strokeWeight(3)
+  rect(left+10, top, Math.floor(5000/widthFactor)+3, 20)
+  let color = value > 3333 ? "green" :
+               value > 1666 ? "#e90" : "red"
   fill(color)
   noStroke()
-  rect(left+12, top+9, Math.floor(man.energy/10), 22)
+  rect(left+12, top+2, Math.floor(value/widthFactor), 17)
+  let f, x
+  if (value/widthFactor > 100){
+    f = 250, x = Math.floor(value/(widthFactor*2))
+    textAlign(CENTER,TOP)
+  }
+  else {
+    f = 0, x = Math.floor(value/widthFactor)+2
+    textAlign(LEFT,TOP)
+  }
+  fill(f)
+  textSize(14)
+  text(title+value, left+12+x, top+2)
 }
 
 function showBackpack(){
-  let left = abs($("#board").position().left)
-  let top = abs($("#board").position().top-topOffset)
-  image(tiles.backpack, left+530, top)
+  let left = abs($("#board").position().left-leftOffset)
+  left = window.innerWidth > 1000 ? left+530 : left+340
+  let top = abs($("#board").position().top-topOffset)+3
+  image(tiles.backpack, left, top)
   if (man.backpack.weight > 0){
     let items = man.backpack.items
     for (let i = 0; i<items.length; i++){
-      image(tiles[items[i].type], i*25+left+535, top+14)
+      let row = i > 1 ? 22 : -1
+      let col = i > 1 ? i-2 : i
+      image(tiles[items[i].type], col*25+left+2, top+row)
       if (items[i].type !== "log")
-        drawBadge(i*25+left+555, top+19, items[i].quantity)
+        drawBadge(col*25+left+22, top+5+row, items[i].quantity)
     }
   }
 }
 
+function jumpToHour(hour){
+  let pmins = hour*60
+  startTime -= ((pmins - wemoMins)*250)
+  timeJump = true
+}
+
 function updateTimer(){
   let newMins = Math.floor((Date.now() - startTime)/250)+120//shift time 2 hours from 0
-  if (newMins - wemoMins > 10)
+  if (newMins - wemoMins > 10  && !timeJump)
     resumeTimer()
   else
     wemoMins = newMins
@@ -117,7 +145,7 @@ function showNight(){
   let fires = board.objectsToShow.fires
   for (let i =0; i<fires.length; i++){
     if (fires[i].value > 0){
-      let size = (fires[i].value/3)+2
+      let size = (fires[i].value/4)+3.1
       let x = fires[i].x*25+12.5
       let y = fires[i].y*25+12.5+topbarHeight
       let r = size*25/2
@@ -134,7 +162,7 @@ function showNight(){
   endShape(CLOSE)
   for (let i =0; i<fires.length; i++){
     if (fires[i].value > 0){
-      let size = (fires[i].value/3)+2
+      let size = (fires[i].value/4)+3.1
       drawFireCircle(fires[i].x,fires[i].y,size,alpha)
     }
   }

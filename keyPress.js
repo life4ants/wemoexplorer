@@ -49,7 +49,7 @@ function playKeys() {
       grab()
       break
     case "X":
-      centerOn(active)
+      game.setAutoCenter()
       break
     case "J":
       man.dismount()
@@ -172,11 +172,14 @@ function build(type){
       fires.push({id: id, x: active.x, y: active.y, value: 0})
       man.isNextToFire = true
       man.fireId = id
-      man.energy -= 20
+      man.energy -= 60
       return false
     }
     else
       return "Opps! Firepits can only be built on grass, beach, sand, or stumps"
+  }
+  else if (type === "basket"){
+    return "Sorry, not available yet"
   }
 }
 

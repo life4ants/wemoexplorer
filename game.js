@@ -1,7 +1,7 @@
 let game = new Vue({
   el: '#topBar',
   template: `
-    <div class="topBar" :style="{height: mode === 'edit' ? '100px' : mode === 'play' ? '30px' : '0px'}">
+    <div :class="{topBar: mode === 'edit', sideBar: mode === 'play'}" :style="{display: mode === 'welcome' ? 'none' : 'block'}">
       <div v-if="mode === 'edit'" class="flex">
         <button type='button' @click='exit'>exit</button>
         <div class="tileBox" v-if="mode === 'edit'">
@@ -19,12 +19,12 @@ let game = new Vue({
         <button type="button" @click="loadBoard" title="load a saved board">Load</button>
         <button type="button" @click="fillBoard" title="fill board with trees and grass">Fill</button>
       </div>
-      <div v-else-if="mode === 'play'" class="topBar-content">
-        <button type="button" @click="exit">Exit</button>
-        <button type="button" id='pauseBtn' @click="pauseGame" title="shortcut key: space">{{paused ? 'Resume' : 'Pause'}} Game</button>
-        <!--<div class="infobox" v-text="info"></div>-->
-        <img v-for="icon in icons" :key="icon.id" :src="icon.src"
-          height="25" width="25" class="tile" :style="{display: icon.active ? 'block' : 'none' }" @click="() => action(icon.code)">
+      <div v-else-if="mode === 'play'" class="sideBar-content">
+        <i class="fa fa-sign-out fa-flip-horizontal fa-2x" aria-hidden="true" @click="exit" title="Exit Game"></i>
+        <i :class="{fa: true, 'fa-2x': true, 'fa-play': paused, 'fa-pause': !paused}"
+                      aria-hidden="true" @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
+        <img v-for="icon in icons" :key="icon.id" :src="icon.src" :title="icon.title"
+          height="30" width="30" :class="{icon: true, selected: icon.selected}" :style="{display: icon.active ? 'block' : 'none' }" @click="() => action(icon.code)">
       </div>
     </div>
     `,
@@ -45,20 +45,20 @@ let game = new Vue({
       { id: "beach12", src: "images/beach12.png", type: "beach"},
       { id: "beachEdge1", src: "images/beachEdge1.png", type: "beachEdge"},
       { id: "sand", src: "images/sand.png", type: "sand"},
-      { id: "rockEdge1", src: "images/rock1.png", type: "rockEdge"},
-      { id: "rockEdge2", src: "images/rock2.png", type: "rockEdge"},
-      { id: "rockEdge3", src: "images/rock3.png", type: "rockEdge"},
-      { id: "rockEdge4", src: "images/rock4.png", type: "rockEdge"},
-      { id: "rockEdge5", src: "images/rock5.png", type: "rockEdge"},
-      { id: "rockEdge6", src: "images/rock6.png", type: "rockEdge"},
-      { id: "rockEdge7", src: "images/rock7.png", type: "rockEdge"},
-      { id: "rockEdge8", src: "images/rock8.png", type: "rockEdge"},
-      { id: "rockEdge9", src: "images/rock9.png", type: "rockEdge"},
-      { id: "rockEdge10", src: "images/rock10.png", type: "rockEdge"},
-      { id: "rockEdge11", src: "images/rock11.png", type: "rockEdge"},
-      { id: "rockEdge12", src: "images/rock12.png", type: "rockEdge"},
+      { id: "rockEdge1", src: "images/rockEdge1.png", type: "rockEdge"},
+      { id: "rockEdge2", src: "images/rockEdge2.png", type: "rockEdge"},
+      { id: "rockEdge3", src: "images/rockEdge3.png", type: "rockEdge"},
+      { id: "rockEdge4", src: "images/rockEdge4.png", type: "rockEdge"},
+      { id: "rockEdge5", src: "images/rockEdge5.png", type: "rockEdge"},
+      { id: "rockEdge6", src: "images/rockEdge6.png", type: "rockEdge"},
+      { id: "rockEdge7", src: "images/rockEdge7.png", type: "rockEdge"},
+      { id: "rockEdge8", src: "images/rockEdge8.png", type: "rockEdge"},
+      { id: "rockEdge9", src: "images/rockEdge9.png", type: "rockEdge"},
+      { id: "rockEdge10", src: "images/rockEdge10.png", type: "rockEdge"},
+      { id: "rockEdge11", src: "images/rockEdge11.png", type: "rockEdge"},
+      { id: "rockEdge12", src: "images/rockEdge12.png", type: "rockEdge"},
       { id: "beachEdge2", src: "images/beachEdge2.png", type: "beachEdge"},
-      { id: "rockMiddle", src: "images/rock13.png", type: "rockMiddle"}
+      { id: "rockMiddle", src: "images/rockEdge13.png", type: "rockMiddle"}
     ],
     tiles2: [
       { id: "grass", src: "images/grass.png", type: "grass"},
@@ -95,7 +95,7 @@ let game = new Vue({
       { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
       { id: "stump", src: "images/stump.png", type: "stump"},
       { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
-      { id: "rock", src: "images/rock.png", type: "rock"},
+      { id: "rock", src: "images/rock4.png", type: "rock"},
       { id: "dock1", src: "images/dock1.png", type: "dock"},
       { id: "dock2", src: "images/dock2.png", type: "dock"},
       { id: "dock3", src: "images/dock3.png", type: "dock"},
@@ -124,7 +124,6 @@ let game = new Vue({
       { id: "river20", src: "images/rockRiver8.png", type: "river"},
       { id: "river21", src: "images/rockRiver9.png", type: "river"},
       { id: "river22", src: "images/rockRiver10.png", type: "river"},
-      { id: "tent", src: "images/tent.png", type: "tent"},
       { id: "water", src: "images/water.png", type: "water"},
       {id: "beach", src: "images/beachX.png", type: "auto"},
       {id: "treeShore", src: "images/treeShoreX.png", type: "auto"},
@@ -133,12 +132,14 @@ let game = new Vue({
       {id: "canoe", src: "images/canoe0_4.png", type: "canoe"}
     ],
     icons: [
-      {code: "X", active: true, id: "centerScreen", src: "images/centerScreen.png", title: "Center Screen (X)"},
-      {code: "B", active: true, id: "build", src: "images/build.png", title: "Build (B)"},
-      {code: "D", active: true, id: "dump", src: "images/dump.png", title: "Dump (D)"},
-      {code: "G", active: true, id: "grab", src: "images/grab.png", title: "Grab/Gather (G)"},
-      {code: "F", active: true, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
-      {code: "E", active: true, id: "eat", src: "images/eat.png", title: "Eat (E)"}
+      {code: "X", active: true, selected: false, id: "centerScreen", src: "images/centerScreen.png", title: "Center Screen (X)"},
+      {code: "B", active: true, selected: false, id: "build", src: "images/build.png", title: "Build (B)"},
+      {code: "D", active: true, selected: false, id: "dump", src: "images/dump.png", title: "Dump (D)"},
+      {code: "G", active: true, selected: false, id: "grab", src: "images/grab.png", title: "Grab/Gather (G)"},
+      {code: "F", active: true, selected: false, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
+      {code: "E", active: true, selected: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
+      {code: "J", active: true, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
+      {code: "G", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down tree (G)"}
     ],
     currentTile: "water",
     currentType: "water",
@@ -166,7 +167,7 @@ let game = new Vue({
           grab()
           break
         case "X":
-          centerOn(active)
+          this.setAutoCenter()
           break
         case "J":
           man.dismount()
@@ -180,19 +181,24 @@ let game = new Vue({
       this.icons[2].active = (man.backpack.items.findIndex((i) => i.type === "log") >= 0 &&
               ["sand", "grass", "stump", "logpile"].includes(board.cells[man.x][man.y].type))
       //grab:
-      this.icons[3].active = ((man.backpack.weight === 0 && ["tree", "treeShore", "logpile"].includes(board.cells[man.x][man.y].type)) ||
-        (man.backpack.weight < 10 && "berryTree" === board.cells[man.x][man.y].type &&
-        board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0))
+      this.icons[3].active = (man.backpack.weight < 10 && "berryTree" === board.cells[man.x][man.y].type &&
+        board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)
       //feed fire:
       this.icons[4].active = (man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire)
       //eat:
       this.icons[5].active = (("berryTree" === board.cells[man.x][man.y].type &&
               board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)) ||
               (man.backpack.items.findIndex((e) => e.type === "berries") >= 0 )
-      //jump in:
-      // icons[?].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y))
-      //jump out:
-      // icons[?].active = (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock")))
+      //jump:
+      this.icons[6].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)) ||
+               (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock")))
+      //chop:
+      this.icons[7].active = man.backpack.weight === 0 && ["tree", "treeShore", "logpile"].includes(board.cells[man.x][man.y].type)
+    },
+    setAutoCenter(){
+      this.icons[0].selected = !this.icons[0].selected
+      autoCenter = !autoCenter
+      centerOn(active)
     },
     exit() {
       this.mode = "welcome"
@@ -200,7 +206,7 @@ let game = new Vue({
       draw()
       $("body").addClass("full-screen")
       topOffset = 0
-      $("#board").css("top", topOffset+"px").css("left", "0px")
+      $("#board").css("top", topOffset+"px").css("left", leftOffset)
       $(window).scrollTop(0).scrollLeft(0)
       initializeVars()
       noLoop()
@@ -253,11 +259,10 @@ let game = new Vue({
         board.objectsToShow = {logpiles: [], fires: [], berryTrees: []}
       }
       if (board.id === undefined){
-        board.in = id
+        board.id = id
       }
       if (this.mode === "welcome"){
         this.mode = "play"
-        topOffset = 30
         this.started = true
         startGame()
       }
@@ -280,7 +285,7 @@ let game = new Vue({
       board = JSON.parse(JSON.stringify(gameBoards[0]))
       this.mode = "play"
       this.started = true
-      topOffset = 30
+      leftOffset = 37
       startGame()
     },
     pauseGame(){
@@ -296,7 +301,6 @@ let game = new Vue({
         this.paused = true
         noLoop()
       }
-      $("#pauseBtn").blur()
     }
   }
 })

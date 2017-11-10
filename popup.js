@@ -11,7 +11,15 @@ let popup = new Vue({
               </h4>
             </div>
             <div v-if="type === 'build'" class="modal-body">
-              <img src="images/firepitIcon.png" height="50" width="50" id="firepit" :class="{selected: selected === 'firepit'}" @click="select">
+              <div class="build-option-container">
+                <div v-for="item in options" :id="item.id" :key="item.id"
+                          :class="{'build-option': true, 'build-option-selected': selected === item.id}" @click="() => select(item.id)">
+                  <h5>{{item.title}}</h5>
+                  <img :src="item.src" height="50" width="50" >
+                  <p>cost: {{item.cost}}</p>
+                  <p>{{item.info}}</p>
+                </div>
+              </div>
             </div>
             <div v-else-if="type === 'welcome'" class="modal-body">
               <div class="button-tiles">
@@ -25,7 +33,7 @@ let popup = new Vue({
               </div>
             </div>
             <div v-else-if="type === 'gameOver'" class="modal-body">
-              <p>Your energy got below 0, and you died.</p>
+              <p>Your energy and/or health got below 0, and you died.</p>
             </div>
 
             <div v-if="'build' === type" class="modal-footer">
@@ -50,7 +58,11 @@ let popup = new Vue({
       size: "popup-small",
       title: "Welcome to Wemo",
       type: "welcome",
-      selected: null
+      selected: null,
+      options: [
+        {id: "firepit", src: "images/firepitIcon.png", title: "Firepit", cost: "60 energy", info: "firepits are for fires"},
+        {id: "basket", src: "images/basket.png", title: "Basket", cost: "15 energy, 6 long grass", info: "for picking berries in"}
+      ]
     }
   },
   methods: {
@@ -108,8 +120,8 @@ let popup = new Vue({
       }
       alert(games)
     },
-    select(){
-      this.selected = "firepit"
+    select(id){
+      this.selected = id
     },
     gameOver(){
       this.show = true
