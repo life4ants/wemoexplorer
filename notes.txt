@@ -1,0 +1,25 @@
+
+all Types:
+
+beach
+sand
+grass
+stump
+beachEdge
+grassBeach
+logpile
+dock
+rock
+
+rockEdge
+rockMiddle
+tree
+treeShore
+sandpit
+berryTree
+longGrass
+palm
+pit
+river
+water
+random

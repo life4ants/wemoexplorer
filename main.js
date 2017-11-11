@@ -1,4 +1,4 @@
-let tiles, players, man, canoe, active, berryCount, wemoMins, noKeys, centerX, centerY, autoCenter
+let tiles, players, man, canoe, active, berryCount, wemoMins, noKeys, centerX, centerY, autoCenter, showEnergy, showHealth
 const topbarHeight = 55
 const cols = 80
 const rows = 50
@@ -7,7 +7,11 @@ const worldHeight = rows * 25 + topbarHeight
 let topOffset = 0, leftOffset = 37
 let path, showCount, message, timeOfDay, startTime
 
+const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rock"]
+
 function initializeVars(){
+  showHealth = 0
+  showEnergy = 0
   autoCenter = false
   noKeys = false
   berryCount = 0
@@ -42,9 +46,16 @@ function preload(){
     dock1: loadImage("images/dock1.png"),
     dock2: loadImage("images/dock2.png"),
     dock3: loadImage("images/dock3.png"),
+    dock4: loadImage("images/dock4.png"),
+    dock5: loadImage("images/dock5.png"),
+    dock6: loadImage("images/dock6.png"),
     fire: loadImage("images/fire1.png"),
     firepit: loadImage("images/firepit.png"),
     grass: loadImage("images/grass.png"),
+    longGrass: loadImage("images/longGrass.png"),
+    longGrass1: loadImage("images/longGrass1.png"),
+    longGrass2: loadImage("images/longGrass2.png"),
+    longGrass3: loadImage("images/longGrass3.png"),
     grassBeach1: loadImage("images/grassBeach1.png"),
     grassBeach2: loadImage("images/grassBeach2.png"),
     grassBeach3: loadImage("images/grassBeach3.png"),
@@ -85,7 +96,8 @@ function preload(){
     rock1: loadImage("images/rock1.png"),
     rock2: loadImage("images/rock2.png"),
     rock3: loadImage("images/rock3.png"),
-    rock: loadImage("images/rock4.png"),
+    rock4: loadImage("images/rock4.png"),
+    rocks: loadImage("images/rocks.png"),
     rockEdge1: loadImage("images/rockEdge1.png"),
     rockEdge2: loadImage("images/rockEdge2.png"),
     rockEdge3: loadImage("images/rockEdge3.png"),
@@ -125,7 +137,9 @@ function preload(){
     logpile: loadImage("images/logs.png"),
     log: loadImage("images/log.png"),
     backpack: loadImage("images/carrying.png"),
-    berries: loadImage("images/berries.png")
+    berries: loadImage("images/berries.png"),
+    basket: loadImage("images/basket.png"),
+    basketBerries: loadImage("images/basketBerries.png")
   }
 
   player1 = [
@@ -174,7 +188,7 @@ function draw(){
       showMessage()
       centerScreen()
       showTopbar()
-      if (man.energy < 0 && showCount === 0)
+      if (showCount === 0 && (man.energy < 0 || man.health < 0 ))
         popup.gameOver()
     }
   }
@@ -199,7 +213,7 @@ function showMessage(){
     }
     if (board.cells[man.x][man.y].type === "firepit" && board.objectsToShow.fires[man.fireId].value > 0){
       showCount++
-      man.energy -= 25
+      man.health -= 25
       if (man.energy < 0 || man.health < 0)
         popup.gameOver()
     }
@@ -234,10 +248,12 @@ function displayBoard() {
   for (let i = left; i < right; i++) {
     for (let j = top; j< bottom; j++){
       let cell = board.cells[i][j]
-      let img = game.mode === "edit" ? tiles[cell.tile]:
-                  cell.revealed ? tiles[cell.tile] : tiles["clouds"]
       let offset = game.mode === "play" ? topbarHeight : 0
+      let img = game.mode === "edit" || cell.revealed ? tiles[cell.tile]: tiles["clouds"]
       image(img, i*25, j*25+offset)
+      if (cell.type === "rock" && (cell.revealed || game.mode === "edit")){
+        image(tiles["rock"+cell.quantity], i*25, j*25+offset)
+      }
       if (cell.byPit && (cell.revealed || game.mode === 'edit'))
         drawRing(i,j)
     }
@@ -352,6 +368,10 @@ function showObjects(){
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
         drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
       }
+      else if (x === "rockpiles"){
+        image(tiles.rocks, items[i].x*25, items[i].y*25+topbarHeight)
+        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
+      }
       else if (x === "fires"){
         let tile = items[i].value > 0 ? tiles.fire : tiles.firepit
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
@@ -398,9 +418,26 @@ function progressBar(i,j,value){
 function drawRing(x,y){
   noFill()
   stroke(255,0,0)
-  strokeWeight(5)
+  strokeWeight(3)
   let offset = game.mode === 'play' ? topbarHeight : 0
   ellipseMode(CENTER)
-  ellipse(x*25+12.5, y*25+offset+12.5,20,20)
+  ellipse(x*25+12.5, y*25+offset+12.5,23,23)
+}
+
+function drawPitLines(x,y){
+  noFill()
+  stroke(255,0,0)
   strokeWeight(1)
+  let offset = game.mode === 'play' ? topbarHeight : 0
+  let basex = x*25+2
+  let basey = y*25+2+offset
+  for (let i = 0; i < 5; i++){
+    let x1 = i < 2 ? 2-i : i == 2 ? 0.57 : 0
+    let y1 = i < 2 ? 0 : i == 2 ? 0.57 : i-2
+    let x2 = i < 2 ? 3 : i == 2 ? 2.57 : 5-i
+    let y2 = i > 2 ? 3: i == 2 ? 2.57 : i+1
+    line(Math.round(x1*7)+basex, Math.round(y1*7)+basey, Math.round(x2*7)+basex, Math.round(y2*7)+basey)
+  }
+  ellipseMode(CENTER)
+  ellipse(x*25+12.5, y*25+12.5+offset,22,22)
 }

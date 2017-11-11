@@ -95,10 +95,14 @@ let game = new Vue({
       { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
       { id: "stump", src: "images/stump.png", type: "stump"},
       { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
-      { id: "rock", src: "images/rock4.png", type: "rock"},
+      { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
+      { id: "rock4", src: "images/rock4.png", type: "rock"},
       { id: "dock1", src: "images/dock1.png", type: "dock"},
+      { id: "dock6", src: "images/dock6.png", type: "dock"},
       { id: "dock2", src: "images/dock2.png", type: "dock"},
       { id: "dock3", src: "images/dock3.png", type: "dock"},
+      { id: "dock4", src: "images/dock4.png", type: "dock"},
+      { id: "dock5", src: "images/dock5.png", type: "dock"},
       { id: "palm", src: "images/palm.png", type: "palm"},
       { id: "pit", src: "images/pit.png", type: "pit"},
       { id: "random", src: "images/random.png", type: "random"},
@@ -139,7 +143,8 @@ let game = new Vue({
       {code: "F", active: true, selected: false, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
       {code: "E", active: true, selected: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
       {code: "J", active: true, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
-      {code: "G", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down tree (G)"}
+      {code: "C", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down tree (C)"},
+      {code: "P", active: true, selected: false, id: "pick", src: "images/pick.png", title: "Pick berries (P)"}
     ],
     currentTile: "water",
     currentType: "water",
@@ -151,49 +156,38 @@ let game = new Vue({
   methods: {
     action(key){
       switch(key){
-        case "B":
-          popup.buildMenu()
-          break
-        case "D":
-          dump()
-          break
-        case "E":
-          eat()
-          break
-        case "F":
-          feedFire()
-          break
-        case "G":
-          grab()
-          break
-        case "X":
-          this.setAutoCenter()
-          break
-        case "J":
-          man.dismount()
-          break
+        case "B": popup.buildMenu();    break;
+        case "C": chop();               break;
+        case "D": popup.dumpMenu();     break;
+        case "E": eat();                break;
+        case "F": feedFire();           break;
+        case "G": grab();               break;
+        case "X": this.setAutoCenter(); break;
+        case "J": man.dismount();       break;
+        case "P": pick();               break;
       }
     },
     checkActive(){
       //build:
       this.icons[1].active = active === man
       //dump:
-      this.icons[2].active = (man.backpack.items.findIndex((i) => i.type === "log") >= 0 &&
-              ["sand", "grass", "stump", "logpile"].includes(board.cells[man.x][man.y].type))
+      this.icons[2].active = man.backpack.weight > 0 && dumpable.includes(board.cells[man.x][man.y].type)
       //grab:
-      this.icons[3].active = (man.backpack.weight < 10 && "berryTree" === board.cells[man.x][man.y].type &&
-        board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)
+      this.icons[3].active = man.backpack.weight < 40 && ["longGrass", "rock", "logpile"].includes(board.cells[man.x][man.y].type)
       //feed fire:
-      this.icons[4].active = (man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire)
+      this.icons[4].active = man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire
       //eat:
       this.icons[5].active = (("berryTree" === board.cells[man.x][man.y].type &&
               board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)) ||
-              (man.backpack.items.findIndex((e) => e.type === "berries") >= 0 )
+              (man.basket && man.basket.quantity > 0)
       //jump:
       this.icons[6].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)) ||
                (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock")))
       //chop:
       this.icons[7].active = man.backpack.weight === 0 && ["tree", "treeShore", "logpile"].includes(board.cells[man.x][man.y].type)
+      //pick:
+      this.icons[8].active = (man.basket && "berryTree" === board.cells[man.x][man.y].type &&
+            board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)
     },
     setAutoCenter(){
       this.icons[0].selected = !this.icons[0].selected
@@ -233,14 +227,15 @@ let game = new Vue({
       board.objectsToShow = {logpiles: [], fires: [], berryTrees: []}
       for (let i = 0; i < cols; i++){
         for (let j = 0; j< rows; j++){
-          if (board.cells[i][j].type === "berryTree"){
-            board.cells[i][j].id = board.objectsToShow.berryTrees.length
+          let cell = board.cells[i][j]
+          if (cell.type === "berryTree"){
+            cell.id = board.objectsToShow.berryTrees.length
             board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
           }
           if (isNextToType(i,j, ["pit", "sandpit"]))
-            board.cells[i][j].byPit = true
+            cell.byPit = true
           else
-            delete board.cells[i][j].byPit
+            delete cell.byPit
         }
       }
       let id = prompt("enter id for game")
@@ -250,13 +245,13 @@ let game = new Vue({
         alert("Game "+id+" was saved.")
       }
     },
-    loadBoard(){
+    loadBoard(){1
       let id = prompt("enter id of game to load")
       if (id === null)
         return
       board = JSON.parse(localStorage["board"+id])
-      if (!board.objectsToShow){
-        board.objectsToShow = {logpiles: [], fires: [], berryTrees: []}
+      if (!board.objectsToShow.rockpiles){
+        board.objectsToShow.rockpiles = []
       }
       if (board.id === undefined){
         board.id = id

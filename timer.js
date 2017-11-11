@@ -1,5 +1,4 @@
 let timeJump = false
-let showEnergy, showHealth
 
 function showTopbar(){
   let left = abs($("#board").position().left-leftOffset)
@@ -17,13 +16,20 @@ function showTopbar(){
   if (frameCount % 75 === 0){
     growBerries()
   }
+  if (frameCount % 180 === 0 && man.health < 5000)
+    man.health++
   showBackpack()
-  let EH = flyTo(showEnergy, showHealth, man.energy, man.health)
-  showEnergy = EH.x
-  showHealth = EH.y
+  showEnergy = smoothChange(showEnergy, man.energy)
+  showHealth = smoothChange(showHealth, man.health)
   showEnergyBar("Energy: ", showEnergy, 3)
   showEnergyBar("Health: ", showHealth, 30)
   showTimer()
+}
+
+function smoothChange(curX, toX){
+  let leftDiff = toX-curX
+  let left = leftDiff <= -6 ? curX+Math.floor(leftDiff/8)-5 : leftDiff >= 5 ? curX+Math.floor(leftDiff/8)+5 : toX
+  return left
 }
 
 function showTimer(){
@@ -78,9 +84,16 @@ function showBackpack(){
       let row = i > 1 ? 22 : -1
       let col = i > 1 ? i-2 : i
       image(tiles[items[i].type], col*25+left+2, top+row)
-      if (items[i].type !== "log")
-        drawBadge(col*25+left+22, top+5+row, items[i].quantity)
+      drawBadge(col*25+left+22, top+5+row, items[i].quantity)
     }
+  }
+  if (man.basket){
+    if (man.basket.quantity > 0){
+      image(tiles.basketBerries, left+80, top+25)
+      drawBadge(left+110, top+25, man.basket.quantity)
+    }
+    else
+      image(tiles.basket, left+80, top+25)
   }
 }
 

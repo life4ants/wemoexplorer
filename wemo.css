@@ -95,7 +95,7 @@ body {
   margin-right: 8px;
 }
 
-.build-option-selected {
+.red-border {
   border: solid 2px red;
 }
 

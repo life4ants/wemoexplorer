@@ -12,8 +12,8 @@ let popup = new Vue({
             </div>
             <div v-if="type === 'build'" class="modal-body">
               <div class="build-option-container">
-                <div v-for="item in options" :id="item.id" :key="item.id"
-                          :class="{'build-option': true, 'build-option-selected': selected === item.id}" @click="() => select(item.id)">
+                <div v-for="item in options" v-if="item.active" :id="item.id" :key="item.id"
+                          :class="{'build-option': true, 'red-border': selected === item.id}" @click="() => select(item.id)">
                   <h5>{{item.title}}</h5>
                   <img :src="item.src" height="50" width="50" >
                   <p>cost: {{item.cost}}</p>
@@ -35,6 +35,13 @@ let popup = new Vue({
             <div v-else-if="type === 'gameOver'" class="modal-body">
               <p>Your energy and/or health got below 0, and you died.</p>
             </div>
+            <div v-else-if="type === 'dumpMenu'" class="modal-body">
+              <p>Use arrow keys or click:</p>
+              <div style="display: flex">
+                <img v-for="item in dumpOptions" :key="item.id" :src="item.src" height="50" width="50"
+                          :class="{'red-border': selected === item.id}" @click="() => select(item.id)">
+              </div>
+            </div>
 
             <div v-if="'build' === type" class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
@@ -45,6 +52,10 @@ let popup = new Vue({
             </div>
             <div v-else-if="type === 'gameOver'" class="modal-footer">
               <button type="button" id="etr" @click="exit">Ok</button>
+            </div>
+            <div v-else-if="'dumpMenu' === type" class="modal-footer">
+              <button type="button" id="esc" @click="close">Cancel</button>
+              <button type="button" class="button-primary" id="etr" @click="dump">Dump</button>
             </div>
           </div>
         </div>
@@ -60,9 +71,14 @@ let popup = new Vue({
       type: "welcome",
       selected: null,
       options: [
-        {id: "firepit", src: "images/firepitIcon.png", title: "Firepit", cost: "60 energy", info: "firepits are for fires"},
-        {id: "basket", src: "images/basket.png", title: "Basket", cost: "15 energy, 6 long grass", info: "for picking berries in"}
-      ]
+        {id: "firepit", src: "images/firepitIcon.png", title: "Firepit",
+                  cost: "60 energy", info: "firepits are for fires", active: true},
+        {id: "basket", src: "images/basket.png", title: "Basket",
+                  cost: "15 energy, 6 long grass", info: "for picking berries in", active: true}
+      ],
+      dumpOptions: [
+      ],
+      selectId: null
     }
   },
   methods: {
@@ -89,17 +105,59 @@ let popup = new Vue({
         noLoop()
       }
     },
+
+    dumpMenu(){
+      if (man.backpack.items.length === 0)
+        return
+      if (man.backpack.items.length === 1){
+        dump(man.backpack.items[0].type)
+      }
+      else {
+        this.title = "What would you like to Dump?"
+        this.type = "dumpMenu"
+        let options = [
+          {id: "log", src: "images/logs.png"},
+          {id: "rocks", src: "images/rocks.png"},
+          {id: "longGrass", src: "images/longGrass.png"}
+        ]
+        let output = []
+        for (let i = 0; i < options.length; i++){
+          if (man.backpack.items.findIndex((e) => e.type === options[i].id) >= 0){
+            output.push(options[i])
+          }
+        }
+        this.selected = output[0].id
+        this.selectId = 0
+        this.dumpOptions = output
+        this.show = true
+        noKeys = true
+      }
+    },
+
+    dump(){
+      this.close()
+      dump(this.selected)
+    },
+
+    changeSelect(dir){
+      let id = this.selectId+dir
+      this.selectId = id >= this.dumpOptions.length ? 0 : id < 0 ? this.dumpOptions.length-1 : id
+      this.selected = this.dumpOptions[this.selectId].id
+    },
+
     welcomeMenu(){
       this.show = true
       this.size = "popup-small"
       this.title = "Welcome to Wemo"
       this.type = "welcome"
     },
+
     close(){
       this.show = false
       noKeys = false
       loop()
     },
+
     build(){
       if (this.selected !== null){
         let error = build(this.selected)
@@ -111,6 +169,7 @@ let popup = new Vue({
         }
       }
     },
+
     listGames(){
       let saved = Object.keys(localStorage)
       let games = []

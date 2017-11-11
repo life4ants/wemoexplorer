@@ -10,6 +10,7 @@ function Man(imgs, x, y) {
     weight: 0,
     items: []
   }
+  this.basket = false
   this.isNextToFire = false
   this.fireId = null
   this.stepCount = 0
@@ -48,6 +49,8 @@ function Man(imgs, x, y) {
         let id = this.vomit ? 8 : this.index+offset
         image(this.imgs[id], this.x*25, this.y*25+topbarHeight)
       }
+      if (board.cells[this.x][this.y].byPit)
+        drawPitLines(this.x, this.y)
     }
   }
 
@@ -81,8 +84,11 @@ function Man(imgs, x, y) {
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        let cost = 3+Math.round(this.backpack.weight/5)
+        let cost = 3+Math.round(this.backpack.weight/8)
+        if (this.basket)
+          cost = 3+Math.round((this.basket.quantity/10 + this.backpack.weight)/8)
         this.energy -= cost
+        this.health -= 1
 
         // reveal cell
         if (!board.cells[this.x][this.y].revealed){
