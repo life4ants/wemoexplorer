@@ -28,7 +28,9 @@ function showTopbar(){
 
 function smoothChange(curX, toX){
   let leftDiff = toX-curX
-  let left = leftDiff <= -6 ? curX+Math.floor(leftDiff/8)-5 : leftDiff >= 5 ? curX+Math.floor(leftDiff/8)+5 : toX
+  let left = leftDiff >= 1500 ? curX+250 : leftDiff <= -1500 ? curX-250 :
+             leftDiff >= 90 ? curX+Math.floor(leftDiff/6)-5 : leftDiff <= -90 ? curX+Math.floor(leftDiff/6)+5 :
+             leftDiff >= 10 ? curX+10 : leftDiff <= -10 ? curX-10 : toX
   return left
 }
 

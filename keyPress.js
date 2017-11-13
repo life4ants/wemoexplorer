@@ -226,7 +226,8 @@ function grab(){
   else if (man.backpack.weight <= 25 && "rock" === cell.type){
     cell.quantity--
     if (cell.quantity === 0){
-      cell.type = Number(cell.tile.substr(cell.tile.length-1, 1)) === NaN ? cell.type : cell.tile.substr(0, cell.tile.length-1)
+      cell.type =  cell.tile.replace(/\d+$/, "")
+      delete cell.quantity
     }
     let id = man.backpack.items.findIndex((e) => e.type === "rocks")
     if (id === -1)

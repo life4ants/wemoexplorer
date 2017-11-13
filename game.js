@@ -173,7 +173,7 @@ let game = new Vue({
       //dump:
       this.icons[2].active = man.backpack.weight > 0 && dumpable.includes(board.cells[man.x][man.y].type)
       //grab:
-      this.icons[3].active = man.backpack.weight < 40 && ["longGrass", "rock", "logpile"].includes(board.cells[man.x][man.y].type)
+      this.icons[3].active = man.backpack.weight < 40 && ["longGrass", "rock", "logpile", "rockpile"].includes(board.cells[man.x][man.y].type)
       //feed fire:
       this.icons[4].active = man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire
       //eat:
@@ -224,7 +224,7 @@ let game = new Vue({
       generateBoard()
     },
     saveBoard(){
-      board.objectsToShow = {logpiles: [], fires: [], berryTrees: []}
+      board.objectsToShow = {logpiles: [], fires: [], berryTrees: [], rockpiles: []}
       for (let i = 0; i < cols; i++){
         for (let j = 0; j< rows; j++){
           let cell = board.cells[i][j]

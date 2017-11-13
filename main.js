@@ -49,7 +49,6 @@ function preload(){
     dock4: loadImage("images/dock4.png"),
     dock5: loadImage("images/dock5.png"),
     dock6: loadImage("images/dock6.png"),
-    fire: loadImage("images/fire1.png"),
     firepit: loadImage("images/firepit.png"),
     grass: loadImage("images/grass.png"),
     longGrass: loadImage("images/longGrass.png"),
@@ -161,6 +160,13 @@ function preload(){
     loadImage("images/canoe1_3.png"),
     loadImage("images/canoe0_4.png"),
     loadImage("images/canoe0_5.png")
+  ]
+
+  fire = [
+    loadImage("images/fire1.png"),
+    loadImage("images/fire2.png"),
+    loadImage("images/fire3.png"),
+    loadImage("images/fire4.png")
   ]
 }
 
@@ -373,7 +379,7 @@ function showObjects(){
         drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
       }
       else if (x === "fires"){
-        let tile = items[i].value > 0 ? tiles.fire : tiles.firepit
+        let tile = items[i].value > 0 ? fire[Math.floor((frameCount%6)/2)] : tiles.firepit
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
         if (items[i].value > 0)
           progressBar(items[i].x, items[i].y, items[i].value)
