@@ -149,8 +149,10 @@ let game = new Vue({
       {code: "F", active: true, selected: false, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
       {code: "E", active: true, selected: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
       {code: "J", active: true, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
-      {code: "C", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down tree (C)"},
-      {code: "G", active: true, selected: false, id: "pick", src: "images/pick.png", title: "Gather berries (G)"}
+      {code: "C", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down Tree (C)"},
+      {code: "G", active: true, selected: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
+      {code: "S", active: true, selected: false, id: "sleep", src: "images/sleeping.png", title: "Go to Sleep (S)"},
+      {code: "S", active: true, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
     ],
     mode: "loading",
     currentTile: "water",
@@ -172,6 +174,7 @@ let game = new Vue({
         case "G": grab();               break;
         case "X": this.setAutoCenter(); break;
         case "J": man.dismount();       break;
+        case "S": man.sleep();          break;
       }
     },
     checkActive(){
@@ -195,6 +198,10 @@ let game = new Vue({
       //pick:
       this.icons[8].active = (man.basket && "berryTree" === board.cells[man.x][man.y].type &&
             board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)
+      //sleep:
+      this.icons[9].active = ("day" !== timeOfDay && sleepable.includes(board.cells[man.x][man.y].type) && !man.isSleeping)
+      //wake up:
+      this.icons[10].active = man.isSleeping
     },
     setAutoCenter(){
       this.icons[0].selected = !this.icons[0].selected

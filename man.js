@@ -21,6 +21,7 @@ function Man(imgs, x, y) {
   this.isFallingIntoPit = false
   this.vomit = false
   this.inDark = false
+  this.isSleeping = false
 
   this.initialize = function(obj) {
     for (key in obj){
@@ -63,7 +64,7 @@ function Man(imgs, x, y) {
         }
       }
       else {
-        let id = this.vomit ? 8 : this.index+offset
+        let id = this.vomit ? 8 : this.isSleeping ? 9 : this.index+offset
         image(this.imgs[id], this.x*25, this.y*25+topbarHeight)
       }
       if (board.cells[this.x][this.y].byPit)
@@ -73,11 +74,15 @@ function Man(imgs, x, y) {
         showCount = 1
         this.health -= 10
       }
+      if (this.isSleeping){
+        this.health = this.health < 4997 ? this.health+3 : 5000
+        this.energy = frameCount%3 === 0 ? this.energy+1 : this.energy
+      }
     }
   }
 
   this.move = function(x, y) {
-    if (this.isClimbingOutOfPit || this.isFallingIntoPit)
+    if (this.isClimbingOutOfPit || this.isFallingIntoPit || this.isSleeping)
       return
     //check for edge case
     if (this.x + x >= 0 && this.x + x < cols &&
@@ -190,5 +195,12 @@ function Man(imgs, x, y) {
       return true
     }
     return false
+  }
+
+  this.sleep = function(){
+    if ("day" !== timeOfDay && sleepable.includes(board.cells[this.x][this.y].type))
+      this.isSleeping = !this.isSleeping
+    else if (this.isSleeping)
+      this.isSleeping = false
   }
 }

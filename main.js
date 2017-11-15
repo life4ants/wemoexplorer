@@ -9,7 +9,8 @@ const worldHeight = rows * 25 + topbarHeight
 let topOffset = 0, leftOffset = 37
 let path, showCount, message, timeOfDay, startTime
 
-const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rock"]
+const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rock", "rockpile"]
+const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
 
 function initializeVars(){
   showHealth = man.health
@@ -24,6 +25,9 @@ function initializeVars(){
 
 function preload(){
   tiles = {
+    backpack: loadImage("images/carrying.png"),
+    basket: loadImage("images/basket.png"),
+    basketBerries: loadImage("images/basketBerries.png"),
     beach1: loadImage("images/beach1.png"),
     beach2: loadImage("images/beach2.png"),
     beach3: loadImage("images/beach3.png"),
@@ -40,16 +44,23 @@ function preload(){
     beachEdge2: loadImage("images/beachEdge2.png"),
     beachEdge3: loadImage("images/beachEdge3.png"),
     beachEdge4: loadImage("images/beachEdge4.png"),
+    berries: loadImage("images/berries.png"),
     berryTree: loadImage("images/berryTree.png"),
     clouds: loadImage("images/clouds.png"),
+    cross: loadImage("images/cross.png"),
+    day: loadImage("images/sun.png"),
+    dawn: loadImage("images/dawn.png"),
     dock1: loadImage("images/dock1.png"),
     dock2: loadImage("images/dock2.png"),
     dock3: loadImage("images/dock3.png"),
     dock4: loadImage("images/dock4.png"),
     dock5: loadImage("images/dock5.png"),
     dock6: loadImage("images/dock6.png"),
+    dusk: loadImage("images/dusk.png"),
     firepit: loadImage("images/firepit.png"),
     grass: loadImage("images/grass.png"),
+    log: loadImage("images/log.png"),
+    logpile: loadImage("images/logs.png"),
     longGrass: loadImage("images/longGrass.png"),
     longGrass1: loadImage("images/longGrass1.png"),
     longGrass2: loadImage("images/longGrass2.png"),
@@ -66,6 +77,7 @@ function preload(){
     grassBeach10: loadImage("images/grassBeach10.png"),
     grassBeach11: loadImage("images/grassBeach11.png"),
     grassBeach12: loadImage("images/grassBeach12.png"),
+    night: loadImage("images/moon.png"),
     palm: loadImage("images/palm.png"),
     pit: loadImage("images/pit.png"),
     random: loadImage("images/random.png"),
@@ -111,6 +123,7 @@ function preload(){
     rockMiddle: loadImage("images/rockEdge13.png"),
     sand: loadImage("images/sand.png"),
     sandpit: loadImage("images/sandpit.png"),
+    sleeping: loadImage("images/sleeping.png"),
     stump: loadImage("images/stump.png"),
     tent: loadImage("images/tent.png"),
     tree: loadImage("images/tree.png"),
@@ -126,18 +139,7 @@ function preload(){
     treeShore10: loadImage("images/treeShore10.png"),
     treeShore11: loadImage("images/treeShore11.png"),
     treeShore12: loadImage("images/treeShore12.png"),
-    water: loadImage("images/water.png"),
-    cross: loadImage("images/cross.png"),
-    day: loadImage("images/sun.png"),
-    night: loadImage("images/moon.png"),
-    dawn: loadImage("images/dawn.png"),
-    dusk: loadImage("images/dusk.png"),
-    logpile: loadImage("images/logs.png"),
-    log: loadImage("images/log.png"),
-    backpack: loadImage("images/carrying.png"),
-    berries: loadImage("images/berries.png"),
-    basket: loadImage("images/basket.png"),
-    basketBerries: loadImage("images/basketBerries.png")
+    water: loadImage("images/water.png")
   }
 
   player1 = [
@@ -149,7 +151,8 @@ function preload(){
     loadImage("images/player5.png"),
     loadImage("images/player6.png"),
     loadImage("images/player7.png"),
-    loadImage("images/player8.png")
+    loadImage("images/player8.png"),
+    loadImage("images/sleeping.png")
   ]
 
   canoe1 = [

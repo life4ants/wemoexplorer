@@ -112,6 +112,10 @@ body {
   border: solid 2px red;
 }
 
+.no-border {
+  margin: 2px;
+}
+
 .tileBox {
   display: flex;
   flex-wrap: wrap;

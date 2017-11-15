@@ -28,7 +28,7 @@ let popup = new Vue({
               <p>Use arrow keys or click:</p>
               <div style="display: flex">
                 <img v-for="item in dumpOptions" :key="item.id" :src="item.src" height="50" width="50"
-                          :class="{'red-border': selected === item.id}" @click="() => select(item.id)">
+                          :class="selected === item.id ? 'red-border' : 'no-border'" @click="() => select(item.id)">
               </div>
             </div>
 
