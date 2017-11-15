@@ -1,4 +1,6 @@
-let timeJump = false
+let saveC = 0
+let infoShown = false
+let firesize = 0
 
 function showTopbar(){
   let left = abs($("#board").position().left-leftOffset)
@@ -24,27 +26,37 @@ function showTopbar(){
   showEnergyBar("Energy: ", showEnergy, 3)
   showEnergyBar("Health: ", showHealth, 30)
   showTimer()
+  if (infoShown)
+    showInfo()
+  if (frameCount%239 === 0 && typeof board.level === "number"){
+    saveC++
+    if (Date.now()-frameTime < 18 || saveC > 2){
+      saveC = 0
+      saveGame()
+      console.log("game saved", frameCount/239)
+    }
+    else
+      console.log("game not saved", Date.now()-frameTime)
+  }
 }
 
 function smoothChange(curX, toX){
-  let leftDiff = toX-curX
-  let left = leftDiff >= 1500 ? curX+250 : leftDiff <= -1500 ? curX-250 :
-             leftDiff >= 90 ? curX+Math.floor(leftDiff/6)-5 : leftDiff <= -90 ? curX+Math.floor(leftDiff/6)+5 :
-             leftDiff >= 10 ? curX+10 : leftDiff <= -10 ? curX-10 : toX
-  return left
+  let diff = toX-curX
+  return diff >= 90 ? curX+Math.floor(diff/6)-5 : diff <= -90 ? curX+Math.floor(diff/6)+5 :
+             diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
 }
 
 function showTimer(){
-  let showMins = wemoMins%60 < 10 ? "0"+wemoMins%60 : wemoMins%60
-  let showHours = Math.floor(wemoMins/60)%12 === 0 ? 12 : Math.floor(wemoMins/60)%12
-  let suffix = wemoMins%1440 < 720 ? " AM" : " PM"
+  let showMins = board.wemoMins%60 < 10 ? "0"+board.wemoMins%60 : board.wemoMins%60
+  let showHours = Math.floor(board.wemoMins/60)%12 === 0 ? 12 : Math.floor(board.wemoMins/60)%12
+  let suffix = board.wemoMins%1440 < 720 ? " AM" : " PM"
   let right = abs($("#board").position().left-leftOffset)+window.innerWidth-leftOffset
   let top = abs($("#board").position().top-topOffset)+20
 
   textAlign(RIGHT, TOP)
   textSize(26)
   fill(0)
-  text(" Day "+ (Math.floor(wemoMins/1440)+1) + ", "+showHours+":"+showMins+suffix, right-40, top)
+  text(" Day "+ (Math.floor(board.wemoMins/1440)+1) + ", "+showHours+":"+showMins+suffix, right-40, top)
   image(tiles[timeOfDay], right-35, top)
 }
 
@@ -99,20 +111,36 @@ function showBackpack(){
   }
 }
 
-function jumpToHour(hour){
-  let pmins = hour*60
-  startTime -= ((pmins - wemoMins)*250)
-  timeJump = true
+function showInfo(){
+  let left = abs($("#board").position().left-leftOffset)
+  let bottom = abs($("#board").position().top-topOffset)+window.innerHeight
+  let f = timeOfDay === "night" || game.paused ? 255 : ["dusk", "dawn"].includes(timeOfDay) ? 230 : 20
+  fill(f)
+  textSize(15)
+  textAlign(LEFT,BOTTOM)
+  let message = "man dist: "+man.stepCount+"  canoe dist: "+canoe.stepCount+"   inDark: "+man.inDark+"   fire size: "+firesize
+  text(message, left, bottom)
+}
+
+function setTime(smins){
+  startTime = Date.now() - (smins*250)
+  board.wemoMins = smins
+  let mins = smins%1440
+  timeOfDay = mins >= 60 && mins <= 119 ? "dawn" :
+                mins >= 1320 && mins <= 1379 ? "dusk" :
+                  mins >= 1380 || mins <= 59 ? "night" :
+                    "day"
+
 }
 
 function updateTimer(){
-  let newMins = Math.floor((Date.now() - startTime)/250)+120//shift time 2 hours from 0
-  if (newMins - wemoMins > 10  && !timeJump)
+  let newMins = Math.floor((Date.now() - startTime)/250)
+  if (newMins - board.wemoMins > 10)
     resumeTimer()
   else
-    wemoMins = newMins
+    board.wemoMins = newMins
 
-  let mins = wemoMins%1440
+  let mins = board.wemoMins%1440
   timeOfDay = mins >= 60 && mins <= 119 ? "dawn" :
                 mins >= 1320 && mins <= 1379 ? "dusk" :
                   mins >= 1380 || mins <= 59 ? "night" :
@@ -125,31 +153,36 @@ function updateTimer(){
 }
 
 function resumeTimer(){
-  let newMins = Math.floor((Date.now() - startTime)/250)+120
-  startTime += (newMins-wemoMins-1)*250
-  wemoMins = Math.floor((Date.now() - startTime)/250)+120
+  let newMins = Math.floor((Date.now() - startTime)/250)
+  startTime += (newMins-board.wemoMins-1)*250
+  board.wemoMins = Math.floor((Date.now() - startTime)/250)
 }
 
 function showNight(){
   let alpha, time
   switch(timeOfDay){
     case "day":
-      if (!game.paused)
-        return
-      alpha = 220
-      break
+      if (game.paused) {
+        fill(0,0,0,210)
+        rect(0,0,worldWidth,worldHeight)
+      }
+      return
     case "dusk":
-      time = wemoMins%1440-1320
+      time = board.wemoMins%1440-1320
       alpha = Math.floor(255-pow((60-time)*.266, 2))
       break
     case "night":
       alpha = 255
       break
     case "dawn":
-      time = wemoMins%1440-60
+      time = board.wemoMins%1440-60
       alpha = Math.round(255-pow((time+1)*.266, 2))
       break
   }
+
+  let dark = (board.wemoMins%1440 >= 1350 || board.wemoMins%1440 < 90)
+  man.inDark = dark
+
   fill(0,0,0,alpha)
   noStroke()
   beginShape()
@@ -165,6 +198,12 @@ function showNight(){
       let y = fires[i].y*25+12.5+topbarHeight
       let r = size*25/2
       let arm = r*0.54666
+        firesize = Math.floor(size/2.1)
+      if (dark){
+        let a = abs(man.x-fires[i].x)
+        let b = abs(man.y-fires[i].y)
+        man.inDark = !( (a <= firesize && b <= firesize-1) || (a <= firesize-1 && b <= firesize) )
+      }
       beginContour()
       vertex(x,y-r)
       bezierVertex(x-arm,y-r,x-r,y-arm,x-r,y)

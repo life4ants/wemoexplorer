@@ -18,8 +18,25 @@ function Man(imgs, x, y) {
   this.health = 5000
   this.isInPit = false
   this.isClimbingOutOfPit = false
-  this.isFallingIntoPit
+  this.isFallingIntoPit = false
   this.vomit = false
+  this.inDark = false
+
+  this.initialize = function(obj) {
+    for (key in obj){
+      this[key] = obj[key]
+    }
+  }
+
+  this.save = function(){
+    let output = {}
+    let items = Object.keys(this)
+    for (let i = 0; i < items.length; i++){
+      if (typeof this[items[i]] !== "function" && items[i] !== "imgs")
+        output[items[i]] = this[items[i]]
+    }
+    return output
+  }
 
   this.display = function() {
     if (!this.isRidingCanoe){
@@ -51,6 +68,11 @@ function Man(imgs, x, y) {
       }
       if (board.cells[this.x][this.y].byPit)
         drawPitLines(this.x, this.y)
+      if (this.inDark){
+        message = "You're scared and cold! Find a fire!"
+        showCount = 1
+        this.health -= 10
+      }
     }
   }
 
@@ -94,6 +116,7 @@ function Man(imgs, x, y) {
         if (!board.cells[this.x][this.y].revealed){
           board.cells[this.x][this.y].revealed = true
           this.energy--
+          board.revealCount--
         }
       }
       //reveal rockEdge cells
@@ -101,6 +124,7 @@ function Man(imgs, x, y) {
         if (!board.cells[this.x+x][this.y+y].revealed){
           board.cells[this.x+x][this.y+y].revealed = true
           this.energy--
+          board.revealCount--
         }
       }
       //check if next to fires

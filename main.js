@@ -1,4 +1,6 @@
-let tiles, players, man, canoe, active, berryCount, wemoMins, noKeys, centerX, centerY, autoCenter, showEnergy, showHealth
+let frameTime = Date.now()
+
+let tiles, player1, man, canoe, active, noKeys, centerX, centerY, autoCenter, showEnergy, showHealth, currentPlayer, level, gameId
 const topbarHeight = 55
 const cols = 80
 const rows = 50
@@ -10,17 +12,14 @@ let path, showCount, message, timeOfDay, startTime
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rock"]
 
 function initializeVars(){
-  showHealth = 0
-  showEnergy = 0
+  showHealth = man.health
+  showEnergy = man.energy
   autoCenter = false
   noKeys = false
-  berryCount = 0
   path = []
   showCount = 0
   message = ""
-  timeOfDay = "day"
-  startTime = Date.now()
-  wemoMins = 120
+  setTime(board.wemoMins)
 }
 
 function preload(){
@@ -182,6 +181,7 @@ function setup(){
 }
 
 function draw(){
+  frameTime = Date.now()
   if (game.started){
     background(255)
     displayBoard()
@@ -194,14 +194,55 @@ function draw(){
       showMessage()
       centerScreen()
       showTopbar()
-      if (showCount === 0 && (man.energy < 0 || man.health < 0 ))
+      if (showCount === 0 && (man.energy <= 0 || man.health <= 0 ))
         popup.gameOver()
     }
   }
   else {
     background('green')
-    popup.welcomeMenu()
+    game.mode = "welcome"
   }
+}
+
+function startGame(){
+  man = new Man(player1, board.startX, board.startY)
+  canoe = new Canoe(canoe1, board.startX, board.startY)
+  if (board.progress){
+    canoe.initialize(board.canoe)
+    man.initialize(board.man)
+    delete board.canoe
+    delete board.man
+    active = man.isRidingCanoe ? canoe : man
+  }
+  else
+    active = canoe
+  centerOn(active)
+  initializeVars()
+  loop()
+  $("#board").css("top", centerY+"px").css("left", centerX+"px")
+}
+
+function saveGame(){
+  let index1 = currentPlayer.games.findIndex((e) => e.level === board.level)
+  let gameId = 0
+  if (index1 === -1){
+    let games = Object.keys(localStorage)
+    for (let i = 0; i < games.length; i++){
+      if (games[i].substr(0, 8) === "wemoGame")
+        gameId = Number(games[i].substring(8, games[i].length))+1
+    }
+    currentPlayer.games.push({level: board.level, id: gameId})
+    let p = JSON.parse(localStorage.wemoPlayers)
+    p[currentPlayer.index] = currentPlayer
+    localStorage.setItem("wemoPlayers", JSON.stringify(p))
+  }
+  else
+    gameId = currentPlayer.games[index1].id
+
+  board.progress = true
+  localStorage.setItem("wemoGame"+gameId, JSON.stringify(
+    Object.assign({man: man.save(), canoe: canoe.save()}, board)
+  ))
 }
 
 function showMessage(){
@@ -224,16 +265,6 @@ function showMessage(){
         popup.gameOver()
     }
   }
-}
-
-function startGame(){
-  man = new Man(player1, board.startX, board.startY)
-  canoe = new Canoe(canoe1, board.startX, board.startY)
-  active = canoe
-  centerOn(active)
-  initializeVars()
-  loop()
-  $("#board").css("top", centerY+"px").css("left", centerX+"px")
 }
 
 function displayBoard() {

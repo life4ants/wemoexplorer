@@ -2,7 +2,7 @@ let popup = new Vue({
   el: '#popup',
   template: `
     <div>
-      <div :class="{modal: true, fade: true, in: show}" :style="{ display: show ? 'block' : 'none' }" :id="size">
+      <div class="modal" v-show="show" :id="size">
         <div class="modal-dialog">
           <div class="modal-content" >
             <div class="modal-header">
@@ -21,19 +21,8 @@ let popup = new Vue({
                 </div>
               </div>
             </div>
-            <div v-else-if="type === 'welcome'" class="modal-body">
-              <div class="button-tiles">
-                <span @click="startGame">Default Board</span>
-                <hr>
-                <span @click="loadBoard">Custom Board</span>
-                <hr>
-                <span @click="edit">Edit</span>
-                <hr>
-                <span @click="listGames">List Games</span>
-              </div>
-            </div>
             <div v-else-if="type === 'gameOver'" class="modal-body">
-              <p>Your energy and/or health got below 0, and you died.</p>
+              <p>Your energy and/or health reached 0, and you died.</p>
             </div>
             <div v-else-if="type === 'dumpMenu'" class="modal-body">
               <p>Use arrow keys or click:</p>
@@ -67,8 +56,8 @@ let popup = new Vue({
     return {
       show: false,
       size: "popup-small",
-      title: "Welcome to Wemo",
-      type: "welcome",
+      title: "",
+      type: "",
       selected: null,
       options: [
         {id: "firepit", src: "images/firepitIcon.png", title: "Firepit",
@@ -82,18 +71,6 @@ let popup = new Vue({
     }
   },
   methods: {
-    startGame(){
-      game.startGame()
-      this.close()
-    },
-    loadBoard(){
-      game.loadBoard()
-      this.close()
-    },
-    edit(){
-      game.edit()
-      this.close()
-    },
     buildMenu(){
       if (active === man){
          this.title = "Build Menu"
@@ -104,6 +81,22 @@ let popup = new Vue({
         noKeys = true
         noLoop()
       }
+    },
+
+    build(){
+      if (this.selected !== null){
+        let error = build(this.selected)
+        if (!error)
+          this.close()
+        else {
+          this.type = "alert"
+          this.title = error
+        }
+      }
+    },
+
+    select(id){
+      this.selected = id
     },
 
     dumpMenu(){
@@ -145,44 +138,9 @@ let popup = new Vue({
       this.selected = this.dumpOptions[this.selectId].id
     },
 
-    welcomeMenu(){
-      this.show = true
-      this.size = "popup-small"
-      this.title = "Welcome to Wemo"
-      this.type = "welcome"
-    },
-
-    close(){
-      this.show = false
-      noKeys = false
-      loop()
-    },
-
-    build(){
-      if (this.selected !== null){
-        let error = build(this.selected)
-        if (!error)
-          this.close()
-        else {
-          this.type = "alert"
-          this.title = error
-        }
-      }
-    },
-
-    listGames(){
-      let saved = Object.keys(localStorage)
-      let games = []
-      for (let i = 0; i < saved.length; i++){
-        if (saved[i].substr(0, 5) === "board")
-          games.push(saved[i].substring(5, saved[i].length))
-      }
-      alert(games)
-    },
-    select(id){
-      this.selected = id
-    },
     gameOver(){
+      console.log("gameOver")
+      board.gameOver = true
       this.show = true
       this.title = "Game Over!!"
       this.size = "popup-center"
@@ -190,10 +148,26 @@ let popup = new Vue({
       noKeys = true
       noLoop()
     },
+
     exit(){
-      this.close()
+      let index = currentPlayer.games.findIndex((e) => e.level === board.level)
+      if (index !== -1){
+        let gameId = currentPlayer.games[index].id
+        localStorage.removeItem("wemoGame"+gameId)
+        currentPlayer.games.splice(index,1)
+        let p = JSON.parse(localStorage.wemoPlayers)
+        p[currentPlayer.index] = currentPlayer
+        localStorage.setItem("wemoPlayers", JSON.stringify(p))
+        board.progress = false
+      }
       game.exit()
+      this.close()
+    },
+
+    close(){
+      this.show = false
+      noKeys = false
+      loop()
     }
   }
 })
-

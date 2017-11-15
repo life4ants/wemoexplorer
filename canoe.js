@@ -6,6 +6,22 @@ function Canoe(imgs, x, y) {
   this.landed = false
   this.stepCount = 0
 
+  this.initialize = function(obj) {
+    for (key in obj){
+      this[key] = obj[key]
+    }
+  }
+
+  this.save = function(){
+    let output = {}
+    let items = Object.keys(this)
+    for (let i = 0; i < items.length; i++){
+      if (typeof this[items[i]] !== "function" && items[i] !== "imgs")
+        output[items[i]] = this[items[i]]
+    }
+    return output
+  }
+
   this.display = function() {
     let x = [0,1,4].includes(this.index) ? (this.x-1)*25 : this.x*25
     let y = [0,1,4].includes(this.index) ? this.y*25+topbarHeight : (this.y-1)*25+topbarHeight
@@ -35,6 +51,7 @@ function Canoe(imgs, x, y) {
             if (a >= 0 && a < cols && b >= 0 && b < rows && !board.cells[a][b].revealed){
               board.cells[a][b].revealed = true
               man.energy--
+              board.revealCount--
             }
           }
         }

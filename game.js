@@ -1,35 +1,41 @@
 let game = new Vue({
   el: '#topBar',
   template: `
-    <div :class="{topBar: mode === 'edit', sideBar: mode === 'play'}" :style="{display: mode === 'welcome' ? 'none' : 'block'}">
-      <div v-if="mode === 'edit'" class="flex">
-        <button type='button' @click='exit'>exit</button>
-        <div class="tileBox" v-if="mode === 'edit'">
-          <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+    <div>
+      <welcome-menu v-if="mode === 'welcome'" :startGame="startGame" :loadBoard="loadBoard" :edit="edit"></welcome-menu>
+      <div :class="{topBar: mode === 'edit', sideBar: mode === 'play'}">
+        <div v-if="mode === 'edit'" class="flex">
+          <button type='button' @click='exit'>exit</button>
+          <div class="tileBox" v-if="mode === 'edit'">
+            <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
+            height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+          </div>
+          <div class="tileBox" v-if="mode === 'edit'">
+            <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
+            height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+          </div>
+          <img v-if="mode === 'edit'" v-for="pic in tiles3" :key="pic.id" :src="pic.src"
+            height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+          <button type="button" @click="saveBoard" title="save the current board">Save</button>
+          <button type="button" @click="generateBoard" title="generate new board">New</button>
+          <button type="button" @click="loadBoard" title="load a saved board">Load</button>
+          <button type="button" @click="fillBoard" title="fill board with trees and grass">Fill</button>
         </div>
-        <div class="tileBox" v-if="mode === 'edit'">
-          <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+        <div v-else-if="mode === 'play'" class="sideBar-content">
+          <i class="fa fa-sign-out fa-flip-horizontal fa-2x" aria-hidden="true" @click="exit" title="Exit Game"></i>
+          <i :class="{fa: true, 'fa-2x': true, 'fa-play': paused, 'fa-pause': !paused}"
+                        aria-hidden="true" @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
+          <img v-for="icon in icons" v-show="icon.active" :key="icon.id" :src="icon.src" :title="icon.title"
+            height="30" width="30" :class="{icon: true, selected: icon.selected}" @click="() => action(icon.code)">
+          <i class="fa fa-info-circle fa-2x" aria-hidden="true" @click="showInfo" title="Show Info"></i>
         </div>
-        <img v-if="mode === 'edit'" v-for="pic in tiles3" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
-        <button type="button" @click="saveBoard" title="save the current board">Save</button>
-        <button type="button" @click="generateBoard" title="generate new board">New</button>
-        <button type="button" @click="loadBoard" title="load a saved board">Load</button>
-        <button type="button" @click="fillBoard" title="fill board with trees and grass">Fill</button>
-      </div>
-      <div v-else-if="mode === 'play'" class="sideBar-content">
-        <i class="fa fa-sign-out fa-flip-horizontal fa-2x" aria-hidden="true" @click="exit" title="Exit Game"></i>
-        <i :class="{fa: true, 'fa-2x': true, 'fa-play': paused, 'fa-pause': !paused}"
-                      aria-hidden="true" @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
-        <img v-for="icon in icons" :key="icon.id" :src="icon.src" :title="icon.title"
-          height="30" width="30" :class="{icon: true, selected: icon.selected}" :style="{display: icon.active ? 'block' : 'none' }" @click="() => action(icon.code)">
       </div>
     </div>
     `,
+  components: {
+    'welcome-menu': welcome
+  },
   data: {
-    mode: "welcome",
     tiles1: [
       { id: "beach1", src: "images/beach1.png", type: "beach"},
       { id: "beach2", src: "images/beach2.png", type: "beach"},
@@ -144,14 +150,16 @@ let game = new Vue({
       {code: "E", active: true, selected: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
       {code: "J", active: true, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
       {code: "C", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down tree (C)"},
-      {code: "P", active: true, selected: false, id: "pick", src: "images/pick.png", title: "Pick berries (P)"}
+      {code: "G", active: true, selected: false, id: "pick", src: "images/pick.png", title: "Gather berries (G)"}
     ],
+    mode: "loading",
     currentTile: "water",
     currentType: "water",
     auto: false,
     availableActions: "default",
     started: false,
-    paused: false
+    paused: false,
+    level: 1
   },
   methods: {
     action(key){
@@ -164,7 +172,6 @@ let game = new Vue({
         case "G": grab();               break;
         case "X": this.setAutoCenter(); break;
         case "J": man.dismount();       break;
-        case "P": pick();               break;
       }
     },
     checkActive(){
@@ -194,17 +201,20 @@ let game = new Vue({
       autoCenter = !autoCenter
       centerOn(active)
     },
+    showInfo(){
+      infoShown = !infoShown
+    },
     exit() {
+      if (this.mode === "play" && !board.gameOver){
+        saveGame()
+      }
       this.mode = "welcome"
+      noLoop()
       this.started = false
-      draw()
       $("body").addClass("full-screen")
       topOffset = 0
       $("#board").css("top", topOffset+"px").css("left", leftOffset)
       $(window).scrollTop(0).scrollLeft(0)
-      initializeVars()
-      noLoop()
-      popup.welcomeMenu()
     },
     edit(){
       this.mode = "edit"
@@ -225,9 +235,16 @@ let game = new Vue({
     },
     saveBoard(){
       board.objectsToShow = {logpiles: [], fires: [], berryTrees: [], rockpiles: []}
+      let revealCount = 0
       for (let i = 0; i < cols; i++){
         for (let j = 0; j< rows; j++){
           let cell = board.cells[i][j]
+          if (j === board.startY && (i-1 === board.startX || i+1 === board.startX))
+            cell.revealed = true
+          else {
+            cell.revealed = false
+            revealCount++
+          }
           if (cell.type === "berryTree"){
             cell.id = board.objectsToShow.berryTrees.length
             board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
@@ -238,6 +255,10 @@ let game = new Vue({
             delete cell.byPit
         }
       }
+      board.revealCount = revealCount
+      board.version = 2
+      board.wemoMins = 120
+      board.progress = false
       let id = prompt("enter id for game")
       if (id !== null){
         board.id = id
@@ -245,26 +266,20 @@ let game = new Vue({
         alert("Game "+id+" was saved.")
       }
     },
-    loadBoard(){1
+    loadBoard(){
       let id = prompt("enter id of game to load")
       if (id === null)
         return
       board = JSON.parse(localStorage["board"+id])
-      if (!board.objectsToShow.rockpiles){
-        board.objectsToShow.rockpiles = []
+      if (board.version === 1){
+        console.log("version 1 game")
+        board.revealCount = 4000
+        board.wemoMins = 120
+        board.version = "1upgraded"
       }
-      if (board.id === undefined){
-        board.id = id
-      }
-      if (this.mode === "welcome"){
-        this.mode = "play"
-        this.started = true
-        startGame()
-      }
-      else if (this.mode === "play"){
-        initializeVars()
-        startGame()
-      }
+      this.mode = "play"
+      this.started = true
+      startGame()
     },
     fillBoard(){
       for (let i=0; i<cols; i++){
@@ -277,7 +292,13 @@ let game = new Vue({
       }
     },
     startGame(){
-      board = JSON.parse(JSON.stringify(gameBoards[0]))
+      let index1 = currentPlayer.games.findIndex((e) => e.level === this.level)
+      if (index1 === -1)
+        board = JSON.parse(JSON.stringify(gameBoards[0]))
+      else {
+        let id = currentPlayer.games[index1].id
+        board = JSON.parse(localStorage["wemoGame"+id])
+      }
       this.mode = "play"
       this.started = true
       leftOffset = 37
