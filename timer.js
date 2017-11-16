@@ -118,7 +118,7 @@ function showInfo(){
   fill(f)
   textSize(15)
   textAlign(LEFT,BOTTOM)
-  let message = "man dist: "+man.stepCount+"  canoe dist: "+canoe.stepCount+"   inDark: "+man.inDark+"   fire size: "+firesize
+  let message = "man dist: "+man.stepCount+"  canoe dist: "+canoe.stepCount+" cells left to explore: "+board.revealCount
   text(message, left, bottom)
 }
 

@@ -7,7 +7,8 @@ const rows = 50
 const worldWidth = cols * 25
 const worldHeight = rows * 25 + topbarHeight
 let topOffset = 0, leftOffset = 37
-let path, showCount, message, timeOfDay, startTime
+let showCount, message, timeOfDay, startTime
+let path = []
 
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rock", "rockpile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
@@ -17,7 +18,6 @@ function initializeVars(){
   showEnergy = man.energy
   autoCenter = false
   noKeys = false
-  path = []
   showCount = 0
   message = ""
   setTime(board.wemoMins)
@@ -139,7 +139,8 @@ function preload(){
     treeShore10: loadImage("images/treeShore10.png"),
     treeShore11: loadImage("images/treeShore11.png"),
     treeShore12: loadImage("images/treeShore12.png"),
-    water: loadImage("images/water.png")
+    water: loadImage("images/water.png"),
+    wigwam: loadImage("images/wigwam.png")
   }
 
   player1 = [
@@ -175,8 +176,6 @@ function preload(){
 function setup(){
   let cvs = createCanvas(worldWidth, worldHeight)
   cvs.parent("board")
-  cvs.mousePressed(clickHandler)
-  cvs.mouseReleased(mouseReleaseHandler)
   $("#board").css("top", topOffset).css("left", leftOffset)
   frameRate(12)
   strokeJoin(ROUND)

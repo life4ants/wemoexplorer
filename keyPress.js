@@ -40,8 +40,9 @@ function playKeys() {
     case DOWN_ARROW:
       move(0,1)
       break
+    default:
+      game.action(key)
   }
-  game.action(key)
   return false
 }
 
@@ -53,31 +54,33 @@ function move(x, y){
     man.move(x,y)
 }
 
-function clickHandler(){
-  let x = Math.floor(mouseX/25)
-  let y = Math.floor(mouseY/25)
-  let id = x+"_"+y
-  if (game.mode === "edit" && mouseButton === LEFT){
-    if (game.auto){
-      path = [id]
-      changeTile(x,y, "cross", "cross")
+function mousePressed(){
+  if (mouseY > $(window).scrollTop() && mouseX > abs($("#board").position().left-leftOffset)){
+    let x = Math.floor(mouseX/25)
+    let y = Math.floor(mouseY/25)
+    let id = x+"_"+y
+    if (game.mode === "edit" && mouseButton === LEFT){
+      if (game.auto){
+        path = [id]
+        changeTile(x,y, "cross", "cross")
+      }
+      else if (game.currentType === "canoe"){
+        board.startX = x
+        board.startY = y
+      }
+      else
+        changeTile(x,y, game.currentTile, game.currentType)
     }
-    else if (game.currentType === "canoe"){
-      board.startX = x
-      board.startY = y
+    else if (game.mode === "edit" && mouseButton === RIGHT && !game.auto){
+      if (confirm("are you sure you want to flood fill?")){
+        let cell = board.cells[x][y]
+        floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
+      }
     }
-    else
-      changeTile(x,y, game.currentTile, game.currentType)
-  }
-  else if (game.mode === "edit" && mouseButton === RIGHT && !game.auto){
-    if (confirm("are you sure you want to flood fill?")){
-      let cell = board.cells[x][y]
-      floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
+    else if (mouseY > abs($("#board").position().top-topOffset)+topbarHeight){
+      y = Math.floor((mouseY-topbarHeight)/25)
+      console.log(x, y)
     }
-  }
-  else if (mouseY > abs($("#board").position().top-topOffset)+topbarHeight){
-    y = Math.floor((mouseY-topbarHeight)/25)
-    console.log(x, y)
   }
   return false
 }
@@ -99,7 +102,7 @@ function mouseDragged(){
   }
 }
 
-function mouseReleaseHandler(){
+function mouseReleased(){
   if (game.auto){
     let tiles = magic()
     if (tiles){
@@ -117,8 +120,13 @@ function mouseReleaseHandler(){
 
 function changeTile(x,y, tile, type){
   if (type === "rock"){
-    board.cells[x][y].type = type
-    board.cells[x][y].quantity = 4
+    if (board.cells[x][y].type === "rock"){
+      board.cells[x][y].quantity = board.cells[x][y].quantity === 1 ? 4 : board.cells[x][y].quantity-1
+    }
+    else {
+      board.cells[x][y].type = type
+      board.cells[x][y].quantity = 4
+    }
   }
   else
     board.cells[x][y] = {tile, type, revealed: false}

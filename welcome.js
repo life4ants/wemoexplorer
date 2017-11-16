@@ -25,9 +25,9 @@ let welcome = {
             <button class="button-primary" @click="newPlayer">New Player</button>
             <input type="text" v-model="name">
             <div class="links">
-              <a @click="loadBoard">custom board</a>
+              <a @click="() => loadBoard('play')">custom board</a>
               <a @click="edit">create board</a>
-              <a @click="listGames">list games</a>
+              <a @click="listGames">list boards</a>
             </div>
           </div>
         </div>

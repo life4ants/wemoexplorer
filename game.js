@@ -18,7 +18,7 @@ let game = new Vue({
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
           <button type="button" @click="saveBoard" title="save the current board">Save</button>
           <button type="button" @click="generateBoard" title="generate new board">New</button>
-          <button type="button" @click="loadBoard" title="load a saved board">Load</button>
+          <button type="button" @click="() => loadBoard('edit')" title="load a saved board">Load</button>
           <button type="button" @click="fillBoard" title="fill board with trees and grass">Fill</button>
         </div>
         <div v-else-if="mode === 'play'" class="sideBar-content">
@@ -135,6 +135,7 @@ let game = new Vue({
       { id: "river21", src: "images/rockRiver9.png", type: "river"},
       { id: "river22", src: "images/rockRiver10.png", type: "river"},
       { id: "water", src: "images/water.png", type: "water"},
+      { id: "wigwam", src: "images/wigwam.png", type: "wigwam"},
       {id: "beach", src: "images/beachX.png", type: "auto"},
       {id: "treeShore", src: "images/treeShoreX.png", type: "auto"},
       {id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
@@ -165,43 +166,58 @@ let game = new Vue({
   },
   methods: {
     action(key){
-      switch(key){
-        case "B": popup.buildMenu();    break;
-        case "C": chop();               break;
-        case "D": popup.dumpMenu();     break;
-        case "E": eat();                break;
-        case "F": feedFire();           break;
-        case "G": grab();               break;
-        case "X": this.setAutoCenter(); break;
-        case "J": man.dismount();       break;
-        case "S": man.sleep();          break;
+      if (man.isSleeping){
+        if (key === "S")
+          man.sleep()
+      }
+      else {
+        switch(key){
+          case "B": popup.buildMenu();    break;
+          case "C": chop();               break;
+          case "D": popup.dumpMenu();     break;
+          case "E": eat();                break;
+          case "F": feedFire();           break;
+          case "G": grab();               break;
+          case "X": this.setAutoCenter(); break;
+          case "J": man.dismount();       break;
+          case "S": man.sleep();          break;
+        }
       }
     },
     checkActive(){
-      //build:
-      this.icons[1].active = active === man
-      //dump:
-      this.icons[2].active = man.backpack.weight > 0 && dumpable.includes(board.cells[man.x][man.y].type)
-      //grab:
-      this.icons[3].active = man.backpack.weight < 40 && ["longGrass", "rock", "logpile", "rockpile"].includes(board.cells[man.x][man.y].type)
-      //feed fire:
-      this.icons[4].active = man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire
-      //eat:
-      this.icons[5].active = (("berryTree" === board.cells[man.x][man.y].type &&
-              board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)) ||
-              (man.basket && man.basket.quantity > 0)
-      //jump:
-      this.icons[6].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)) ||
-               (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock")))
-      //chop:
-      this.icons[7].active = man.backpack.weight === 0 && ["tree", "treeShore", "logpile"].includes(board.cells[man.x][man.y].type)
-      //pick:
-      this.icons[8].active = (man.basket && "berryTree" === board.cells[man.x][man.y].type &&
-            board.objectsToShow.berryTrees[board.cells[man.x][man.y].id].berries.length > 0)
-      //sleep:
-      this.icons[9].active = ("day" !== timeOfDay && sleepable.includes(board.cells[man.x][man.y].type) && !man.isSleeping)
-      //wake up:
-      this.icons[10].active = man.isSleeping
+      if (man.isSleeping){
+        for (let i = 1; i<this.icons.length; i++){
+          this.icons[i].active = false
+        }
+        this.icons[10].active = true
+      }
+      else {
+        let cell = board.cells[man.x][man.y]
+        //build:
+        this.icons[1].active = active === man
+        //dump:
+        this.icons[2].active = man.backpack.weight > 0 && dumpable.includes(cell.type)
+        //grab:
+        this.icons[3].active = man.backpack.weight < 40 && ["longGrass", "rock", "logpile", "rockpile"].includes(cell.type)
+        //feed fire:
+        this.icons[4].active = man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire
+        //eat:
+        this.icons[5].active = (("berryTree" === cell.type &&
+                board.objectsToShow.berryTrees[cell.id].berries.length > 0)) ||
+                (man.basket && man.basket.quantity > 0)
+        //jump:
+        this.icons[6].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)) ||
+                 (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock") || "river" === cell.type))
+        //chop:
+        this.icons[7].active = man.backpack.weight === 0 && ["tree", "treeShore"].includes(cell.type)
+        //pick:
+        this.icons[8].active = (man.basket && "berryTree" === cell.type &&
+              board.objectsToShow.berryTrees[cell.id].berries.length > 0)
+        //sleep:
+        this.icons[9].active = ("day" !== timeOfDay && sleepable.includes(cell.type) && !man.isSleeping)
+        //wake up:
+        this.icons[10].active = man.isSleeping
+      }
     },
     setAutoCenter(){
       this.icons[0].selected = !this.icons[0].selected
@@ -246,7 +262,7 @@ let game = new Vue({
       for (let i = 0; i < cols; i++){
         for (let j = 0; j< rows; j++){
           let cell = board.cells[i][j]
-          if (j === board.startY && (i-1 === board.startX || i+1 === board.startX))
+          if (j === board.startY && [i,i+1,i-1].includes(board.startX))
             cell.revealed = true
           else {
             cell.revealed = false
@@ -273,20 +289,22 @@ let game = new Vue({
         alert("Game "+id+" was saved.")
       }
     },
-    loadBoard(){
+    loadBoard(mode){
       let id = prompt("enter id of game to load")
       if (id === null)
         return
+      this.mode = mode
       board = JSON.parse(localStorage["board"+id])
-      if (board.version === 1){
-        console.log("version 1 game")
-        board.revealCount = 4000
-        board.wemoMins = 120
-        board.version = "1upgraded"
+      if (mode === "play" && board.version === 1){
+        if (board.version === 1){
+          console.log("version 1 game")
+          board.revealCount = 4000
+          board.wemoMins = 120
+          board.version = "1upgraded"
+        }
+        this.started = true
+        startGame()
       }
-      this.mode = "play"
-      this.started = true
-      startGame()
     },
     fillBoard(){
       for (let i=0; i<cols; i++){
