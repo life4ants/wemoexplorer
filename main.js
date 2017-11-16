@@ -21,6 +21,7 @@ function initializeVars(){
   showCount = 0
   message = ""
   setTime(board.wemoMins)
+  game.paused = false
 }
 
 function preload(){

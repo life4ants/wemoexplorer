@@ -100,6 +100,13 @@ function showBackpack(){
       image(tiles[items[i].type], col*25+left+2, top+row)
       drawBadge(col*25+left+22, top+5+row, items[i].quantity)
     }
+    fill(255)
+    stroke(80)
+    strokeWeight(1)
+    rect(left+55, top-1, 5, 21)
+    fill("#6C3C00")
+    noStroke()
+    rect(left+56, top+20-Math.floor(man.backpack.weight/2), 4, Math.floor(man.backpack.weight/2))
   }
   if (man.basket){
     if (man.basket.quantity > 0){

@@ -29,7 +29,7 @@ function build(type){
         man.backpack.items.splice(id, 1)
       man.energy -= 15
       man.basket = {quantity: 0}
-      popup.options[1].active = false
+      popup.buildOptions[1].active = false
     }
     else
       return "Oops! You don't have enough long grass to make a Basket!"

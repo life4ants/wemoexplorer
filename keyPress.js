@@ -2,11 +2,13 @@ function keyPressed(){
   if (game.mode === "play" && game.started && !game.paused && !noKeys){
     playKeys()
   }
-  else if (popup.type === "dumpMenu"){
+  else if (["dumpMenu", "build"].includes(popup.type)){
     switch(keyCode){
+      case UP_ARROW:
       case LEFT_ARROW:
         popup.changeSelect(-1)
         break
+      case DOWN_ARROW:
       case RIGHT_ARROW:
         popup.changeSelect(1)
         break

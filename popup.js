@@ -12,7 +12,7 @@ let popup = new Vue({
             </div>
             <div v-if="type === 'build'" class="modal-body">
               <div class="build-option-container">
-                <div v-for="item in options" v-if="item.active" :id="item.id" :key="item.id"
+                <div v-for="item in showOptions" :id="item.id" :key="item.id"
                           :class="{'build-option': true, 'red-border': selected === item.id}" @click="() => select(item.id)">
                   <h5>{{item.title}}</h5>
                   <img :src="item.src" height="50" width="50" >
@@ -27,7 +27,7 @@ let popup = new Vue({
             <div v-else-if="type === 'dumpMenu'" class="modal-body">
               <p>Use arrow keys or click:</p>
               <div style="display: flex">
-                <img v-for="item in dumpOptions" :key="item.id" :src="item.src" height="50" width="50"
+                <img v-for="item in showOptions" :key="item.id" :src="item.src" height="50" width="50"
                           :class="selected === item.id ? 'red-border' : 'no-border'" @click="() => select(item.id)">
               </div>
             </div>
@@ -59,24 +59,30 @@ let popup = new Vue({
       title: "",
       type: "",
       selected: null,
-      options: [
+      buildOptions: [
         {id: "firepit", src: "images/firepitIcon.png", title: "Firepit",
                   cost: "60 energy", info: "firepits are for fires", active: true},
         {id: "basket", src: "images/basket.png", title: "Basket",
                   cost: "15 energy, 6 long grass", info: "for picking berries in", active: true}
       ],
-      dumpOptions: [
-      ],
+      showOptions: [],
       selectId: null
     }
   },
   methods: {
     buildMenu(){
       if (active === man){
-         this.title = "Build Menu"
+        let ar = []
+        for (let i = 0; i<this.buildOptions.length; i++){
+          if (this.buildOptions[i].active)
+            ar.push(this.buildOptions[i])
+        }
+        this.showOptions = ar
+        this.title = "Build Menu"
         this.type = "build"
         this.size = "popup-center"
-        this.selected = null
+        this.selected = this.showOptions[0].id
+        this.selectId = 0
         this.show = true
         noKeys = true
         noLoop()
@@ -121,7 +127,7 @@ let popup = new Vue({
         }
         this.selected = output[0].id
         this.selectId = 0
-        this.dumpOptions = output
+        this.showOptions = output
         this.show = true
         noKeys = true
       }
@@ -134,8 +140,8 @@ let popup = new Vue({
 
     changeSelect(dir){
       let id = this.selectId+dir
-      this.selectId = id >= this.dumpOptions.length ? 0 : id < 0 ? this.dumpOptions.length-1 : id
-      this.selected = this.dumpOptions[this.selectId].id
+      this.selectId = id >= this.showOptions.length ? 0 : id < 0 ? this.showOptions.length-1 : id
+      this.selected = this.showOptions[this.selectId].id
     },
 
     gameOver(){

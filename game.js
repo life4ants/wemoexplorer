@@ -99,7 +99,6 @@ let game = new Vue({
     ],
     tiles3: [
       { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
-      { id: "stump", src: "images/stump.png", type: "stump"},
       { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
       { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
       { id: "rock4", src: "images/rock4.png", type: "rock"},
@@ -207,7 +206,7 @@ let game = new Vue({
                 (man.basket && man.basket.quantity > 0)
         //jump:
         this.icons[6].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)) ||
-                 (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock") || "river" === cell.type))
+                 (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock") || "river" === board.cells[canoe.x][canoe.y].type))
         //chop:
         this.icons[7].active = man.backpack.weight === 0 && ["tree", "treeShore"].includes(cell.type)
         //pick:
@@ -228,7 +227,7 @@ let game = new Vue({
       infoShown = !infoShown
     },
     exit() {
-      if (this.mode === "play" && !board.gameOver){
+      if (this.mode === "play" && !board.gameOver && board.level){
         saveGame()
       }
       this.mode = "welcome"
@@ -238,6 +237,7 @@ let game = new Vue({
       topOffset = 0
       $("#board").css("top", topOffset+"px").css("left", leftOffset)
       $(window).scrollTop(0).scrollLeft(0)
+      redraw()
     },
     edit(){
       this.mode = "edit"
@@ -295,7 +295,7 @@ let game = new Vue({
         return
       this.mode = mode
       board = JSON.parse(localStorage["board"+id])
-      if (mode === "play" && board.version === 1){
+      if (mode === "play"){
         if (board.version === 1){
           console.log("version 1 game")
           board.revealCount = 4000

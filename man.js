@@ -76,7 +76,7 @@ function Man(imgs, x, y) {
       }
       if (this.isSleeping){
         this.health = this.health < 4997 ? this.health+3 : 5000
-        this.energy = frameCount%3 === 0 ? this.energy+1 : this.energy
+        this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
       }
     }
   }
