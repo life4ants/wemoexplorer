@@ -163,6 +163,16 @@ function grab(){
       delete cell.id
     }
   }
+  //gather a log:
+  else if (man.backpack.weight <= 25 && "log" === cell.type){
+    cell.type = cell.tile.replace(/\d+$/, "")
+    let id = man.backpack.items.findIndex((e) => e.type === "log")
+    if (id === -1)
+      man.backpack.items.push({type: "log", quantity: 1})
+    else
+      man.backpack.items[id].quantity++
+    man.backpack.weight += 15
+  }
   //gather a rock:
   else if (man.backpack.weight <= 25 && "rock" === cell.type){
     cell.quantity--

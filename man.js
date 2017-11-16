@@ -70,7 +70,7 @@ function Man(imgs, x, y) {
       if (board.cells[this.x][this.y].byPit)
         drawPitLines(this.x, this.y)
       if (this.inDark){
-        message = "You're scared and cold! Find a fire!"
+        message = "You're too far from a fire!"
         showCount = 1
         this.health -= 10
       }
@@ -88,11 +88,13 @@ function Man(imgs, x, y) {
     if (this.x + x >= 0 && this.x + x < cols &&
       this.y + y >= 0 && this.y + y < rows){
        //check for forbidden cells
-      if (!["water", "rockEdge", "firepit", "river"].includes(board.cells[this.x+x][this.y+y].type)){
+      if (!["water", "rockEdge", "river"].includes(board.cells[this.x+x][this.y+y].type)){
+        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[this.fireId].value > 0)
+          return
         if (this.isInPit){
           this.oldX = this.x
           this.oldY = this.y
-          this.health -= 800
+          this.energy -= 600-(Math.floor(this.energy/10))
           message = ""
           showCount = 30-Math.round(this.energy/200)
           this.isClimbingOutOfPit = true
@@ -102,6 +104,7 @@ function Man(imgs, x, y) {
             this.isFallingIntoPit = true
             this.oldX = this.x
             this.oldY = this.y
+            this.health -= 800
             showCount = 5
             let name = board.cells[this.x+x][this.y+y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
             message = "You fell in "+name
@@ -132,6 +135,12 @@ function Man(imgs, x, y) {
           board.revealCount--
         }
       }
+
+      if (autoCenter)
+        centerOn(this)
+      else
+        follow(this)
+
       //check if next to fires
       let fires = board.objectsToShow.fires
       for (let i=0; i<fires.length; i++){
@@ -143,10 +152,6 @@ function Man(imgs, x, y) {
       }
       this.isNextToFire = false
       this.fireId = null
-      if (autoCenter)
-        centerOn(this)
-      else
-        follow(this)
     }
   }
 

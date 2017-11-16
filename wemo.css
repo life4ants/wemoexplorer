@@ -122,6 +122,12 @@ body {
   width: 434px;
 }
 
+.tileBox-short {
+  display: flex;
+  flex-wrap: wrap;
+  width: 341px;
+}
+
 .infobox {
   margin-left: 10px;
   padding: 1px;
@@ -138,14 +144,22 @@ body {
 
 .button-tiles {
   margin: 5px;
-  border: 1px solid #999;
+  border: solid #999;
+  border-width: 0 1px;
 }
 .button-tiles div {
-  display: block;
   padding: 10px;
   background-color: #ffa;
   cursor: pointer;
   border-bottom: 1px solid #E1E1E1;
+}
+
+.button-tiles div:nth-child(1){
+  border-top: 1px solid #999;
+}
+
+.button-tiles div:nth-last-child(1){
+  border-bottom: 1px solid #999;
 }
 
 .button-tiles div:hover {
@@ -159,6 +173,7 @@ body {
 
 .links {
   display: flex;
+  float: right;
 }
 .links a {
   text-decoration: underline;
@@ -172,6 +187,36 @@ body {
   bottom: 0;
 }
 
+.left-header {
+  text-align: left;
+  font-size: 16px;
+}
+
+.flex-around {
+  display: flex;
+  justify-content: space-around;
+}
+
+#etr, #esc {
+  position: relative;
+}
+
+#etr:after, #esc:after {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #aaa;
+  font-size: 9px;
+}
+
+#etr:after {
+  content: "(enter)";
+}
+
+#esc:after {
+  content: "(escape)";
+}
 
 /* ---------------- Modals: ------------ */
 

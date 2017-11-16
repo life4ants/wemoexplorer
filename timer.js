@@ -32,7 +32,7 @@ function showTopbar(){
     saveC++
     if (Date.now()-frameTime < 18 || saveC > 2){
       saveC = 0
-      saveGame()
+      game.saveGame()
       console.log("game saved", frameCount/239)
     }
     else

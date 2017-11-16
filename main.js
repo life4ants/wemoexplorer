@@ -82,6 +82,10 @@ function preload(){
     palm: loadImage("images/palm.png"),
     pit: loadImage("images/pit.png"),
     random: loadImage("images/random.png"),
+    randomPit: loadImage("images/randomPit.png"),
+    randomGrass: loadImage("images/randomGrass.png"),
+    randomLog: loadImage("images/randomLog.png"),
+    randomBerries: loadImage("images/randomBerries.png"),
     river1: loadImage("images/grassRiver1.png"),
     river2: loadImage("images/grassRiver2.png"),
     river3: loadImage("images/grassRiver3.png"),
@@ -181,6 +185,7 @@ function setup(){
   frameRate(12)
   strokeJoin(ROUND)
   noLoop()
+  game.mode = "welcome"
 }
 
 function draw(){
@@ -203,7 +208,6 @@ function draw(){
   }
   else {
     background('green')
-    game.mode = "welcome"
   }
 }
 
@@ -217,35 +221,56 @@ function startGame(){
     delete board.man
     active = man.isRidingCanoe ? canoe : man
   }
-  else
+  else {
     active = canoe
+    fillBoard()
+  }
   centerOn(active)
   initializeVars()
   loop()
   $("#board").css("top", centerY+"px").css("left", centerX+"px")
 }
 
-function saveGame(){
-  let index1 = currentPlayer.games.findIndex((e) => e.level === board.level)
-  let gameId = 0
-  if (index1 === -1){
-    let games = Object.keys(localStorage)
-    for (let i = 0; i < games.length; i++){
-      if (games[i].substr(0, 8) === "wemoGame")
-        gameId = Number(games[i].substring(8, games[i].length))+1
+function fillBoard(){
+  for (let i = 0; i < cols; i++){
+    for (let j = 0; j< rows; j++){
+      let cell = board.cells[i][j]
+      if (["randomPit", "randomGrass", "randomBerries", "randomLog"].includes(cell.type)){
+        let roll = Math.random()
+        if (cell.type === "randomPit" && roll < .5){
+          cell.type = "pit"
+          cell.tile = "pit"
+          for (let k = -1; k <=1; k++){
+            for (let l = -1; l<=1; l++){
+              if (abs(l+k) === 1)
+                board.cells[i+k][j+l].byPit = true
+            }
+          }
+        }
+        else if (cell.type === "randomGrass" && roll < .8){
+          let a = Math.floor(Math.random()*3)+1
+          cell.type = "longGrass"
+          cell.tile = "longGrass"+a
+        }
+        else if (cell.type === "randomBerries" && roll < .7){
+          cell.type = "berryTree"
+          cell.tile = "berryTree"
+          cell.id = board.objectsToShow.berryTrees.length
+          board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
+        }
+        else if (cell.type === "randomLog"){
+          if (Math.random() < .5)
+            cell.type = "log"
+          else
+            cell.type = cell.tile.replace(/\d+$/, "")
+        }
+        else {
+          cell.type = "grass"
+          cell.tile = "grass"
+        }
+      }
     }
-    currentPlayer.games.push({level: board.level, id: gameId})
-    let p = JSON.parse(localStorage.wemoPlayers)
-    p[currentPlayer.index] = currentPlayer
-    localStorage.setItem("wemoPlayers", JSON.stringify(p))
   }
-  else
-    gameId = currentPlayer.games[index1].id
-
-  board.progress = true
-  localStorage.setItem("wemoGame"+gameId, JSON.stringify(
-    Object.assign({man: man.save(), canoe: canoe.save()}, board)
-  ))
 }
 
 function showMessage(){
@@ -294,6 +319,8 @@ function displayBoard() {
       if (cell.type === "rock" && (cell.revealed || game.mode === "edit")){
         image(tiles["rock"+cell.quantity], i*25, j*25+offset)
       }
+      else if (["log", "randomLog"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
+        image(tiles[cell.type], i*25, j*25+offset)
       if (cell.byPit && (cell.revealed || game.mode === 'edit'))
         drawRing(i,j)
     }

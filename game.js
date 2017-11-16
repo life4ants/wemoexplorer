@@ -2,10 +2,9 @@ let game = new Vue({
   el: '#topBar',
   template: `
     <div>
-      <welcome-menu v-if="mode === 'welcome'" :startGame="startGame" :loadBoard="loadBoard" :edit="edit"></welcome-menu>
+      <welcome-menu v-if="mode === 'welcome'" :startGame="startGame" :player="currentPlayer" :edit="edit"></welcome-menu>
       <div :class="{topBar: mode === 'edit', sideBar: mode === 'play'}">
         <div v-if="mode === 'edit'" class="flex">
-          <button type='button' @click='exit'>exit</button>
           <div class="tileBox" v-if="mode === 'edit'">
             <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
@@ -14,12 +13,18 @@ let game = new Vue({
             <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
           </div>
-          <img v-if="mode === 'edit'" v-for="pic in tiles3" :key="pic.id" :src="pic.src"
+          <div class="tileBox-short" v-if="mode === 'edit'">
+            <img v-for="pic in tiles3" :key="pic.id" :src="pic.src"
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+          </div>
+          <img v-if="mode === 'edit'" v-for="pic in tiles4" :key="pic.id" :src="pic.src"
+            height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+          <button type='button' @click='exit'>exit</button>
           <button type="button" @click="saveBoard" title="save the current board">Save</button>
           <button type="button" @click="generateBoard" title="generate new board">New</button>
-          <button type="button" @click="() => loadBoard('edit')" title="load a saved board">Load</button>
-          <button type="button" @click="fillBoard" title="fill board with trees and grass">Fill</button>
+          <button type="button" @click="editBoard" title="load a saved board">Load</button>
+          <button type="button" @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</button>
+          <button type="button" @click="previewBoard">Preview (save first)</button>
         </div>
         <div v-else-if="mode === 'play'" class="sideBar-content">
           <i class="fa fa-sign-out fa-flip-horizontal fa-2x" aria-hidden="true" @click="exit" title="Exit Game"></i>
@@ -95,22 +100,8 @@ let game = new Vue({
       { id: "treeShore10", src: "images/treeShore10.png", type: "treeShore"},
       { id: "treeShore11", src: "images/treeShore11.png", type: "treeShore"},
       { id: "treeShore12", src: "images/treeShore12.png", type: "treeShore"}
-
     ],
     tiles3: [
-      { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
-      { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
-      { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
-      { id: "rock4", src: "images/rock4.png", type: "rock"},
-      { id: "dock1", src: "images/dock1.png", type: "dock"},
-      { id: "dock6", src: "images/dock6.png", type: "dock"},
-      { id: "dock2", src: "images/dock2.png", type: "dock"},
-      { id: "dock3", src: "images/dock3.png", type: "dock"},
-      { id: "dock4", src: "images/dock4.png", type: "dock"},
-      { id: "dock5", src: "images/dock5.png", type: "dock"},
-      { id: "palm", src: "images/palm.png", type: "palm"},
-      { id: "pit", src: "images/pit.png", type: "pit"},
-      { id: "random", src: "images/random.png", type: "random"},
       { id: "river1", src: "images/grassRiver1.png", type: "river"},
       { id: "river2", src: "images/grassRiver2.png", type: "river"},
       { id: "river3", src: "images/grassRiver3.png", type: "river"},
@@ -123,6 +114,8 @@ let game = new Vue({
       { id: "river10", src: "images/beachRiver4.png", type: "river"},
       { id: "river11", src: "images/beachRiver5.png", type: "river"},
       { id: "river12", src: "images/beachRiver6.png", type: "river"},
+      { id: "river21", src: "images/rockRiver9.png", type: "river"},
+      { id: "river22", src: "images/rockRiver10.png", type: "river"},
       { id: "river13", src: "images/rockRiver1.png", type: "river"},
       { id: "river14", src: "images/rockRiver2.png", type: "river"},
       { id: "river15", src: "images/rockRiver3.png", type: "river"},
@@ -130,9 +123,27 @@ let game = new Vue({
       { id: "river17", src: "images/rockRiver5.png", type: "river"},
       { id: "river18", src: "images/rockRiver6.png", type: "river"},
       { id: "river19", src: "images/rockRiver7.png", type: "river"},
-      { id: "river20", src: "images/rockRiver8.png", type: "river"},
-      { id: "river21", src: "images/rockRiver9.png", type: "river"},
-      { id: "river22", src: "images/rockRiver10.png", type: "river"},
+      { id: "river20", src: "images/rockRiver8.png", type: "river"}
+    ],
+    tiles4: [
+      { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
+      { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
+      { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
+      { id: "log", src: "images/log.png", type: "log"},
+      { id: "rock4", src: "images/rock4.png", type: "rock"},
+      { id: "dock1", src: "images/dock1.png", type: "dock"},
+      { id: "dock6", src: "images/dock6.png", type: "dock"},
+      { id: "dock2", src: "images/dock2.png", type: "dock"},
+      { id: "dock3", src: "images/dock3.png", type: "dock"},
+      { id: "dock4", src: "images/dock4.png", type: "dock"},
+      { id: "dock5", src: "images/dock5.png", type: "dock"},
+      { id: "palm", src: "images/palm.png", type: "palm"},
+      { id: "pit", src: "images/pit.png", type: "pit"},
+      { id: "random", src: "images/random.png", type: "random"},
+      { id: "randomPit", src: "images/randomPit.png", type: "randomPit"},
+      { id: "randomGrass", src: "images/randomGrass.png", type: "randomGrass"},
+      { id: "randomLog", src: "images/randomLog.png", type: "randomLog"},
+      { id: "randomBerries", src: "images/randomBerries.png", type: "randomBerries"},
       { id: "water", src: "images/water.png", type: "water"},
       { id: "wigwam", src: "images/wigwam.png", type: "wigwam"},
       {id: "beach", src: "images/beachX.png", type: "auto"},
@@ -151,17 +162,17 @@ let game = new Vue({
       {code: "J", active: true, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
       {code: "C", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down Tree (C)"},
       {code: "G", active: true, selected: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
-      {code: "S", active: true, selected: false, id: "sleep", src: "images/sleeping.png", title: "Go to Sleep (S)"},
+      {code: "S", active: true, selected: false, id: "sleep", src: "images/sleepIcon.png", title: "Go to Sleep (S)"},
       {code: "S", active: true, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
     ],
     mode: "loading",
     currentTile: "water",
     currentType: "water",
     auto: false,
-    availableActions: "default",
     started: false,
     paused: false,
-    level: 1
+    level: 1,
+    currentPlayer: {}
   },
   methods: {
     action(key){
@@ -197,7 +208,7 @@ let game = new Vue({
         //dump:
         this.icons[2].active = man.backpack.weight > 0 && dumpable.includes(cell.type)
         //grab:
-        this.icons[3].active = man.backpack.weight < 40 && ["longGrass", "rock", "logpile", "rockpile"].includes(cell.type)
+        this.icons[3].active = man.backpack.weight < 40 && ["longGrass", "rock", "logpile", "rockpile", "log"].includes(cell.type)
         //feed fire:
         this.icons[4].active = man.backpack.items.findIndex((i) => i.type === "log") >= 0 && man.isNextToFire
         //eat:
@@ -227,8 +238,19 @@ let game = new Vue({
       infoShown = !infoShown
     },
     exit() {
-      if (this.mode === "play" && !board.gameOver && board.level){
-        saveGame()
+      if (this.mode === "play" && !board.gameOver){
+        this.saveGame()
+      }
+      else if (board.gameOver){
+        let index = this.currentPlayer.games.findIndex((e) => e.level === board.level)
+        if (index !== -1){
+          let gameId = this.currentPlayer.games[index].id
+          localStorage.removeItem("wemoGame"+gameId)
+          this.currentPlayer.games.splice(index,1)
+          let p = JSON.parse(localStorage.wemoPlayers)
+          p[this.currentPlayer.index] = this.currentPlayer
+          localStorage.setItem("wemoPlayers", JSON.stringify(p))
+        }
       }
       this.mode = "welcome"
       noLoop()
@@ -256,6 +278,11 @@ let game = new Vue({
     generateBoard(){
       generateBoard()
     },
+
+    previewBoard(){
+      fillBoard()
+    },
+
     saveBoard(){
       board.objectsToShow = {logpiles: [], fires: [], berryTrees: [], rockpiles: []}
       let revealCount = 0
@@ -289,24 +316,15 @@ let game = new Vue({
         alert("Game "+id+" was saved.")
       }
     },
-    loadBoard(mode){
+
+    editBoard(){
       let id = prompt("enter id of game to load")
       if (id === null)
         return
-      this.mode = mode
       board = JSON.parse(localStorage["board"+id])
-      if (mode === "play"){
-        if (board.version === 1){
-          console.log("version 1 game")
-          board.revealCount = 4000
-          board.wemoMins = 120
-          board.version = "1upgraded"
-        }
-        this.started = true
-        startGame()
-      }
     },
-    fillBoard(){
+
+    grassAndTreeFill(){
       for (let i=0; i<cols; i++){
         for (let j =0; j<rows; j++){
           let type = (i%8 + j%8 > Math.random()*5 && i%8 + j%8 < Math.random()*14) ?
@@ -316,19 +334,55 @@ let game = new Vue({
         }
       }
     },
-    startGame(){
-      let index1 = currentPlayer.games.findIndex((e) => e.level === this.level)
-      if (index1 === -1)
-        board = JSON.parse(JSON.stringify(gameBoards[0]))
-      else {
-        let id = currentPlayer.games[index1].id
-        board = JSON.parse(localStorage["wemoGame"+id])
+
+    startGame(type, player, index){
+      console.log(player)
+      if (type === "default"){
+        board = JSON.parse(JSON.stringify(gameBoards[index-1]))
       }
+      else if (type === "resume"){
+        board = JSON.parse(localStorage["wemoGame"+index])
+      }
+      else if (type === "custom"){
+        board = JSON.parse(localStorage["board"+index])
+        board.level = index
+      }
+      if (board.version === 1){
+        console.log("version 1 game")
+        board.revealCount = 4000
+        board.wemoMins = 120
+        board.version = "1upgraded"
+      }
+      this.currentPlayer = player
       this.mode = "play"
       this.started = true
       leftOffset = 37
       startGame()
     },
+
+    saveGame(){
+      let index1 = this.currentPlayer.games.findIndex((e) => e.level === board.level)
+      let gameId = 0
+      if (index1 === -1){
+        let games = Object.keys(localStorage)
+        for (let i = 0; i < games.length; i++){
+          if (games[i].substr(0, 8) === "wemoGame")
+            gameId = Number(games[i].substring(8, games[i].length))+1
+        }
+        this.currentPlayer.games.push({level: board.level, id: gameId})
+        let p = JSON.parse(localStorage.wemoPlayers)
+        p[this.currentPlayer.index] = this.currentPlayer
+        localStorage.setItem("wemoPlayers", JSON.stringify(p))
+      }
+      else
+        gameId = this.currentPlayer.games[index1].id
+
+      board.progress = true
+      localStorage.setItem("wemoGame"+gameId, JSON.stringify(
+        Object.assign({man: man.save(), canoe: canoe.save()}, board)
+      ))
+    },
+
     pauseGame(){
       if (this.paused){
         showCount = 0

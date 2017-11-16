@@ -156,21 +156,12 @@ let popup = new Vue({
     },
 
     exit(){
-      let index = currentPlayer.games.findIndex((e) => e.level === board.level)
-      if (index !== -1){
-        let gameId = currentPlayer.games[index].id
-        localStorage.removeItem("wemoGame"+gameId)
-        currentPlayer.games.splice(index,1)
-        let p = JSON.parse(localStorage.wemoPlayers)
-        p[currentPlayer.index] = currentPlayer
-        localStorage.setItem("wemoPlayers", JSON.stringify(p))
-        board.progress = false
-      }
       game.exit()
       this.close()
     },
 
     close(){
+      this.type = ""
       this.show = false
       noKeys = false
       loop()

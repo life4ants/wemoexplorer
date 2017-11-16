@@ -16,12 +16,10 @@ function keyPressed(){
   }
   switch(keyCode){
     case ENTER:
-      if (popup.show)
-        $('#etr').click()
+      $('#etr').click()
       break
     case ESCAPE:
-      if (popup.show)
-        $('#esc').click()
+      $('#esc').click()
       break
     case 32:
       game.pauseGame()
@@ -79,12 +77,11 @@ function mousePressed(){
         floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
       }
     }
-    else if (mouseY > abs($("#board").position().top-topOffset)+topbarHeight){
+    else if (mouseY > abs($("#board").position().top-topOffset)+topbarHeight && game.mode === "play"){
       y = Math.floor((mouseY-topbarHeight)/25)
       console.log(x, y)
     }
   }
-  return false
 }
 
 function mouseDragged(){
@@ -130,6 +127,8 @@ function changeTile(x,y, tile, type){
       board.cells[x][y].quantity = 4
     }
   }
+  else if (["log", "randomLog"].includes(type))
+    board.cells[x][y].type = type
   else
     board.cells[x][y] = {tile, type, revealed: false}
 }
