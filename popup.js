@@ -55,15 +55,17 @@ let popup = new Vue({
   data(){
     return {
       show: false,
-      size: "popup-small",
+      size: "popup-center",
       title: "",
       type: "",
       selected: null,
       buildOptions: [
+        {id: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax",
+                  cost: "100 energy, 1 long grass, 1 rock, 1 log", info: "For chopping down trees so you have logs to burn. Very important.", active: true},
         {id: "firepit", src: "images/firepitIcon.png", title: "Firepit",
-                  cost: "60 energy", info: "firepits are for fires", active: true},
+                  cost: "200 energy", info: "For building fires in. Very important for staying alive every night.", active: true},
         {id: "basket", src: "images/basket.png", title: "Basket",
-                  cost: "15 energy, 6 long grass", info: "for picking berries in", active: true}
+                  cost: "50 energy, 6 long grass", info: "For picking berries in", active: true}
       ],
       showOptions: [],
       selectId: null
@@ -95,8 +97,8 @@ let popup = new Vue({
         if (!error)
           this.close()
         else {
-          this.type = "alert"
           this.title = error
+          this.type = "alert"
         }
       }
     },
@@ -116,7 +118,7 @@ let popup = new Vue({
         this.type = "dumpMenu"
         let options = [
           {id: "log", src: "images/logs.png"},
-          {id: "rocks", src: "images/rocks.png"},
+          {id: "rock", src: "images/rocks.png"},
           {id: "longGrass", src: "images/longGrass.png"}
         ]
         let output = []
@@ -165,6 +167,12 @@ let popup = new Vue({
       this.show = false
       noKeys = false
       loop()
+    },
+
+    setAlert(content){
+      this.show = true
+      this.title = content
+      this.type = "alert"
     }
   }
 })

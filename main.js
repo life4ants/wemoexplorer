@@ -112,7 +112,7 @@ function preload(){
     rock2: loadImage("images/rock2.png"),
     rock3: loadImage("images/rock3.png"),
     rock4: loadImage("images/rock4.png"),
-    rocks: loadImage("images/rocks.png"),
+    rock: loadImage("images/rocks.png"),
     rockEdge1: loadImage("images/rockEdge1.png"),
     rockEdge2: loadImage("images/rockEdge2.png"),
     rockEdge3: loadImage("images/rockEdge3.png"),
@@ -129,6 +129,7 @@ function preload(){
     sand: loadImage("images/sand.png"),
     sandpit: loadImage("images/sandpit.png"),
     sleeping: loadImage("images/sleeping.png"),
+    stoneAx: loadImage("images/stoneAx.png"),
     stump: loadImage("images/stump.png"),
     tent: loadImage("images/tent.png"),
     tree: loadImage("images/tree.png"),
@@ -436,7 +437,7 @@ function showObjects(){
         drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
       }
       else if (x === "rockpiles"){
-        image(tiles.rocks, items[i].x*25, items[i].y*25+topbarHeight)
+        image(tiles.rock, items[i].x*25, items[i].y*25+topbarHeight)
         drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
       }
       else if (x === "fires"){

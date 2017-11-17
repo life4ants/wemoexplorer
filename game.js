@@ -336,7 +336,6 @@ let game = new Vue({
     },
 
     startGame(type, player, index){
-      console.log(player)
       if (type === "default"){
         board = JSON.parse(JSON.stringify(gameBoards[index-1]))
       }
@@ -352,6 +351,14 @@ let game = new Vue({
         board.revealCount = 4000
         board.wemoMins = 120
         board.version = "1upgraded"
+      }
+      if (board.version !== 4 && board.progress){
+        console.log("version 3 or older game")
+        board.man.tools = []
+        let a = board.man.backpack.items.findIndex((e) => e.type === "rocks")
+        if (a >= 0)
+          board.man.backpack.items[a].type = "rock"
+        board.version = 4
       }
       this.currentPlayer = player
       this.mode = "play"

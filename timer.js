@@ -116,6 +116,11 @@ function showBackpack(){
     else
       image(tiles.basket, left+80, top+25)
   }
+  if (man.tools.length > 0){
+    for (let i = 0; i < man.tools.length; i++){
+      image(tiles[man.tools[i]], left+80+(i*26), top-1)
+    }
+  }
 }
 
 function showInfo(){

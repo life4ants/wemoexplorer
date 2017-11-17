@@ -33,7 +33,7 @@ function Canoe(imgs, x, y) {
       this.y + y >= 0 && this.y + y < rows) {
       if (["water", "river"].includes(board.cells[this.x+x][this.y+y].type) ||
           (board.cells[this.x+x][this.y+y].type === "beach" &&
-           board.cells[this.x][this.y].type === "water")
+           ["water", "river"].includes(board.cells[this.x][this.y].type))
         ) {
 
         this.x += x

@@ -11,6 +11,7 @@ function Man(imgs, x, y) {
     items: []
   }
   this.basket = false
+  this.tools = []
   this.isNextToFire = false
   this.fireId = null
   this.stepCount = 0

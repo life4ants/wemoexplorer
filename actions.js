@@ -3,49 +3,97 @@ function build(type){
   let cell = board.cells[active.x][active.y]
   if (type === "firepit"){
     let fires = board.objectsToShow.fires
+    if (man.energy <= 200)
+      return "Oops! You don't have enough energy!"
     if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
-      if (man.energy <= 60)
-        return "Oops! You don't have enough energy to build a Firepit!"
       let id = fires.length > 0 ? fires[fires.length-1].id+1 : 0
       cell.type = "firepit"
       cell.id = id
       fires.push({id: id, x: active.x, y: active.y, value: 0})
       man.isNextToFire = true
       man.fireId = id
-      man.energy -= 60
+      man.energy -= 200
       return false
     }
     else
-      return "Opps! Firepits cannot be build on the type of square you are on."
+      return "Opps! You can't build a Firepit on a "+cell.type+"!"
   }
   else if (type === "basket"){
     let id = man.backpack.items.findIndex((e) => e.type === "longGrass")
+    if (man.energy <= 50)
+      return "Oops! you don't have enough energy!"
     if (id >= 0 && man.backpack.items[id].quantity >= 6){
-      if (man.energy <= 15)
-        return "Oops! you do not have enough energy to make a Basket!"
       man.backpack.weight -= 12
       man.backpack.items[id].quantity -= 6
       if (man.backpack.items[id].quantity === 0)
         man.backpack.items.splice(id, 1)
-      man.energy -= 15
+      man.energy -= 50
       man.basket = {quantity: 0}
-      popup.buildOptions[1].active = false
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "basket")].active = false
+      return "Congratulations! You can now gather berries. Look for the Basket icon on the top bar."
     }
-    else
-      return "Oops! You don't have enough long grass to make a Basket!"
+    else {
+      let num = id >= ? man.backpack.items[id].quantity : 0
+      return "Oops! You need "+(6-num)+" more Long Grass!"
+    }
+  }
+  else if (type === "stoneAx"){
+    if (man.energy <= 100)
+      return "Oops! you don't have enough energy!"
+    let ar = [ {type: "longGrass", found: false, index: null},
+               {type: "rock", found: false, index: null},
+               {type: "log", found: false, index: null}
+             ]
+    let found = 0
+    for (let i = 0; i < man.backpack.items.length; i++){
+      for (let j = 0; j < ar.length; j++){
+        if (man.backpack.items[i].type === ar[j].type){
+          ar[j].found = true
+          ar[j].index = i
+          found++
+        }
+      }
+    }
+    if (found === 3){
+      man.backpack.weight -= 32
+      for (let j = 0; j < ar.length; j++){
+        man.backpack.items[ar[j].index].quantity--
+        if (man.backpack.items[ar[j].index].quantity === 0)
+          man.backpack.items.splice(ar[j].index, 1)
+      }
+      man.tools.push("stoneAx")
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
+      return "Congratulations! You can now chop down trees! Look for the Stone Ax icon on the top bar."
+    }
+    else {
+      let out = "Opps! You still need "
+      for (let j = 0; j < ar.length; j++){
+        if (!ar[j].found){
+          let name = j === 0 ? "a Long Grass and " : j === 1 ? "a Rock and " : "a Log and "
+          out += name
+        }
+      }
+      return out.slice(0, -5)+"!"
+    }
   }
 }
 
 function chop(){
   let cell = board.cells[man.x][man.y]
   if (["tree", "treeShore"].includes(board.cells[active.x][active.y].type)){
-    let logpiles = board.objectsToShow.logpiles
-    let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
-    cell.type = "logpile"
-    cell.tile = "stump"
-    cell.id = id
-    logpiles.push({id: id, x: active.x, y: active.y, quantity: 5})
-    man.energy -= 20
+    let t = man.tools.findIndex((e) => e === "stoneAx" || e === "steelAx")
+    if (t === -1){
+      popup.setAlert("It looks like you don't have any tools for chopping down trees. Look for an ax on the Build Menu.")
+    }
+    else {
+      let logpiles = board.objectsToShow.logpiles
+      let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
+      cell.type = "logpile"
+      cell.tile = "stump"
+      cell.id = id
+      logpiles.push({id: id, x: active.x, y: active.y, quantity: 5})
+      man.energy = man.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
+    }
   }
 }
 
@@ -68,7 +116,7 @@ function dump(type){
       return
     weight = 15
   }
-  else if (type === "rocks"){
+  else if (type === "rock"){
     let rockpiles = board.objectsToShow.rockpiles
     if ("rockpile" === cell.type){
       let index = rockpiles.findIndex((e) => e.id === cell.id)
@@ -149,7 +197,7 @@ function grab(){
     let piles = board.objectsToShow[cell.type+"s"]
     let index = piles.findIndex((e) => e.id === cell.id)
     piles[index].quantity--
-    let name = cell.type === "logpile" ? "log" : cell.type === "rockpile" ? "rocks" : ""
+    let name = cell.type.slice(0, -4)
     let weight = ["logpile", "rockpile"].includes(cell.type) ? 15 : 10
     let bpid = man.backpack.items.findIndex((e) => e.type === name)
     if (bpid === -1)
@@ -180,9 +228,9 @@ function grab(){
       cell.type =  cell.tile.replace(/\d+$/, "")
       delete cell.quantity
     }
-    let id = man.backpack.items.findIndex((e) => e.type === "rocks")
+    let id = man.backpack.items.findIndex((e) => e.type === "rock")
     if (id === -1)
-      man.backpack.items.push({type: "rocks", quantity: 1})
+      man.backpack.items.push({type: "rock", quantity: 1})
     else
       man.backpack.items[id].quantity++
     man.backpack.weight += 15
