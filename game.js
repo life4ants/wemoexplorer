@@ -255,6 +255,7 @@ let game = new Vue({
       this.mode = "welcome"
       noLoop()
       this.started = false
+      popup.show = false
       $("body").addClass("full-screen")
       topOffset = 0
       $("#board").css("top", topOffset+"px").css("left", leftOffset)
@@ -266,6 +267,7 @@ let game = new Vue({
       $("body").removeClass("full-screen")
       topOffset = 100
       $("#board").css("top", topOffset+"px").css("left", "0px")
+      resizeWorld(80, 50)
       generateBoard()
       this.started = true
       loop()
@@ -276,7 +278,18 @@ let game = new Vue({
       this.auto = type === "auto" ? true : false
     },
     generateBoard(){
-      generateBoard()
+      let p = prompt("How big would you like your world to be?\nPlease enter width and height separated by a coma:")
+      if (p === null)
+        return
+      p = p.split(",")
+      let cols = Number(p[0])
+      let rows = Number(p[1])
+      if (cols != cols || rows != rows)
+        alert("Please enter 2 numbers separated by a coma (\",\")")
+      else {
+        resizeWorld(cols, rows)
+        generateBoard()
+      }
     },
 
     previewBoard(){
@@ -322,6 +335,7 @@ let game = new Vue({
       if (id === null)
         return
       board = JSON.parse(localStorage["board"+id])
+      resizeWorld(board.cells.length, board.cells[0].length)
     },
 
     grassAndTreeFill(){
@@ -392,14 +406,14 @@ let game = new Vue({
 
     pauseGame(){
       if (this.paused){
-        showCount = 0
         resumeTimer()
-        loop()
         this.paused = false
+        popup.close()
       }
       else {
-        message = "Game Paused"
-        showCount = 2
+        popup.type = "gamePaused"
+        popup.size = "popup-tiny"
+        popup.show = true
         this.paused = true
         noLoop()
       }

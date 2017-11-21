@@ -47,6 +47,7 @@ body {
   border: solid #B7CBBA;
   border-width: 0 2px 0 0;
   z-index: 1;
+  user-select: none;
 }
 
 .hidden {
@@ -218,6 +219,11 @@ body {
   content: "(escape)";
 }
 
+.center-grey {
+  text-align: center;
+  color: #777;
+}
+
 /* ---------------- Modals: ------------ */
 
 .modal {
@@ -228,6 +234,7 @@ body {
   right: 0;
   bottom: 0;
   z-index: 10;
+  pointer-events: none;
 }
 
 #grow {
@@ -249,23 +256,29 @@ body {
 }
 
 .modal-backdrop {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 5;
-    background-color: #000;
-}
-
-.modal-backdrop.in {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  background-color: #000;
   opacity: .5;
+  pointer-events: auto;
 }
 
 .modal-dialog {
     position: relative;
     width: auto;
     margin: 10px;
+    pointer-events: auto;
+}
+
+#popup-tiny .modal-dialog {
+  width: 250px;
+  top: 50%;
+  margin: 0 auto;
+  transform: translateY(-50%);
 }
 
 @media (min-width: 450px) {
@@ -315,10 +328,6 @@ body {
     padding: 15px;
     text-align: right;
     border-top: 1px solid #e5e5e5;
-}
-
-.modal-title {
-    font-size: 20px;
 }
 
 

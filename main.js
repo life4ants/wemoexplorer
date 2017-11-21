@@ -1,12 +1,10 @@
 let frameTime = Date.now()
 
-let tiles, player1, man, canoe, active, noKeys, centerX, centerY, autoCenter, showEnergy, showHealth, currentPlayer, level, gameId
+let tiles, player1, man, canoe, active
+let noKeys, centerX, centerY, autoCenter, showEnergy, showHealth
+let cols, rows, worldWidth, worldHeight
 const topbarHeight = 55
-const cols = 80
-const rows = 50
-const worldWidth = cols * 25
-const worldHeight = rows * 25 + topbarHeight
-let topOffset = 0, leftOffset = 37
+let topOffset = 0, leftOffset = 0
 let showCount, message, timeOfDay, startTime
 let path = []
 
@@ -14,6 +12,7 @@ const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", 
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
 
 function initializeVars(){
+  resizeWorld(board.cells.length, board.cells[0].length)
   showHealth = man.health
   showEnergy = man.energy
   autoCenter = false
@@ -22,6 +21,14 @@ function initializeVars(){
   message = ""
   setTime(board.wemoMins)
   game.paused = false
+  resizeCanvas(worldWidth, worldHeight)
+}
+
+function resizeWorld(c, r){
+  cols = c
+  rows = r
+  worldWidth = cols * 25
+  worldHeight = rows * 25 + topbarHeight
 }
 
 function preload(){
@@ -180,7 +187,7 @@ function preload(){
 }
 
 function setup(){
-  let cvs = createCanvas(worldWidth, worldHeight)
+  let cvs = createCanvas(window.innerWidth, window.innerHeight)
   cvs.parent("board")
   $("#board").css("top", topOffset).css("left", leftOffset)
   frameRate(12)
@@ -215,6 +222,7 @@ function draw(){
 function startGame(){
   man = new Man(player1, board.startX, board.startY)
   canoe = new Canoe(canoe1, board.startX, board.startY)
+  initializeVars()
   if (board.progress){
     canoe.initialize(board.canoe)
     man.initialize(board.man)
@@ -226,8 +234,8 @@ function startGame(){
     active = canoe
     fillBoard()
   }
+  popup.reset()
   centerOn(active)
-  initializeVars()
   loop()
   $("#board").css("top", centerY+"px").css("left", centerX+"px")
 }

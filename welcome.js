@@ -142,7 +142,7 @@ let welcome = {
           if (index === -1)
             console.error("saved game",savedGames[i].level,"not found in custom worlds")
           customWorlds[index].savedGame = true
-          customWorlds[index].gameId = savedGames[index].id
+          customWorlds[index].gameId = savedGames[i].id
         }
       }
       this.customWorlds = customWorlds

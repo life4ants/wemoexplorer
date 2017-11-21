@@ -41,6 +41,11 @@ function Man(imgs, x, y) {
   }
 
   this.display = function() {
+    if (this.inDark){
+      message = "You're too far from a fire!"
+      showCount = 1
+      this.health -= Math.floor(this.health/369)
+    }
     if (!this.isRidingCanoe){
       let offset = this.backpack.weight > 0 ? 4 : 0
       if (this.isInPit){
@@ -70,11 +75,6 @@ function Man(imgs, x, y) {
       }
       if (board.cells[this.x][this.y].byPit)
         drawPitLines(this.x, this.y)
-      if (this.inDark){
-        message = "You're too far from a fire!"
-        showCount = 1
-        this.health -= 10
-      }
       if (this.isSleeping){
         this.health = this.health < 4997 ? this.health+3 : 5000
         this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy

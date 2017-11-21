@@ -33,7 +33,7 @@ function build(type){
       return "Congratulations! You can now gather berries. Look for the Basket icon on the top bar."
     }
     else {
-      let num = id >= ? man.backpack.items[id].quantity : 0
+      let num = id !== -1 ? man.backpack.items[id].quantity : 0
       return "Oops! You need "+(6-num)+" more Long Grass!"
     }
   }
@@ -157,8 +157,6 @@ function eat(){
   }
   else
     return
-  man.energy += 35
-  man.health = man.health < 5000 ? man.health+5 : 5000
   if (man.energy > 5000){
     man.energy -= Math.floor((Math.random()*5+1)*100)
     man.health -= Math.floor((Math.random()*5+1)*10)
@@ -168,7 +166,13 @@ function eat(){
     noKeys = true
   }
   else if (man.energy > 4965){
-    alert("You are full. Stop eating!")
+    man.energy += 35
+    man.health = man.health < 5000 ? man.health+10 : 5000
+    popup.setAlert("You are full. Stop eating!")
+  }
+  else {
+    man.energy += 35
+    man.health = man.health < 5000 ? man.health+5 : 5000
   }
 }
 

@@ -5,10 +5,8 @@ let popup = new Vue({
       <div class="modal" v-show="show" :id="size">
         <div class="modal-dialog">
           <div class="modal-content" >
-            <div class="modal-header">
-              <h4 class="modal-title">
-                {{title}}
-              </h4>
+            <div class="modal-header" v-if="type !== 'gamePaused'">
+              <h6>{{title}}</h6>
             </div>
             <div v-if="type === 'build'" class="modal-body">
               <div class="build-option-container">
@@ -32,24 +30,28 @@ let popup = new Vue({
               </div>
             </div>
 
-            <div v-if="'build' === type" class="modal-footer">
+            <div      v-if="'build' === type" class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
               <button type="button" class="button-primary" :class="{disabled: selected === null}" id="etr" @click="build">Build</button>
             </div>
-            <div v-else-if="type === 'alert'" class="modal-footer">
+            <div v-else-if="'alert' === type" class="modal-footer">
               <button type="button" id="etr" @click="close">Ok</button>
-            </div>
-            <div v-else-if="type === 'gameOver'" class="modal-footer">
-              <button type="button" id="etr" @click="exit">Ok</button>
             </div>
             <div v-else-if="'dumpMenu' === type" class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
               <button type="button" class="button-primary" id="etr" @click="dump">Dump</button>
             </div>
+            <div v-else-if="'gameOver' === type" class="modal-footer">
+              <button type="button" id="etr" @click="exit">Ok</button>
+            </div>
+            <div v-else-if="'gamePaused' === type" class="modal-footer">
+              <h6>Game Paused</h6>
+              <p class="center-grey">press space bar to resume</p>
+            </div>
           </div>
         </div>
       </div>
-      <div :class="{'modal-backdrop': show, in: show}"></div>
+      <div :class="{'modal-backdrop': show && type !== 'gamePaused'}"></div>
     </div>
     `,
   data(){
@@ -72,6 +74,14 @@ let popup = new Vue({
     }
   },
   methods: {
+    reset(){
+      if (man.basket){
+        this.buildOptions[this.buildOptions.findIndex((e) => e.id === "basket")].active = false
+      }
+      if (man.tools.includes("stoneAx"))
+        this.buildOptions[this.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
+    },
+
     buildMenu(){
       if (active === man){
         let ar = []
@@ -159,11 +169,9 @@ let popup = new Vue({
 
     exit(){
       game.exit()
-      this.close()
     },
 
     close(){
-      this.type = ""
       this.show = false
       noKeys = false
       loop()
@@ -173,6 +181,9 @@ let popup = new Vue({
       this.show = true
       this.title = content
       this.type = "alert"
+      this.size = "popup-center"
+      noKeys = true
+      noLoop()
     }
   }
 })

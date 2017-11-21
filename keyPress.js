@@ -29,29 +29,21 @@ function keyPressed(){
 function playKeys() {
   switch(keyCode){
     case LEFT_ARROW:
-      move(-1, 0)
+      active.move(-1, 0)
       break
     case RIGHT_ARROW:
-      move(1,0)
+      active.move(1,0)
       break
     case UP_ARROW:
-      move(0,-1)
+      active.move(0,-1)
       break
     case DOWN_ARROW:
-      move(0,1)
+      active.move(0,1)
       break
     default:
       game.action(key)
   }
   return false
-}
-
-function move(x, y){
-  if (active === canoe){
-    canoe.move(x,y)
-  }
-  else
-    man.move(x,y)
 }
 
 function mousePressed(){
@@ -71,13 +63,8 @@ function mousePressed(){
       else
         changeTile(x,y, game.currentTile, game.currentType)
     }
-    else if (game.mode === "edit" && mouseButton === RIGHT && !game.auto){
-      if (confirm("are you sure you want to flood fill?")){
-        let cell = board.cells[x][y]
-        floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
-      }
-    }
-    else if (mouseY > abs($("#board").position().top-topOffset)+topbarHeight && game.mode === "play"){
+    else if (game.mode === "play" && !popup.show &&
+        mouseY > abs($("#board").position().top-topOffset)+topbarHeight){
       y = Math.floor((mouseY-topbarHeight)/25)
       console.log(x, y)
     }
@@ -102,7 +89,17 @@ function mouseDragged(){
 }
 
 function mouseReleased(){
-  if (game.auto){
+  if (mouseY > $(window).scrollTop() && mouseX > abs($("#board").position().left-leftOffset) &&
+    game.mode === "edit" && mouseButton === RIGHT && !game.auto){
+    let x = Math.floor(mouseX/25)
+    let y = Math.floor(mouseY/25)
+    let id = x+"_"+y
+    if (confirm("are you sure you want to flood fill?")){
+      let cell = board.cells[x][y]
+      floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
+    }
+  }
+  else if (game.auto){
     let tiles = magic()
     if (tiles){
       for (let i = 0; i < path.length; i++){

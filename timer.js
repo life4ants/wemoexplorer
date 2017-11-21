@@ -28,15 +28,16 @@ function showTopbar(){
   showTimer()
   if (infoShown)
     showInfo()
-  if (frameCount%239 === 0 && typeof board.level === "number"){
+  if (frameCount%239 === 0){
     saveC++
+    console.log("slot "+(frameCount/239)+":")
     if (Date.now()-frameTime < 18 || saveC > 2){
       saveC = 0
       game.saveGame()
-      console.log("game saved", frameCount/239)
+      console.log("game saved in:", Date.now()-frameTime)
     }
     else
-      console.log("game not saved", Date.now()-frameTime)
+      console.log("game not saved. time was:", Date.now()-frameTime)
   }
 }
 
@@ -171,13 +172,15 @@ function resumeTimer(){
 }
 
 function showNight(){
+  if (game.paused) {
+    fill(0,0,0,210)
+    rect(0,0,worldWidth,worldHeight)
+    return
+  }
+
   let alpha, time
   switch(timeOfDay){
     case "day":
-      if (game.paused) {
-        fill(0,0,0,210)
-        rect(0,0,worldWidth,worldHeight)
-      }
       return
     case "dusk":
       time = board.wemoMins%1440-1320
@@ -192,8 +195,7 @@ function showNight(){
       break
   }
 
-  let dark = (board.wemoMins%1440 >= 1350 || board.wemoMins%1440 < 90)
-  man.inDark = dark
+  man.inDark = (board.wemoMins%1440 >= 1350 || board.wemoMins%1440 < 90)
 
   fill(0,0,0,alpha)
   noStroke()
