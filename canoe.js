@@ -23,9 +23,18 @@ function Canoe(imgs, x, y) {
   }
 
   this.display = function() {
-    let x = [0,1,4].includes(this.index) ? (this.x-1)*25 : this.x*25
-    let y = [0,1,4].includes(this.index) ? this.y*25+topbarHeight : (this.y-1)*25+topbarHeight
-    image(this.imgs[this.index], x, y)
+    let x, y, id
+    if ([0,1,4].includes(this.index)){
+      x = (this.x-1)*25
+      y = this.y*25+topbarHeight
+      id = 0
+    }
+    else {
+      x = this.x*25
+      y = (this.y-1)*25+topbarHeight
+      id = 1
+    }
+    image(this.imgs[id], x, y)
   }
 
   this.move = function(x, y) {

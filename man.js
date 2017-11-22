@@ -1,9 +1,9 @@
-function Man(imgs, x, y) {
+function Man(img, x, y) {
   this.x = x
   this.y = y
   this.oldX = 0
   this.oldY = 0
-  this.imgs = imgs
+  this.img = img
   this.index = 0
   this.isRidingCanoe = true
   this.backpack = {
@@ -34,7 +34,7 @@ function Man(imgs, x, y) {
     let output = {}
     let items = Object.keys(this)
     for (let i = 0; i < items.length; i++){
-      if (typeof this[items[i]] !== "function" && items[i] !== "imgs")
+      if (typeof this[items[i]] !== "function" && items[i] !== "img")
         output[items[i]] = this[items[i]]
     }
     return output
@@ -46,11 +46,17 @@ function Man(imgs, x, y) {
       showCount = 1
       this.health -= Math.floor(this.health/369)
     }
-    if (!this.isRidingCanoe){
+    if (this.isRidingCanoe){
+      let sx = (canoe.index%3)*25
+      let sy = Math.floor(canoe.index/3)*25
+      let h = [0,1].includes(canoe.index) ? 19 : 21
+      image(this.img, canoe.x*25, canoe.y*25+topbarHeight, 25, h, sx, sy, 25, h)
+    }
+    else {
       let offset = this.backpack.weight > 0 ? 4 : 0
       if (this.isInPit){
         imageMode(CENTER)
-        image(this.imgs[this.index+offset], this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
+        this.drawImage(this.img, this.index+offset, this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
         imageMode(CORNER)
       }
       else if (this.isClimbingOutOfPit || this.isFallingIntoPit){
@@ -60,7 +66,7 @@ function Man(imgs, x, y) {
         let x = (this.x-this.oldX)*speed
         let y = (this.y-this.oldY)*speed
         imageMode(CENTER)
-        image(this.imgs[this.index+offset], this.oldX*25+12.5+x, this.oldY*25+topbarHeight+12.5+y, size, size)
+        this.drawImage(this.img, this.index+offset, this.oldX*25+12.5+x, this.oldY*25+topbarHeight+12.5+y, size, size)
         imageMode(CORNER)
         if (showCount === 0){
           this.isInPit = this.isFallingIntoPit ? true : false
@@ -71,7 +77,7 @@ function Man(imgs, x, y) {
       }
       else {
         let id = this.vomit ? 8 : this.isSleeping ? 9 : this.index+offset
-        image(this.imgs[id], this.x*25, this.y*25+topbarHeight)
+        this.drawImage(this.img, id, this.x*25, this.y*25+topbarHeight, 25, 25)
       }
       if (board.cells[this.x][this.y].byPit)
         drawPitLines(this.x, this.y)
@@ -204,9 +210,21 @@ function Man(imgs, x, y) {
   }
 
   this.sleep = function(){
-    if ("day" !== timeOfDay && sleepable.includes(board.cells[this.x][this.y].type))
-      this.isSleeping = !this.isSleeping
-    else if (this.isSleeping)
+    if (this.isSleeping)
       this.isSleeping = false
+    else if ("day" !== timeOfDay && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRidingCanoe)
+      this.isSleeping = !this.isSleeping
+    else {
+      let message = this.isRidingCanoe ? "Sorry, no sleeping in your canoe!" :
+                      timeOfDay === "day" ? "Sorry, no sleeping during the day!" :
+                        "You can't sleep on a "+board.cells[this.x][this.y].type+"!"
+      popup.setAlert(message)
+    }
+  }
+
+  this.drawImage = function(img, index, x, y, w, h){
+    let sx = (index%3)*25
+    let sy = Math.floor(index/3)*25
+    image(img, x, y, w, h, sx, sy, 25, 25)
   }
 }

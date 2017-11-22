@@ -26,10 +26,13 @@ let welcome = {
             <input type="text" v-model="name" placeholder="enter name">
           </div>
           <div v-else class="modal-body">
-            <h5>{{currentPlayer.name}}, pick the world you want to play in:</h5>
+            <h6>{{currentPlayer.name}}, pick your player:</h6>
+            <img v-for="(pic, i) in characters" :src="pic" :key="i" @click="() => selectCharacter(i)"
+                  :class="selected === i ? 'red-border' : 'no-border'" height="32" width="32">
             <div class="links">
               <a @click="signout">not {{currentPlayer.name}}? sign out</a>
             </div>
+            <h6>Pick the world you want to play in:</h6>
             <h6 class="left-header">Default Worlds:</h6>
             <div class="button-tiles">
               <div v-for="item in worlds" class="flex-around">
@@ -58,6 +61,8 @@ let welcome = {
       stage: 1,
       players: [],
       currentPlayer: {},
+      characters: ["images/player10icon.png", "images/player11icon.png"],
+      selected: 0,
       worlds: [],
       customWorlds: [],
       name: "",
@@ -151,7 +156,12 @@ let welcome = {
 
     pickGame(type, id){
       console.log(type, id)
+      this.currentPlayer.character = this.selected
       this.startGame(type, this.currentPlayer, id)
+    },
+
+    selectCharacter(id){
+      this.selected = id
     }
   }
 }

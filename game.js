@@ -224,7 +224,7 @@ let game = new Vue({
         this.icons[8].active = (man.basket && "berryTree" === cell.type &&
               board.objectsToShow.berryTrees[cell.id].berries.length > 0)
         //sleep:
-        this.icons[9].active = ("day" !== timeOfDay && sleepable.includes(cell.type) && !man.isSleeping)
+        this.icons[9].active = ("day" !== timeOfDay && !man.isSleeping && !man.isRidingCanoe)
         //wake up:
         this.icons[10].active = man.isSleeping
       }

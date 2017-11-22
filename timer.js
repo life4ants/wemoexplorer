@@ -148,7 +148,7 @@ function setTime(smins){
 
 function updateTimer(){
   let newMins = Math.floor((Date.now() - startTime)/250)
-  if (newMins - board.wemoMins > 10)
+  if (newMins - board.wemoMins > 5)
     resumeTimer()
   else
     board.wemoMins = newMins
@@ -172,13 +172,14 @@ function resumeTimer(){
 }
 
 function showNight(){
+  let alpha, time
   if (game.paused) {
-    fill(0,0,0,210)
+    alpha = timeOfDay === "day" ? 210 : 255
+    fill(0,0,0,alpha)
     rect(0,0,worldWidth,worldHeight)
     return
   }
 
-  let alpha, time
   switch(timeOfDay){
     case "day":
       return
@@ -195,7 +196,8 @@ function showNight(){
       break
   }
 
-  man.inDark = (board.wemoMins%1440 >= 1350 || board.wemoMins%1440 < 90)
+  let dark = (board.wemoMins%1440 >= 1350 || board.wemoMins%1440 < 90)
+  man.inDark = dark
 
   fill(0,0,0,alpha)
   noStroke()
@@ -214,9 +216,11 @@ function showNight(){
       let arm = r*0.54666
         firesize = Math.floor(size/2.1)
       if (dark){
-        let a = abs(man.x-fires[i].x)
-        let b = abs(man.y-fires[i].y)
-        man.inDark = !( (a <= firesize && b <= firesize-1) || (a <= firesize-1 && b <= firesize) )
+        let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
+        man.inDark = d > r-10
+        if (frameCount % 6 === 0){
+          console.log(d, r)
+        }
       }
       beginContour()
       vertex(x,y-r)
@@ -234,6 +238,8 @@ function showNight(){
       drawFireCircle(fires[i].x,fires[i].y,size,alpha)
     }
   }
+  if (man.inDark && man.isSleeping)
+    image(tiles.z, man.x*25, man.y*25+topbarHeight)
 }
 
 function drawFireCircle(x,y,size,alpha){

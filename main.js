@@ -1,6 +1,6 @@
 let frameTime = Date.now()
 
-let tiles, player1, man, canoe, active
+let tiles, man, canoe, active
 let noKeys, centerX, centerY, autoCenter, showEnergy, showHealth
 let cols, rows, worldWidth, worldHeight
 const topbarHeight = 55
@@ -65,6 +65,9 @@ function preload(){
     dock5: loadImage("images/dock5.png"),
     dock6: loadImage("images/dock6.png"),
     dusk: loadImage("images/dusk.png"),
+    canoe: [ loadImage("images/canoe0.png"),
+              loadImage("images/canoe1.png")
+            ],
     firepit: loadImage("images/firepit.png"),
     grass: loadImage("images/grass.png"),
     log: loadImage("images/log.png"),
@@ -88,6 +91,9 @@ function preload(){
     night: loadImage("images/moon.png"),
     palm: loadImage("images/palm.png"),
     pit: loadImage("images/pit.png"),
+    players: [ loadImage("images/player10.png"),
+               loadImage("images/player11.png")
+             ],
     random: loadImage("images/random.png"),
     randomPit: loadImage("images/randomPit.png"),
     randomGrass: loadImage("images/randomGrass.png"),
@@ -153,30 +159,9 @@ function preload(){
     treeShore11: loadImage("images/treeShore11.png"),
     treeShore12: loadImage("images/treeShore12.png"),
     water: loadImage("images/water.png"),
-    wigwam: loadImage("images/wigwam.png")
+    wigwam: loadImage("images/wigwam.png"),
+    z: loadImage("images/z's.png")
   }
-
-  player1 = [
-    loadImage("images/player0.png"),
-    loadImage("images/player1.png"),
-    loadImage("images/player2.png"),
-    loadImage("images/player3.png"),
-    loadImage("images/player4.png"),
-    loadImage("images/player5.png"),
-    loadImage("images/player6.png"),
-    loadImage("images/player7.png"),
-    loadImage("images/player8.png"),
-    loadImage("images/sleeping.png")
-  ]
-
-  canoe1 = [
-    loadImage("images/canoe1_0.png"),
-    loadImage("images/canoe1_1.png"),
-    loadImage("images/canoe1_2.png"),
-    loadImage("images/canoe1_3.png"),
-    loadImage("images/canoe0_4.png"),
-    loadImage("images/canoe0_5.png")
-  ]
 
   fire = [
     loadImage("images/fire1.png"),
@@ -220,9 +205,8 @@ function draw(){
 }
 
 function startGame(){
-  man = new Man(player1, board.startX, board.startY)
-  canoe = new Canoe(canoe1, board.startX, board.startY)
-  initializeVars()
+  man = new Man(tiles.players[game.currentPlayer.character], board.startX, board.startY)
+  canoe = new Canoe(tiles.canoe, board.startX, board.startY)
   if (board.progress){
     canoe.initialize(board.canoe)
     man.initialize(board.man)
@@ -234,6 +218,7 @@ function startGame(){
     active = canoe
     fillBoard()
   }
+  initializeVars()
   popup.reset()
   centerOn(active)
   loop()
