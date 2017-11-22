@@ -56,7 +56,7 @@ function build(type){
     }
     if (found === 3){
       man.backpack.weight -= 32
-      for (let j = 0; j < ar.length; j++){
+      for (let j = ar.length-1; j >= 0; j--){
         man.backpack.items[ar[j].index].quantity--
         if (man.backpack.items[ar[j].index].quantity === 0)
           man.backpack.items.splice(ar[j].index, 1)

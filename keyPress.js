@@ -56,9 +56,11 @@ function mousePressed(){
         path = [id]
         changeTile(x,y, "cross", "cross")
       }
-      else if (game.currentType === "canoe"){
-        board.startX = x
-        board.startY = y
+      else if (game.currentType === "start"){
+        if (board.cells[x][y].type !== "water"){
+          board.startX = x
+          board.startY = y
+        }
       }
       else
         changeTile(x,y, game.currentTile, game.currentType)

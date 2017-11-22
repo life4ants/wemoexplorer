@@ -189,7 +189,7 @@ function draw(){
     if (game.mode === "play") {
       game.checkActive()
       showObjects()
-      canoe.display()
+      vehicles.display()
       man.display()
       showNight()
       showMessage()
@@ -206,19 +206,17 @@ function draw(){
 
 function startGame(){
   man = new Man(tiles.players[game.currentPlayer.character], board.startX, board.startY)
-  canoe = new Canoe(tiles.canoe, board.startX, board.startY)
-  if (board.progress){
-    canoe.initialize(board.canoe)
+  if (board.man){
     man.initialize(board.man)
-    delete board.canoe
     delete board.man
-    active = man.isRidingCanoe ? canoe : man
   }
-  else {
-    active = canoe
+  vehicles = new Vehicle(board.vehicles)
+  delete board.vehicles
+  initializeVars()
+  if (!board.progress) {
     fillBoard()
   }
-  initializeVars()
+  active = man.ridingId === "canoe" ? vehicles.canoe : man
   popup.reset()
   centerOn(active)
   loop()
@@ -320,7 +318,7 @@ function displayBoard() {
     }
   }
   if (game.mode === "edit")
-    image(tiles.canoe[0], (board.startX-1)*25, board.startY*25)
+    image(tiles.players[0], board.startX*25, board.startY*25, 25, 25, 0, 25, 25, 25)
 }
 
 function centerScreen(){

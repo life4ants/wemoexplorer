@@ -5,7 +5,8 @@ function Man(img, x, y) {
   this.oldY = 0
   this.img = img
   this.index = 0
-  this.isRidingCanoe = true
+  this.isRiding = false
+  this.ridingId = ""
   this.backpack = {
     weight: 0,
     items: []
@@ -44,13 +45,13 @@ function Man(img, x, y) {
     if (this.inDark){
       message = "You're too far from a fire!"
       showCount = 1
-      this.health -= Math.floor(this.health/369)
+      this.health -= Math.floor((this.health+1500)/499)
     }
-    if (this.isRidingCanoe){
-      let sx = (canoe.index%3)*25
-      let sy = Math.floor(canoe.index/3)*25
-      let h = [0,1].includes(canoe.index) ? 19 : 21
-      image(this.img, canoe.x*25, canoe.y*25+topbarHeight, 25, h, sx, sy, 25, h)
+    if (this.isRiding){
+      let sx = (active.index%3)*25
+      let sy = Math.floor(active.index/3)*25
+      let h = [0,1].includes(active.index) ? 19 : 21
+      image(this.img, active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
     }
     else {
       let offset = this.backpack.weight > 0 ? 4 : 0
@@ -163,20 +164,21 @@ function Man(img, x, y) {
   }
 
   this.dismount = function(){
-    if (this.isRidingCanoe && (canoe.landed || canoe.isBeside("dock") || board.cells[canoe.x][canoe.y].type === "river")){
-      let dirs = canoe.index === 0 ? [4,0,2,3,1,5,7,6] :
-                   canoe.index === 1 ? [0,4,6,7,5,3,1,2] :
-                     canoe.index === 2 ? [2,6,0,1,7,3,5,4] :
+    if (this.isRiding && (active.landed || active.isBeside("dock") || board.cells[active.x][active.y].type === "river")){
+      let dirs = active.index === 0 ? [4,0,2,3,1,5,7,6] :
+                   active.index === 1 ? [0,4,6,7,5,3,1,2] :
+                     active.index === 2 ? [2,6,0,1,7,3,5,4] :
                                            [6,2,4,5,3,7,1,0]
       for (let i = 0; i < dirs.length; i++){
         if (this.dismountDirection(dirs[i]))
           break
       }
     }
-    else if (!this.isRidingCanoe && isNearSquare(this.x, this.y, canoe.x, canoe.y)){
-      active = canoe
-      this.isRidingCanoe = true
-      canoe.index = canoe.index === 4 ? 0 : 3
+    else if (!this.isRiding && isNearSquare(this.x, this.y, vehicles.canoe.x, vehicles.canoe.y)){
+      active = vehicles.canoe
+      this.isRiding = true
+      this.ridingId = "canoe"
+      vehicles.canoe.index = vehicles.canoe.index === 4 ? 0 : 3
     }
     if (autoCenter)
       centerOn(this)
@@ -185,8 +187,8 @@ function Man(img, x, y) {
   }
 
   this.dismountDirection = function(dir){
-    let x = canoe.x
-    let y = canoe.y
+    let x = active.x
+    let y = active.y
     switch(dir){
       case 0: y--;      break;
       case 1: x++; y--; break;
@@ -201,9 +203,9 @@ function Man(img, x, y) {
       this.x = x
       this.y = y
       this.index = dir === 0 ? 2 : [1,2,3].includes(dir) ? 0 : 4 === dir ? 3 : 1
-      this.isRidingCanoe = false
+      this.isRiding = false
+      active.index = [0,1].includes(active.index) ? 4 : 5
       active = man
-      canoe.index = [0,1].includes(canoe.index) ? 4 : 5
       return true
     }
     return false
@@ -212,10 +214,10 @@ function Man(img, x, y) {
   this.sleep = function(){
     if (this.isSleeping)
       this.isSleeping = false
-    else if ("day" !== timeOfDay && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRidingCanoe)
+    else if ("day" !== timeOfDay && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding)
       this.isSleeping = !this.isSleeping
     else {
-      let message = this.isRidingCanoe ? "Sorry, no sleeping in your canoe!" :
+      let message = this.isRiding ? "Sorry, no sleeping in your canoe!" :
                       timeOfDay === "day" ? "Sorry, no sleeping during the day!" :
                         "You can't sleep on a "+board.cells[this.x][this.y].type+"!"
       popup.setAlert(message)

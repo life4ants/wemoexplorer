@@ -150,20 +150,20 @@ let game = new Vue({
       {id: "treeShore", src: "images/treeShoreX.png", type: "auto"},
       {id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
       {id: "rockEdge", src: "images/rockX.png", type: "auto"},
-      {id: "canoe", src: "images/canoe0.png", type: "canoe"}
+      {id: "start", src: "images/player10icon.png", type: "start"}
     ],
     icons: [
       {code: "X", active: true, selected: false, id: "centerScreen", src: "images/centerScreen.png", title: "Center Screen (X)"},
-      {code: "B", active: true, selected: false, id: "build", src: "images/build.png", title: "Build (B)"},
-      {code: "D", active: true, selected: false, id: "dump", src: "images/dump.png", title: "Dump (D)"},
-      {code: "G", active: true, selected: false, id: "grab", src: "images/grab.png", title: "Grab/Gather (G)"},
-      {code: "F", active: true, selected: false, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
-      {code: "E", active: true, selected: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
-      {code: "J", active: true, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
-      {code: "C", active: true, selected: false, id: "chop", src: "images/chop.png", title: "Chop down Tree (C)"},
-      {code: "G", active: true, selected: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
-      {code: "S", active: true, selected: false, id: "sleep", src: "images/sleepIcon.png", title: "Go to Sleep (S)"},
-      {code: "S", active: true, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
+      {code: "B", active: false, selected: false, id: "build", src: "images/build.png", title: "Build (B)"},
+      {code: "D", active: false, selected: false, id: "dump", src: "images/dump.png", title: "Dump (D)"},
+      {code: "G", active: false, selected: false, id: "grab", src: "images/grab.png", title: "Grab/Gather (G)"},
+      {code: "F", active: false, selected: false, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
+      {code: "E", active: false, selected: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
+      {code: "J", active: false, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
+      {code: "C", active: false, selected: false, id: "chop", src: "images/chop.png", title: "Chop down Tree (C)"},
+      {code: "G", active: false, selected: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
+      {code: "S", active: false, selected: false, id: "sleep", src: "images/sleepIcon.png", title: "Go to Sleep (S)"},
+      {code: "S", active: false, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
     ],
     mode: "loading",
     currentTile: "water",
@@ -216,15 +216,15 @@ let game = new Vue({
                 board.objectsToShow.berryTrees[cell.id].berries.length > 0)) ||
                 (man.basket && man.basket.quantity > 0)
         //jump:
-        this.icons[6].active = (!man.isRidingCanoe && isNearSquare(man.x, man.y, canoe.x, canoe.y)) ||
-                 (man.isRidingCanoe && (canoe.landed || canoe.isBeside("dock") || "river" === board.cells[canoe.x][canoe.y].type))
+        //this.icons[6].active = (!man.isRiding && isNearSquare(man.x, man.y, canoe.x, canoe.y)) ||
+          //      (man.isRiding && (canoe.landed || canoe.isBeside("dock") || "river" === board.cells[canoe.x][canoe.y].type))
         //chop:
         this.icons[7].active = man.backpack.weight === 0 && ["tree", "treeShore"].includes(cell.type)
         //pick:
         this.icons[8].active = (man.basket && "berryTree" === cell.type &&
               board.objectsToShow.berryTrees[cell.id].berries.length > 0)
         //sleep:
-        this.icons[9].active = ("day" !== timeOfDay && !man.isSleeping && !man.isRidingCanoe)
+        this.icons[9].active = ("day" !== timeOfDay && !man.isSleeping && !man.isRiding)
         //wake up:
         this.icons[10].active = man.isSleeping
       }
@@ -360,19 +360,29 @@ let game = new Vue({
         board = JSON.parse(localStorage["board"+index])
         board.level = index
       }
-      if (board.version === 1){
-        console.log("version 1 game")
-        board.revealCount = 4000
-        board.wemoMins = 120
-        board.version = "1upgraded"
-      }
-      if (board.version !== 4 && board.progress){
-        console.log("version 3 or older game")
-        board.man.tools = []
-        let a = board.man.backpack.items.findIndex((e) => e.type === "rocks")
-        if (a >= 0)
-          board.man.backpack.items[a].type = "rock"
-        board.version = 4
+      if (board.version !== 5){
+        if (board.version === 1){
+          console.log("version 1 game")
+          board.revealCount = 4000
+          board.wemoMins = 120
+        }
+        if (!(board.version >= 4) && board.progress){
+          console.log("resume version 3 or older game")
+          board.man.tools = []
+          let a = board.man.backpack.items.findIndex((e) => e.type === "rocks")
+          if (a >= 0)
+            board.man.backpack.items[a].type = "rock"
+        }
+        board.vehicles = {}
+        if (board.version === 4 && board.progress){
+          console.log("resume version 4 game")
+          board.man.isRiding = board.man.isRidingCanoe
+          delete board.man.isRidingCanoe
+          board.man.ridingId = board.man.isRiding ? "canoe" : ""
+          board.vehicles.canoe = board.canoe
+          delete board.canoe
+        }
+        board.version = 5
       }
       this.currentPlayer = player
       this.mode = "play"
@@ -400,7 +410,7 @@ let game = new Vue({
 
       board.progress = true
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
-        Object.assign({man: man.save(), canoe: canoe.save()}, board)
+        Object.assign({man: man.save(), vehicles: vehicles.save()}, board)
       ))
     },
 

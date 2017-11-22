@@ -2,7 +2,7 @@ function Canoe(imgs, x, y) {
   this.x = x
   this.y = y
   this.imgs = imgs
-  this.index = 0
+  this.index = 4
   this.landed = false
   this.stepCount = 0
 
