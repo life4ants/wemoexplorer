@@ -12,7 +12,6 @@ const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", 
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
 
 function initializeVars(){
-  resizeWorld(board.cells.length, board.cells[0].length)
   showHealth = man.health
   showEnergy = man.energy
   autoCenter = false
@@ -21,14 +20,15 @@ function initializeVars(){
   message = ""
   setTime(board.wemoMins)
   game.paused = false
-  resizeCanvas(worldWidth, worldHeight)
+  resizeWorld(board.cells.length, board.cells[0].length)
 }
 
 function resizeWorld(c, r){
   cols = c
   rows = r
   worldWidth = cols * 25
-  worldHeight = rows * 25 + topbarHeight
+  worldHeight = game.mode === "play" ? rows * 25 + topbarHeight : rows * 25
+  resizeCanvas(worldWidth, worldHeight)
 }
 
 function preload(){
@@ -320,7 +320,7 @@ function displayBoard() {
     }
   }
   if (game.mode === "edit")
-    image(canoe1[4], (board.startX-1)*25, board.startY*25)
+    image(tiles.canoe[0], (board.startX-1)*25, board.startY*25)
 }
 
 function centerScreen(){

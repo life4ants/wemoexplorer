@@ -150,7 +150,7 @@ let game = new Vue({
       {id: "treeShore", src: "images/treeShoreX.png", type: "auto"},
       {id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
       {id: "rockEdge", src: "images/rockX.png", type: "auto"},
-      {id: "canoe", src: "images/canoe0_4.png", type: "canoe"}
+      {id: "canoe", src: "images/canoe0.png", type: "canoe"}
     ],
     icons: [
       {code: "X", active: true, selected: false, id: "centerScreen", src: "images/centerScreen.png", title: "Center Screen (X)"},
