@@ -1,7 +1,7 @@
 let frameTime = Date.now()
 
 let tiles, man, canoe, active
-let noKeys, centerX, centerY, autoCenter, showEnergy, showHealth
+let noKeys, autoCenter, showEnergy, showHealth
 let cols, rows, worldWidth, worldHeight
 const topbarHeight = 55
 let topOffset = 0, leftOffset = 0
@@ -196,7 +196,10 @@ function draw(){
       man.display()
       showNight()
       showMessage()
-      centerScreen()
+      if (autoCenter)
+          centerOn(active)
+      else
+        follow(active)
       showTopbar()
       if (showCount === 0 && (man.energy <= 0 || man.health <= 0 ))
         popup.gameOver()
@@ -223,7 +226,7 @@ function startGame(){
   popup.reset()
   centerOn(active)
   loop()
-  $("#board").css("top", centerY+"px").css("left", centerX+"px")
+  $("body").addClass("full-screen")
 }
 
 function fillBoard(){
@@ -291,18 +294,24 @@ function showMessage(){
 }
 
 function displayBoard() {
-  let left = Math.floor(abs($("#board").position().left-leftOffset)/25)
-  let right = left + Math.floor(window.innerWidth/25)+1
-  right = right > cols ? cols : right
-  let top = Math.floor(abs($("#board").position().top-topOffset)/25)
-  let bottom = top + Math.floor(window.innerHeight/25)+1
-  bottom = bottom > rows ? rows : bottom
-
-  if (game.mode === "edit"){
-    left = 0
-    right = cols
+  let left, right, top, bottom
+  if (window.innerHeight-topOffset > worldHeight || game.mode === "edit"){
     top = 0
     bottom = rows
+  }
+  else {
+    top = Math.floor(abs($("#board").position().top-topOffset)/25)
+    bottom = top + Math.floor(window.innerHeight/25)+1
+    bottom = bottom > rows ? rows : bottom
+  }
+  if (window.innerWidth-leftOffset > worldWidth || game.mode === "edit"){
+    left = 0
+    right = cols
+  }
+  else {
+    left = Math.floor(abs($("#board").position().left-leftOffset)/25)
+    right = left + Math.floor(window.innerWidth/25)+1
+    right = right > cols ? cols : right
   }
 
   for (let i = left; i < right; i++) {
@@ -324,50 +333,56 @@ function displayBoard() {
     image(tiles.players[0], board.startX*25, board.startY*25, 25, 25, 0, 25, 25, 25)
 }
 
-function centerScreen(){
-  let pos = flyTo($("#board").position().left, $("#board").position().top, centerX, centerY)
-  $("#board").css("top", pos.y+"px").css("left", pos.x+"px")
-}
-
-function flyTo(curX, curY, toX, toY){
-  let leftDiff = toX-curX
-  let topDiff = toY-curY
-  let left = leftDiff <= -5 ? curX+Math.floor(leftDiff/5)-4 : leftDiff >= 5 ? curX+Math.floor(leftDiff/5)+4 : toX
-  let top = topDiff <= -5 ? curY+Math.floor(topDiff/5)-4 : topDiff >= 5 ? curY+Math.floor(topDiff/5)+4 : toY
-  return {x: left, y: top}
+function smoothChange(curX, toX){
+  let diff = toX-curX
+  return diff >= 90 ? curX+Math.floor(diff/6)-5 : diff <= -90 ? curX+Math.floor(diff/6)+5 :
+             diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
 }
 
 function follow(object) {
-  let left = centerX
-  let top = centerY
+  let left = $("#board").position().left
+  let top = $("#board").position().top
+  let newLeft = left
+  let newTop = top
 
-  if ((object.x*25) + left < 75 + leftOffset) // left
-    left = left+25 > leftOffset ? leftOffset : left+25
-  else if ((object.x*25) + left > window.innerWidth - 100) //right
-    left = left-25 < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left-25
+  if (window.innerWidth < worldWidth){
+    if ((object.x*25) + left < 100 + leftOffset) // left
+      newLeft = left+10 > leftOffset ? leftOffset : left+10
+    else if ((object.x*25) + left > window.innerWidth - 125) //right
+      newLeft = left-10 < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left-10
+  }
+  if (window.innerHeight < worldHeight){
+    if (object.y*25+topbarHeight - (topbarHeight - top) < 100) //top
+      newTop = top+10 > topOffset ? topOffset : top+10
+    else if ((object.y*25+topbarHeight) + top > window.innerHeight - 125) //bottom
+      newTop = top-10 < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top-10
+  }
 
-  if ((object.y*25+topbarHeight) + top < 75 + topOffset) //top
-    top = top+25 > topOffset ? topOffset : top+25
-  else if ((object.y*25+topbarHeight) + top > window.innerHeight - 100) //bottom
-    top = top-25 < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top-25
-
-  centerX = left
-  centerY = top
+  if (newTop !== top || newLeft !== left)
+    $("#board").css("top", newTop).css("left", newLeft)
 }
 
 function centerOn(object) {
-  let x = Math.floor(window.innerWidth/2)
-  let y = Math.floor(window.innerHeight/2)
-  let left = x-object.x*25+13
-  left = left > leftOffset ? leftOffset : left
-  left = left < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left
-
-  let top = y-object.y*25+13-topbarHeight
-  top = top > topOffset ? topOffset : top
-  top = top < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top
-
-  centerX = left
-  centerY = top
+  // center in the x direction:
+  let currentX = $("#board").position().left
+  let left = Math.floor((window.innerWidth+leftOffset)/2)
+  let centerX = left-object.x*25+13 // the left value to set #board in order to center the man in the viewport
+  let maxLeft = leftOffset
+  let minLeft = window.innerWidth - worldWidth
+  centerX = worldWidth < window.innerWidth-leftOffset ? Math.floor((window.innerWidth-leftOffset-worldWidth)/2)+leftOffset :
+              centerX > minLeft && centerX < maxLeft ? smoothChange(currentX, centerX) :
+                centerX <= minLeft ? minLeft : centerX >= maxLeft ? maxLeft : currentX
+  // center in the y direction:
+  let currentY = $("#board").position().top
+  let top = Math.floor((window.innerHeight+topOffset)/2)
+  let centerY = top-object.y*25+13-topbarHeight
+  let maxTop = topOffset
+  let minTop = window.innerHeight - worldHeight
+  centerY = worldHeight < window.innerHeight ? Math.floor((window.innerHeight - worldHeight)/2) :
+              centerY > minTop && centerY < maxTop ? smoothChange(currentY, centerY) :
+              centerY <= minTop ? minTop : centerY >= maxTop ? maxTop : currentY
+  if (centerY !== currentY || centerX !== currentX)
+    $("#board").css("top", centerY).css("left", centerX)
 }
 
 $("#board").contextmenu(function(e) {
@@ -422,7 +437,7 @@ function isNearSquare(x1, y1, x2, y2){ //with diagonals
 // }
 
 function showObjects(){
-  for (x in board.objectsToShow){
+  for (let x in board.objectsToShow){
     let items = board.objectsToShow[x]
     for (let i=0; i<items.length; i++){
       if (x === "logpiles"){

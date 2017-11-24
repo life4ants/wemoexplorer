@@ -2,13 +2,24 @@ let saveC = 0
 let infoShown = false
 let firesize = 0
 
+let viewport = {
+  top: topOffset,
+  left: leftOffset,
+  bottom: window.innerHeight-topOffset,
+  right: window.innerWidth-leftOffset
+}
+
 function showTopbar(){
-  let left = abs($("#board").position().left-leftOffset)
-  let top = abs($("#board").position().top-topOffset)
-  let width = window.innerWidth
+  let boardLeft = $("#board").position().left-leftOffset
+  let boardTop = $("#board").position().top-topOffset
+  viewport.left = boardLeft < 0 ? abs(boardLeft) : 0
+  viewport.top = boardTop < 0 ? abs(boardTop) : 0
+  viewport.right = window.innerWidth < worldWidth ? viewport.left+window.innerWidth-leftOffset : viewport.left+worldWidth
+  viewport.bottom = window.innerHeight < worldHeight ? viewport.top+window.innerHeight-topOffset : viewport.top+worldHeight
+  let width = window.innerWidth-leftOffset
   noStroke()
   fill(255)
-  rect (left, top, width, topbarHeight)
+  rect (viewport.left, viewport.top, width, topbarHeight)
   if (frameCount%3 === 0){
     updateTimer()
   }
@@ -41,39 +52,31 @@ function showTopbar(){
   }
 }
 
-function smoothChange(curX, toX){
-  let diff = toX-curX
-  return diff >= 90 ? curX+Math.floor(diff/6)-5 : diff <= -90 ? curX+Math.floor(diff/6)+5 :
-             diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
-}
-
 function showTimer(){
   let showMins = board.wemoMins%60 < 10 ? "0"+board.wemoMins%60 : board.wemoMins%60
   let showHours = Math.floor(board.wemoMins/60)%12 === 0 ? 12 : Math.floor(board.wemoMins/60)%12
   let suffix = board.wemoMins%1440 < 720 ? " AM" : " PM"
-  let right = abs($("#board").position().left-leftOffset)+window.innerWidth-leftOffset
-  let top = abs($("#board").position().top-topOffset)+20
+  let top = viewport.top+20
 
   textAlign(RIGHT, TOP)
   textSize(26)
   fill(0)
-  text(" Day "+ (Math.floor(board.wemoMins/1440)+1) + ", "+showHours+":"+showMins+suffix, right-40, top)
-  image(tiles[timeOfDay], right-35, top)
+  text(" Day "+ (Math.floor(board.wemoMins/1440)+1) + ", "+showHours+":"+showMins+suffix, viewport.right-40, top)
+  image(tiles[timeOfDay], viewport.right-35, top)
 }
 
 function showEnergyBar(title, value, offset){
-  let left = abs($("#board").position().left-leftOffset)
-  let top = abs($("#board").position().top-topOffset)+offset
+  let top = viewport.top+offset
   let widthFactor = window.innerWidth > 1000 ? 10 : 16
   fill(255)
   stroke(80)
   strokeWeight(3)
-  rect(left+10, top, Math.floor(5000/widthFactor)+3, 20)
+  rect(viewport.left+10, top, Math.floor(5000/widthFactor)+3, 20)
   let color = value > 3333 ? "green" :
                value > 1666 ? "#e90" : "red"
   fill(color)
   noStroke()
-  rect(left+12, top+2, Math.floor(value/widthFactor), 17)
+  rect(viewport.left+12, top+2, Math.floor(value/widthFactor), 17)
   let f, x
   if (value/widthFactor > 100){
     f = 250, x = Math.floor(value/(widthFactor*2))
@@ -85,13 +88,12 @@ function showEnergyBar(title, value, offset){
   }
   fill(f)
   textSize(14)
-  text(title+value, left+12+x, top+2)
+  text(title+value, viewport.left+12+x, top+2)
 }
 
 function showBackpack(){
-  let left = abs($("#board").position().left-leftOffset)
-  left = window.innerWidth > 1000 ? left+530 : left+340
-  let top = abs($("#board").position().top-topOffset)+3
+  let left = window.innerWidth > 1000 ? viewport.left+530 : viewport.left+340
+  let top = viewport.top+3
   image(tiles.backpack, left, top)
   if (man.backpack.weight > 0){
     let items = man.backpack.items
@@ -125,8 +127,6 @@ function showBackpack(){
 }
 
 function showInfo(){
-  let left = abs($("#board").position().left-leftOffset)
-  let bottom = abs($("#board").position().top-topOffset)+window.innerHeight
   let f = timeOfDay === "night" || game.paused ? 255 : ["dusk", "dawn"].includes(timeOfDay) ? 230 : 20
   fill(f)
   textSize(15)
@@ -135,7 +135,7 @@ function showInfo(){
   if (man.basket)
     cost = 3+Math.round((man.basket.quantity/10 + man.backpack.weight)/8)
   let message = "man dist: "+man.stepCount+" cells left to explore: "+board.revealCount+" walking cost: "+cost
-  text(message, left, bottom)
+  text(message, viewport.left, viewport.bottom)
 }
 
 function setTime(smins){
@@ -210,7 +210,7 @@ function showNight(){
   vertex(worldWidth,worldHeight)
   vertex(0,worldHeight)
   let fires = board.objectsToShow.fires
-  for (let i =0; i<fires.length; i++){
+  for (let i=0; i<fires.length; i++){
     if (fires[i].value > 0){
       let size = (fires[i].value/4)+3.1
       let x = fires[i].x*25+12.5
@@ -221,9 +221,6 @@ function showNight(){
       if (dark){
         let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
         man.inDark = d > r-10
-        if (frameCount % 6 === 0){
-          console.log(d, r)
-        }
       }
       beginContour()
       vertex(x,y-r)

@@ -50,6 +50,8 @@ function mousePressed(){
   if (mouseY > $(window).scrollTop() && mouseX > abs($("#board").position().left-leftOffset)){
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
+    if (x >= cols || y >= rows)
+      return
     let id = x+"_"+y
     if (game.mode === "edit" && mouseButton === LEFT){
       if (game.auto){

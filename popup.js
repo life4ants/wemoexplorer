@@ -11,7 +11,7 @@ let popup = new Vue({
             <div v-if="type === 'build'" class="modal-body">
               <div class="build-option-container">
                 <div v-for="item in showOptions" :id="item.id" :key="item.id"
-                          :class="{'build-option': true, 'red-border': selected === item.id}" @click="() => select(item.id)">
+                          :class="{'red-border': selected === item.id, 'build-option': true}" @click="() => select(item.id)">
                   <h5>{{item.title}}</h5>
                   <img :src="item.src" height="50" width="50" >
                   <p>cost: {{item.cost}}</p>
@@ -32,7 +32,7 @@ let popup = new Vue({
 
             <div      v-if="'build' === type" class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
-              <button type="button" class="button-primary" :class="{disabled: selected === null}" id="etr" @click="build">Build</button>
+              <button type="button" class="button-primary" id="etr" @click="build">Build</button>
             </div>
             <div v-else-if="'alert' === type" class="modal-footer">
               <button type="button" id="etr" @click="close">Ok</button>
@@ -106,14 +106,12 @@ let popup = new Vue({
     },
 
     build(){
-      if (this.selected !== null){
-        let error = build(this.selected)
-        if (!error)
-          this.close()
-        else {
-          this.title = error
-          this.type = "alert"
-        }
+      let message = build(this.selected)
+      if (!message)
+        this.close()
+      else {
+        this.title = message
+        this.type = "alert"
       }
     },
 

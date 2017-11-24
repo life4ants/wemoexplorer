@@ -9,13 +9,13 @@ let welcome = {
             <h5>Hi there! Welcome to Wemo!</h5>
             <p>{{message}}</p>
             <div v-if="deleteMode" class="button-tiles">
-              <div v-for="(player, id) in players">
+              <div v-for="(player, id) in players" class="button-tiles-content">
                 {{player.name}}
                 <a @click="() => deletePlayer(id)">delete</a>
               </div>
             </div>
             <div v-else class="button-tiles">
-              <div v-for="(player, id) in players" @click="() => pickPlayer(id)">
+              <div v-for="(player, id) in players" @click="() => pickPlayer(id)" class="button-tiles-content clickable">
                 {{player.name}}
               </div>
             </div>
@@ -26,31 +26,46 @@ let welcome = {
             <input type="text" v-model="name" placeholder="enter name">
           </div>
           <div v-else class="modal-body">
-            <h6>{{currentPlayer.name}}, pick your player:</h6>
-            <img v-for="(pic, i) in characters" :src="pic" :key="i" @click="() => selectCharacter(i)"
-                  :class="selected === i ? 'red-border' : 'no-border'" height="32" width="32">
             <div class="links">
               <a @click="signout">not {{currentPlayer.name}}? sign out</a>
             </div>
+            <h6>{{currentPlayer.name}}, pick your player:</h6>
+            <img v-for="(pic, i) in characters" :src="pic" :key="i" @click="() => selectCharacter(i)"
+                  :class="selected === i ? 'red-border' : 'no-border'" height="32" width="32">
             <h6>Pick the world you want to play in:</h6>
             <h6 class="left-header">Default Worlds:</h6>
             <div class="button-tiles">
-              <div v-for="item in worlds" class="flex-around">
-                <h6 class="left-header">World {{item.level}}</h6>
-                <button @click="() => pickGame('default', item.level)">Play</button>
-                <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+              <div v-for="item in worlds" class="button-tiles-content">
+                <h6 class="center-header four columns">World {{item.level}}</h6>
+                <div class="four columns">
+                  <button @click="() => pickGame('default', item.level)">Play</button>
+                </div>
+                <div class="four columns">
+                  <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+                </div>
               </div>
             </div>
             <h6 class="left-header">Custom Worlds:</h6>
-            <div class="button-tiles">
-              <div v-for="item in customWorlds" class="flex-around">
-                <h6 class="left-header">{{item.name}}</h6>
-                <button @click="() => pickGame('custom', item.name)">Play</button>
-                <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+            <div v-if="deleteMode" class="button-tiles">
+              <div v-for="item in customWorlds" class="button-tiles-content">
+                {{item.name}}
+                <a @click="() => deleteGame(item.name)">delete</a>
+              </div>
+            </div>
+            <div v-else class="button-tiles">
+              <div v-for="item in customWorlds" class="button-tiles-content">
+                <h6 class="center-header four columns">{{item.name}}</h6>
+                <div class="four columns">
+                  <button @click="() => pickGame('custom', item.name)">Play</button>
+                </div>
+                <div class="four columns">
+                  <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+                </div>
               </div>
             </div>
             <div class="links">
-              <a @click="edit">create your own world</a>
+              <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done' : 'delete custom worlds'}}</a>
+              <a @click="() => edit(currentPlayer)">create/edit custom worlds</a>
             </div>
           </div>
         </div>
@@ -98,6 +113,7 @@ let welcome = {
     pickPlayer(id){
       let p = this.players[id]
       p.index = id
+      this.selected = p.character
       this.currentPlayer = p
       this.matchWorlds()
       this.stage = 2
@@ -115,6 +131,10 @@ let welcome = {
         if (this.players.length === 0)
           this.deleteMode = false
       }
+    },
+
+    deleteGame(name){
+      console.log(name)
     },
 
     signout(){
@@ -156,6 +176,11 @@ let welcome = {
 
     pickGame(type, id){
       console.log(type, id)
+      if (this.selected !== this.players[this.currentPlayer.index].character){
+        let p = JSON.parse(localStorage.wemoPlayers)
+        p[this.currentPlayer.index].character = this.selected
+        localStorage.setItem("wemoPlayers", JSON.stringify(p))
+      }
       this.currentPlayer.character = this.selected
       this.startGame(type, this.currentPlayer, id)
     },

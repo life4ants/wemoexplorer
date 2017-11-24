@@ -26,7 +26,7 @@ function Man(img, x, y) {
   this.isSleeping = false
 
   this.initialize = function(obj) {
-    for (key in obj){
+    for (let key in obj){
       this[key] = obj[key]
     }
   }
@@ -144,12 +144,6 @@ function Man(img, x, y) {
           board.revealCount--
         }
       }
-
-      if (autoCenter)
-        centerOn(this)
-      else
-        follow(this)
-
       //check if next to fires
       let fires = board.objectsToShow.fires
       for (let i=0; i<fires.length; i++){
@@ -187,10 +181,6 @@ function Man(img, x, y) {
       this.ridingId = "raft"
       vehicles.raft.index = vehicles.raft.index === 4 ? 0 : 3
     }
-    if (autoCenter)
-      centerOn(this)
-    else
-      follow(this)
   }
 
   this.dismountDirection = function(dir){

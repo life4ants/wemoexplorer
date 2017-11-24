@@ -5,19 +5,19 @@ let game = new Vue({
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame" :player="currentPlayer" :edit="edit"></welcome-menu>
       <div :class="{topBar: mode === 'edit', sideBar: mode === 'play'}">
         <div v-if="mode === 'edit'" class="flex">
-          <div class="tileBox" v-if="mode === 'edit'">
+          <div class="tileBox">
             <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
           </div>
-          <div class="tileBox" v-if="mode === 'edit'">
+          <div class="tileBox">
             <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
           </div>
-          <div class="tileBox-short" v-if="mode === 'edit'">
+          <div class="tileBox-short">
             <img v-for="pic in tiles3" :key="pic.id" :src="pic.src"
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
           </div>
-          <img v-if="mode === 'edit'" v-for="pic in tiles4" :key="pic.id" :src="pic.src"
+          <img v-for="pic in tiles4" :key="pic.id" :src="pic.src"
             height="25" width="25" class="tile" :class="{selected: currentTile === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
           <button type='button' @click='exit'>exit</button>
           <button type="button" @click="saveBoard" title="save the current board">Save</button>
@@ -253,22 +253,24 @@ let game = new Vue({
         }
       }
       this.mode = "welcome"
+      $("body").removeClass("full-screen")
       noLoop()
       this.started = false
       popup.show = false
-      $("body").addClass("full-screen")
       topOffset = 0
       $("#board").css("top", topOffset+"px").css("left", leftOffset)
       $(window).scrollTop(0).scrollLeft(0)
       redraw()
     },
-    edit(){
+    edit(player){
+      this.currentPlayer = player
       this.mode = "edit"
-      $("body").removeClass("full-screen")
       topOffset = 100
       $("#board").css("top", topOffset+"px").css("left", "0px")
-      resizeWorld(80, 50)
-      generateBoard()
+      let cols = Math.floor(window.innerWidth/25)
+      let rows = Math.floor(window.innerHeight/25)
+      resizeWorld(cols, rows)
+      generateBoard(cols,rows)
       this.started = true
       loop()
     },
@@ -287,8 +289,8 @@ let game = new Vue({
       if (cols != cols || rows != rows)
         alert("Please enter 2 numbers separated by a coma (\",\")")
       else {
+        generateBoard(cols,rows)
         resizeWorld(cols, rows)
-        generateBoard()
       }
     },
 
@@ -397,8 +399,10 @@ let game = new Vue({
       if (index1 === -1){
         let games = Object.keys(localStorage)
         for (let i = 0; i < games.length; i++){
-          if (games[i].substr(0, 8) === "wemoGame")
-            gameId = Number(games[i].substring(8, games[i].length))+1
+          if (games[i].substr(0, 8) === "wemoGame"){
+            let n = Number(games[i].substring(8, games[i].length))+1
+            gameId = n > gameId ? n : gameId
+          }
         }
         this.currentPlayer.games.push({level: board.level, id: gameId})
         let p = JSON.parse(localStorage.wemoPlayers)

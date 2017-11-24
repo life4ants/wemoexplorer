@@ -8,7 +8,7 @@ function WaterCraft(imgs, x, y, type) {
   this.stepCount = 0
 
   this.initialize = function(obj) {
-    for (key in obj){
+    for (let key in obj){
       this[key] = obj[key]
     }
   }
@@ -72,10 +72,6 @@ function WaterCraft(imgs, x, y, type) {
           man.energy--
           board.revealCount--
         }
-        if (autoCenter)
-          centerOn(this)
-        else
-          follow(this)
       }
     }
   }

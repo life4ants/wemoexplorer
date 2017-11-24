@@ -26,7 +26,7 @@ body {
   border-radius: 10px;
   background-color: #ffe;
 }
-
+        /* ----------------------- Sidebar/Topbar: --------------------*/
 .topBar {
   position: fixed;
   top: 0;
@@ -50,16 +50,6 @@ body {
   user-select: none;
 }
 
-.hidden {
-  display: hidden
-}
-
-.flex {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-}
 .topBar-content{
   display: flex;
   font-size: 22px;
@@ -73,20 +63,85 @@ body {
   margin: 0 10px;
 }
 
-.tile {
- margin: 3px;
+.fa-info-circle {
+  position: absolute;
+  bottom: 0;
 }
 
-.icon {
-  margin: 4px 0;
+.tileBox {
+  display: flex;
+  flex-wrap: wrap;
+  width: 434px;
 }
 
-.selected {
-  height: 25px;
-  width: 25px;
-  border: solid 2px red;
-  margin: 1px;
+.tileBox-short {
+  display: flex;
+  flex-wrap: wrap;
+  width: 341px;
 }
+
+        /* ------------------------------- Welcome screen: -----------------------*/
+
+.button-tiles {
+  margin: 5px;
+  border: solid #999;
+  border-width: 0 1px;
+}
+.button-tiles-content {
+  padding: 10px;
+  background-color: #ffa;
+  border-bottom: 1px solid #E1E1E1;
+  min-height: 28px;
+  overflow: hidden;
+}
+
+.button-tiles .button-tiles-content:nth-child(1){
+  border-top: 1px solid #999;
+}
+
+.button-tiles .button-tiles-content:nth-last-child(1){
+  border-bottom: 1px solid #999;
+}
+
+.button-tiles .clickable:hover {
+  cursor: pointer;
+  background-color: #ffc;
+}
+
+.button-tiles a {
+  float: right;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.links {
+  display: flex;
+  float: right;
+}
+.links a {
+  text-decoration: underline;
+  color: #000;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.left-header {
+  margin-top: 8px;
+  text-align: left;
+  font-size: 17px;
+}
+
+.center-header {
+  text-align: center;
+  font-size: 16px;
+}
+
+.flex-around {
+  display: flex;
+  justify-content: space-around;
+}
+
+           /* ---------------------------- Build Menu: -------------------------*/
 
 .build-option-container {
   border: 1px solid #666;
@@ -109,93 +164,39 @@ body {
   margin-right: 8px;
 }
 
+          /* ------------------------------ General: -------------------------- */
+.hidden {
+  display: hidden
+}
+
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.tile {
+ margin: 3px;
+}
+
+.icon {
+  margin: 4px 0;
+}
+
+.selected {
+  height: 25px;
+  width: 25px;
+  border: solid 2px red;
+  margin: 1px;
+}
+
 .red-border {
   border: solid 2px red;
 }
 
 .no-border {
   margin: 2px;
-}
-
-.tileBox {
-  display: flex;
-  flex-wrap: wrap;
-  width: 434px;
-}
-
-.tileBox-short {
-  display: flex;
-  flex-wrap: wrap;
-  width: 341px;
-}
-
-.infobox {
-  margin-left: 10px;
-  padding: 1px;
-}
-
-.score img {
-  margin-right: 3px;
-}
-
-.disabled {
-  cursor: not-allowed;
-  opacity: .65;
-}
-
-.button-tiles {
-  margin: 5px;
-  border: solid #999;
-  border-width: 0 1px;
-}
-.button-tiles div {
-  padding: 10px;
-  background-color: #ffa;
-  cursor: pointer;
-  border-bottom: 1px solid #E1E1E1;
-}
-
-.button-tiles div:nth-child(1){
-  border-top: 1px solid #999;
-}
-
-.button-tiles div:nth-last-child(1){
-  border-bottom: 1px solid #999;
-}
-
-.button-tiles div:hover {
-  background-color: #ffc;
-}
-
-.button-tiles a {
-  float: right;
-  margin: 0 10px;
-}
-
-.links {
-  display: flex;
-  float: right;
-}
-.links a {
-  text-decoration: underline;
-  color: #000;
-  cursor: pointer;
-  margin: 0 10px;
-}
-
-.fa-info-circle {
-  position: absolute;
-  bottom: 0;
-}
-
-.left-header {
-  text-align: left;
-  font-size: 16px;
-}
-
-.flex-around {
-  display: flex;
-  justify-content: space-around;
 }
 
 #etr, #esc {
@@ -224,7 +225,7 @@ body {
   color: #777;
 }
 
-/* ---------------- Modals: ------------ */
+            /* ----------------------- Modals: --------------------- */
 
 .modal {
   overflow: scroll;
@@ -295,9 +296,9 @@ body {
   }
 }
 
-@media (min-width: 700px){
+@media (min-width: 600px){
   #popup-lg {
-    width: 650px;
+    width: 550px;
     margin: 30px auto;
   }
 }
@@ -331,3 +332,16 @@ body {
 }
 
 
+/* ------------ extra: ------------
+
+.disabled {
+  cursor: not-allowed;
+  opacity: .65;
+}
+
+.infobox {
+  margin-left: 10px;
+  padding: 1px;
+}
+
+/*

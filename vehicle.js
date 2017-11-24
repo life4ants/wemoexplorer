@@ -1,6 +1,6 @@
 class Vehicle {
   constructor(obj){
-    for (key in obj){
+    for (let key in obj){
       if (key === "canoe"){
         this.canoe = new WaterCraft(tiles.canoe, obj[key].startX, obj[key].startY, "canoe")
         this.canoe.initialize(obj[key])
