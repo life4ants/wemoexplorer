@@ -131,7 +131,10 @@ function showInfo(){
   fill(f)
   textSize(15)
   textAlign(LEFT,BOTTOM)
-  let message = "man dist: "+man.stepCount+" cells left to explore: "+board.revealCount
+  let cost = 3+Math.round(man.backpack.weight/8)
+  if (man.basket)
+    cost = 3+Math.round((man.basket.quantity/10 + man.backpack.weight)/8)
+  let message = "man dist: "+man.stepCount+" cells left to explore: "+board.revealCount+" walking cost: "+cost
   text(message, left, bottom)
 }
 

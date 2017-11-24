@@ -50,7 +50,8 @@ function Man(img, x, y) {
     if (this.isRiding){
       let sx = (active.index%3)*25
       let sy = Math.floor(active.index/3)*25
-      let h = [0,1].includes(active.index) ? 19 : 21
+      let h = active.type === "canoe" && [0,1].includes(active.index) ? 19 :
+              active.type === "canoe" ? 21 : 25
       image(this.img, active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
     }
     else {
@@ -179,6 +180,12 @@ function Man(img, x, y) {
       this.isRiding = true
       this.ridingId = "canoe"
       vehicles.canoe.index = vehicles.canoe.index === 4 ? 0 : 3
+    }
+    else if (!this.isRiding && isNearSquare(this.x, this.y, vehicles.raft.x, vehicles.raft.y)){
+      active = vehicles.raft
+      this.isRiding = true
+      this.ridingId = "raft"
+      vehicles.raft.index = vehicles.raft.index === 4 ? 0 : 3
     }
     if (autoCenter)
       centerOn(this)

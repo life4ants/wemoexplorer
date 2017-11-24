@@ -84,7 +84,7 @@ function mouseDragged(){
         path.push(id)
       }
     }
-    else if (game.currentType !== "canoe"){
+    else if (game.currentType !== "start"){
       changeTile(x,y, game.currentTile, game.currentType)
     }
   }

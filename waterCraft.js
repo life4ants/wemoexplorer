@@ -1,6 +1,7 @@
-function Canoe(imgs, x, y) {
+function WaterCraft(imgs, x, y, type) {
   this.x = x
   this.y = y
+  this.type = type
   this.imgs = imgs
   this.index = 4
   this.landed = false
@@ -25,13 +26,13 @@ function Canoe(imgs, x, y) {
   this.display = function() {
     let x, y, id
     if ([0,1,4].includes(this.index)){
-      x = (this.x-1)*25
-      y = this.y*25+topbarHeight
+      x = this.type === "canoe" ? (this.x-1)*25 : this.x*25-5
+      y = this.type === "canoe" ? this.y*25+topbarHeight : this.y*25+topbarHeight+3
       id = 0
     }
     else {
       x = this.x*25
-      y = (this.y-1)*25+topbarHeight
+      y = this.type === "canoe" ? (this.y-1)*25+topbarHeight : this.y*25+topbarHeight-5
       id = 1
     }
     image(this.imgs[id], x, y)
@@ -52,23 +53,30 @@ function Canoe(imgs, x, y) {
         this.stepCount++
         man.energy -= 2
 
-        for (let i=-1; i<=1; i++){
-          for (let j = -1; j <= 1; j++){
-            let a = this.x+i
-            let b = this.y+j
+        if (this.type === "canoe"){
+          for (let i=-1; i<=1; i++){
+            for (let j = -1; j <= 1; j++){
+              let a = this.x+i
+              let b = this.y+j
 
-            if (a >= 0 && a < cols && b >= 0 && b < rows && !board.cells[a][b].revealed){
-              board.cells[a][b].revealed = true
-              man.energy--
-              board.revealCount--
+              if (a >= 0 && a < cols && b >= 0 && b < rows && !board.cells[a][b].revealed){
+                board.cells[a][b].revealed = true
+                man.energy--
+                board.revealCount--
+              }
             }
           }
         }
+        else if (!board.cells[this.x][this.y].revealed){
+          board.cells[this.x][this.y].revealed = true
+          man.energy--
+          board.revealCount--
+        }
+        if (autoCenter)
+          centerOn(this)
+        else
+          follow(this)
       }
-      if (autoCenter)
-        centerOn(this)
-      else
-        follow(this)
     }
   }
 

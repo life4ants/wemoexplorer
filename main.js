@@ -94,6 +94,9 @@ function preload(){
     players: [ loadImage("images/player10.png"),
                loadImage("images/player11.png")
              ],
+    raft: [ loadImage("images/raft0.png"),
+            loadImage("images/raft1.png"),
+          ],
     random: loadImage("images/random.png"),
     randomPit: loadImage("images/randomPit.png"),
     randomGrass: loadImage("images/randomGrass.png"),
@@ -212,11 +215,11 @@ function startGame(){
   }
   vehicles = new Vehicle(board.vehicles)
   delete board.vehicles
+  active = man.ridingId ? vehicles[man.ridingId] : man
   initializeVars()
   if (!board.progress) {
     fillBoard()
   }
-  active = man.ridingId === "canoe" ? vehicles.canoe : man
   popup.reset()
   centerOn(active)
   loop()

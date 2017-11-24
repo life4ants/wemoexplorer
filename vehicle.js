@@ -2,11 +2,12 @@ class Vehicle {
   constructor(obj){
     for (key in obj){
       if (key === "canoe"){
-        this.canoe = new Canoe(tiles.canoe, obj[key].startX, obj[key].startY)
+        this.canoe = new WaterCraft(tiles.canoe, obj[key].startX, obj[key].startY, "canoe")
         this.canoe.initialize(obj[key])
       }
       else if (key === "raft"){
-        console.log("board had a raft")
+        this.raft = new WaterCraft(tiles.raft, obj[key].startX, obj[key].startY, "raft")
+        this.raft.initialize(obj[key])
       }
     }
   }
@@ -31,8 +32,10 @@ class Vehicle {
   }
 
   addCanoe(x, y){
-    this.canoe = new Canoe(tiles.canoe, x, y)
+    this.canoe = new WaterCraft(tiles.canoe, x, y, "canoe")
   }
 
-
+  addRaft(x, y){
+    this.raft = new WaterCraft(tiles.raft, x, y, "raft")
+  }
 }

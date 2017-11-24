@@ -75,11 +75,15 @@ let popup = new Vue({
   },
   methods: {
     reset(){
-      if (man.basket){
-        this.buildOptions[this.buildOptions.findIndex((e) => e.id === "basket")].active = false
+      for (var i = this.buildOptions.length - 1; i >= 0; i--) {
+        switch (this.buildOptions[i].id) {
+          case "basket":
+            this.buildOptions[i].active = !man.basket
+            break
+          case "stoneAx":
+            this.buildOptions[i].active = !man.tools.includes("stoneAx")
+        }
       }
-      if (man.tools.includes("stoneAx"))
-        this.buildOptions[this.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
     },
 
     buildMenu(){

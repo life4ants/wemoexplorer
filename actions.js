@@ -54,6 +54,7 @@ function build(type){
         }
       }
     }
+    ar.sort((a,b) => a.index > b.index)
     if (found === 3){
       man.backpack.weight -= 32
       for (let j = ar.length-1; j >= 0; j--){
@@ -172,7 +173,7 @@ function eat(){
   }
   else {
     man.energy += 35
-    man.health = man.health < 5000 ? man.health+5 : 5000
+    man.health = man.health < 4995 ? man.health+5 : 5000
   }
 }
 
