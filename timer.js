@@ -39,17 +39,17 @@ function showTopbar(){
   showTimer()
   if (infoShown)
     showInfo()
-  if (frameCount%239 === 0){
-    saveC++
-    console.log("slot "+(frameCount/239)+":")
-    if (Date.now()-frameTime < 18 || saveC > 2){
-      saveC = 0
-      game.saveGame()
-      console.log("game saved in:", Date.now()-frameTime)
-    }
-    else
-      console.log("game not saved. time was:", Date.now()-frameTime)
-  }
+  // if (frameCount%239 === 0){
+  //   saveC++
+  //   console.log("slot "+(frameCount/239)+":")
+  //   if (Date.now()-frameTime < 18 || saveC > 2){
+  //     saveC = 0
+  //     game.saveGame()
+  //     console.log("game saved in:", Date.now()-frameTime)
+  //   }
+  //   else
+  //     console.log("game not saved. time was:", Date.now()-frameTime)
+  // }
 }
 
 function showTimer(){
@@ -177,7 +177,7 @@ function resumeTimer(){
 function showNight(){
   let alpha, time
   if (game.paused) {
-    alpha = timeOfDay === "day" ? 210 : 255
+    alpha = timeOfDay === "day" ? 230 : 255
     fill(0,0,0,alpha)
     rect(0,0,worldWidth,worldHeight)
     return
@@ -199,7 +199,7 @@ function showNight(){
       break
   }
 
-  let dark = (board.wemoMins%1440 >= 1350 || board.wemoMins%1440 < 90)
+  let dark = (board.wemoMins%1440 >= 1310 || board.wemoMins%1440 < 100)
   man.inDark = dark
 
   fill(0,0,0,alpha)
@@ -218,7 +218,7 @@ function showNight(){
       let r = size*25/2
       let arm = r*0.54666
         firesize = Math.floor(size/2.1)
-      if (dark){
+      if (dark && man.inDark){
         let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
         man.inDark = d > r-10
       }

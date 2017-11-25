@@ -226,6 +226,7 @@ function startGame(){
   popup.reset()
   centerOn(active)
   loop()
+  $(window).scrollTop(0).scrollLeft(0)
   $("body").addClass("full-screen")
 }
 

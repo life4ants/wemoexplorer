@@ -20,7 +20,7 @@ let welcome = {
               </div>
             </div>
             <div v-if="players.length > 0" class="links">
-              <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done' : 'delete players'}}</a>
+              <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete players'}}</a>
             </div>
             <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
             <input type="text" v-model="name" placeholder="enter name">
@@ -47,9 +47,9 @@ let welcome = {
             </div>
             <h6 class="left-header">Custom Worlds:</h6>
             <div v-if="deleteMode" class="button-tiles">
-              <div v-for="item in customWorlds" class="button-tiles-content">
+              <div v-for="(item, id) in customWorlds" class="button-tiles-content">
                 {{item.name}}
-                <a @click="() => deleteGame(item.name)">delete</a>
+                <a @click="() => deleteGame(item.name, id)">delete</a>
               </div>
             </div>
             <div v-else class="button-tiles">
@@ -64,7 +64,7 @@ let welcome = {
               </div>
             </div>
             <div class="links">
-              <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done' : 'delete custom worlds'}}</a>
+              <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete custom worlds'}}</a>
               <a @click="() => edit(currentPlayer)">create/edit custom worlds</a>
             </div>
           </div>
@@ -81,30 +81,50 @@ let welcome = {
       worlds: [],
       customWorlds: [],
       name: "",
-      deleteMode: false
+      deleteMode: false,
+      updateMessage: false
     }
   },
   props: [
-    'startGame', 'edit', 'player'
+    'startGame', 'edit', 'player', 'upToDate'
   ],
   mounted(){
     setTimeout(() => $("#grow").addClass("large"), 0)
     if (localStorage.wemoPlayers){
       this.players = JSON.parse(localStorage.wemoPlayers)
+      for (let i = this.players.length - 1; i >= 0; i--) {
+        for (let j = this.players[i].games.length - 1; j >= 0; j--) {
+          let game = this.players[i].games[j]
+          if (!game.name){
+            if (typeof game.level === "number"){
+              game.name = "Level "+game.level
+              game.type = "default"
+            }
+            else {
+              game.name = game.level
+              game.level = 10
+              game.type = "custom"
+            }
+          }
+        }
+      }
     }
-    if (this.player.index != undefined) {
+    if (this.player.index !== undefined) {
       this.pickPlayer(this.player.index)
     }
+    this.updateMessage = !this.upToDate
   },
   computed: {
     message(){
-      return this.players.length > 0 ? "Click on your name or make a new player:" : "Please enter your name to get started:"
+      return this.updateMessage ? `Sorry, Andy made some breaking changes to the code, and all your progress had to be deleted.
+        Your custom games are still here. Enter your name to continue.` :
+          this.players.length > 0 ? "Click on your name or make a new player:" : "Please enter your name to get started:"
     }
   },
   methods: {
     newPlayer(){
       if (this.name.length > 0){
-        this.players.push({name: this.name, unlockedLevel: 1, games: []})
+        this.players.push({name: this.name, unlockedLevel: 1, games: [], character: 0})
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
       }
@@ -113,7 +133,7 @@ let welcome = {
     pickPlayer(id){
       let p = this.players[id]
       p.index = id
-      this.selected = p.character
+      this.selected = p.character || 0
       this.currentPlayer = p
       this.matchWorlds()
       this.stage = 2
@@ -133,8 +153,21 @@ let welcome = {
       }
     },
 
-    deleteGame(name){
-      console.log(name)
+    deleteGame(name, customWorldIndex){
+      if (confirm("Are you sure you want to delete "+name+"? Everyone's progress on this world will also be deleted.")){
+        localStorage.removeItem("board"+name)
+        for (let i = this.players.length - 1; i >= 0; i--) {
+          for (let j = this.players[i].games.length - 1; j >= 0; j--) {
+            let game = this.players[i].games[j]
+            if (game.name === name){
+              localStorage.removeItem("wemoGame"+game.id)
+              this.players[i].games.splice(j, 1)
+            }
+          }
+        }
+        this.customWorlds.splice(customWorldIndex, 1)
+        localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
+      }
     },
 
     signout(){
@@ -158,14 +191,20 @@ let welcome = {
       //match:
       let savedGames = this.currentPlayer.games
       for (let i = 0; i < savedGames.length; i++){
-        if (typeof savedGames[i].level === "number"){
+        if (savedGames[i].type === "default"){
           defaultWorlds[savedGames[i].level-1].savedGame = true
           defaultWorlds[savedGames[i].level-1].gameId = savedGames[i].id
         }
         else {
-          let index = customWorlds.findIndex((e) => e.name === savedGames[i].level)
-          if (index === -1)
-            console.error("saved game",savedGames[i].level,"not found in custom worlds")
+          console.log(savedGames[i].type)
+          let index = customWorlds.findIndex((e) => e.name === savedGames[i].name)
+          if (index === -1){
+            let name = savedGames[i].name
+            savedGames.splice(i, 1)
+            localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
+            console.error("saved game",name,"was not found in custom worlds, so it was deleted")
+            continue
+          }
           customWorlds[index].savedGame = true
           customWorlds[index].gameId = savedGames[i].id
         }
@@ -177,9 +216,8 @@ let welcome = {
     pickGame(type, id){
       console.log(type, id)
       if (this.selected !== this.players[this.currentPlayer.index].character){
-        let p = JSON.parse(localStorage.wemoPlayers)
-        p[this.currentPlayer.index].character = this.selected
-        localStorage.setItem("wemoPlayers", JSON.stringify(p))
+        this.players[this.currentPlayer.index].character = this.selected
+        localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
       }
       this.currentPlayer.character = this.selected
       this.startGame(type, this.currentPlayer, id)

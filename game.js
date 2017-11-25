@@ -2,7 +2,8 @@ let game = new Vue({
   el: '#topBar',
   template: `
     <div>
-      <welcome-menu v-if="mode === 'welcome'" :startGame="startGame" :player="currentPlayer" :edit="edit"></welcome-menu>
+      <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
+        :player="currentPlayer" :edit="edit" :upToDate="upToDate"></welcome-menu>
       <div :class="{topBar: mode === 'edit', sideBar: mode === 'play'}">
         <div v-if="mode === 'edit'" class="flex">
           <div class="tileBox">
@@ -166,6 +167,7 @@ let game = new Vue({
       {code: "S", active: false, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
     ],
     mode: "loading",
+    upToDate: false,
     currentTile: "water",
     currentType: "water",
     auto: false,
@@ -173,6 +175,28 @@ let game = new Vue({
     paused: false,
     level: 1,
     currentPlayer: {}
+  },
+  mounted(){
+    if (localStorage.wemoUpToDate && localStorage.wemoUpToDate === "9pmNov242017"){
+      this.upToDate = true
+    }
+    else {
+      let s = Object.keys(localStorage)
+      for (let i = 0; i < s.length; i++){
+        if (s[i].substr(0,8) === "wemoGame" || s[i] === "wemoPlayers"){
+          delete localStorage[s[i]]
+        }
+        else if (s[i].substr(0, 5) === "board"){
+          let _board = JSON.parse(localStorage[s[i]])
+          _board.name = s[i].substring(5, s[i].length)
+          _board.level = 10
+          _board.type = "custom"
+          delete _board.id
+          localStorage.setItem(s[i], JSON.stringify(_board))
+        }
+      }
+      localStorage.setItem("wemoUpToDate", "9pmNov242017")
+    }
   },
   methods: {
     action(key){
@@ -324,11 +348,11 @@ let game = new Vue({
       board.version = 2
       board.wemoMins = 120
       board.progress = false
-      let id = prompt("enter id for game")
-      if (id !== null){
-        board.id = id
-        localStorage.setItem("board"+id, JSON.stringify(board))
-        alert("Game "+id+" was saved.")
+      let name = prompt("enter name for game")
+      if (name !== null){
+        board.name = name
+        localStorage.setItem("board"+name, JSON.stringify(board))
+        alert("Game "+name+" was saved.")
       }
     },
 
@@ -360,7 +384,9 @@ let game = new Vue({
       }
       else if (type === "custom"){
         board = JSON.parse(localStorage["board"+index])
-        board.level = index
+        board.name = index
+        board.level = board.level || 10
+        board.type = "custom"
       }
       if (board.version !== 5){
         if (board.version === 1){
@@ -394,7 +420,7 @@ let game = new Vue({
     },
 
     saveGame(){
-      let index1 = this.currentPlayer.games.findIndex((e) => e.level === board.level)
+      let index1 = this.currentPlayer.games.findIndex((e) => e.name === board.name)
       let gameId = 0
       if (index1 === -1){
         let games = Object.keys(localStorage)
@@ -404,7 +430,7 @@ let game = new Vue({
             gameId = n > gameId ? n : gameId
           }
         }
-        this.currentPlayer.games.push({level: board.level, id: gameId})
+        this.currentPlayer.games.push({level: board.level, id: gameId, name: board.name, type: board.type})
         let p = JSON.parse(localStorage.wemoPlayers)
         p[this.currentPlayer.index] = this.currentPlayer
         localStorage.setItem("wemoPlayers", JSON.stringify(p))

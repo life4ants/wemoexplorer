@@ -98,7 +98,7 @@ function Man(img, x, y) {
       this.y + y >= 0 && this.y + y < rows){
        //check for forbidden cells
       if (!["water", "rockEdge", "river"].includes(board.cells[this.x+x][this.y+y].type)){
-        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[this.fireId].value > 0)
+        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[board.cells[this.x+x][this.y+y].id].value > 0)
           return
         if (this.isInPit){
           this.oldX = this.x
