@@ -73,6 +73,11 @@ function WaterCraft(imgs, x, y, type) {
           board.revealCount--
         }
       }
+      else if (!board.cells[this.x+x][this.y+y].revealed){
+        board.cells[this.x+x][this.y+y].revealed = true
+        man.energy--
+        board.revealCount--
+      }
     }
   }
 

@@ -38,4 +38,12 @@ class Vehicle {
   addRaft(x, y){
     this.raft = new WaterCraft(tiles.raft, x, y, "raft")
   }
+
+  canMount(x,y){
+    if (this.raft && isNearSquare(x, y, this.raft.x, this.raft.y))
+      return "raft"
+    if (this.canoe && isNearSquare(x, y, this.canoe.x, this.canoe.y))
+      return "canoe"
+    return false
+  }
 }

@@ -82,7 +82,7 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      updateMessage: false
+      updateMessage: !this.upToDate
     }
   },
   props: [
@@ -112,7 +112,6 @@ let welcome = {
     if (this.player.index !== undefined) {
       this.pickPlayer(this.player.index)
     }
-    this.updateMessage = !this.upToDate
   },
   computed: {
     message(){
@@ -127,6 +126,7 @@ let welcome = {
         this.players.push({name: this.name, unlockedLevel: 1, games: [], character: 0})
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
+        this.updateMessage = false
       }
     },
 
@@ -196,7 +196,6 @@ let welcome = {
           defaultWorlds[savedGames[i].level-1].gameId = savedGames[i].id
         }
         else {
-          console.log(savedGames[i].type)
           let index = customWorlds.findIndex((e) => e.name === savedGames[i].name)
           if (index === -1){
             let name = savedGames[i].name

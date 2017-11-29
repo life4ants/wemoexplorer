@@ -1,6 +1,4 @@
 let saveC = 0
-let infoShown = false
-let firesize = 0
 
 let viewport = {
   top: topOffset,
@@ -14,7 +12,7 @@ function showTopbar(){
   let boardTop = $("#board").position().top-topOffset
   viewport.left = boardLeft < 0 ? abs(boardLeft) : 0
   viewport.top = boardTop < 0 ? abs(boardTop) : 0
-  viewport.right = window.innerWidth < worldWidth ? viewport.left+window.innerWidth-leftOffset : viewport.left+worldWidth
+  viewport.right = window.innerWidth < worldWidth+leftOffset ? viewport.left+window.innerWidth-leftOffset : viewport.left+worldWidth
   viewport.bottom = window.innerHeight < worldHeight ? viewport.top+window.innerHeight-topOffset : viewport.top+worldHeight
   let width = window.innerWidth-leftOffset
   noStroke()
@@ -37,19 +35,19 @@ function showTopbar(){
   showEnergyBar("Energy: ", showEnergy, 3)
   showEnergyBar("Health: ", showHealth, 30)
   showTimer()
-  if (infoShown)
+  if (game.infoShown)
     showInfo()
-  // if (frameCount%239 === 0){
-  //   saveC++
-  //   console.log("slot "+(frameCount/239)+":")
-  //   if (Date.now()-frameTime < 18 || saveC > 2){
-  //     saveC = 0
-  //     game.saveGame()
-  //     console.log("game saved in:", Date.now()-frameTime)
-  //   }
-  //   else
-  //     console.log("game not saved. time was:", Date.now()-frameTime)
-  // }
+  if (frameCount%239 === 0){
+    saveC++
+    if (Date.now()-frameTime < 18 || saveC > 2){
+      game.saveGame()
+      if (saveC > 2)
+        console.log("extra save", Date.now()-frameTime)
+      else
+        console.log("game saved")
+      saveC = 0
+    }
+  }
 }
 
 function showTimer(){
@@ -95,13 +93,13 @@ function showBackpack(){
   let left = window.innerWidth > 1000 ? viewport.left+530 : viewport.left+340
   let top = viewport.top+3
   image(tiles.backpack, left, top)
-  if (man.backpack.weight > 0){
-    let items = man.backpack.items
+  if (backpack.weight > 0){
+    let items = backpack.getAllItems()
     for (let i = 0; i<items.length; i++){
       let row = i > 1 ? 22 : -1
       let col = i > 1 ? i-2 : i
       image(tiles[items[i].type], col*25+left+2, top+row)
-      drawBadge(col*25+left+22, top+5+row, items[i].quantity)
+      drawBadge(col*25+left+22, top+5+row, items[i].quantity, "#000")
     }
     fill(255)
     stroke(80)
@@ -109,12 +107,12 @@ function showBackpack(){
     rect(left+55, top-1, 5, 21)
     fill("#6C3C00")
     noStroke()
-    rect(left+56, top+20-Math.floor(man.backpack.weight/2), 4, Math.floor(man.backpack.weight/2))
+    rect(left+56, top+20-Math.floor(backpack.weight/2), 4, Math.floor(backpack.weight/2))
   }
   if (man.basket){
     if (man.basket.quantity > 0){
       image(tiles.basketBerries, left+80, top+25)
-      drawBadge(left+110, top+25, man.basket.quantity)
+      drawBadge(left+110, top+25, man.basket.quantity, "#000")
     }
     else
       image(tiles.basket, left+80, top+25)
@@ -131,9 +129,9 @@ function showInfo(){
   fill(f)
   textSize(15)
   textAlign(LEFT,BOTTOM)
-  let cost = 3+Math.round(man.backpack.weight/8)
+  let cost = 3+Math.round(backpack.weight/8)
   if (man.basket)
-    cost = 3+Math.round((man.basket.quantity/10 + man.backpack.weight)/8)
+    cost = 3+Math.round((man.basket.quantity/10 + backpack.weight)/8)
   let message = "man dist: "+man.stepCount+" cells left to explore: "+board.revealCount+" walking cost: "+cost
   text(message, viewport.left, viewport.bottom)
 }
@@ -199,7 +197,7 @@ function showNight(){
       break
   }
 
-  let dark = (board.wemoMins%1440 >= 1310 || board.wemoMins%1440 < 100)
+  let dark = (board.wemoMins%1440 >= 1360 || board.wemoMins%1440 < 80)
   man.inDark = dark
 
   fill(0,0,0,alpha)
@@ -217,7 +215,6 @@ function showNight(){
       let y = fires[i].y*25+12.5+topbarHeight
       let r = size*25/2
       let arm = r*0.54666
-        firesize = Math.floor(size/2.1)
       if (dark && man.inDark){
         let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
         man.inDark = d > r-10
@@ -263,7 +260,7 @@ function drawFireCircle(x,y,size,alpha){
 function updateFires(){
   let fires = board.objectsToShow.fires
   let x = Math.round(frameCount%40/20)
-  for (let i =x; i<fires.length; i+=2){
+  for (let i=x; i<fires.length; i+=2){
     if (fires[i].value > 0){
       fires[i].value--
     }

@@ -1,4 +1,4 @@
-let popup = new Vue({
+var popup = new Vue({
   el: '#popup',
   template: `
     <div>
@@ -67,7 +67,10 @@ let popup = new Vue({
         {id: "firepit", src: "images/firepitIcon.png", title: "Firepit",
                   cost: "200 energy", info: "For building fires in. Very important for staying alive every night.", active: true},
         {id: "basket", src: "images/basket.png", title: "Basket",
-                  cost: "50 energy, 6 long grass", info: "For picking berries in", active: true}
+                  cost: "50 energy, 6 long grass", info: "For picking berries in", active: true},
+        {id: "raft", src: "images/raft0.png", title: "Raft",
+                  cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true}
+
       ],
       showOptions: [],
       selectId: null
@@ -120,10 +123,11 @@ let popup = new Vue({
     },
 
     dumpMenu(){
-      if (man.backpack.items.length === 0)
+      let items = backpack.getAllItems()
+      if (items.length === 0)
         return
-      if (man.backpack.items.length === 1){
-        dump(man.backpack.items[0].type)
+      if (items.length === 1){
+        dump(items[0].type)
       }
       else {
         this.title = "What would you like to Dump?"
@@ -135,7 +139,7 @@ let popup = new Vue({
         ]
         let output = []
         for (let i = 0; i < options.length; i++){
-          if (man.backpack.items.findIndex((e) => e.type === options[i].id) >= 0){
+          if (items.find((e) => e.type === options[i].id)){
             output.push(options[i])
           }
         }

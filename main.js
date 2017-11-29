@@ -1,7 +1,7 @@
 let frameTime = Date.now()
 
 let tiles, man, canoe, active
-let noKeys, autoCenter, showEnergy, showHealth
+let noKeys, showEnergy, showHealth
 let cols, rows, worldWidth, worldHeight
 const topbarHeight = 55
 let topOffset = 0, leftOffset = 0
@@ -14,7 +14,6 @@ const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", 
 function initializeVars(){
   showHealth = man.health
   showEnergy = man.energy
-  autoCenter = false
   noKeys = false
   showCount = 0
   message = ""
@@ -67,7 +66,10 @@ function preload(){
     dusk: loadImage("images/dusk.png"),
     canoe: [ loadImage("images/canoe0.png"),
               loadImage("images/canoe1.png")
-            ],
+           ],
+    construction: {
+                    raft: loadImage("images/raftHB.png")
+                   },
     firepit: loadImage("images/firepit.png"),
     grass: loadImage("images/grass.png"),
     log: loadImage("images/log.png"),
@@ -195,12 +197,12 @@ function draw(){
       vehicles.display()
       man.display()
       showNight()
-      showMessage()
-      if (autoCenter)
+      if (game.autoCenter)
           centerOn(active)
       else
         follow(active)
       showTopbar()
+      showMessage()
       if (showCount === 0 && (man.energy <= 0 || man.health <= 0 ))
         popup.gameOver()
     }
@@ -212,6 +214,8 @@ function draw(){
 
 function startGame(){
   man = new Man(tiles.players[game.currentPlayer.character], board.startX, board.startY)
+  backpack = new Backpack(board.backpack)
+  delete board.backpack
   if (board.man){
     man.initialize(board.man)
     delete board.man
@@ -324,8 +328,17 @@ function displayBoard() {
       if (cell.type === "rock" && (cell.revealed || game.mode === "edit")){
         image(tiles["rock"+cell.quantity], i*25, j*25+offset)
       }
-      else if (["log", "randomLog"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
+      else if (["log", "randomLog", "raftHB"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
         image(tiles[cell.type], i*25, j*25+offset)
+      else if (cell.type === "construction" && (cell.revealed || game.mode === "edit")){
+        image(tiles.construction[cell.construction.type], i*25, j*25+offset)
+        for (let a = 0; a < cell.construction.needed.length; a++) {
+          let item = cell.construction.needed[a]
+          let x = a < 2 ? a : a-2
+          let y = Math.floor(a/2)
+          drawBadge(i*25+x*14+4, j*25+offset+(y*14)+4, item.quantity, item.color)
+        }
+      }
       if (cell.byPit && (cell.revealed || game.mode === 'edit'))
         drawRing(i,j)
     }
@@ -425,17 +438,17 @@ function isNearSquare(x1, y1, x2, y2){ //with diagonals
   return false
 }
 
-// function isNearType(x,y, type){ //with diagonals
-//   for (let i = x-1; i <= x+1; i++){
-//     for (let j = y-1; j <= y+1; j++){
-//       if (i >= 0 && i < cols && j >= 0 && j < rows){
-//         if (board.cells[i][j].type === type)
-//           return true
-//       }
-//     }
-//   }
-//   return false
-// }
+function nearbyType(x,y, type){ //returns the cell data if found, otherwise false
+  for (let i = x-1; i <= x+1; i++){
+    for (let j = y-1; j <= y+1; j++){
+      if (i >= 0 && i < cols && j >= 0 && j < rows){
+        if (board.cells[i][j].type === type)
+          return Object.assign({x: i, y: j}, board.cells[i][j])
+      }
+    }
+  }
+  return false
+}
 
 function showObjects(){
   for (let x in board.objectsToShow){
@@ -444,11 +457,11 @@ function showObjects(){
       if (x === "logpiles"){
         let tile = items[i].quantity > 1 ? tiles.logpile : tiles.log
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
-        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
+        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity, "#000")
       }
       else if (x === "rockpiles"){
         image(tiles.rock, items[i].x*25, items[i].y*25+topbarHeight)
-        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity)
+        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity, "#000")
       }
       else if (x === "fires"){
         let tile = items[i].value > 0 ? fire[Math.floor((frameCount%6)/2)] : tiles.firepit
@@ -469,10 +482,10 @@ function showObjects(){
   }
 }
 
-function drawBadge(x,y,num){
+function drawBadge(x,y,num,color){
   num = num+""
   noStroke()
-  fill(0)
+  fill(color)
   ellipseMode(CENTER)
   ellipse(x,y,10+(num.length*3),13)
   textAlign(CENTER, CENTER)

@@ -203,6 +203,10 @@ body {
   position: relative;
 }
 
+#etr, #esc:focus {
+  outline: none;
+}
+
 #etr:after, #esc:after {
   position: absolute;
   bottom: -22px;

@@ -7,10 +7,6 @@ function Man(img, x, y) {
   this.index = 0
   this.isRiding = false
   this.ridingId = ""
-  this.backpack = {
-    weight: 0,
-    items: []
-  }
   this.basket = false
   this.tools = []
   this.isNextToFire = false
@@ -55,7 +51,7 @@ function Man(img, x, y) {
       image(this.img, active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
     }
     else {
-      let offset = this.backpack.weight > 0 ? 4 : 0
+      let offset = backpack.weight > 0 ? 4 : 0
       if (this.isInPit){
         imageMode(CENTER)
         this.drawImage(this.img, this.index+offset, this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
@@ -123,9 +119,9 @@ function Man(img, x, y) {
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        let cost = 3+Math.round(this.backpack.weight/8)
+        let cost = 3+Math.round(backpack.weight/8)
         if (this.basket)
-          cost = 3+Math.round((this.basket.quantity/10 + this.backpack.weight)/8)
+          cost = 3+Math.round((this.basket.quantity/10 + backpack.weight)/8)
         this.energy -= cost
         this.health -= 1
 
@@ -169,17 +165,14 @@ function Man(img, x, y) {
           break
       }
     }
-    else if (!this.isRiding && isNearSquare(this.x, this.y, vehicles.canoe.x, vehicles.canoe.y)){
-      active = vehicles.canoe
-      this.isRiding = true
-      this.ridingId = "canoe"
-      vehicles.canoe.index = vehicles.canoe.index === 4 ? 0 : 3
-    }
-    else if (!this.isRiding && isNearSquare(this.x, this.y, vehicles.raft.x, vehicles.raft.y)){
-      active = vehicles.raft
-      this.isRiding = true
-      this.ridingId = "raft"
-      vehicles.raft.index = vehicles.raft.index === 4 ? 0 : 3
+    else if (!this.isRiding) {
+      let watercraft = vehicles.canMount(this.x, this.y)
+      if (watercraft) {
+        active = vehicles[watercraft]
+        this.isRiding = true
+        this.ridingId = watercraft
+        vehicles[watercraft].index = vehicles[watercraft].index === 4 ? 0 : 3
+      }
     }
   }
 
@@ -201,6 +194,7 @@ function Man(img, x, y) {
       this.y = y
       this.index = dir === 0 ? 2 : [1,2,3].includes(dir) ? 0 : 4 === dir ? 3 : 1
       this.isRiding = false
+      this.ridingId = ""
       active.index = [0,1].includes(active.index) ? 4 : 5
       active = man
       return true
