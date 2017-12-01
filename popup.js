@@ -8,10 +8,10 @@ var popup = new Vue({
             <div class="modal-header" v-if="type !== 'gamePaused'">
               <h6>{{title}}</h6>
             </div>
-            <div v-if="type === 'build'" class="modal-body">
+            <div v-if="type === 'build'" class="modal-body build-menu">
               <div class="build-option-container">
-                <div v-for="item in showOptions" :id="item.id" :key="item.id"
-                          :class="{'red-border': selected === item.id, 'build-option': true}" @click="() => select(item.id)">
+                <div v-for="(item, k) in showOptions" :id="item.id" :key="item.id"
+                          :class="{'red-border': selected === item.id, 'build-option': true}" @click="() => select(k)">
                   <h5>{{item.title}}</h5>
                   <img :src="item.src" height="50" width="50" >
                   <p>cost: {{item.cost}}</p>
@@ -25,8 +25,8 @@ var popup = new Vue({
             <div v-else-if="type === 'dumpMenu'" class="modal-body">
               <p>Use arrow keys or click:</p>
               <div style="display: flex">
-                <img v-for="item in showOptions" :key="item.id" :src="item.src" height="50" width="50"
-                          :class="selected === item.id ? 'red-border' : 'no-border'" @click="() => select(item.id)">
+                <img v-for="(item, k) in showOptions" :key="item.id" :src="item.src" height="50" width="50"
+                          :class="selected === item.id ? 'red-border' : 'no-border'" @click="() => select(k)">
               </div>
             </div>
 
@@ -69,7 +69,9 @@ var popup = new Vue({
         {id: "basket", src: "images/basket.png", title: "Basket",
                   cost: "50 energy, 6 long grass", info: "For picking berries in", active: true},
         {id: "raft", src: "images/raft0.png", title: "Raft",
-                  cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true}
+                  cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true},
+        {id: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel",
+                  cost: "120 energy, 1 log, 1 long grass, 1 bone", info: "For digging up clay and ore", active: true}
 
       ],
       showOptions: [],
@@ -119,7 +121,14 @@ var popup = new Vue({
     },
 
     select(id){
-      this.selected = id
+      this.selectId = id
+      this.selected = this.showOptions[id].id
+      if (this.type === "build"){
+        $(".build-menu").scrollTop(
+          $("#"+this.selected).offset().top-$(".build-menu").offset().top+$(".build-menu").scrollTop()-
+          $(".build-menu").height()+$("#"+this.selected).height()
+        );
+      }
     },
 
     dumpMenu(){
@@ -135,7 +144,9 @@ var popup = new Vue({
         let options = [
           {id: "log", src: "images/logs.png"},
           {id: "rock", src: "images/rocks.png"},
-          {id: "longGrass", src: "images/longGrass.png"}
+          {id: "longGrass", src: "images/longGrass.png"},
+          {id: "bone", src: "images/bone.png"},
+          {id: "clay", src: "images/clay.png"}
         ]
         let output = []
         for (let i = 0; i < options.length; i++){
@@ -158,8 +169,8 @@ var popup = new Vue({
 
     changeSelect(dir){
       let id = this.selectId+dir
-      this.selectId = id >= this.showOptions.length ? 0 : id < 0 ? this.showOptions.length-1 : id
-      this.selected = this.showOptions[this.selectId].id
+      id = id >= this.showOptions.length ? 0 : id < 0 ? this.showOptions.length-1 : id
+      this.select(id)
     },
 
     gameOver(){

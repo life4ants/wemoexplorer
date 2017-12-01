@@ -71,13 +71,13 @@ body {
 .tileBox {
   display: flex;
   flex-wrap: wrap;
-  width: 434px;
+  width: 372px;
 }
 
 .tileBox-short {
   display: flex;
   flex-wrap: wrap;
-  width: 341px;
+  width: 248px;
 }
 
         /* ------------------------------- Welcome screen: -----------------------*/
@@ -142,7 +142,10 @@ body {
 }
 
            /* ---------------------------- Build Menu: -------------------------*/
-
+.build-menu {
+  max-height: 350px;
+  overflow: scroll;
+}
 .build-option-container {
   border: 1px solid #666;
   border-bottom-width: 0;

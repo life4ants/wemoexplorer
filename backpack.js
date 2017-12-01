@@ -5,7 +5,9 @@ class Backpack {
     this.items = {
       log: {weight: 15, quantity: 0},
       rock: {weight: 15, quantity: 0},
-      longGrass: {weight: 2, quantity: 0}
+      longGrass: {weight: 2, quantity: 0},
+      bone: {weight: 4, quantity: 0},
+      clay: {weight: 10, quantity: 0}
     }
     if (items){
       for (let i = items.length - 1; i >= 0; i--) {
@@ -16,7 +18,7 @@ class Backpack {
   }
 
   getAllItems(){
-    return this.includesItems(["log", "rock", "longGrass"])
+    return this.includesItems(["log", "rock", "longGrass", "bone", "clay"])
   }
 
   addItem(e){
@@ -37,13 +39,13 @@ class Backpack {
     return false
   }
 
-  includesItem(s){
-    if (this.items[s] && this.items[s].quantity > 0)
-      return {quantity: this.items[s].quantity}
+  includesItem(s){ // returns the quantity of asked for item, or false if doesn't exsist
+    if (this.items[s])
+      return this.items[s].quantity
     return false
   }
 
-  includesItems(ar){ // returns items in order asked for
+  includesItems(ar){ // returns an object for each item that has quantity more than 0, in order asked for
     let output = []
     for (let i=0; i < ar.length; i++) {
       if (this.items[ar[i]] && this.items[ar[i]].quantity > 0)

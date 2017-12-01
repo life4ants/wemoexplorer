@@ -7,11 +7,11 @@ function keyPressed(){
       case UP_ARROW:
       case LEFT_ARROW:
         popup.changeSelect(-1)
-        break
+        return false
       case DOWN_ARROW:
       case RIGHT_ARROW:
         popup.changeSelect(1)
-        break
+        return false
     }
   }
   switch(keyCode){
@@ -128,7 +128,11 @@ function changeTile(x,y, tile, type){
       board.cells[x][y].quantity = 4
     }
   }
-  else if (["log", "randomLog"].includes(type))
+  else if (type === "clay"){
+    board.cells[x][y].type = type
+    board.cells[x][y].quantity = 5
+  }
+  else if (["log", "randomLog", "bone"].includes(type))
     board.cells[x][y].type = type
   else
     board.cells[x][y] = {tile, type, revealed: false}
@@ -190,3 +194,94 @@ function magic(){
   return tileNum
 }
 
+function islandMaker(){
+  path = ["10_3"]
+  let x = 11, y = 3;
+  let go = true, count = 0
+  let dir = "R"
+  let move = "R"
+
+  while(go){
+    if (x < cols-6 && y < 6 && count < cols*2){//top left
+      move = y === 0 ? (dir === "U" ? ["R"] : ["D", "R"]) :
+               y === 5 ? (dir === "D" ? ["R"] : ["U", "R"]) : findDirs(["R", "U", "D"], dir)
+    }
+    else if (x>cols-7 && y<rows-6){//right top
+      move = x === cols-1 ? (dir === "R" ? ["D"] : ["L", "D"]) :
+               x === cols-6 ? (dir === "L" ? ["D"] : ["R", "D"]) : findDirs(["D", "L", "R"], dir)
+    }
+    else if (x>5 && y>rows-7){//bottom right
+      move = y === rows-6 ? (dir === "U" ? ["L"] : ["D", "L"]) :
+               y === rows-1 ? (dir === "D" ? ["L"] : ["U", "L"]) : findDirs(["L", "U", "D"], dir)
+    }
+    else if (x<6 && y>5){//left bottom
+      move = x === 0 ? (dir === "L" ? ["U"] : ["R", "U"]) :
+               x === 5 ? (dir === "R" ? ["U"] : ["L", "U"]) : findDirs(["U", "L", "R"], dir)
+    }
+    else if (x < cols-6 && y < 5 && count > cols*2){//finish up
+      go = false
+      move = ["R"]
+      // if (x === 9 && y === 3){
+      //   go = false
+      //   move = ["R"]
+      // }
+      // else {
+      //   let xdiff = 9-x, ydiff = 3-y
+      //   if
+      // }
+    }
+    let ob = magicMove(x,y, move)
+    x = ob.x
+    y = ob.y
+    dir = ob.dir
+    count++
+  }
+  console.log(path)
+  let tiles = magic()
+  if (tiles){
+    for (let i = 0; i < path.length; i++){
+      let ar = path[i].split("_")
+      let x = Number(ar[0])
+      let y = Number(ar[1])
+      changeTile(x,y, "beach"+tiles[i], "beach")
+    }
+  }
+  path = []
+}
+
+function magicMove(x,y,dirs){
+  let roll = Math.random()
+  switch (dirs.length){
+    case 1:
+      return magicSet(x,y,dirs[0])
+    case 2:
+      return roll > .5 ? magicSet(x,y,dirs[0]) : magicSet(x,y,dirs[1])
+    case 3:
+      return roll > .5 ? magicSet(x,y,dirs[0]) : roll > .25 ? magicSet(x,y,dirs[1]) : magicSet(x,y,dirs[2])
+  }
+}
+
+function magicSet(x,y, dir){
+  path.push(x+"_"+y)
+  switch (dir){
+    case "U": y--; break;
+    case "D": y++; break;
+    case "R": x++; break;
+    case "L": x--; break;
+  }
+  return {x,y, dir}
+}
+
+function findDirs(dirs, lastDir){
+  let d = ""
+  switch (lastDir){
+    case "U": d = "D"; break;
+    case "D": d= "U"; break;
+    case "R": d= "L"; break;
+    case "L": d= "R"; break;
+  }
+  let i = dirs.findIndex((e) => e === d)
+  if (i !== -1)
+    dirs.splice(i, 1)
+  return dirs
+}

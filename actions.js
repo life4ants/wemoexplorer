@@ -22,7 +22,7 @@ function build(type){
     let longGrass = backpack.includesItem("longGrass")
     if (man.energy <= 50)
       return "Oops! you don't have enough energy!"
-    if (longGrass && longGrass.quantity >= 6){
+    if (longGrass >= 6){
       backpack.removeItem("longGrass", 6)
       man.basket = {quantity: 0}
       popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "basket")].active = false
@@ -40,11 +40,11 @@ function build(type){
     let ar = backpack.includesItems(needed)
     if (ar.length === 3){
       backpack.removeItem("longGrass", 1)
-      backpack.removeItem("log", 1)
       backpack.removeItem("rock", 1)
+      backpack.removeItem("log", 1)
       man.tools.push("stoneAx")
       popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
-      return "Congratulations! You can now chop down trees! Look for the Stone Ax icon on the top bar."
+      return "Congratulations! You can now chop down trees at a cost of 300 energy. Look for the Stone Ax icon on the top bar."
     }
     else {
       let out = "Opps! You still need "
@@ -57,8 +57,32 @@ function build(type){
       return out.slice(0, -5)+"!"
     }
   }
+  else if (type === "boneShovel"){
+    if (man.energy <= 120)
+      return "Oops! you don't have enough energy!"
+    let needed = ["longGrass", "bone", "log"]
+    let ar = backpack.includesItems(needed)
+    if (ar.length === 3){
+      backpack.removeItem("longGrass", 1)
+      backpack.removeItem("bone", 1)
+      backpack.removeItem("log", 1)
+      man.tools.push("boneShovel")
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "boneShovel")].active = false
+      return "Congratulations! You can now dig clay at a cost of 200 energy. Look for the Bone Shovel icon on the top bar."
+    }
+    else {
+      let out = "Opps! You still need "
+      for (let j = 0; j < needed.length; j++){
+        if (ar.find((e) => e.type === needed[j]) === undefined){
+          let name = j === 0 ? "a Long Grass and " : j === 1 ? "a Bone and " : "a Log and "
+          out += name
+        }
+      }
+      return out.slice(0, -5)+"!"
+    }
+  }
   else if (type === "raft"){
-    if (cell.type === "beach"){
+    if (cell.type === "beach" && isNextToType(cell.x, cell.y, "water")){
       if (man.energy <= 400)
         return "Oops! you don't have enough energy!"
       else {
@@ -90,10 +114,11 @@ function build(type){
         cell.type = "construction"
         cell.construction = construction
         man.energy -= 400
+        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "raft")].active = false
       }
     }
     else
-      return "You must build a raft on the beach"
+      return "You must build a raft on a beach square next to a water square"
   }
 }
 
@@ -118,41 +143,69 @@ function chop(){
 
 function dump(type){
   let cell = board.cells[active.x][active.y]
-  if (type === "log"){
-    let logpiles = board.objectsToShow.logpiles
-    if (cell.type === "logpile"){
-      let index = logpiles.findIndex((e) => e.id === cell.id)
-      logpiles[index].quantity++
-    }
-    else if (["sand", "grass", "stump", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
-      let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
-      cell.type = "logpile"
-      cell.id = id
-      logpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
-    }
-    else
-      return
-    backpack.removeItem("log", 1)
-  }
-  else if (type === "rock"){
-    let rockpiles = board.objectsToShow.rockpiles
-    if ("rockpile" === cell.type){
-      let index = rockpiles.findIndex((e) => e.id === cell.id)
-      rockpiles[index].quantity++
-    }
-    else if (["sand", "grass", "stump", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
-      let id = rockpiles.length > 0 ? rockpiles[rockpiles.length-1].id+1 : 0
-      cell.type = "rockpile"
-      cell.id = id
-      rockpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
-    }
-    else
-      return
-    backpack.removeItem("rock", 1)
-  }
-  else if (type === "longGrass"){
+  // long Grass:
+  if (type === "longGrass"){
     backpack.removeItem("longGrass", 1)
   }
+  // clay:
+  else if (type === "clay"){
+    if (cell.type === "stump"){
+      popup.setAlert("Sorry, you can't put clay on top of stumps.")
+      return
+    }
+    else if (cell.type === "clay" && cell.quantity < 5){
+      cell.quantity++
+      backpack.removeItem("clay", 1)
+    }
+    else if (dumpable.includes(cell.type)){
+      cell.type = "clay"
+      cell.quantity = 1
+      backpack.removeItem("clay", 1)
+    }
+  }
+  else if (dumpable.includes(cell.type)){
+    // log:
+    if (type === "log"){
+      let logpiles = board.objectsToShow.logpiles
+      if (cell.type === "logpile"){
+        let index = logpiles.findIndex((e) => e.id === cell.id)
+        logpiles[index].quantity++
+      }
+      else {
+        let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
+        cell.type = "logpile"
+        cell.id = id
+        logpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
+      }
+      backpack.removeItem("log", 1)
+    }
+    // rock:
+    else if (type === "rock"){
+      let rockpiles = board.objectsToShow.rockpiles
+      if ("rockpile" === cell.type){
+        let index = rockpiles.findIndex((e) => e.id === cell.id)
+        rockpiles[index].quantity++
+      }
+      else {
+        let id = rockpiles.length > 0 ? rockpiles[rockpiles.length-1].id+1 : 0
+        cell.type = "rockpile"
+        cell.id = id
+        rockpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
+      }
+      backpack.removeItem("rock", 1)
+    }
+    // bone:
+    else if (type === "bone"){
+      if (cell.type === "stump"){
+        popup.setAlert("Sorry, you can't put bones on top of stumps.")
+        return
+      }
+      backpack.removeItem("bone", 1)
+      cell.type = "bone"
+    }
+  }
+  else
+    popup.setAlert("You can't dump "+type+" on a "+cell.type+"!")
 }
 
 function eat(){
@@ -238,9 +291,9 @@ function grab(){
       delete cell.id
     }
   }
-  //gather a log:
-  else if ("log" === cell.type){
-    if (backpack.addItem("log"))
+  //gather a log or bone:
+  else if (["log", "bone"].includes(cell.type)){
+    if (backpack.addItem(cell.type))
       cell.type = cell.tile.replace(/\d+$/, "")
   }
   //gather a rock:
@@ -268,6 +321,22 @@ function grab(){
     let p = Math.floor(Math.random()*tree.berries.length)
     tree.berries.splice(p, 1)
     man.basket.quantity++
+  }
+  //dig clay:
+  else if (cell.type === "clay"){
+    let id = man.tools.findIndex((e) => e === "boneShovel" || e === "steelShovel")
+    if (id === -1){
+      popup.setAlert("It looks like you don't have any tools for digging clay. Look for a Shovel on the Build Menu")
+      return
+    }
+    else if (backpack.addItem("clay")){
+      cell.quantity--
+      if (cell.quantity === 0){
+        cell.type =  cell.tile.replace(/\d+$/, "")
+        delete cell.quantity
+      }
+      man.energy = man.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
+    }
   }
 }
 

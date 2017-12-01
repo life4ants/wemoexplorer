@@ -8,7 +8,7 @@ let topOffset = 0, leftOffset = 0
 let showCount, message, timeOfDay, startTime
 let path = []
 
-const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rock", "rockpile"]
+const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
 
 function initializeVars(){
@@ -53,6 +53,8 @@ function preload(){
     beachEdge4: loadImage("images/beachEdge4.png"),
     berries: loadImage("images/berries.png"),
     berryTree: loadImage("images/berryTree.png"),
+    bone: loadImage("images/bone.png"),
+    boneShovel: loadImage("images/boneShovel.png"),
     clouds: loadImage("images/clouds.png"),
     cross: loadImage("images/cross.png"),
     day: loadImage("images/sun.png"),
@@ -67,6 +69,12 @@ function preload(){
     canoe: [ loadImage("images/canoe0.png"),
               loadImage("images/canoe1.png")
            ],
+    clay: loadImage("images/clay.png"),
+    clay1: loadImage("images/clay1.png"),
+    clay2: loadImage("images/clay2.png"),
+    clay3: loadImage("images/clay3.png"),
+    clay4: loadImage("images/clay4.png"),
+    clay5: loadImage("images/clay5.png"),
     construction: {
                     raft: loadImage("images/raftHB.png")
                    },
@@ -324,11 +332,16 @@ function displayBoard() {
       let cell = board.cells[i][j]
       let offset = game.mode === "play" ? topbarHeight : 0
       let img = game.mode === "edit" || cell.revealed ? tiles[cell.tile]: tiles["clouds"]
-      image(img, i*25, j*25+offset)
-      if (cell.type === "rock" && (cell.revealed || game.mode === "edit")){
-        image(tiles["rock"+cell.quantity], i*25, j*25+offset)
+      try {
+        image(img, i*25, j*25+offset)
       }
-      else if (["log", "randomLog", "raftHB"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
+      catch(error){
+        console.error(i,j,board.cells[i][j])
+      }
+      if (["rock", "clay"].includes(cell.type) && (cell.revealed || game.mode === "edit")){
+        image(tiles[cell.type+cell.quantity], i*25, j*25+offset)
+      }
+      else if (["log", "randomLog", "bone"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
         image(tiles[cell.type], i*25, j*25+offset)
       else if (cell.type === "construction" && (cell.revealed || game.mode === "edit")){
         image(tiles.construction[cell.construction.type], i*25, j*25+offset)
