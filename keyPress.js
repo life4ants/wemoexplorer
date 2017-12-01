@@ -194,9 +194,9 @@ function magic(){
   return tileNum
 }
 
-function islandMaker(){
-  path = ["10_3"]
-  let x = 11, y = 3;
+function islandMaker(cols,rows){
+  path = []
+  let x = 10, y = 3;
   let go = true, count = 0
   let dir = "R"
   let move = "R"
@@ -218,23 +218,24 @@ function islandMaker(){
       move = x === 0 ? (dir === "L" ? ["U"] : ["R", "U"]) :
                x === 5 ? (dir === "R" ? ["U"] : ["L", "U"]) : findDirs(["U", "L", "R"], dir)
     }
-    else if (x < cols-6 && y < 5 && count > cols*2){//finish up
-      go = false
-      move = ["R"]
-      // if (x === 9 && y === 3){
-      //   go = false
-      //   move = ["R"]
-      // }
-      // else {
-      //   let xdiff = 9-x, ydiff = 3-y
-      //   if
-      // }
+    else if (x < cols-6 && y < 6 && count > cols*2){//finish up
+      if (y === 3){
+        if (x === 9)
+          go = false
+        move = ["R"]
+      }
+      else
+        move = ["U"]
     }
     let ob = magicMove(x,y, move)
     x = ob.x
     y = ob.y
     dir = ob.dir
     count++
+    if (count > (cols+rows)*4){
+      go = false
+      console.error("while loop forced to quit")
+    }
   }
   console.log(path)
   let tiles = magic()

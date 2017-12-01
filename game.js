@@ -262,10 +262,10 @@ let game = new Vue({
       this.mode = "edit"
       topOffset = 100
       $("#board").css("top", topOffset+"px").css("left", "0px")
-      let cols = Math.floor(window.innerWidth/25)
-      let rows = Math.floor(window.innerHeight/25)
-      resizeWorld(cols, rows)
-      generateBoard(cols,rows)
+      let wcols = Math.floor(window.innerWidth/25)
+      let wrows = Math.floor(window.innerHeight/25)
+      resizeWorld(wcols, wrows)
+      generateBoard(wcols,wrows)
       this.started = true
       loop()
     },
@@ -275,7 +275,10 @@ let game = new Vue({
       this.auto = type === "auto" ? true : false
     },
     generateBoard(){
-      let p = prompt("How big would you like your world to be?\nPlease enter width and height separated by a coma:")
+      let wcols = Math.floor(window.innerWidth/25)
+      let wrows = Math.floor(window.innerHeight/25)
+      let p = prompt("How big would you like your world to be?\nSize of screen is "+wcols+" by "+wrows+". Max suggested size is 80 by 50.\n"+
+        "Please enter width and height separated by a coma:")
       if (p === null)
         return
       p = p.split(",")

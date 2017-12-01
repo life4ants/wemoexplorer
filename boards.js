@@ -16,9 +16,11 @@ function generateBoard(cols, rows){
   for (let x = 0; x<cols; x++){
     output.cells.push([])
     for (let y = 0; y<rows; y++){
-      let type = (x<6 || y<6 || x > cols-7 || y > rows-7) ? "water" : "random"
-      output.cells[x].push({tile: type, type: type, revealed: false})
+      // let type = (x<6 || y<6 || x > cols-7 || y > rows-7) ? "water" : "random"
+      output.cells[x].push({tile: "water", type: "water", revealed: false})
     }
   }
   board = output
+  islandMaker(cols,rows)
+  floodFill(6,6,"water","water","random","random")
 }
