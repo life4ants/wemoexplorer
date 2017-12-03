@@ -22,5 +22,5 @@ function generateBoard(cols, rows){
   }
   board = output
   editor.islandMaker(cols,rows)
-  editor.floodFill(6,6,"water","water","random","random")
+  editor.floodFill(12,12,"water","water","random","random")
 }
