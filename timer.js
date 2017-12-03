@@ -32,8 +32,8 @@ function showTopbar(){
   showBackpack()
   showEnergy = smoothChange(showEnergy, man.energy)
   showHealth = smoothChange(showHealth, man.health)
-  showEnergyBar("Energy: ", showEnergy, 3)
-  showEnergyBar("Health: ", showHealth, 30)
+  showEnergyBar("Energy: ", Math.round(showEnergy), 3)
+  showEnergyBar("Health: ", Math.round(showHealth), 30)
   showTimer()
   if (game.infoShown)
     showInfo()
@@ -129,10 +129,10 @@ function showInfo(){
   fill(f)
   textSize(15)
   textAlign(LEFT,BOTTOM)
-  let cost = 3+Math.round(backpack.weight/8)
+  let cost = 2.5+(backpack.weight/8)
   if (man.basket)
-    cost = 3+Math.round((man.basket.quantity/10 + backpack.weight)/8)
-  let message = "man dist: "+man.stepCount+" cells left to explore: "+board.revealCount+" walking cost: "+cost
+    cost = 2.5+(man.basket.quantity/10 + backpack.weight)/8
+  let message = "man dist: "+man.stepCount+" cells left to explore: "+board.revealCount+" walking cost: "+(Math.round(cost*100)/100)
   text(message, viewport.left, viewport.bottom)
 }
 

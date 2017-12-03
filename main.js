@@ -6,10 +6,10 @@ let cols, rows, worldWidth, worldHeight
 const topbarHeight = 55
 let topOffset = 0, leftOffset = 0
 let showCount, message, timeOfDay, startTime
-let path = []
 
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
+const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
 
 function initializeVars(){
   showHealth = man.health
@@ -155,6 +155,7 @@ function preload(){
     sand: loadImage("images/sand.png"),
     sandpit: loadImage("images/sandpit.png"),
     sleeping: loadImage("images/sleeping.png"),
+    steppingStones: loadImage("images/steppingStones.png"),
     stoneAx: loadImage("images/stoneAx.png"),
     stump: loadImage("images/stump.png"),
     tent: loadImage("images/tent.png"),
@@ -175,6 +176,8 @@ function preload(){
     wigwam: loadImage("images/wigwam.png"),
     z: loadImage("images/z's.png")
   }
+
+  tiles.construction.steppingStones = tiles.steppingStones
 
   fire = [
     loadImage("images/fire1.png"),
@@ -341,7 +344,7 @@ function displayBoard() {
       if (["rock", "clay"].includes(cell.type) && (cell.revealed || game.mode === "edit")){
         image(tiles[cell.type+cell.quantity], i*25, j*25+offset)
       }
-      else if (["log", "randomLog", "bone"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
+      else if (["log", "randomLog", "bone", "steppingStones"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
         image(tiles[cell.type], i*25, j*25+offset)
       else if (cell.type === "construction" && (cell.revealed || game.mode === "edit")){
         image(tiles.construction[cell.construction.type], i*25, j*25+offset)
@@ -417,52 +420,6 @@ $("#board").contextmenu(function(e) {
     e.stopPropagation();
 });
 
-function isNextToSquare(x1, y1, x2, y2){ //no diagonals
-  for (let i = -1; i <= 1; i++){
-    for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
-      let a = x1+i, b = y1+j;
-      if (a === x2 && b === y2)
-        return true
-    }
-  }
-  return false
-}
-
-function isNextToType(x, y, type){ //accepts a string or array as type
-  for (let i = -1; i <= 1; i++){
-    for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
-      let a = x+i, b = y+j;
-      if (a >= 0 && a < cols && b >= 0 && b < rows){
-        if (type.includes(board.cells[a][b].type))
-          return true
-      }
-    }
-  }
-  return false
-}
-
-function isNearSquare(x1, y1, x2, y2){ //with diagonals
-  for (let x = x1-1; x <= x1+1; x++){
-    for (let y = y1-1; y <= y1+1; y++){
-      if (x === x2 && y === y2)
-        return true
-    }
-  }
-  return false
-}
-
-function nearbyType(x,y, type){ //returns the cell data if found, otherwise false
-  for (let i = x-1; i <= x+1; i++){
-    for (let j = y-1; j <= y+1; j++){
-      if (i >= 0 && i < cols && j >= 0 && j < rows){
-        if (board.cells[i][j].type === type)
-          return Object.assign({x: i, y: j}, board.cells[i][j])
-      }
-    }
-  }
-  return false
-}
-
 function showObjects(){
   for (let x in board.objectsToShow){
     let items = board.objectsToShow[x]
@@ -502,7 +459,8 @@ function drawBadge(x,y,num,color){
   ellipseMode(CENTER)
   ellipse(x,y,10+(num.length*3),13)
   textAlign(CENTER, CENTER)
-  fill(255)
+  let textColor = color === "#000" ? 255 : 0
+  fill(textColor)
   textSize(10)
   text(num,x,y)
 }

@@ -68,10 +68,12 @@ var popup = new Vue({
                   cost: "200 energy", info: "For building fires in. Very important for staying alive every night.", active: true},
         {id: "basket", src: "images/basket.png", title: "Basket",
                   cost: "50 energy, 6 long grass", info: "For picking berries in", active: true},
+        {id: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel",
+                  cost: "120 energy, 1 log, 1 long grass, 1 bone", info: "For digging up clay and ore", active: true},
         {id: "raft", src: "images/raft0.png", title: "Raft",
                   cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true},
-        {id: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel",
-                  cost: "120 energy, 1 log, 1 long grass, 1 bone", info: "For digging up clay and ore", active: true}
+        {id: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones",
+                  cost: "150 energy, 3 rocks", info: "For crossing rivers", active: true}
 
       ],
       showOptions: [],
@@ -105,6 +107,7 @@ var popup = new Vue({
         this.selected = this.showOptions[0].id
         this.selectId = 0
         this.show = true
+        $(".build-menu").scrollTop(0)
         noKeys = true
         noLoop()
       }

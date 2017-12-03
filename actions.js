@@ -1,6 +1,7 @@
 
 function build(type){
   let cell = board.cells[active.x][active.y]
+  // build firepit:
   if (type === "firepit"){
     let fires = board.objectsToShow.fires
     if (man.energy <= 200)
@@ -18,21 +19,22 @@ function build(type){
     else
       return "Opps! You can't build a Firepit on a "+cell.type+"!"
   }
+  // build basket:
   else if (type === "basket"){
-    let longGrass = backpack.includesItem("longGrass")
+    let num = backpack.includesItem("longGrass")
     if (man.energy <= 50)
       return "Oops! you don't have enough energy!"
-    if (longGrass >= 6){
+    if (num >= 6){
       backpack.removeItem("longGrass", 6)
       man.basket = {quantity: 0}
       popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "basket")].active = false
       return "Congratulations! You can now gather berries. Look for the Basket icon on the top bar."
     }
     else {
-      let num = longGrass ? longGrass.quantity : 0
       return "Oops! You need "+(6-num)+" more Long Grass!"
     }
   }
+  // build stoneAx:
   else if (type === "stoneAx"){
     if (man.energy <= 100)
       return "Oops! you don't have enough energy!"
@@ -57,6 +59,7 @@ function build(type){
       return out.slice(0, -5)+"!"
     }
   }
+  // build bone Shovel:
   else if (type === "boneShovel"){
     if (man.energy <= 120)
       return "Oops! you don't have enough energy!"
@@ -81,8 +84,9 @@ function build(type){
       return out.slice(0, -5)+"!"
     }
   }
+  // build raft:
   else if (type === "raft"){
-    if (cell.type === "beach" && isNextToType(cell.x, cell.y, "water")){
+    if (cell.type === "beach" && helpers.isNextToType(active.x, active.y, "water")){
       if (man.energy <= 400)
         return "Oops! you don't have enough energy!"
       else {
@@ -93,32 +97,37 @@ function build(type){
             {type: "longGrass", quantity: 8, color: "#207414"}
           ]
         }
-        let items = backpack.includesItems(["log", "longGrass"])
-        if (items.length === 2){
-          //take the logs
-          construction.needed[0].quantity -= items[0].quantity
-          backpack.removeItem("log", items[0].quantity)
-          //take the longGrass
-          let num = items[1].quantity >= 8 ? 8 : items[1].quantity
-          construction.needed[1].quantity -= num
-          backpack.removeItem("longGrass", num)
-        }
-        else if (items.length === 1){
-          let id = construction.needed.findIndex((e) => e.type === items[0].type)
-          let num = items[0].quantity >= 8 ? 8 : items[0].quantity
-          construction.needed[id].quantity -= num
-          backpack.removeItem(items[0].type, num)
-        }
-        if (construction.needed[1].quantity === 0)
-          construction.needed.pop()
         cell.type = "construction"
         cell.construction = construction
         man.energy -= 400
         popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "raft")].active = false
+        fling()
       }
     }
     else
       return "You must build a raft on a beach square next to a water square"
+  }
+  // build stepping stones:
+  else if (type === "steppingStones"){
+    let item = helpers.isNextToTile(active.x, active.y, fordable)
+    if (item){
+      if (man.energy <= 150)
+        return "Oops! you don't have enough energy!"
+      else {
+        let construction = {
+          type: "steppingStones",
+          needed: [
+            {type: "rock", quantity: 3, color: "#B4D9D9"}
+          ]
+        }
+        board.cells[item.x][item.y].type = "construction"
+        board.cells[item.x][item.y].construction = construction
+        man.energy -= 150
+        fling()
+      }
+    }
+    else
+      return "You must be next to a straight piece of river to build stepping stones"
   }
 }
 
@@ -215,7 +224,7 @@ function eat(){
     let p = Math.floor(Math.random()*tree.berries.length)
     tree.berries.splice(p, 1)
   }
-  else if (man.basket && man.basket.quantity > 0){
+  else if (man.basket && man.basket.quantity > 0 && cell.type !== "berryTree"){
      man.basket.quantity--
   }
   else
@@ -254,19 +263,27 @@ function fling(){
     }
   }
   else {
-    let cell = nearbyType(active.x, active.y, "construction")
-    if (cell && cell.construction.type === "raft"){
-      for (let i = cell.construction.needed.length - 1; i >= 0; i--) {
-        let item = backpack.includesItem(cell.construction.needed[i].type)
-        if (item){
-          backpack.removeItem(cell.construction.needed[i].type, 1)
-          cell.construction.needed[i].quantity--
-          if (cell.construction.needed[i].quantity === 0){
-            cell.construction.needed.splice(i, 1)
-            if (cell.construction.needed.length === 0){
-              vehicles.addRaft(cell.x, cell.y)
-              cell = board.cells[cell.x][cell.y]
-              cell.type = cell.tile.replace(/\d+$/, "")
+    let cell = helpers.nearbyType(active.x, active.y, "construction")
+    if (cell){
+      let item = cell.construction
+      for (let i = item.needed.length - 1; i >= 0; i--) {
+        let num = backpack.includesItem(item.needed[i].type)
+        if (num){
+          num = min(item.needed[i].quantity, num)
+          backpack.removeItem(item.needed[i].type, num)
+          item.needed[i].quantity -= num
+          if (item.needed[i].quantity === 0){
+            item.needed.splice(i, 1)
+            if (item.needed.length === 0){
+              if (item.type === "raft"){
+                vehicles.addRaft(cell.x, cell.y)
+                cell = board.cells[cell.x][cell.y]
+                cell.type = cell.tile.replace(/\d+$/, "")
+              }
+              else if (item.type === "steppingStones"){
+                cell = board.cells[cell.x][cell.y]
+                cell.type = "steppingStones"
+              }
               delete cell.construction
             }
           }

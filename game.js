@@ -312,7 +312,7 @@ let game = new Vue({
             cell.id = board.objectsToShow.berryTrees.length
             board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
           }
-          if (isNextToType(i,j, ["pit", "sandpit"]))
+          if (helpers.isNextToType(i,j, ["pit", "sandpit"]))
             cell.byPit = true
           else
             delete cell.byPit

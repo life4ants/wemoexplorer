@@ -21,6 +21,6 @@ function generateBoard(cols, rows){
     }
   }
   board = output
-  islandMaker(cols,rows)
-  floodFill(6,6,"water","water","random","random")
+  editor.islandMaker(cols,rows)
+  editor.floodFill(6,6,"water","water","random","random")
 }

@@ -41,7 +41,7 @@ function WaterCraft(imgs, x, y, type) {
   this.move = function(x, y) {
     if (this.x + x >= 0 && this.x + x < cols &&
       this.y + y >= 0 && this.y + y < rows) {
-      if (["water", "river"].includes(board.cells[this.x+x][this.y+y].type) ||
+      if (["water", "river", "steppingStones"].includes(board.cells[this.x+x][this.y+y].type) ||
           (board.cells[this.x+x][this.y+y].type === "beach" &&
            ["water", "river"].includes(board.cells[this.x][this.y].type))
         ) {
@@ -51,7 +51,7 @@ function WaterCraft(imgs, x, y, type) {
         this.landed = board.cells[this.x][this.y].type === "beach"
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        man.energy -= 2
+        man.energy -= 1.5
 
         if (this.type === "canoe"){
           for (let i=-1; i<=1; i++){
@@ -59,25 +59,17 @@ function WaterCraft(imgs, x, y, type) {
               let a = this.x+i
               let b = this.y+j
 
-              if (a >= 0 && a < cols && b >= 0 && b < rows && !board.cells[a][b].revealed){
-                board.cells[a][b].revealed = true
-                man.energy--
-                board.revealCount--
+              if (a >= 0 && a < cols && b >= 0 && b < rows){
+                man.revealCell(a,b)
               }
             }
           }
         }
-        else if (!board.cells[this.x][this.y].revealed){
-          board.cells[this.x][this.y].revealed = true
-          man.energy--
-          board.revealCount--
-        }
+        else
+          man.revealCell(this.x, this.y)
       }
-      else if (!board.cells[this.x+x][this.y+y].revealed){
-        board.cells[this.x+x][this.y+y].revealed = true
-        man.energy--
-        board.revealCount--
-      }
+      else
+        man.revealCell(this.x+x, this.y+y)
     }
   }
 

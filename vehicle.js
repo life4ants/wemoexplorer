@@ -40,9 +40,9 @@ class Vehicle {
   }
 
   canMount(x,y){
-    if (this.raft && isNearSquare(x, y, this.raft.x, this.raft.y))
+    if (this.raft && helpers.isNearSquare(x, y, this.raft.x, this.raft.y))
       return "raft"
-    if (this.canoe && isNearSquare(x, y, this.canoe.x, this.canoe.y))
+    if (this.canoe && helpers.isNearSquare(x, y, this.canoe.x, this.canoe.y))
       return "canoe"
     return false
   }

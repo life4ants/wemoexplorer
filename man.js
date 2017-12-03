@@ -1,33 +1,35 @@
-function Man(img, x, y) {
-  this.x = x
-  this.y = y
-  this.oldX = 0
-  this.oldY = 0
-  this.img = img
-  this.index = 0
-  this.isRiding = false
-  this.ridingId = ""
-  this.basket = false
-  this.tools = []
-  this.isNextToFire = false
-  this.fireId = null
-  this.stepCount = 0
-  this.energy = 5000
-  this.health = 5000
-  this.isInPit = false
-  this.isClimbingOutOfPit = false
-  this.isFallingIntoPit = false
-  this.vomit = false
-  this.inDark = false
-  this.isSleeping = false
+class Man {
+  constructor(img, x, y){
+    this.x = x
+    this.y = y
+    this.oldX = 0
+    this.oldY = 0
+    this.img = img
+    this.index = 0
+    this.isRiding = false
+    this.ridingId = ""
+    this.basket = false
+    this.tools = []
+    this.isNextToFire = false
+    this.fireId = null
+    this.stepCount = 0
+    this.energy = 5000
+    this.health = 5000
+    this.isInPit = false
+    this.isClimbingOutOfPit = false
+    this.isFallingIntoPit = false
+    this.vomit = false
+    this.inDark = false
+    this.isSleeping = false
+  }
 
-  this.initialize = function(obj) {
+  initialize(obj) {
     for (let key in obj){
       this[key] = obj[key]
     }
   }
 
-  this.save = function(){
+  save(){
     let output = {}
     let items = Object.keys(this)
     for (let i = 0; i < items.length; i++){
@@ -37,7 +39,7 @@ function Man(img, x, y) {
     return output
   }
 
-  this.display = function() {
+  display() {
     if (this.inDark){
       message = "You're too far from a fire!"
       showCount = 1
@@ -86,7 +88,7 @@ function Man(img, x, y) {
     }
   }
 
-  this.move = function(x, y) {
+  move(x, y) {
     if (this.isClimbingOutOfPit || this.isFallingIntoPit || this.isSleeping)
       return
     //check for edge case
@@ -94,7 +96,9 @@ function Man(img, x, y) {
       this.y + y >= 0 && this.y + y < rows){
        //check for forbidden cells
       if (!["water", "rockEdge", "river"].includes(board.cells[this.x+x][this.y+y].type)){
-        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[board.cells[this.x+x][this.y+y].id].value > 0)
+        if (("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[board.cells[this.x+x][this.y+y].id].value > 0) ||
+            (board.cells[this.x+x][this.y+y].type === "construction" && board.cells[this.x+x][this.y+y].construction.type === "steppingStones")
+           )
           return
         if (this.isInPit){
           this.oldX = this.x
@@ -119,31 +123,22 @@ function Man(img, x, y) {
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        let cost = 3+Math.round(backpack.weight/8)
+        let cost = 2.5+(backpack.weight/8)
         if (this.basket)
-          cost = 3+Math.round((this.basket.quantity/10 + backpack.weight)/8)
+          cost = 2.5+(this.basket.quantity/10 + backpack.weight)/8
         this.energy -= cost
         this.health -= 1
 
-        // reveal cell
-        if (!board.cells[this.x][this.y].revealed){
-          board.cells[this.x][this.y].revealed = true
-          this.energy--
-          board.revealCount--
-        }
+        this.revealCell(this.x, this.y)
       }
       //reveal rockEdge cells
       else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type)){
-        if (!board.cells[this.x+x][this.y+y].revealed){
-          board.cells[this.x+x][this.y+y].revealed = true
-          this.energy--
-          board.revealCount--
-        }
+        this.revealCell(this.x+x, this.y+y)
       }
       //check if next to fires
       let fires = board.objectsToShow.fires
       for (let i=0; i<fires.length; i++){
-        if (isNearSquare(this.x, this.y, fires[i].x, fires[i].y)){
+        if (helpers.isNearSquare(this.x, this.y, fires[i].x, fires[i].y)){
           this.isNextToFire = true
           this.fireId = i
           return
@@ -154,7 +149,7 @@ function Man(img, x, y) {
     }
   }
 
-  this.dismount = function(){
+  dismount(){
     if (this.isRiding && (active.landed || active.isBeside("dock") || board.cells[active.x][active.y].type === "river")){
       let dirs = active.index === 0 ? [4,0,2,3,1,5,7,6] :
                    active.index === 1 ? [0,4,6,7,5,3,1,2] :
@@ -176,7 +171,7 @@ function Man(img, x, y) {
     }
   }
 
-  this.dismountDirection = function(dir){
+  dismountDirection(dir){
     let x = active.x
     let y = active.y
     switch(dir){
@@ -197,12 +192,13 @@ function Man(img, x, y) {
       this.ridingId = ""
       active.index = [0,1].includes(active.index) ? 4 : 5
       active = man
+      this.revealCell(x,y)
       return true
     }
     return false
   }
 
-  this.sleep = function(){
+  sleep(){
     if (this.isSleeping)
       this.isSleeping = false
     else if ("day" !== timeOfDay && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding)
@@ -215,9 +211,21 @@ function Man(img, x, y) {
     }
   }
 
-  this.drawImage = function(img, index, x, y, w, h){
+  drawImage(img, index, x, y, w, h){
     let sx = (index%3)*25
     let sy = Math.floor(index/3)*25
     image(img, x, y, w, h, sx, sy, 25, 25)
+  }
+
+  revealCell(x,y){
+    if (!board.cells[x][y].revealed){
+      board.cells[x][y].revealed = true
+      this.energy-=.75
+      board.revealCount--
+      if (board.revealCount === 50)
+        popup.setAlert("Only 50 more cells to reaveal!")
+      else if (board.revealCount === 0)
+        popup.setAlert("You revealed the whole world!\nI guess that means you won.")
+    }
   }
 }
