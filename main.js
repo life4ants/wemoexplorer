@@ -363,29 +363,24 @@ function displayBoard() {
     image(tiles.players[0], board.startX*25, board.startY*25, 25, 25, 0, 25, 25, 25)
 }
 
-function smoothChange(curX, toX){
-  let diff = toX-curX
-  return diff >= 90 ? curX+Math.floor(diff/6)-5 : diff <= -90 ? curX+Math.floor(diff/6)+5 :
-             diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
-}
-
 function follow(object) {
   let left = $("#board").position().left
   let top = $("#board").position().top
   let newLeft = left
   let newTop = top
+  let step = 10
 
-  if (window.innerWidth < worldWidth){
+  if (window.innerWidth < worldWidth+leftOffset){
     if ((object.x*25) + left < 100 + leftOffset) // left
-      newLeft = left+10 > leftOffset ? leftOffset : left+10
+      newLeft = left+step > leftOffset ? leftOffset : left+step
     else if ((object.x*25) + left > window.innerWidth - 125) //right
-      newLeft = left-10 < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left-10
+      newLeft = left-step < window.innerWidth - worldWidth ? window.innerWidth - worldWidth : left-step
   }
-  if (window.innerHeight < worldHeight){
+  if (window.innerHeight < worldHeight+topOffset){
     if (object.y*25+topbarHeight - (topbarHeight - top) < 100) //top
-      newTop = top+10 > topOffset ? topOffset : top+10
+      newTop = top+step > topOffset ? topOffset : top+step
     else if ((object.y*25+topbarHeight) + top > window.innerHeight - 125) //bottom
-      newTop = top-10 < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top-10
+      newTop = top-step < window.innerHeight - worldHeight ? window.innerHeight - worldHeight : top-step
   }
 
   if (newTop !== top || newLeft !== left)
@@ -400,8 +395,7 @@ function centerOn(object) {
   let maxLeft = leftOffset
   let minLeft = window.innerWidth - worldWidth
   centerX = worldWidth < window.innerWidth-leftOffset ? Math.floor((window.innerWidth-leftOffset-worldWidth)/2)+leftOffset :
-              centerX > minLeft && centerX < maxLeft ? smoothChange(currentX, centerX) :
-                centerX <= minLeft ? minLeft : centerX >= maxLeft ? maxLeft : currentX
+              constrain(helpers.smoothChange(currentX, centerX), minLeft, maxLeft)
   // center in the y direction:
   let currentY = $("#board").position().top
   let top = Math.floor((window.innerHeight+topOffset)/2)
@@ -409,8 +403,7 @@ function centerOn(object) {
   let maxTop = topOffset
   let minTop = window.innerHeight - worldHeight
   centerY = worldHeight < window.innerHeight ? Math.floor((window.innerHeight - worldHeight)/2) :
-              centerY > minTop && centerY < maxTop ? smoothChange(currentY, centerY) :
-              centerY <= minTop ? minTop : centerY >= maxTop ? maxTop : currentY
+              constrain(helpers.smoothChange(currentY, centerY), minTop, maxTop)
   if (centerY !== currentY || centerX !== currentX)
     $("#board").css("top", centerY).css("left", centerX)
 }
@@ -419,6 +412,18 @@ $("#board").contextmenu(function(e) {
     e.preventDefault();
     e.stopPropagation();
 });
+
+window.onblur = function(){
+  console.log("blur")
+  if (game.mode === "play")
+    popup.outOfFocus()
+}
+
+window.onfocus = function(){
+  console.log("focus")
+  if (popup.type === "outOfFocus")
+    popup.close()
+}
 
 function showObjects(){
   for (let x in board.objectsToShow){

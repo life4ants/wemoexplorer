@@ -46,19 +46,8 @@ let editor = {
         this.floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
       }
     }
-    else if (game.auto){
-      let tiles = this.magic()
-      if (tiles){
-        for (let i = 0; i < this.path.length; i++){
-          let ar = this.path[i].split("_")
-          let x = Number(ar[0])
-          let y = Number(ar[1])
-
-          this.changeTile(x,y, game.currentTile+tiles[i], game.currentTile)
-        }
-      }
-    }
-    this.path = []
+    else if (game.auto)
+      this.parsePath(game.currentTile)
   },
 
   changeTile(x,y, tile, type){
@@ -81,18 +70,32 @@ let editor = {
       board.cells[x][y] = {tile, type, revealed: false}
   },
 
-  floodFill(x,y, type1, tile1, type2, tile2){
+  parsePath(type){
+    let tiles = this.plotPath()
+    if (tiles){
+      for (let i = 0; i < this.path.length; i++){
+        let ar = this.path[i].split("_")
+        let x = Number(ar[0])
+        let y = Number(ar[1])
+
+        this.changeTile(x,y, type+tiles[i], type)
+      }
+    }
+    this.path = []
+  },
+
+  floodFill(x,y, tile1, type1, tile2, type2){
     board.cells[x][y] = {tile: tile2, type: type2, revealed: false}
 
     for (let i = x-1; i <= x+1; i++){
       for (let j = y-1; j <= y+1; j++){
-        if (i >= 0 && i < cols && j >= 0 && j < rows && board.cells[i][j].tile === tile1)
-          this.floodFill(i,j, type1, tile1, type2, tile2)
+        if (i >= 0 && i < cols && j >= 0 && j < rows && board.cells[i][j].type === type1)
+          this.floodFill(i,j, tile1, type1, tile2, type2)
       }
     }
   },
 
-  magic(){
+  plotPath(){
     if (this.path.length < 2)
       return false
     let ar = []
@@ -148,19 +151,19 @@ let editor = {
     while(go){
       if (x < cols-size && y < size && count < cols*2){//top left
         move = y === 1 ? (dir === "U" ? ["R"] : ["D", "R"]) :
-                 y === size-1 ? (dir === "D" ? ["R"] : ["U", "R"]) : this.findDirs(["R", "U", "D"], dir)
+                 y === size-1 ? (dir === "D" ? ["R"] : ["U", "R"]) : this.sanitizeDirs(["R", "U", "D"], dir)
       }
       else if (x>=cols-size && y<rows-size){//right top
         move = x === cols-2 ? (dir === "R" ? ["D"] : ["L", "D"]) :
-                 x === cols-size ? (dir === "L" ? ["D"] : ["R", "D"]) : this.findDirs(["D", "L", "R"], dir)
+                 x === cols-size ? (dir === "L" ? ["D"] : ["R", "D"]) : this.sanitizeDirs(["D", "L", "R"], dir)
       }
       else if (x>=size && y>=rows-size){//bottom right
         move = y === rows-size ? (dir === "U" ? ["L"] : ["D", "L"]) :
-                 y === rows-2 ? (dir === "D" ? ["L"] : ["U", "L"]) : this.findDirs(["L", "U", "D"], dir)
+                 y === rows-2 ? (dir === "D" ? ["L"] : ["U", "L"]) : this.sanitizeDirs(["L", "U", "D"], dir)
       }
       else if (x<size && y>=size){//left bottom
         move = x === 1 ? (dir === "L" ? ["U"] : ["R", "U"]) :
-                 x === size-1 ? (dir === "R" ? ["U"] : ["L", "U"]) : this.findDirs(["U", "L", "R"], dir)
+                 x === size-1 ? (dir === "R" ? ["U"] : ["L", "U"]) : this.sanitizeDirs(["U", "L", "R"], dir)
       }
       else if (x < cols-size && y < size && count > cols*2){//finish up
         if (y === 3){
@@ -171,7 +174,7 @@ let editor = {
         else
           move = ["U"]
       }
-      let ob = this.move(x,y, move)
+      let ob = this.pickMove(x,y, move)
       x = ob.x
       y = ob.y
       dir = ob.dir
@@ -181,31 +184,22 @@ let editor = {
         console.error("while loop forced to quit")
       }
     }
-    let tiles = this.magic()
-    if (tiles){
-      for (let i = 0; i < this.path.length; i++){
-        let ar = this.path[i].split("_")
-        let x = Number(ar[0])
-        let y = Number(ar[1])
-        this.changeTile(x,y, "beach"+tiles[i], "beach")
-      }
-    }
-    this.path = []
+    this.parsePath("beach")
   },
 
-  move(x,y,dirs){
+  pickMove(x,y,dirs){
     let roll = Math.random()
     switch (dirs.length){
       case 1:
-        return this.magicSet(x,y,dirs[0])
+        return this.move(x,y,dirs[0])
       case 2:
-        return roll > .5 ? this.magicSet(x,y,dirs[0]) : this.magicSet(x,y,dirs[1])
+        return roll > .5 ? this.move(x,y,dirs[0]) : this.move(x,y,dirs[1])
       case 3:
-        return roll > .5 ? this.magicSet(x,y,dirs[0]) : roll > .25 ? this.magicSet(x,y,dirs[1]) : this.magicSet(x,y,dirs[2])
+        return roll > .5 ? this.move(x,y,dirs[0]) : roll > .25 ? this.move(x,y,dirs[1]) : this.move(x,y,dirs[2])
     }
   },
 
-  magicSet(x,y, dir){
+  move(x,y, dir){
     this.path.push(x+"_"+y)
     switch (dir){
       case "U": y--; break;
@@ -216,7 +210,7 @@ let editor = {
     return {x,y, dir}
   },
 
-  findDirs(dirs, lastDir){
+  sanitizeDirs(dirs, lastDir){
     let d = ""
     switch (lastDir){
       case "U": d = "D"; break;
@@ -228,5 +222,23 @@ let editor = {
     if (i !== -1)
       dirs.splice(i, 1)
     return dirs
+  },
+
+  magicCircle(i,j,r,print){
+    let x = r, y = 0
+    for (let a = TWO_PI; a >= 0; a-=(TWO_PI/(r*10))){
+      let nx = r*cos(a)
+      let ny = r*sin(a)
+      if (round(nx) != x || round(ny) != y)
+        this.path.push(round(nx+i)+"_"+round(ny+j))
+      x = round(nx)
+      y = round(ny)
+    }
+    if (print)
+      this.parsePath("beach")
+    else {
+      console.log(this.path)
+      this.path = []
+    }
   }
 }

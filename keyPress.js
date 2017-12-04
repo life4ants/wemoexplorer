@@ -49,7 +49,7 @@ function playKeys() {
 function mousePressed(){
   if (mouseX < 0 || mouseX > worldWidth || mouseY < 0 || mouseY > worldHeight)
       return
-  if (game.mode === "play" && !popup.show && winMouseX > leftOffset && mouseY > viewport.top+topbarHeight){
+  if (game.mode === "play" && !popup.show && winMouseX > leftOffset && mouseY > viewport.top+topbarHeight && window.focused){
     let y = Math.floor((mouseY-topbarHeight)/25)
     let x = Math.floor(mouseX/25)
     console.log(x, y)

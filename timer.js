@@ -1,4 +1,4 @@
-let saveC = 0
+ let saveC = 0
 
 let viewport = {
   top: topOffset,
@@ -30,8 +30,8 @@ function showTopbar(){
   if (frameCount % 180 === 0 && man.health < 5000)
     man.health++
   showBackpack()
-  showEnergy = smoothChange(showEnergy, man.energy)
-  showHealth = smoothChange(showHealth, man.health)
+  showEnergy = helpers.smoothChange(showEnergy, man.energy)
+  showHealth = helpers.smoothChange(showHealth, man.health)
   showEnergyBar("Energy: ", Math.round(showEnergy), 3)
   showEnergyBar("Health: ", Math.round(showHealth), 30)
   showTimer()

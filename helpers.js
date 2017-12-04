@@ -58,8 +58,20 @@ let helpers = {
     return false
   },
 
-  looker(){
-    console.log(board.cells[active.x][active.y])
+  smoothChange(curX, toX){
+    let diff = toX-curX
+    return diff >= 90 ? curX+Math.floor(diff/6)-5 : diff <= -90 ? curX+Math.floor(diff/6)+5 :
+               diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
+  },
+
+  looker(id){
+    if (id === "active")
+      return board.cells[active.x][active.y]
+    if (id === "man")
+      return board.cells[man.x][man.y]
+    if (id === "mouse")
+      return board.cells[floor(mouseX/25)][floor((mouseY-topbarHeight)/25)]
+
   },
 
   randomPicker(type){

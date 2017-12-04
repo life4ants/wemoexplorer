@@ -5,7 +5,15 @@ var popup = new Vue({
       <div class="modal" v-show="show" :id="size">
         <div class="modal-dialog">
           <div class="modal-content" >
-            <div class="modal-header" v-if="type !== 'gamePaused'">
+            <div v-if="'gamePaused' === type" class="modal-footer">
+              <h6>Game Paused</h6>
+              <p class="center-grey">press space bar to resume</p>
+            </div>
+            <div v-else-if="'outOfFocus' === type" class="modal-footer">
+              <h6>Out of focus</h6>
+              <p class="center-grey">click anywhere to close this</p>
+            </div>
+            <div v-else class="modal-header">
               <h6>{{title}}</h6>
             </div>
             <div v-if="type === 'build'" class="modal-body build-menu">
@@ -43,10 +51,6 @@ var popup = new Vue({
             </div>
             <div v-else-if="'gameOver' === type" class="modal-footer">
               <button type="button" id="etr" @click="exit">Ok</button>
-            </div>
-            <div v-else-if="'gamePaused' === type" class="modal-footer">
-              <h6>Game Paused</h6>
-              <p class="center-grey">press space bar to resume</p>
             </div>
           </div>
         </div>
@@ -203,6 +207,13 @@ var popup = new Vue({
       this.type = "alert"
       this.size = "popup-center"
       noKeys = true
+      noLoop()
+    },
+
+    outOfFocus(){
+      this.show = true
+      this.type = "outOfFocus"
+      this.size = "popup-tiny"
       noLoop()
     }
   }
