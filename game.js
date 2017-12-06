@@ -1,5 +1,5 @@
 let game = new Vue({
-  el: '#topBar',
+  el: '#game',
   template: `
     <div>
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
@@ -180,7 +180,7 @@ let game = new Vue({
     action(key){
       if (man.isSleeping){
         if (key === "S")
-          man.sleep()
+          man.goToSleep()
       }
       else {
         switch(key){
@@ -192,7 +192,7 @@ let game = new Vue({
           case "G": grab();               break;
           case "X": this.autoCenter = !this.autoCenter; break;
           case "J": man.dismount();       break;
-          case "S": man.sleep();          break;
+          case "S": man.goToSleep();          break;
         }
       }
     },
@@ -226,7 +226,7 @@ let game = new Vue({
         this.icons[7].active = (man.basket && "berryTree" === cell.type &&
               board.objectsToShow.berryTrees[cell.id].berries.length > 0)
         //sleep:
-        this.icons[8].active = ("day" !== timeOfDay && !man.isSleeping && !man.isRiding)
+        this.icons[8].active = (man.canSleep && !man.isSleeping && !man.isRiding)
         //wake up:
         this.icons[9].active = man.isSleeping
       }
@@ -275,7 +275,7 @@ let game = new Vue({
       this.auto = type === "auto" ? true : false
     },
     generateBoard(){
-      let wcols = Math.floor(window.innerWidth/25)
+      let wcols = Math.floor(window.innerWidth/25-37)
       let wrows = Math.floor(window.innerHeight/25)
       let p = prompt("How big would you like your world to be?\nSize of screen is "+wcols+" by "+wrows+". Max suggested size is 80 by 50.\n"+
         "Please enter width and height separated by a coma:")
@@ -398,7 +398,7 @@ let game = new Vue({
 
     pauseGame(){
       if (this.paused){
-        resumeTimer()
+        timer.resume()
         this.paused = false
         popup.close()
       }

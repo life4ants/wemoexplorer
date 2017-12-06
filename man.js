@@ -21,6 +21,7 @@ class Man {
     this.vomit = false
     this.inDark = false
     this.isSleeping = false
+    this.canSleep = false
   }
 
   initialize(obj) {
@@ -40,6 +41,7 @@ class Man {
   }
 
   display() {
+    this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
     if (this.inDark){
       message = "You're too far from a fire!"
       showCount = 1
@@ -81,10 +83,8 @@ class Man {
       }
       if (board.cells[this.x][this.y].byPit)
         drawPitLines(this.x, this.y)
-      if (this.isSleeping){
-        this.health = this.health < 4997 ? this.health+3 : 5000
-        this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
-      }
+      if (this.isSleeping)
+       this.sleep()
     }
   }
 
@@ -95,10 +95,8 @@ class Man {
     if (this.x + x >= 0 && this.x + x < cols &&
       this.y + y >= 0 && this.y + y < rows){
        //check for forbidden cells
-      if (!["water", "rockEdge", "river"].includes(board.cells[this.x+x][this.y+y].type)){
-        if (("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[board.cells[this.x+x][this.y+y].id].value > 0) ||
-            (board.cells[this.x+x][this.y+y].type === "construction" && board.cells[this.x+x][this.y+y].construction.type === "steppingStones")
-           )
+      if (!["water", "rockEdge", "river", "construction"].includes(board.cells[this.x+x][this.y+y].type)){
+        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[board.cells[this.x+x][this.y+y].id].value > 0)
           return
         if (this.isInPit){
           this.oldX = this.x
@@ -123,10 +121,7 @@ class Man {
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        let cost = 2.5+(backpack.weight/8)
-        if (this.basket)
-          cost = 2.5+(this.basket.quantity/10 + backpack.weight)/8
-        this.energy -= cost
+        this.energy -= backpack.walkingCost()
         this.health -= 1
 
         this.revealCell(this.x, this.y)
@@ -147,6 +142,11 @@ class Man {
       this.isNextToFire = false
       this.fireId = null
     }
+  }
+
+  sleep(){
+    this.health = this.health < 4997 ? this.health+3 : 5000
+    this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
   }
 
   dismount(){
@@ -198,14 +198,14 @@ class Man {
     return false
   }
 
-  sleep(){
+  goToSleep(){
     if (this.isSleeping)
       this.isSleeping = false
-    else if ("day" !== timeOfDay && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding)
+    else if (this.canSleep && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding)
       this.isSleeping = !this.isSleeping
     else {
       let message = this.isRiding ? "Sorry, no sleeping in your canoe!" :
-                      timeOfDay === "day" ? "Sorry, no sleeping during the day!" :
+                      !this.canSleep ? "Sorry, no sleeping during the day!" :
                         "You can't sleep on a "+board.cells[this.x][this.y].type+"!"
       popup.setAlert(message)
     }

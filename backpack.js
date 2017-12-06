@@ -53,4 +53,8 @@ class Backpack {
     }
     return output
   }
+
+  walkingCost(){
+    return man.basket ? 2.5+(man.basket.quantity/10 + this.weight)/8 : 2.5+(this.weight/8)
+  }
 }

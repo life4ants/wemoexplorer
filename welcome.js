@@ -213,7 +213,6 @@ let welcome = {
     },
 
     pickGame(type, id){
-      console.log(type, id)
       if (this.selected !== this.players[this.currentPlayer.index].character){
         this.players[this.currentPlayer.index].character = this.selected
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))

@@ -111,7 +111,7 @@ var popup = new Vue({
         this.selected = this.showOptions[0].id
         this.selectId = 0
         this.show = true
-        $(".build-menu").scrollTop(0)
+        setTimeout(() => $(".build-menu").scrollTop(0), 0)
         noKeys = true
         noLoop()
       }
