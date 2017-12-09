@@ -2,7 +2,7 @@ let topbar = {
   energy: 0,
   health: 0,
 
-  update(){
+  display(){
     this.showSelf()
     this.energy = helpers.smoothChange(this.energy, man.energy)
     this.health = helpers.smoothChange(this.health, man.health)
@@ -13,10 +13,9 @@ let topbar = {
   },
 
   showSelf(){
-    let width = window.innerWidth-leftOffset
     noStroke()
     fill(255)
-    rect (viewport.left, viewport.top, width, topbarHeight)
+    rect (viewport.left, viewport.top, viewport.width, topbarHeight)
   },
 
   showTimer(){
@@ -41,7 +40,7 @@ let topbar = {
 
   showEnergyBar(title, value, offset){
     let top = viewport.top+offset
-    let widthFactor = window.innerWidth > 1000 ? 10 : 16
+    let widthFactor = viewport.width > 1000 ? 10 : 16
     fill(255)
     stroke(80)
     strokeWeight(3)
@@ -66,7 +65,7 @@ let topbar = {
   },
 
   showBackpack(){
-    let left = window.innerWidth > 1000 ? viewport.left+530 : viewport.left+340
+    let left = viewport.width > 1000 ? viewport.left+530 : viewport.left+340
     let top = viewport.top+3
     image(tiles.backpack, left, top)
     if (backpack.weight > 0){

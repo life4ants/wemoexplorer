@@ -1,23 +1,26 @@
 let editor = {
   path: [],
+  tile: "water",
+  type: "water",
+  auto: false,
 
   mousePressed(){
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
     let id = x+"_"+y
     if (mouseButton === LEFT){
-      if (game.auto){
+      if (this.auto){
         this.path = [id]
         this.changeTile(x,y, "cross", "cross")
       }
-      else if (game.currentType === "start"){
+      else if (this.type === "start"){
         if (board.cells[x][y].type !== "water"){
           board.startX = x
           board.startY = y
         }
       }
       else
-        this.changeTile(x,y, game.currentTile, game.currentType)
+        this.changeTile(x,y, this.tile, this.type)
     }
   },
 
@@ -25,29 +28,29 @@ let editor = {
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
     let id = x+"_"+y
-    if (game.auto){
+    if (this.auto){
       if (!this.path.includes(id)){
         this.changeTile(x,y, "cross", "cross")
         this.path.push(id)
       }
     }
-    else if (game.currentType !== "start"){
-      this.changeTile(x,y, game.currentTile, game.currentType)
+    else if (this.type !== "start"){
+      this.changeTile(x,y, this.tile, this.type)
     }
   },
 
   mouseReleased(){
-    if (mouseButton === RIGHT && !game.auto){
+    if (mouseButton === RIGHT && !this.auto){
       let x = Math.floor(mouseX/25)
       let y = Math.floor(mouseY/25)
       let id = x+"_"+y
       if (confirm("are you sure you want to flood fill?")){
         let cell = board.cells[x][y]
-        this.floodFill(x, y, cell.tile, cell.type, game.currentTile, game.currentType)
+        this.floodFill(x, y, cell.tile, cell.type, this.tile, this.type)
       }
     }
-    else if (game.auto)
-      this.parsePath(game.currentTile)
+    else if (this.auto)
+      this.parsePath(this.tile)
   },
 
   changeTile(x,y, tile, type){
@@ -64,7 +67,7 @@ let editor = {
       board.cells[x][y].type = type
       board.cells[x][y].quantity = 5
     }
-    else if (["log", "randomLog", "bone"].includes(type))
+    else if (["log", "randomLog", "bone", "randomRock", "randomStick"].includes(type))
       board.cells[x][y].type = type
     else
       board.cells[x][y] = {tile, type, revealed: false}

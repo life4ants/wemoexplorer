@@ -10,6 +10,7 @@ let showCount, message
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
+const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick"]
 
 function initializeVars(){
   topbar.health = man.health
@@ -28,6 +29,11 @@ function resizeWorld(c, r){
   worldWidth = cols * 25
   worldHeight = game.mode === "play" ? rows * 25 + topbarHeight : rows * 25
   resizeCanvas(worldWidth, worldHeight)
+}
+
+function windowResized(){
+  if (game.mode === "play")
+    viewport.update(true)
 }
 
 function preload(){
@@ -108,10 +114,13 @@ function preload(){
             loadImage("images/raft1.png"),
           ],
     random: loadImage("images/random.png"),
-    randomPit: loadImage("images/randomPit.png"),
+    randomBerries: loadImage("images/randomBerries.png"),
     randomGrass: loadImage("images/randomGrass.png"),
     randomLog: loadImage("images/randomLog.png"),
-    randomBerries: loadImage("images/randomBerries.png"),
+    randomPit: loadImage("images/randomPit.png"),
+    randomRock: loadImage("images/randomRock.png"),
+    randomStick: loadImage("images/randomStick.png"),
+    randomTree: loadImage("images/randomTree.png"),
     river1: loadImage("images/grassRiver1.png"),
     river2: loadImage("images/grassRiver2.png"),
     river3: loadImage("images/grassRiver3.png"),
@@ -156,11 +165,13 @@ function preload(){
     sandpit: loadImage("images/sandpit.png"),
     sleeping: loadImage("images/sleeping.png"),
     steppingStones: loadImage("images/steppingStones.png"),
+    stick: loadImage("images/stick.png"),
     stoneAx: loadImage("images/stoneAx.png"),
     stump: loadImage("images/stump.png"),
     tent: loadImage("images/tent.png"),
     timeOfDay: loadImage("images/timeOfDay.png"),
     tree: loadImage("images/tree.png"),
+    treeThin: loadImage("images/tree-thin.png"),
     treeShore1: loadImage("images/treeShore1.png"),
     treeShore2: loadImage("images/treeShore2.png"),
     treeShore3: loadImage("images/treeShore3.png"),
@@ -196,6 +207,7 @@ function setup(){
   strokeJoin(ROUND)
   noLoop()
   game.mode = "welcome"
+  console.log("loaded in", Date.now()-frameTime)
 }
 
 function draw(){
@@ -205,28 +217,46 @@ function draw(){
   background('green')
   if (game.started){
     displayBoard()
-    if (game.mode === "play") {
-      updateLoop()
-    }
+    if (game.mode === "play")
+      playLoop()
+    else if (game.mode === "build")
+      buildLoop()
   }
 }
 
-function updateLoop(){
+function playLoop(){
   timer.update()
   game.checkActive()
+  // move board:
+  viewport.update(false)
+  //display:
   showObjects()
   vehicles.display()
   man.display()
   showNight()
-  if (game.autoCenter)
-    viewport.centerOn(active, false)
-  else
-    viewport.follow(active)
-  viewport.update()
-  topbar.update()
+  topbar.display()
   showMessage()
   if (showCount === 0 && (man.energy <= 0 || man.health <= 0 ))
     popup.gameOver()
+}
+
+function buildLoop(){
+  showObjects()
+  vehicles.display()
+  man.display()
+  topbar.display()
+  showMouse(popup.size)
+}
+
+function showMouse(size){
+  let o = size*12.5
+  let x = Math.floor((mouseX-o)/25)
+  let y = Math.floor((mouseY-topbarHeight-o)/25)
+  let w = (size+1)*25
+  stroke(255,0,0)
+  strokeWeight(2)
+  noFill()
+  rect(x*25,y*25+topbarHeight,w,w)
 }
 
 function startGame(){
@@ -245,7 +275,7 @@ function startGame(){
     fillBoard()
   }
   popup.reset()
-  viewport.centerOn(active, true)
+  viewport.update(true)
   loop()
   $(window).scrollTop(0).scrollLeft(0)
   $("body").addClass("full-screen")
@@ -255,7 +285,7 @@ function fillBoard(){
   for (let i = 0; i < cols; i++){
     for (let j = 0; j< rows; j++){
       let cell = board.cells[i][j]
-      if (["randomPit", "randomGrass", "randomBerries", "randomLog"].includes(cell.type)){
+      if (["randomPit", "randomGrass", "randomBerries", "randomLog", "randomTree", "randomRock", "randomStick"].includes(cell.type)){
         let roll = Math.random()
         if (cell.type === "randomPit" && roll < .5){
           cell.type = "pit"
@@ -279,10 +309,39 @@ function fillBoard(){
           board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
         }
         else if (cell.type === "randomLog"){
-          if (Math.random() < .5)
+          if (roll < .5)
             cell.type = "log"
           else
             cell.type = cell.tile.replace(/\d+$/, "")
+        }
+        else if (cell.type === "randomRock"){
+          let a = Math.floor(Math.random()*4)+1
+          if (Math.random() < .5){
+            cell.type = "rock"
+            cell.quantity = a
+          }
+          else
+            cell.type = cell.tile.replace(/\d+$/, "")
+        }
+        else if (cell.type === "randomStick"){
+          if (Math.random() < .5)
+            cell.type = "stick"
+          else
+            cell.type = cell.tile.replace(/\d+$/, "")
+        }
+        else if (cell.type === "randomTree"){
+          if (roll > .6){
+            cell.type = "treeThin"
+            cell.tile = "treeThin"
+          }
+          else if (roll > .1){
+            cell.type = "tree"
+            cell.tile = "tree"
+          }
+          else {
+            cell.type = "grass"
+            cell.tile = "grass"
+          }
         }
         else {
           cell.type = "grass"
@@ -317,7 +376,7 @@ function displayBoard() {
   for (let i = left; i < right; i++) {
     for (let j = top; j< bottom; j++){
       let cell = board.cells[i][j]
-      let offset = game.mode === "play" ? topbarHeight : 0
+      let offset = game.mode === "edit" ? 0 : topbarHeight
       let img = game.mode === "edit" || cell.revealed ? tiles[cell.tile]: tiles["clouds"]
       try {
         image(img, i*25, j*25+offset)
@@ -328,7 +387,7 @@ function displayBoard() {
       if (["rock", "clay"].includes(cell.type) && (cell.revealed || game.mode === "edit")){
         image(tiles[cell.type+cell.quantity], i*25, j*25+offset)
       }
-      else if (["log", "randomLog", "bone", "steppingStones"].includes(cell.type) && (cell.revealed || game.mode === "edit"))
+      else if (seeThru.includes(cell.type) && (cell.revealed || game.mode === "edit"))
         image(tiles[cell.type], i*25, j*25+offset)
       else if (cell.type === "construction" && (cell.revealed || game.mode === "edit")){
         image(tiles.construction[cell.construction.type], i*25, j*25+offset)

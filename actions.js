@@ -38,12 +38,12 @@ function build(type){
   else if (type === "stoneAx"){
     if (man.energy <= 100)
       return "Oops! you don't have enough energy!"
-    let needed = ["longGrass", "rock", "log"]
+    let needed = ["longGrass", "rock", "stick"]
     let ar = backpack.includesItems(needed)
     if (ar.length === 3){
       backpack.removeItem("longGrass", 1)
       backpack.removeItem("rock", 1)
-      backpack.removeItem("log", 1)
+      backpack.removeItem("stick", 1)
       man.tools.push("stoneAx")
       popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
       return "Congratulations! You can now chop down trees at a cost of 300 energy. Look for the Stone Ax icon on the top bar."
@@ -52,7 +52,7 @@ function build(type){
       let out = "Opps! You still need "
       for (let j = 0; j < needed.length; j++){
         if (ar.find((e) => e.type === needed[j]) === undefined){
-          let name = j === 0 ? "a Long Grass and " : j === 1 ? "a Rock and " : "a Log and "
+          let name = j === 0 ? "a Long Grass and " : j === 1 ? "a Rock and " : "a Stick and "
           out += name
         }
       }
@@ -250,10 +250,11 @@ function eat(){
 
 function fling(){
   if (man.isNextToFire){
-    let items = backpack.includesItems(["log", "longGrass"])
+    let items = backpack.includesItems(["log", "stick", "longGrass"])
     if (items.length > 0){
       let fire = board.objectsToShow.fires[man.fireId]
-      fire.value = items[0].type === "log" ? Math.min(fire.value+13, 20) : Math.min(fire.value+2, 20)
+      fire.value = items[0].type === "log" ? Math.min(fire.value+13, 20) :
+                     items[0].type === "stick" ? Math.min(fire.value+5, 20) : Math.min(fire.value+2, 20)
       backpack.removeItem(items[0].type, 1)
       if (board.cells[man.x][man.y].type === "firepit"){
         showCount = 3
@@ -308,8 +309,8 @@ function grab(){
       delete cell.id
     }
   }
-  //gather a log or bone:
-  else if (["log", "bone"].includes(cell.type)){
+  //gather a log, bone or stick:
+  else if (["log", "bone", "stick"].includes(cell.type)){
     if (backpack.addItem(cell.type))
       cell.type = cell.tile.replace(/\d+$/, "")
   }

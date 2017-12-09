@@ -67,7 +67,7 @@ var popup = new Vue({
       selected: null,
       buildOptions: [
         {id: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax",
-                  cost: "100 energy, 1 long grass, 1 rock, 1 log", info: "For chopping down trees so you have logs to burn. Very important.", active: true},
+                  cost: "100 energy, 1 long grass, 1 rock, 1 stick", info: "For chopping down trees so you have logs to burn. Very important.", active: true},
         {id: "firepit", src: "images/firepitIcon.png", title: "Firepit",
                   cost: "200 energy", info: "For building fires in. Very important for staying alive every night.", active: true},
         {id: "basket", src: "images/basket.png", title: "Basket",

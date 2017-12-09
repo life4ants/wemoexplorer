@@ -4,6 +4,7 @@ class Backpack {
     this.weight = 0
     this.items = {
       log: {weight: 15, quantity: 0},
+      stick: {weight: 6, quantity: 0},
       rock: {weight: 15, quantity: 0},
       longGrass: {weight: 2, quantity: 0},
       bone: {weight: 4, quantity: 0},
@@ -18,7 +19,7 @@ class Backpack {
   }
 
   getAllItems(){
-    return this.includesItems(["log", "rock", "longGrass", "bone", "clay"])
+    return this.includesItems(["stick", "log", "rock", "longGrass", "bone", "clay"])
   }
 
   addItem(e){

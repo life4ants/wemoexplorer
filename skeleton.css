@@ -357,8 +357,8 @@ td:last-child {
 hr {
   margin-top: 1rem;
   margin-bottom: 1rem;
-  border-width: 0;
-  border-top: 1px solid #E1E1E1; }
+  border-width: 1px 0 0 0;
+  border: solid #E1E1E1; }
 
 
 /* Clearing
