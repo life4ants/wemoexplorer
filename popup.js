@@ -73,7 +73,7 @@ var popup = new Vue({
         {id: "basket", src: "images/basket.png", title: "Basket",
                   cost: "50 energy, 6 long grass", info: "For picking berries in", active: true},
         {id: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel",
-                  cost: "120 energy, 1 log, 1 long grass, 1 bone", info: "For digging up clay and ore", active: true},
+                  cost: "120 energy, 1 stick, 1 long grass, 1 bone", info: "For digging up clay and ore", active: true},
         {id: "raft", src: "images/raft0.png", title: "Raft",
                   cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true},
         {id: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones",
@@ -93,6 +93,12 @@ var popup = new Vue({
             break
           case "stoneAx":
             this.buildOptions[i].active = !man.tools.includes("stoneAx")
+            break
+          case "boneShovel":
+            this.buildOptions[i].active = !man.tools.includes("boneShovel")
+            break
+          case "raft":
+            this.buildOptions[i].active = !vehicles.raft
         }
       }
     },

@@ -63,12 +63,12 @@ function build(type){
   else if (type === "boneShovel"){
     if (man.energy <= 120)
       return "Oops! you don't have enough energy!"
-    let needed = ["longGrass", "bone", "log"]
+    let needed = ["longGrass", "bone", "stick"]
     let ar = backpack.includesItems(needed)
     if (ar.length === 3){
       backpack.removeItem("longGrass", 1)
       backpack.removeItem("bone", 1)
-      backpack.removeItem("log", 1)
+      backpack.removeItem("stick", 1)
       man.tools.push("boneShovel")
       popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "boneShovel")].active = false
       return "Congratulations! You can now dig clay at a cost of 200 energy. Look for the Bone Shovel icon on the top bar."
@@ -77,7 +77,7 @@ function build(type){
       let out = "Opps! You still need "
       for (let j = 0; j < needed.length; j++){
         if (ar.find((e) => e.type === needed[j]) === undefined){
-          let name = j === 0 ? "a Long Grass and " : j === 1 ? "a Bone and " : "a Log and "
+          let name = j === 0 ? "a Long Grass and " : j === 1 ? "a Bone and " : "a Stick and "
           out += name
         }
       }
@@ -159,7 +159,7 @@ function dump(type){
   // clay:
   else if (type === "clay"){
     if (cell.type === "stump"){
-      popup.setAlert("Sorry, you can't put clay on top of stumps.")
+      popup.setAlert("Sorry, you can't put clay on a stump.")
       return
     }
     else if (cell.type === "clay" && cell.quantity < 5){
@@ -206,7 +206,7 @@ function dump(type){
     // bone:
     else if (type === "bone"){
       if (cell.type === "stump"){
-        popup.setAlert("Sorry, you can't put bones on top of stumps.")
+        popup.setAlert("Sorry, you can't put a bone on a stump.")
         return
       }
       backpack.removeItem("bone", 1)
