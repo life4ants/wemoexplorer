@@ -36,11 +36,6 @@
                   mins >= 1320 && mins <= 1379 ? "dusk" :
                     mins >= 1380 || mins <= 59 ? "night" :
                       "day"
-
-    if (mins >= 1260 && mins <= 1290){
-      message = "Night is Coming!!"
-      showCount = 8
-    }
   },
 
   resume(){

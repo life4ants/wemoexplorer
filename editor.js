@@ -95,11 +95,11 @@ let editor = {
   treeFill(){
     for (let i=0; i<board.cols; i++){
       for (let j =0; j<board.rows; j++){
-        let l = random(5)
+        let l = random(6)
         let h = random(12)
         let x = i%8 + j%8
         let type = (x > l && x < h) ? "tree" :
-            x < h+2 ? "treeThin" : "grass"
+            x < h ? "treeThin" : "grass"
         if (board.cells[i][j].type === "random")
           board.cells[i][j] = {tile: type, type}
       }

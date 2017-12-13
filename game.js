@@ -125,7 +125,7 @@ let game = new Vue({
       if (this.mode === "play" && !board.gameOver)
         this.saveGame()
       else if (board.gameOver){
-        let index = this.currentPlayer.games.findIndex((e) => e.level === board.level)
+        let index = this.currentPlayer.games.findIndex((e) => e.name === board.name)
         if (index !== -1){
           let gameId = this.currentPlayer.games[index].id
           localStorage.removeItem("wemoGame"+gameId)
@@ -189,8 +189,7 @@ let game = new Vue({
       topbar.health = man.health
       topbar.energy = man.energy
       noKeys = false
-      showCount = 0
-      message = ""
+      message.reset()
       timer.setTime(board.wemoMins)
       if (!board.progress)
         board.fill()

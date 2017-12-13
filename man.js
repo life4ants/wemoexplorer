@@ -28,9 +28,14 @@ class Man extends WemoObject {
   display() {
     this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
     if (this.inDark){
-      message = "You're too far from a fire!"
-      showCount = 1
+      message.following.msg = "You're too far from a fire!"
+      message.following.frames = 1
       this.health -= Math.floor((this.health+1500)/499)
+    }
+    else if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
+      message.following.msg = "Get off the fire! You're burning!"
+      message.following.frames = 1
+      this.health -=25
     }
     if (this.isRiding){
       let sx = (active.index%3)*25
@@ -87,7 +92,6 @@ class Man extends WemoObject {
           this.oldX = this.x
           this.oldY = this.y
           this.energy -= 600-(Math.floor(this.energy/10))
-          message = ""
           showCount = 30-Math.round(this.energy/200)
           this.isClimbingOutOfPit = true
           this.isInPit = false
@@ -99,7 +103,8 @@ class Man extends WemoObject {
             this.health -= 800
             showCount = 5
             let name = board.cells[this.x+x][this.y+y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
-            message = "You fell in "+name
+            message.following.msg = "You fell in "+name
+            message.following.frames = 18
         }
         //move and set image index
         this.x += x
@@ -108,6 +113,7 @@ class Man extends WemoObject {
         this.stepCount++
         this.energy -= backpack.walkingCost()
         this.health -= 1
+        this.vomit = false
 
         this.revealCell(this.x, this.y)
       }

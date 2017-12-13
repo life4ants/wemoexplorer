@@ -123,7 +123,8 @@ class Board extends WemoObject {
     else if (cell.type.substr(-4,4) === "pile"){
       let tile = cell.quantity > 1 ? cell.type.substr(0, cell.type.length-4)+"s" : cell.type.substr(0, cell.type.length-4)
       image(tiles[tile], x*25, y*25+offset)
-      this.drawBadge(x*25+4, y*25+topbarHeight+8, cell.quantity, "#000")
+      if (cell.quantity > 1)
+        this.drawBadge(x*25+4, y*25+topbarHeight+8, cell.quantity, "#000")
     }
     else if (seeThru.includes(cell.type) && (cell.revealed || game.mode === "edit"))
       image(tiles[cell.type], x*25, y*25+offset)

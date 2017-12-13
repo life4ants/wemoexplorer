@@ -233,10 +233,9 @@ function eat(){
   if (man.energy > 5000){
     man.energy -= Math.floor((Math.random()*5+1)*100)
     man.health -= Math.floor((Math.random()*5+1)*10)
-    message = "You ate too much!!!"
-    showCount = 40
+    message.following.msg = "You ate too much!!!"
+    message.following.frames = 30
     man.vomit = true
-    noKeys = true
   }
   else if (man.energy > 4965){
     man.energy += 35
@@ -257,11 +256,6 @@ function fling(){
       fire.value = items[0].type === "log" ? Math.min(fire.value+13, 20) :
                      items[0].type === "stick" ? Math.min(fire.value+5, 20) : Math.min(fire.value+2, 20)
       backpack.removeItem(items[0].type, 1)
-      if (board.cells[man.x][man.y].type === "firepit"){
-        showCount = 3
-        message = "Get off the fire! You're burning!"
-        man.health -= 10
-      }
     }
   }
   else {

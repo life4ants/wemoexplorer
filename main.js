@@ -4,7 +4,7 @@ let tiles, man, canoe, active
 let noKeys, worldWidth, worldHeight
 const topbarHeight = 55
 let topOffset = 0, leftOffset = 0
-let showCount, message
+let showCount //man uses it to display falling in pit animation
 
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile", "stickpile", "log", "rock","stick", "clay"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
@@ -209,8 +209,10 @@ function playLoop(){
   man.display()
   showNight()
   topbar.display()
-  showMessage()
-  if (showCount === 0 && (man.energy <= 0 || man.health <= 0 ))
+  message.display()
+  if (showCount > 0)
+    showCount--
+  if (man.energy <= 0 || man.health <= 0 )
     popup.gameOver()
 }
 
