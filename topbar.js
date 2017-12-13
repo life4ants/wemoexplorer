@@ -74,7 +74,7 @@ let topbar = {
         let row = i > 1 ? 22 : -1
         let col = i > 1 ? i-2 : i
         image(tiles[items[i].type], col*25+left+2, top+row)
-        drawBadge(col*25+left+22, top+5+row, items[i].quantity, "#000")
+        board.drawBadge(col*25+left+22, top+5+row, items[i].quantity, "#000")
       }
       fill(255)
       stroke(80)
@@ -87,7 +87,7 @@ let topbar = {
     if (man.basket){
       if (man.basket.quantity > 0){
         image(tiles.basketBerries, left+80, top+25)
-        drawBadge(left+110, top+25, man.basket.quantity, "#000")
+        board.drawBadge(left+110, top+25, man.basket.quantity, "#000")
       }
       else
         image(tiles.basket, left+80, top+25)

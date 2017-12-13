@@ -1,29 +1,16 @@
-function WaterCraft(imgs, x, y, type) {
-  this.x = x
-  this.y = y
-  this.type = type
-  this.imgs = imgs
-  this.index = 4
-  this.landed = false
-  this.stepCount = 0
-
-  this.initialize = function(obj) {
-    for (let key in obj){
-      this[key] = obj[key]
-    }
+class WaterCraft extends WemoObject{
+  constructor(imgs, x, y, type){
+    super()
+    this.x = x
+    this.y = y
+    this.type = type
+    this.imgs = imgs
+    this.index = 4
+    this.landed = false
+    this.stepCount = 0
   }
 
-  this.save = function(){
-    let output = {}
-    let items = Object.keys(this)
-    for (let i = 0; i < items.length; i++){
-      if (typeof this[items[i]] !== "function" && items[i] !== "imgs")
-        output[items[i]] = this[items[i]]
-    }
-    return output
-  }
-
-  this.display = function() {
+  display() {
     let x, y, id
     if ([0,1,4].includes(this.index)){
       x = this.type === "canoe" ? (this.x-1)*25 : this.x*25-5
@@ -38,9 +25,9 @@ function WaterCraft(imgs, x, y, type) {
     image(this.imgs[id], x, y)
   }
 
-  this.move = function(x, y) {
-    if (this.x + x >= 0 && this.x + x < cols &&
-      this.y + y >= 0 && this.y + y < rows) {
+  move(x, y) {
+    if (this.x + x >= 0 && this.x + x < board.cols &&
+      this.y + y >= 0 && this.y + y < board.rows) {
       if (["water", "river", "steppingStones"].includes(board.cells[this.x+x][this.y+y].type) ||
           (board.cells[this.x+x][this.y+y].type === "beach" &&
            ["water", "river"].includes(board.cells[this.x][this.y].type))
@@ -59,7 +46,7 @@ function WaterCraft(imgs, x, y, type) {
               let a = this.x+i
               let b = this.y+j
 
-              if (a >= 0 && a < cols && b >= 0 && b < rows){
+              if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
                 man.revealCell(a,b)
               }
             }
@@ -73,11 +60,11 @@ function WaterCraft(imgs, x, y, type) {
     }
   }
 
-  this.isBeside = function(type){
+  isBeside(type){
     if ([0,1].includes(this.index)){
       for (let x=0, y= -1; y<2; y+=2){
         let i = this.x+x, j = this.y+y;
-        if (i >= 0 && i < cols && j >= 0 && j < rows){
+        if (i >= 0 && i < board.cols && j >= 0 && j < board.rows){
           if (board.cells[i][j].type === type)
             return true
         }
@@ -86,7 +73,7 @@ function WaterCraft(imgs, x, y, type) {
     else {
       for (let x= -1, y=0; x<2; x+=2){
         let i = this.x+x, j = this.y+y;
-        if (i >= 0 && i < cols && j >= 0 && j < rows){
+        if (i >= 0 && i < board.cols && j >= 0 && j < board.rows){
           if (board.cells[i][j].type === type)
             return true
         }

@@ -82,42 +82,22 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      updateMessage: !this.upToDate
     }
   },
   props: [
-    'startGame', 'edit', 'player', 'upToDate'
+    'startGame', 'edit', 'player'
   ],
   mounted(){
     setTimeout(() => $("#grow").addClass("large"), 0)
-    if (localStorage.wemoPlayers){
+    if (localStorage.wemoPlayers)
       this.players = JSON.parse(localStorage.wemoPlayers)
-      for (let i = this.players.length - 1; i >= 0; i--) {
-        for (let j = this.players[i].games.length - 1; j >= 0; j--) {
-          let game = this.players[i].games[j]
-          if (!game.name){
-            if (typeof game.level === "number"){
-              game.name = "Level "+game.level
-              game.type = "default"
-            }
-            else {
-              game.name = game.level
-              game.level = 10
-              game.type = "custom"
-            }
-          }
-        }
-      }
-    }
     if (this.player.index !== undefined) {
       this.pickPlayer(this.player.index)
     }
   },
   computed: {
     message(){
-      return this.updateMessage ? `Sorry, Andy made some breaking changes to the code, and all your progress had to be deleted.
-        Your custom games are still here. Enter your name to continue.` :
-          this.players.length > 0 ? "Click on your name or make a new player:" : "Please enter your name to get started:"
+      return this.players.length > 0 ? "Click on your name or make a new player:" : "Please enter your name to get started:"
     }
   },
   methods: {

@@ -15,7 +15,7 @@ function showMessage(){
       man.vomit = false
       noKeys = false
     }
-    if (board.cells[man.x][man.y].type === "firepit" && board.objectsToShow.fires[man.fireId].value > 0){
+    if (board.cells[man.x][man.y].type === "firepit" && board.fires[man.fireId].value > 0){
       showCount++
       man.health -= 25
       if (man.energy < 0 || man.health < 0)

@@ -1,40 +1,15 @@
 let frameTime = Date.now()
 
 let tiles, man, canoe, active
-let noKeys
-let cols, rows, worldWidth, worldHeight
+let noKeys, worldWidth, worldHeight
 const topbarHeight = 55
 let topOffset = 0, leftOffset = 0
 let showCount, message
 
-const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile"]
+const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile", "stickpile", "log", "rock","stick", "clay"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
 const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick"]
-
-function initializeVars(){
-  topbar.health = man.health
-  topbar.energy = man.energy
-  noKeys = false
-  showCount = 0
-  message = ""
-  timer.setTime(board.wemoMins)
-  game.paused = false
-  resizeWorld(board.cells.length, board.cells[0].length)
-}
-
-function resizeWorld(c, r){
-  cols = c
-  rows = r
-  worldWidth = cols * 25
-  worldHeight = game.mode === "play" ? rows * 25 + topbarHeight : rows * 25
-  resizeCanvas(worldWidth, worldHeight)
-}
-
-function windowResized(){
-  if (game.mode === "play")
-    viewport.update(true)
-}
 
 function preload(){
   tiles = {
@@ -60,6 +35,7 @@ function preload(){
     berries: loadImage("images/berries.png"),
     berryTree: loadImage("images/berryTree.png"),
     bone: loadImage("images/bone.png"),
+    bones: loadImage("images/bone.png"),
     boneShovel: loadImage("images/boneShovel.png"),
     clouds: loadImage("images/clouds.png"),
     cross: loadImage("images/cross.png"),
@@ -73,7 +49,7 @@ function preload(){
     dock6: loadImage("images/dock6.png"),
     dusk: loadImage("images/dusk.png"),
     canoe: [ loadImage("images/canoe0.png"),
-              loadImage("images/canoe1.png")
+             loadImage("images/canoe1.png")
            ],
     clay: loadImage("images/clay.png"),
     clay1: loadImage("images/clay1.png"),
@@ -82,12 +58,18 @@ function preload(){
     clay4: loadImage("images/clay4.png"),
     clay5: loadImage("images/clay5.png"),
     construction: {
-                    raft: loadImage("images/raftHB.png")
-                   },
+      raft: loadImage("images/raftHB.png")
+    },
+    fire: [
+      loadImage("images/fire1.png"),
+      loadImage("images/fire2.png"),
+      loadImage("images/fire3.png"),
+      loadImage("images/fire4.png")
+    ],
     firepit: loadImage("images/firepit.png"),
     grass: loadImage("images/grass.png"),
     log: loadImage("images/log.png"),
-    logpile: loadImage("images/logs.png"),
+    logs: loadImage("images/logs.png"),
     longGrass: loadImage("images/longGrass.png"),
     longGrass1: loadImage("images/longGrass1.png"),
     longGrass2: loadImage("images/longGrass2.png"),
@@ -147,7 +129,8 @@ function preload(){
     rock2: loadImage("images/rock2.png"),
     rock3: loadImage("images/rock3.png"),
     rock4: loadImage("images/rock4.png"),
-    rock: loadImage("images/rocks.png"),
+    rock: loadImage("images/rock1.png"),
+    rocks: loadImage("images/rocks.png"),
     rockEdge1: loadImage("images/rockEdge1.png"),
     rockEdge2: loadImage("images/rockEdge2.png"),
     rockEdge3: loadImage("images/rockEdge3.png"),
@@ -166,6 +149,7 @@ function preload(){
     sleeping: loadImage("images/sleeping.png"),
     steppingStones: loadImage("images/steppingStones.png"),
     stick: loadImage("images/stick.png"),
+    sticks: loadImage("images/sticks.png"),
     stoneAx: loadImage("images/stoneAx.png"),
     stump: loadImage("images/stump.png"),
     tent: loadImage("images/tent.png"),
@@ -190,13 +174,6 @@ function preload(){
   }
 
   tiles.construction.steppingStones = tiles.steppingStones
-
-  fire = [
-    loadImage("images/fire1.png"),
-    loadImage("images/fire2.png"),
-    loadImage("images/fire3.png"),
-    loadImage("images/fire4.png")
-  ]
 }
 
 function setup(){
@@ -211,12 +188,10 @@ function setup(){
 }
 
 function draw(){
-  if (frameCount === 1)
-    console.log("loaded in", Date.now()-frameTime)
   frameTime = Date.now()
   background('green')
   if (game.started){
-    displayBoard()
+    board.display()
     if (game.mode === "play")
       playLoop()
     else if (game.mode === "build")
@@ -230,7 +205,6 @@ function playLoop(){
   // move board:
   viewport.update(false)
   //display:
-  showObjects()
   vehicles.display()
   man.display()
   showNight()
@@ -241,7 +215,6 @@ function playLoop(){
 }
 
 function buildLoop(){
-  showObjects()
   vehicles.display()
   man.display()
   topbar.display()
@@ -259,151 +232,10 @@ function showMouse(size){
   rect(x*25,y*25+topbarHeight,w,w)
 }
 
-function startGame(){
-  man = new Man(tiles.players[game.currentPlayer.character], board.startX, board.startY)
-  backpack = new Backpack(board.backpack)
-  delete board.backpack
-  if (board.man){
-    man.initialize(board.man)
-    delete board.man
-  }
-  vehicles = new Vehicle(board.vehicles)
-  delete board.vehicles
-  active = man.ridingId ? vehicles[man.ridingId] : man
-  initializeVars()
-  if (!board.progress) {
-    fillBoard()
-  }
-  popup.reset()
-  viewport.update(true)
-  loop()
-  $(window).scrollTop(0).scrollLeft(0)
-  $("body").addClass("full-screen")
-}
-
-function fillBoard(){
-  for (let i = 0; i < cols; i++){
-    for (let j = 0; j< rows; j++){
-      let cell = board.cells[i][j]
-      if (["randomPit", "randomGrass", "randomBerries", "randomLog", "randomTree", "randomRock", "randomStick"].includes(cell.type)){
-        let roll = Math.random()
-        if (cell.type === "randomPit" && roll < .5){
-          cell.type = "pit"
-          cell.tile = "pit"
-          for (let k = -1; k <=1; k++){
-            for (let l = -1; l<=1; l++){
-              if (abs(l+k) === 1)
-                board.cells[i+k][j+l].byPit = true
-            }
-          }
-        }
-        else if (cell.type === "randomGrass" && roll < .8){
-          let a = Math.floor(Math.random()*3)+1
-          cell.type = "longGrass"
-          cell.tile = "longGrass"+a
-        }
-        else if (cell.type === "randomBerries" && roll < .7){
-          cell.type = "berryTree"
-          cell.tile = "berryTree"
-          cell.id = board.objectsToShow.berryTrees.length
-          board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
-        }
-        else if (cell.type === "randomLog"){
-          if (roll < .5)
-            cell.type = "log"
-          else
-            cell.type = cell.tile.replace(/\d+$/, "")
-        }
-        else if (cell.type === "randomRock"){
-          let a = Math.floor(Math.random()*4)+1
-          if (Math.random() < .5){
-            cell.type = "rock"
-            cell.quantity = a
-          }
-          else
-            cell.type = cell.tile.replace(/\d+$/, "")
-        }
-        else if (cell.type === "randomStick"){
-          if (Math.random() < .5)
-            cell.type = "stick"
-          else
-            cell.type = cell.tile.replace(/\d+$/, "")
-        }
-        else if (cell.type === "randomTree"){
-          if (roll > .6){
-            cell.type = "treeThin"
-            cell.tile = "treeThin"
-          }
-          else if (roll > .1){
-            cell.type = "tree"
-            cell.tile = "tree"
-          }
-          else {
-            cell.type = "grass"
-            cell.tile = "grass"
-          }
-        }
-        else {
-          cell.type = "grass"
-          cell.tile = "grass"
-        }
-      }
-    }
-  }
-}
-
-function displayBoard() {
-  let left, right, top, bottom
-  if (window.innerHeight-topOffset > worldHeight || game.mode === "edit"){
-    top = 0
-    bottom = rows
-  }
-  else {
-    top = Math.floor(abs($("#board").position().top-topOffset)/25)
-    bottom = top + Math.floor(window.innerHeight/25)+1
-    bottom = bottom > rows ? rows : bottom
-  }
-  if (window.innerWidth-leftOffset > worldWidth || game.mode === "edit"){
-    left = 0
-    right = cols
-  }
-  else {
-    left = Math.floor(abs($("#board").position().left-leftOffset)/25)
-    right = left + Math.floor(window.innerWidth/25)+1
-    right = right > cols ? cols : right
-  }
-
-  for (let i = left; i < right; i++) {
-    for (let j = top; j< bottom; j++){
-      let cell = board.cells[i][j]
-      let offset = game.mode === "edit" ? 0 : topbarHeight
-      let img = game.mode === "edit" || cell.revealed ? tiles[cell.tile]: tiles["clouds"]
-      try {
-        image(img, i*25, j*25+offset)
-      }
-      catch(error){
-        console.error(i,j,board.cells[i][j])
-      }
-      if (["rock", "clay"].includes(cell.type) && (cell.revealed || game.mode === "edit")){
-        image(tiles[cell.type+cell.quantity], i*25, j*25+offset)
-      }
-      else if (seeThru.includes(cell.type) && (cell.revealed || game.mode === "edit"))
-        image(tiles[cell.type], i*25, j*25+offset)
-      else if (cell.type === "construction" && (cell.revealed || game.mode === "edit")){
-        image(tiles.construction[cell.construction.type], i*25, j*25+offset)
-        for (let a = 0; a < cell.construction.needed.length; a++) {
-          let item = cell.construction.needed[a]
-          let x = a < 2 ? a : a-2
-          let y = Math.floor(a/2)
-          drawBadge(i*25+x*14+4, j*25+offset+(y*14)+4, item.quantity, item.color)
-        }
-      }
-      if (cell.byPit && (cell.revealed || game.mode === 'edit'))
-        drawRing(i,j)
-    }
-  }
-  if (game.mode === "edit")
-    image(tiles.players[0], board.startX*25, board.startY*25, 25, 25, 0, 25, 25, 25)
+function resizeWorld(cols, rows){
+  worldWidth = cols * 25
+  worldHeight = game.mode === "play" ? rows * 25 + topbarHeight : rows * 25
+  resizeCanvas(worldWidth, worldHeight)
 }
 
 $("#board").contextmenu(function(e) {
@@ -462,7 +294,7 @@ function showNight(){
   vertex(worldWidth,0)
   vertex(worldWidth,worldHeight)
   vertex(0,worldHeight)
-  let fires = board.objectsToShow.fires
+  let fires = board.fires
   for (let i=0; i<fires.length; i++){
     if (fires[i].value > 0){
       let size = (fires[i].value/4)+3.1
@@ -519,17 +351,17 @@ function showObjects(){
       if (x === "logpiles"){
         let tile = items[i].quantity > 1 ? tiles.logpile : tiles.log
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
-        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity, "#000")
+        board.drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity, "#000")
       }
       else if (x === "rockpiles"){
         image(tiles.rock, items[i].x*25, items[i].y*25+topbarHeight)
-        drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity, "#000")
+        board.drawBadge(items[i].x*25+20, items[i].y*25+topbarHeight+5, items[i].quantity, "#000")
       }
       else if (x === "fires"){
         let tile = items[i].value > 0 ? fire[Math.floor((frameCount%6)/2)] : tiles.firepit
         image(tile, items[i].x*25, items[i].y*25+topbarHeight)
         if (items[i].value > 0)
-          progressBar(items[i].x, items[i].y, items[i].value)
+          board.drawProgressBar(items[i].x, items[i].y, items[i].value)
       }
       else if (x === "berryTrees" && board.cells[items[i].x][items[i].y].revealed){
         let berries = items[i].berries
@@ -542,56 +374,4 @@ function showObjects(){
       }
     }
   }
-}
-
-function drawBadge(x,y,num,color){
-  num = num+""
-  noStroke()
-  fill(color)
-  ellipseMode(CENTER)
-  ellipse(x,y,10+(num.length*3),13)
-  textAlign(CENTER, CENTER)
-  let textColor = color === "#000" ? 255 : 0
-  fill(textColor)
-  textSize(10)
-  text(num,x,y)
-}
-
-function progressBar(i,j,value){
-  fill(255)
-  stroke(80)
-  strokeWeight(1)
-  rect(i*25+2,j*25+19+topbarHeight, 21, 4)
-  let color = value > 12 ? "green" :
-               value > 6 ? "#e90" : "red"
-  fill(color)
-  noStroke()
-  rect(i*25+3, j*25+20+topbarHeight, value, 3)
-}
-
-function drawRing(x,y){
-  noFill()
-  stroke(255,0,0)
-  strokeWeight(3)
-  let offset = game.mode === 'play' ? topbarHeight : 0
-  ellipseMode(CENTER)
-  ellipse(x*25+12.5, y*25+offset+12.5,23,23)
-}
-
-function drawPitLines(x,y){
-  noFill()
-  stroke(255,0,0)
-  strokeWeight(1)
-  let offset = game.mode === 'play' ? topbarHeight : 0
-  let basex = x*25+2
-  let basey = y*25+2+offset
-  for (let i = 0; i < 5; i++){
-    let x1 = i < 2 ? 2-i : i == 2 ? 0.57 : 0
-    let y1 = i < 2 ? 0 : i == 2 ? 0.57 : i-2
-    let x2 = i < 2 ? 3 : i == 2 ? 2.57 : 5-i
-    let y2 = i > 2 ? 3: i == 2 ? 2.57 : i+1
-    line(Math.round(x1*7)+basex, Math.round(y1*7)+basey, Math.round(x2*7)+basex, Math.round(y2*7)+basey)
-  }
-  ellipseMode(CENTER)
-  ellipse(x*25+12.5, y*25+12.5+offset,22,22)
 }

@@ -70,7 +70,40 @@ let editor = {
     else if (["log", "randomLog", "bone", "randomRock", "randomStick"].includes(type))
       board.cells[x][y].type = type
     else
-      board.cells[x][y] = {tile, type, revealed: false}
+      board.cells[x][y] = {tile, type}
+  },
+
+  floodFill(x,y, tile1, type1, tile2, type2){
+    board.cells[x][y] = {tile: tile2, type: type2}
+
+    for (let i = x-1; i <= x+1; i++){
+      for (let j = y-1; j <= y+1; j++){
+        if (i >= 0 && i < board.cols && j >= 0 && j < board.rows && board.cells[i][j].type === type1)
+          this.floodFill(i,j, tile1, type1, tile2, type2)
+      }
+    }
+  },
+
+  newWorld(cols, rows){
+    board = new Board(cols, rows)
+    resizeWorld(cols, rows)
+    this.islandMaker(cols, rows)
+    this.floodFill(8,8,"water","water","random","random")
+    this.treeFill()
+  },
+
+  treeFill(){
+    for (let i=0; i<board.cols; i++){
+      for (let j =0; j<board.rows; j++){
+        let l = random(5)
+        let h = random(12)
+        let x = i%8 + j%8
+        let type = (x > l && x < h) ? "tree" :
+            x < h+2 ? "treeThin" : "grass"
+        if (board.cells[i][j].type === "random")
+          board.cells[i][j] = {tile: type, type}
+      }
+    }
   },
 
   parsePath(type){
@@ -85,17 +118,6 @@ let editor = {
       }
     }
     this.path = []
-  },
-
-  floodFill(x,y, tile1, type1, tile2, type2){
-    board.cells[x][y] = {tile: tile2, type: type2, revealed: false}
-
-    for (let i = x-1; i <= x+1; i++){
-      for (let j = y-1; j <= y+1; j++){
-        if (i >= 0 && i < cols && j >= 0 && j < rows && board.cells[i][j].type === type1)
-          this.floodFill(i,j, tile1, type1, tile2, type2)
-      }
-    }
   },
 
   plotPath(){
@@ -144,6 +166,8 @@ let editor = {
   },
 
   islandMaker(cols,rows){
+    if (cols < 17 || rows < 17)
+      return
     this.path = ["10_3"]
     let x = 11, y = 3;
     let go = true, count = 0

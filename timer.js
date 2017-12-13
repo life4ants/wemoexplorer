@@ -58,17 +58,15 @@
   },
 
   updateFires(){
-    let fires = board.objectsToShow.fires
     let x = Math.round(frameCount%40/20)
-    for (let i=x; i<fires.length; i+=2){
-      if (fires[i].value > 0){
-        fires[i].value--
-      }
+    for (let i=x; i<board.fires.length; i+=2){
+      if (board.fires[i].value > 0)
+        board.fires[i].value--
     }
   },
 
   growBerries(){
-    let trees = board.objectsToShow.berryTrees
+    let trees = board.berryTrees
     let x = Math.round(frameCount%300/75)
     for (let i=x; i<trees.length; i+=4){
       this.addBerry(trees[i])

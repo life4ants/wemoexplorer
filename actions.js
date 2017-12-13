@@ -3,7 +3,7 @@ function build(type){
   let cell = board.cells[active.x][active.y]
   // build firepit:
   if (type === "firepit"){
-    let fires = board.objectsToShow.fires
+    let fires = board.fires
     if (man.energy <= 200)
       return "Oops! You don't have enough energy!"
     if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
@@ -132,94 +132,95 @@ function build(type){
 }
 
 function chop(){
-  let cell = board.cells[man.x][man.y]
-  if (["tree", "treeShore"].includes(board.cells[active.x][active.y].type)){
+  let cell = board.cells[active.x][active.y]
+  if (["tree", "treeShore", "treeThin"].includes(cell.type)){
     let t = man.tools.findIndex((e) => e === "stoneAx" || e === "steelAx")
     if (t === -1){
       popup.setAlert("It looks like you don't have any tools for chopping down trees. Look for an ax on the Build Menu.")
     }
     else {
-      let logpiles = board.objectsToShow.logpiles
-      let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
-      cell.type = "logpile"
+      cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
       cell.tile = "stump"
-      cell.id = id
-      logpiles.push({id: id, x: active.x, y: active.y, quantity: 5})
+      cell.quantity = 5
       man.energy = man.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
     }
   }
 }
 
 function dump(type){
+  const _dumpable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock"]
   let cell = board.cells[active.x][active.y]
   // long Grass:
   if (type === "longGrass"){
     backpack.removeItem("longGrass", 1)
+    return false
   }
   // clay:
   else if (type === "clay"){
-    if (cell.type === "stump"){
-      popup.setAlert("Sorry, you can't put clay on a stump.")
-      return
+    if (cell.type === "clay"){
+      if (cell.quantity < 5){
+        cell.quantity++
+        backpack.removeItem("clay", 1)
+      }
     }
-    else if (cell.type === "clay" && cell.quantity < 5){
-      cell.quantity++
-      backpack.removeItem("clay", 1)
-    }
-    else if (dumpable.includes(cell.type)){
+    else if (_dumpable.includes(cell.type)){
       cell.type = "clay"
       cell.quantity = 1
       backpack.removeItem("clay", 1)
     }
+    else
+      return "Sorry, you can't dump clay on a "+cell.type+"!"
   }
-  else if (dumpable.includes(cell.type)){
-    // log:
-    if (type === "log"){
-      let logpiles = board.objectsToShow.logpiles
-      if (cell.type === "logpile"){
-        let index = logpiles.findIndex((e) => e.id === cell.id)
-        logpiles[index].quantity++
-      }
-      else {
-        let id = logpiles.length > 0 ? logpiles[logpiles.length-1].id+1 : 0
-        cell.type = "logpile"
-        cell.id = id
-        logpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
-      }
-      backpack.removeItem("log", 1)
+  // log:
+  else if (["log", "stick"].includes(type)){
+    if (cell.type === type+"pile")
+      cell.quantity++
+    else if (cell.type === type){
+      cell.type = type+"pile"
+      cell.quantity = 2
     }
-    // rock:
-    else if (type === "rock"){
-      let rockpiles = board.objectsToShow.rockpiles
-      if ("rockpile" === cell.type){
-        let index = rockpiles.findIndex((e) => e.id === cell.id)
-        rockpiles[index].quantity++
-      }
-      else {
-        let id = rockpiles.length > 0 ? rockpiles[rockpiles.length-1].id+1 : 0
-        cell.type = "rockpile"
-        cell.id = id
-        rockpiles.push({id: id, x: active.x, y: active.y, quantity: 1})
-      }
-      backpack.removeItem("rock", 1)
+    else if (_dumpable.includes(cell.type) || cell.type === "stump")
+      cell.type = type
+    else
+      return "Sorry, you can't dump "+type+"s on a "+cell.type+"!"
+    backpack.removeItem(type, 1)
+  }
+  // rock:
+  else if (type === "rock"){
+    if (cell.type === "rockpile")
+      cell.quantity++
+    else if (cell.type === "rock"){
+      cell.type = "rockpile"
+      cell.quantity++
     }
-    // bone:
-    else if (type === "bone"){
-      if (cell.type === "stump"){
-        popup.setAlert("Sorry, you can't put a bone on a stump.")
-        return
-      }
-      backpack.removeItem("bone", 1)
+    else if (_dumpable.includes(cell.type)){
+      cell.type = "rock"
+      cell.quantity = 1
+    }
+    else
+      return "Sorry, you can't dump rock on a "+cell.type+"!"
+    backpack.removeItem("rock", 1)
+  }
+  // bone:
+  else if (type === "bone"){
+    if (cell.type === "bonepile")
+      cell.quantity++
+    else if (cell.type === "bone"){
+      cell.type = "bonepile"
+      cell.quantity = 2
+    }
+    else if (_dumpable.includes(cell.type))
       cell.type = "bone"
-    }
+    else
+      return "Sorry, you can't dump bone on a "+cell.type+"!"
+    backpack.removeItem("bone", 1)
   }
-  else
-    popup.setAlert("You can't dump "+type+" on a "+cell.type+"!")
+  return false
 }
 
 function eat(){
   let cell = board.cells[man.x][man.y]
-  let tree = board.objectsToShow.berryTrees[cell.id]
+  let tree = board.berryTrees[cell.id]
   if (cell.type === "berryTree" && tree.berries.length > 0){
     let p = Math.floor(Math.random()*tree.berries.length)
     tree.berries.splice(p, 1)
@@ -252,7 +253,7 @@ function fling(){
   if (man.isNextToFire){
     let items = backpack.includesItems(["log", "stick", "longGrass"])
     if (items.length > 0){
-      let fire = board.objectsToShow.fires[man.fireId]
+      let fire = board.fires[man.fireId]
       fire.value = items[0].type === "log" ? Math.min(fire.value+13, 20) :
                      items[0].type === "stick" ? Math.min(fire.value+5, 20) : Math.min(fire.value+2, 20)
       backpack.removeItem(items[0].type, 1)
@@ -297,16 +298,15 @@ function fling(){
 
 function grab(){
   let cell = board.cells[man.x][man.y]
-  //grab a log or rock from pile:
-  if (backpack.weight <= 25 && ["logpile", "rockpile"].includes(cell.type)){
-    let piles = board.objectsToShow[cell.type+"s"]
-    let index = piles.findIndex((e) => e.id === cell.id)
-    piles[index].quantity--
-    backpack.addItem(cell.type.slice(0, -4))
-    if (piles[index].quantity === 0){
-      piles.splice(index, 1)
-      cell.type = cell.tile
-      delete cell.id
+  //grab a something from a pile:
+  if (cell.type.substr(-4,4) === "pile"){
+    let item = cell.type.substr(0, cell.type.length-4)
+    if (backpack.addItem(item)){
+      cell.quantity--
+      if (cell.quantity === 0){
+        cell.type = cell.tile.replace(/\d+$/, "")
+        delete cell.quantity
+      }
     }
   }
   //gather a log, bone or stick:
@@ -334,8 +334,8 @@ function grab(){
   }
   //pick berries:
   else if (man.basket && man.basket.quantity < 50 && "berryTree" === cell.type &&
-              board.objectsToShow.berryTrees[cell.id].berries.length > 0){
-    let tree = board.objectsToShow.berryTrees[cell.id]
+              board.berryTrees[cell.id].berries.length > 0){
+    let tree = board.berryTrees[cell.id]
     let p = Math.floor(Math.random()*tree.berries.length)
     tree.berries.splice(p, 1)
     man.basket.quantity++

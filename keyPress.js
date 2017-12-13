@@ -71,3 +71,8 @@ function mouseReleased(){
   if (game.mode === "edit" && winMouseY > topOffset)
     editor.mouseReleased()
 }
+
+function windowResized(){
+  if (game.mode === "play")
+    viewport.update(true)
+}

@@ -149,7 +149,9 @@ var popup = new Vue({
       if (items.length === 0)
         return
       if (items.length === 1){
-        dump(items[0].type)
+        let msg = dump(items[0].type)
+        if (msg)
+          this.setAlert(msg)
       }
       else {
         this.title = "What would you like to Dump?"
@@ -159,7 +161,8 @@ var popup = new Vue({
           {id: "rock", src: "images/rocks.png"},
           {id: "longGrass", src: "images/longGrass.png"},
           {id: "bone", src: "images/bone.png"},
-          {id: "clay", src: "images/clay.png"}
+          {id: "clay", src: "images/clay.png"},
+          {id: "stick", src: "images/sticks.png"}
         ]
         let output = []
         for (let i = 0; i < options.length; i++){
@@ -176,8 +179,11 @@ var popup = new Vue({
     },
 
     dump(){
-      this.close()
-      dump(this.selected)
+      let msg = dump(this.selected)
+      if (msg)
+        this.setAlert(msg)
+      else
+        this.close()
     },
 
     changeSelect(dir){

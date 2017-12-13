@@ -3,7 +3,7 @@ let game = new Vue({
   template: `
     <div>
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
-        :player="currentPlayer" :edit="edit" :upToDate="upToDate"></welcome-menu>
+        :player="currentPlayer" :edit="edit"></welcome-menu>
       <edit-bar v-else-if="mode === 'edit'" :exit="exit"></edit-bar>
       <div v-else-if="mode === 'loading'"></div>
       <div v-else class="sideBar">
@@ -41,7 +41,6 @@ let game = new Vue({
       {code: "S", active: false, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
     ],
     mode: "loading",
-    upToDate: true,
     started: false,
     paused: false,
     autoCenter: false,
@@ -50,23 +49,20 @@ let game = new Vue({
     currentPlayer: {}
   },
   mounted(){
-    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "10amNov282017"){
+    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "8pmDec122017"){
       let s = Object.keys(localStorage)
       for (let i = 0; i < s.length; i++){
-        if (s[i].substr(0,8) === "wemoGame" || s[i] === "wemoPlayers"){
+        if (s[i].substr(0,8) === "wemoGame"){
           delete localStorage[s[i]]
-          this.upToDate = false
-        }
-        else if (!localStorage.wemoUpToDate && s[i].substr(0, 5) === "board"){
-          let _board = JSON.parse(localStorage[s[i]])
-          _board.name = s[i].substring(5, s[i].length)
-          _board.level = 10
-          _board.type = "custom"
-          delete _board.id
-          localStorage.setItem(s[i], JSON.stringify(_board))
         }
       }
-      localStorage.setItem("wemoUpToDate", "10amNov282017")
+      let players = JSON.parse(localStorage.wemoPlayers)
+      let newPlayers = []
+      for (let i=0; i<players.length; i++){
+        newPlayers.push({name: players[i].name, unlockedLevel: 1, games: [], character: 0})
+      }
+      localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
+      localStorage.setItem("wemoUpToDate", "8pmDec122017")
     }
   },
   methods: {
@@ -108,7 +104,7 @@ let game = new Vue({
         this.icons[3].active = backpack.getAllItems().find((i) => i.type === "log") && man.isNextToFire
         //eat:
         this.icons[4].active = (("berryTree" === cell.type &&
-                board.objectsToShow.berryTrees[cell.id].berries.length > 0)) ||
+                board.berryTrees[cell.id].berries.length > 0)) ||
                 (man.basket && man.basket.quantity > 0)
         //jump:
         this.icons[5].active = (!man.isRiding && vehicles.canMount(man.x, man.y)) ||
@@ -117,7 +113,7 @@ let game = new Vue({
         this.icons[6].active = ["tree", "treeShore"].includes(cell.type)
         //pick:
         this.icons[7].active = (man.basket && "berryTree" === cell.type &&
-              board.objectsToShow.berryTrees[cell.id].berries.length > 0)
+              board.berryTrees[cell.id].berries.length > 0)
         //sleep:
         this.icons[8].active = (man.canSleep && !man.isSleeping && !man.isRiding)
         //wake up:
@@ -126,9 +122,8 @@ let game = new Vue({
     },
 
     exit() {
-      if (this.mode === "play" && !board.gameOver){
+      if (this.mode === "play" && !board.gameOver)
         this.saveGame()
-      }
       else if (board.gameOver){
         let index = this.currentPlayer.games.findIndex((e) => e.level === board.level)
         if (index !== -1){
@@ -144,45 +139,72 @@ let game = new Vue({
       $("body").removeClass("full-screen")
       noLoop()
       this.started = false
+      this.paused = false
       popup.show = false
       topOffset = 0
       $("#board").css("top", topOffset+"px").css("left", leftOffset)
       $(window).scrollTop(0).scrollLeft(0)
       redraw()
     },
+
     edit(player){
-      this.currentPlayer = player
-      this.mode = "edit"
       topOffset = 100
       $("#board").css("top", topOffset+"px").css("left", "0px")
-      let wcols = Math.floor(window.innerWidth/25)
-      let wrows = Math.floor(window.innerHeight/25)
-      resizeWorld(wcols, wrows)
-      generateBoard(wcols,wrows)
+      let cols = min(floor(window.innerWidth/25), 40)
+      let rows = min(floor(window.innerHeight/25), 25)
+      editor.newWorld(cols, rows)
+      this.currentPlayer = player
+      this.mode = "edit"
       this.started = true
       loop()
     },
 
     startGame(type, player, index){
-      if (type === "default"){
-        board = JSON.parse(JSON.stringify(gameBoards[index-1]))
+      let b
+      switch(type){
+        case "default":
+          b = JSON.parse(JSON.stringify(gameBoards[index-1]))
+          break
+        case "resume":
+          b = JSON.parse(localStorage["wemoGame"+index])
+          break
+        case "custom":
+          b = JSON.parse(localStorage["board"+index])
+          b.name = index
+          b.level = board.level || 10
+          b.type = "custom"
       }
-      else if (type === "resume"){
-        board = JSON.parse(localStorage["wemoGame"+index])
+      man = new Man(tiles.players[player.character], b.startX, b.startY)
+      backpack = new Backpack(b.backpack)
+      delete b.backpack
+      if (b.man){
+        man.import(b.man)
+        delete b.man
       }
-      else if (type === "custom"){
-        board = JSON.parse(localStorage["board"+index])
-        board.name = index
-        board.level = board.level || 10
-        board.type = "custom"
-      }
+      vehicles = new Vehicle(b.vehicles)
+      delete b.vehicles
+      active = man.ridingId ? vehicles[man.ridingId] : man
+      board = new Board(b)
+      leftOffset = 37
+      topbar.health = man.health
+      topbar.energy = man.energy
+      noKeys = false
+      showCount = 0
+      message = ""
+      timer.setTime(board.wemoMins)
+      if (!board.progress)
+        board.fill()
+      popup.reset()
+      $(window).scrollTop(0).scrollLeft(0)
+      $("body").addClass("full-screen")
       this.currentPlayer = player
       this.mode = "play"
       this.started = true
       this.autoCenter = false
       this.infoShown = false
-      leftOffset = 37
-      startGame()
+      resizeWorld(board.cols, board.rows)
+      viewport.update(true)
+      loop()
     },
 
     saveGame(){
@@ -206,7 +228,7 @@ let game = new Vue({
 
       board.progress = true
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
-        Object.assign({man: man.save(), vehicles: vehicles.save(), backpack: backpack.getAllItems()}, board)
+        Object.assign({man: man.export(), vehicles: vehicles.save(), backpack: backpack.getAllItems()}, board)
       ))
     },
 

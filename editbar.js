@@ -151,7 +151,7 @@ let editBar = {
     },
     generateBoard(){
       let wcols = Math.floor((window.innerWidth-37)/25)
-      let wrows = Math.floor(window.innerHeight/25)
+      let wrows = Math.floor((window.innerHeight-55)/25)
       let p = prompt("How big would you like your world to be?\nSize of screen is "+wcols+" by "+wrows+". Max suggested size is 80 by 50.\n"+
         "Please enter width and height separated by a coma:")
       if (p === null)
@@ -161,48 +161,16 @@ let editBar = {
       let rows = Number(p[1])
       if (cols != cols || rows != rows)
         alert("Please enter 2 numbers separated by a coma (\",\")")
-      else {
-        generateBoard(cols,rows)
-        resizeWorld(cols, rows)
-      }
+      else
+        editor.newWorld(cols,rows)
     },
 
     previewBoard(){
-      fillBoard()
+      board.fill()
     },
 
     saveBoard(){
-      board.objectsToShow = {logpiles: [], fires: [], berryTrees: [], rockpiles: []}
-      let revealCount = 0
-      for (let i = 0; i < cols; i++){
-        for (let j = 0; j< rows; j++){
-          let cell = board.cells[i][j]
-          if (j === board.startY && [i,i+1,i-1].includes(board.startX))
-            cell.revealed = true
-          else {
-            cell.revealed = false
-            revealCount++
-          }
-          if (cell.type === "berryTree"){
-            cell.id = board.objectsToShow.berryTrees.length
-            board.objectsToShow.berryTrees.push({x: i, y: j, berries: []})
-          }
-          if (helpers.isNextToType(i,j, ["pit", "sandpit"]))
-            cell.byPit = true
-          else
-            delete cell.byPit
-        }
-      }
-      board.revealCount = revealCount
-      board.version = 2
-      board.wemoMins = 120
-      board.progress = false
-      let name = prompt("enter name for game")
-      if (name !== null){
-        board.name = name
-        localStorage.setItem("board"+name, JSON.stringify(board))
-        alert("Game "+name+" was saved.")
-      }
+      board.save()
     },
 
     load(custom){
@@ -211,21 +179,14 @@ let editBar = {
       if (id === null)
         return
       if (custom)
-        board = JSON.parse(localStorage["board"+id])
+        board = new Board(JSON.parse(localStorage["board"+id]))
       else
-        board = JSON.parse(JSON.stringify(gameBoards[id]))
-      resizeWorld(board.cells.length, board.cells[0].length)
+        board = new Board(JSON.parse(JSON.stringify(gameBoards[id])))
+      resizeWorld(board.cols, board.rows)
     },
 
     grassAndTreeFill(){
-      for (let i=0; i<cols; i++){
-        for (let j =0; j<rows; j++){
-          let type = (i%8 + j%8 > Math.random()*5 && i%8 + j%8 < Math.random()*14) ?
-                "tree" : "grass"
-          if (board.cells[i][j].type === "random")
-            board.cells[i][j] = {tile: type, type, revealed: false}
-        }
-      }
+      editor.treeFill()
     }
   }
 }

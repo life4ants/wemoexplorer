@@ -1,5 +1,6 @@
-class Man {
+class Man extends WemoObject {
   constructor(img, x, y){
+    super()
     this.x = x
     this.y = y
     this.oldX = 0
@@ -22,22 +23,6 @@ class Man {
     this.inDark = false
     this.isSleeping = false
     this.canSleep = false
-  }
-
-  initialize(obj) {
-    for (let key in obj){
-      this[key] = obj[key]
-    }
-  }
-
-  save(){
-    let output = {}
-    let items = Object.keys(this)
-    for (let i = 0; i < items.length; i++){
-      if (typeof this[items[i]] !== "function" && items[i] !== "img")
-        output[items[i]] = this[items[i]]
-    }
-    return output
   }
 
   display() {
@@ -82,7 +67,7 @@ class Man {
         this.drawImage(this.img, id, this.x*25, this.y*25+topbarHeight, 25, 25)
       }
       if (board.cells[this.x][this.y].byPit)
-        drawPitLines(this.x, this.y)
+        this.drawPitLines(this.x, this.y)
       if (this.isSleeping)
        this.sleep()
     }
@@ -92,11 +77,11 @@ class Man {
     if (this.isClimbingOutOfPit || this.isFallingIntoPit || this.isSleeping)
       return
     //check for edge case
-    if (this.x + x >= 0 && this.x + x < cols &&
-      this.y + y >= 0 && this.y + y < rows){
+    if (this.x + x >= 0 && this.x + x < board.cols &&
+      this.y + y >= 0 && this.y + y < board.rows){
        //check for forbidden cells
       if (!["water", "rockEdge", "river", "construction"].includes(board.cells[this.x+x][this.y+y].type)){
-        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.objectsToShow.fires[board.cells[this.x+x][this.y+y].id].value > 0)
+        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.fires[board.cells[this.x+x][this.y+y].id].value > 0)
           return
         if (this.isInPit){
           this.oldX = this.x
@@ -129,9 +114,10 @@ class Man {
       //reveal rockEdge cells
       else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type)){
         this.revealCell(this.x+x, this.y+y)
+        this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       }
       //check if next to fires
-      let fires = board.objectsToShow.fires
+      let fires = board.fires
       for (let i=0; i<fires.length; i++){
         if (helpers.isNearSquare(this.x, this.y, fires[i].x, fires[i].y)){
           this.isNextToFire = true
@@ -184,7 +170,8 @@ class Man {
       case 6: x--;      break;
       case 7: x--; y--;
     }
-    if ((x >= 0 && x < cols && y >= 0 && y < rows) && (!["water", "river", "rockEdge", "firepit"].includes(board.cells[x][y].type))){
+    if ((x >= 0 && x < board.cols && y >= 0 && y < board.rows) &&
+          (!["water", "river", "rockEdge", "firepit"].includes(board.cells[x][y].type))){
       this.x = x
       this.y = y
       this.index = dir === 0 ? 2 : [1,2,3].includes(dir) ? 0 : 4 === dir ? 3 : 1
@@ -228,4 +215,23 @@ class Man {
         popup.setAlert("You revealed the whole world!\nI guess that means you won.")
     }
   }
+
+  drawPitLines(x,y){
+    noFill()
+    stroke(255,0,0)
+    strokeWeight(1)
+    let offset = game.mode === 'edit' ? 0 : topbarHeight
+    let basex = x*25+2
+    let basey = y*25+2+offset
+    for (let i = 0; i < 5; i++){
+      let x1 = i < 2 ? 2-i : i == 2 ? 0.57 : 0
+      let y1 = i < 2 ? 0 : i == 2 ? 0.57 : i-2
+      let x2 = i < 2 ? 3 : i == 2 ? 2.57 : 5-i
+      let y2 = i > 2 ? 3: i == 2 ? 2.57 : i+1
+      line(Math.round(x1*7)+basex, Math.round(y1*7)+basey, Math.round(x2*7)+basex, Math.round(y2*7)+basey)
+    }
+    ellipseMode(CENTER)
+    ellipse(x*25+12.5, y*25+12.5+offset,22,22)
+  }
+
 }

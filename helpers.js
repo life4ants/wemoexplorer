@@ -3,7 +3,7 @@ let helpers = {
     for (let i = -1; i <= 1; i++){
       for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
         let a = x+i, b = y+j;
-        if (a >= 0 && a < cols && b >= 0 && b < rows){
+        if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
           if (type.includes(board.cells[a][b].type))
             return true
         }
@@ -16,7 +16,7 @@ let helpers = {
     for (let i = -1; i <= 1; i++){
       for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
         let a = x+i, b = y+j;
-        if (a >= 0 && a < cols && b >= 0 && b < rows){
+        if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
           if (tile.includes(board.cells[a][b].tile))
             return {x: a, y: b}
         }
@@ -49,7 +49,7 @@ let helpers = {
   nearbyType(x,y, type){ //returns the cell data if found, otherwise false
     for (let i = x-1; i <= x+1; i++){
       for (let j = y-1; j <= y+1; j++){
-        if (i >= 0 && i < cols && j >= 0 && j < rows){
+        if (i >= 0 && i < board.cols && j >= 0 && j < board.rows){
           if (board.cells[i][j].type === type)
             return Object.assign({x: i, y: j}, board.cells[i][j])
         }
@@ -77,13 +77,31 @@ let helpers = {
   randomPicker(type){
     let count = 0
     while (count < 80){
-      let x = floor(random(0, cols))
-      let y = floor(random(0, rows))
+      let x = floor(random(0, board.cols))
+      let y = floor(random(0, board.rows))
       if (board.cells[x][y].type === type){
         return {x: x, y: y, cell: board.cells[x][y], count: count}
       }
       count++
     }
     return count
+  }
+}
+
+class WemoObject {
+  import(obj) {
+    for (let key in obj){
+      this[key] = obj[key]
+    }
+  }
+
+  export(){
+    let output = {}
+    let items = Object.keys(this)
+    for (let i = 0; i < items.length; i++){
+      if (typeof this[items[i]] !== "function" && items[i] !== "img")
+        output[items[i]] = this[items[i]]
+    }
+    return output
   }
 }
