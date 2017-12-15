@@ -1,10 +1,10 @@
 class WaterCraft extends WemoObject{
-  constructor(imgs, x, y, type){
+  constructor(img, x, y, type){
     super()
     this.x = x
     this.y = y
     this.type = type
-    this.imgs = imgs
+    this.img = img
     this.index = 4
     this.landed = false
     this.stepCount = 0
@@ -22,7 +22,7 @@ class WaterCraft extends WemoObject{
       y = this.type === "canoe" ? (this.y-1)*25+topbarHeight : this.y*25+topbarHeight-5
       id = 1
     }
-    image(this.imgs[id], x, y)
+    image(this.img[id], x, y)
   }
 
   move(x, y) {

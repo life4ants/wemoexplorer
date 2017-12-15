@@ -1,6 +1,21 @@
 function keyPressed(){
   if (game.mode === "play" && game.started && !game.paused && !noKeys){
-    playKeys()
+    switch(keyCode){
+      case LEFT_ARROW:
+        active.move(-1, 0)
+        break
+      case RIGHT_ARROW:
+        active.move(1,0)
+        break
+      case UP_ARROW:
+        active.move(0,-1)
+        break
+      case DOWN_ARROW:
+        active.move(0,1)
+        break
+      default:
+        game.action(key)
+    }
   }
   else if (["dumpMenu", "build"].includes(popup.type)){
     switch(keyCode){
@@ -26,36 +41,21 @@ function keyPressed(){
   }
 }
 
-function playKeys() {
-  switch(keyCode){
-    case LEFT_ARROW:
-      active.move(-1, 0)
-      break
-    case RIGHT_ARROW:
-      active.move(1,0)
-      break
-    case UP_ARROW:
-      active.move(0,-1)
-      break
-    case DOWN_ARROW:
-      active.move(0,1)
-      break
-    default:
-      game.action(key)
-  }
-  return false
-}
-
 function mousePressed(){
   if (mouseX < 0 || mouseX > worldWidth || mouseY < 0 || mouseY > worldHeight)
       return
-  if (game.mode === "play" && !popup.show && winMouseX > leftOffset && mouseY > viewport.top+topbarHeight && window.focused){
-    let y = Math.floor((mouseY-topbarHeight)/25)
-    let x = Math.floor(mouseX/25)
-    console.log(x, y)
-  }
-  else if (game.mode === "edit" && winMouseY > topOffset )
+  if (game.mode === "edit" && winMouseY > topOffset )
     editor.mousePressed()
+  else if (mouseX > viewport.left && mouseY > viewport.top+topbarHeight){
+    if (game.mode === "play" && !popup.show){
+      let y = Math.floor((mouseY-topbarHeight)/25)
+      let x = Math.floor(mouseX/25)
+      console.log(x, y)
+    }
+    else if (game.mode === "build"){
+      builder.clicker()
+    }
+  }
 }
 
 function mouseDragged(){

@@ -1,6 +1,6 @@
 let editBar = {
   template: `
-    <div class="topBar">
+    <div class="topbar">
       <div class="side-buttons">
         <div class="menu">
           <span>Menu</span>
@@ -19,19 +19,19 @@ let editBar = {
         <div class="menu" @click='() => load(true)' title="load a saved board">Load</div>
       </div>
       <div class="flex">
-        <div class="tileBox">
+        <div class="tilebox">
           <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
           height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
         </div>
-        <div class="tileBox">
+        <div class="tilebox">
           <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
           height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
         </div>
-        <div class="tileBox-short">
+        <div class="tilebox-short">
           <img v-for="pic in tiles3" :key="pic.id" :src="pic.src"
           height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
         </div>
-        <div class="tileBox-short">
+        <div class="tilebox-short">
           <img v-for="pic in tiles4" :key="pic.id" :src="pic.src"
           height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
         </div>

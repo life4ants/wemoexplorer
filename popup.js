@@ -124,12 +124,20 @@ var popup = new Vue({
     },
 
     build(){
-      let message = build(this.selected)
-      if (!message)
+      if (["steppingStones", "raft", "campsite", "firepit"].includes(this.selected)){
+        builder.type = this.selected
+        builder.size = this.selected === "campsite" ? 2 : 1
+        game.toggleBuildMode()
         this.close()
+      }
       else {
-        this.title = message
-        this.type = "alert"
+        let message = build(this.selected, {x: active.x, y: active.y})
+        if (!message)
+          this.close()
+        else {
+          this.title = message
+          this.type = "alert"
+        }
       }
     },
 

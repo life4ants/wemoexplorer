@@ -27,7 +27,7 @@ body {
   background-color: #ffe;
 }
         /* ----------------------- Sidebar/Topbar: --------------------*/
-.topBar {
+.topbar {
   position: fixed;
   top: 0;
   left: 0;
@@ -37,7 +37,7 @@ body {
   z-index: 1;
 }
 
-.sideBar {
+.sidebar {
   position: fixed;
   top: 0;
   left: 0;
@@ -50,17 +50,13 @@ body {
   user-select: none;
 }
 
-.topBar-content{
-  display: flex;
-  font-size: 22px;
+.sidebar-content ul {
+  list-style-type: disc;
+  padding-left: 5px;
 }
 
-.sideBar-content {
+.sidebar-content {
   padding: 4px 2px 3px 3px;
-}
-
-.topBar p {
-  margin: 0 10px;
 }
 
 .fa-info-circle {
@@ -68,13 +64,13 @@ body {
   bottom: 0;
 }
 
-.tileBox {
+.tilebox {
   display: flex;
   flex-wrap: wrap;
   width: 372px;
 }
 
-.tileBox-short {
+.tilebox-short {
   display: flex;
   flex-wrap: wrap;
   width: 217px;

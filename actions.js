@@ -1,23 +1,17 @@
 
-function build(type){
-  let cell = board.cells[active.x][active.y]
+function build(type, pos){
+  let cell = board.cells[pos.x][pos.y]
   // build firepit:
   if (type === "firepit"){
     let fires = board.fires
     if (man.energy <= 200)
       return "Oops! You don't have enough energy!"
-    if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
-      let id = fires.length > 0 ? fires[fires.length-1].id+1 : 0
-      cell.type = "firepit"
-      cell.id = id
-      fires.push({id: id, x: active.x, y: active.y, value: 0})
-      man.isNextToFire = true
-      man.fireId = id
-      man.energy -= 200
-      return false
-    }
-    else
-      return "Opps! You can't build a Firepit on a "+cell.type+"!"
+    let id = fires.length > 0 ? fires[fires.length-1].id+1 : 0
+    cell.type = "firepit"
+    cell.id = id
+    fires.push({id: id, x: pos.x, y: pos.y, value: 0})
+    man.fireCheck()
+    man.energy -= 200
   }
   // build basket:
   else if (type === "basket"){
@@ -86,49 +80,39 @@ function build(type){
   }
   // build raft:
   else if (type === "raft"){
-    if (cell.type === "beach" && helpers.isNextToType(active.x, active.y, "water")){
-      if (man.energy <= 400)
-        return "Oops! you don't have enough energy!"
-      else {
-        let construction = {
-          type: "raft",
-          needed: [
-            {type: "log", quantity: 8, color: "#582C0F"},
-            {type: "longGrass", quantity: 8, color: "#207414"}
-          ]
-        }
-        cell.type = "construction"
-        cell.construction = construction
-        man.energy -= 400
-        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "raft")].active = false
-        fling()
+    if (man.energy <= 400)
+      return "Oops! you don't have enough energy!"
+    else {
+      let construction = {
+        type: "raft",
+        needed: [
+          {type: "log", quantity: 8, color: "#582C0F"},
+          {type: "longGrass", quantity: 8, color: "#207414"}
+        ]
       }
+      cell.type = "construction"
+      cell.construction = construction
+      man.energy -= 400
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "raft")].active = false
     }
-    else
-      return "You must build a raft on a beach square next to a water square"
   }
   // build stepping stones:
   else if (type === "steppingStones"){
-    let item = helpers.isNextToTile(active.x, active.y, fordable)
-    if (item){
-      if (man.energy <= 150)
-        return "Oops! you don't have enough energy!"
-      else {
-        let construction = {
-          type: "steppingStones",
-          needed: [
-            {type: "rock", quantity: 3, color: "#B4D9D9"}
-          ]
-        }
-        board.cells[item.x][item.y].type = "construction"
-        board.cells[item.x][item.y].construction = construction
-        man.energy -= 150
-        fling()
+    if (man.energy <= 150)
+      return "Oops! you don't have enough energy!"
+    else {
+      let construction = {
+        type: "steppingStones",
+        needed: [
+          {type: "rock", quantity: 3, color: "#B4D9D9"}
+        ]
       }
+      cell.type = "construction"
+      cell.construction = construction
+      man.energy -= 150
     }
-    else
-      return "You must be next to a straight piece of river to build stepping stones"
   }
+  return false
 }
 
 function chop(){

@@ -27,6 +27,16 @@ class Man extends WemoObject {
 
   display() {
     this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
+    if (game.mode === "build"){
+      strokeWeight(2)
+      stroke(128)
+      noFill()
+      ellipseMode(CENTER)
+      ellipse(this.x*25+12.5, this.y*25+topbarHeight+12.5, 200, 200)
+      ellipseMode(CORNER)
+      this.drawImage(this.img, this.index, this.x*25, this.y*25+topbarHeight, 25, 25)
+      return
+    }
     if (this.inDark){
       message.following.msg = "You're too far from a fire!"
       message.following.frames = 1
@@ -122,18 +132,21 @@ class Man extends WemoObject {
         this.revealCell(this.x+x, this.y+y)
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       }
-      //check if next to fires
-      let fires = board.fires
-      for (let i=0; i<fires.length; i++){
-        if (helpers.isNearSquare(this.x, this.y, fires[i].x, fires[i].y)){
-          this.isNextToFire = true
-          this.fireId = i
-          return
-        }
-      }
-      this.isNextToFire = false
-      this.fireId = null
+      this.fireCheck()
     }
+  }
+
+  fireCheck(){
+    let fires = board.fires
+    for (let i=0; i<fires.length; i++){
+      if (helpers.isNearSquare(this.x, this.y, fires[i].x, fires[i].y)){
+        this.isNextToFire = true
+        this.fireId = i
+        return
+      }
+    }
+    this.isNextToFire = false
+    this.fireId = null
   }
 
   sleep(){

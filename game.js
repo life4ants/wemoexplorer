@@ -6,8 +6,8 @@ let game = new Vue({
         :player="currentPlayer" :edit="edit"></welcome-menu>
       <edit-bar v-else-if="mode === 'edit'" :exit="exit"></edit-bar>
       <div v-else-if="mode === 'loading'"></div>
-      <div v-else class="sideBar">
-        <div v-if="mode === 'play'" class="sideBar-content">
+      <div v-else-if="mode === 'play'" class="sidebar">
+        <div class="sidebar-content">
           <i class="fa fa-sign-out fa-flip-horizontal fa-2x" aria-hidden="true" @click="exit" title="Exit Game"></i>
           <i :class="{fa: true, 'fa-2x': true, 'fa-play': paused, 'fa-pause': !paused}"
                         aria-hidden="true" @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
@@ -17,8 +17,19 @@ let game = new Vue({
                   height="30" width="30" :class="{icon: true, selected: icon.selected}" @click="() => action(icon.code)">
           <i class="fa fa-info-circle fa-2x" aria-hidden="true" @click="() => infoShown = !infoShown" title="Show Info"></i>
         </div>
-        <div v-else class="sideBar-content">
-          <i class="fa fa-sign-out fa-flip-horizontal fa-2x" aria-hidden="true" @click="exit" title="Exit Game"></i>
+      </div>
+      <div v-else class="sidebar" style="width: 150px">
+        <div class="sidebar-content">
+          <h5 style="text-decoration: underline">Build Mode</h5>
+          <h6>Rules:</h6>
+          <ul>
+            <li>You may only build within the grey circle around your player.</li>
+            <li>You may not build on the same square as your player.</li>
+            <li>You may not build on an unrevealed square.</li>
+            <li>A red square means you can't build at that spot, a green circle inside a square means you can.</li>
+            <li>Click to build!</li>
+          </ul>
+          <button style="margin-left: 20px" @click="toggleBuildMode">Cancel</button>
         </div>
       </div>
     </div>
@@ -232,18 +243,32 @@ let game = new Vue({
     },
 
     pauseGame(){
-      if (this.paused){
-        timer.resume()
-        this.paused = false
-        popup.close()
+      if (this.mode === "play"){
+        if (this.paused){
+          timer.resume()
+          this.paused = false
+          popup.close()
+        }
+        else {
+          popup.type = "gamePaused"
+          popup.size = "popup-tiny"
+          popup.show = true
+          this.paused = true
+          noLoop()
+        }
       }
-      else {
-        popup.type = "gamePaused"
-        popup.size = "popup-tiny"
-        popup.show = true
-        this.paused = true
-        noLoop()
+    },
+
+    toggleBuildMode(){
+      if (this.mode === "build"){
+        this.mode = "play"
+        leftOffset = 37
       }
+      else if (this.mode === "play"){
+        this.mode = "build"
+        leftOffset = 152
+      }
+      viewport.update(true)
     }
   }
 })

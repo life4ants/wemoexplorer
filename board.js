@@ -3,7 +3,7 @@ class Board extends WemoObject {
     super()
     if (arguments.length === 1 && typeof a === "object"){
       this.import(a)
-      if (this.version === 2)
+      if (this.version !== 3)
         this.convertVersion2()
     }
     else if (arguments.length === 2){
@@ -25,6 +25,7 @@ class Board extends WemoObject {
 
   save(){
     let revealCount = 0
+    let trees = []
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
@@ -35,8 +36,8 @@ class Board extends WemoObject {
           revealCount++
         }
         if (cell.type === "berryTree"){
-          cell.id = this.berryTrees.length
-          this.berryTrees.push({x: i, y: j, berries: []})
+          cell.id = trees.length
+          trees.push({x: i, y: j, berries: []})
         }
         if (helpers.isNextToType(i,j, ["pit", "sandpit"]))
           cell.byPit = true
@@ -45,6 +46,7 @@ class Board extends WemoObject {
       }
     }
     this.revealCount = revealCount
+    this.berryTrees = trees
     let name = prompt("enter name for game")
     if (name !== null){
       this.name = name
@@ -202,6 +204,92 @@ class Board extends WemoObject {
     }
   }
 
+  showNight(){
+    let alpha, time
+    let mins = this.wemoMins%1440
+    if (game.paused) {
+      alpha = timer.timeOfDay === "day" ? 230 : 255
+      fill(0,0,0,alpha)
+      rect(0,0,worldWidth,worldHeight)
+      return
+    }
+
+    switch(timer.timeOfDay){
+      case "day":
+        return
+      case "dusk":
+        time = mins-1320
+        alpha = Math.floor(255-pow((60-time)*.266, 2))
+        break
+      case "night":
+        alpha = 255
+        break
+      case "dawn":
+        time = mins-60
+        alpha = Math.round(255-pow((time+1)*.266, 2))
+        break
+    }
+
+    let dark = (mins >= 1360 || mins < 80)
+    man.inDark = dark
+
+    fill(0,0,0,alpha)
+    noStroke()
+    beginShape()
+    vertex(0,0)
+    vertex(worldWidth,0)
+    vertex(worldWidth,worldHeight)
+    vertex(0,worldHeight)
+    let fires = board.fires
+    for (let i=0; i<fires.length; i++){
+      if (fires[i].value > 0){
+        let size = (fires[i].value/4)+3.1
+        let x = fires[i].x*25+12.5
+        let y = fires[i].y*25+12.5+topbarHeight
+        let r = size*25/2
+        let arm = r*0.54666
+        if (dark && man.inDark){
+          let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
+          man.inDark = d > r-10
+        }
+        beginContour()
+        vertex(x,y-r)
+        bezierVertex(x-arm,y-r,x-r,y-arm,x-r,y)
+        bezierVertex(x-r,y+arm,x-arm,y+r,x,y+r)
+        bezierVertex(x+arm,y+r,x+r,y+arm,x+r,y)
+        bezierVertex(x+r,y-arm,x+arm,y-r,x,y-r)
+        endContour()
+      }
+    }
+    endShape(CLOSE)
+    for (let i =0; i<fires.length; i++){
+      if (fires[i].value > 0){
+        let size = (fires[i].value/4)+3.1
+        this.drawFireCircle(fires[i].x,fires[i].y,size,alpha)
+      }
+    }
+    if (man.inDark && man.isSleeping)
+      image(tiles.z, man.x*25, man.y*25+topbarHeight)
+  }
+
+  drawFireCircle(x,y,size,alpha){
+    ellipseMode(CENTER)
+    if (alpha < 20){
+      fill(0,0,0,Math.floor(alpha/2))
+      noStroke()
+      ellipse(x*25+12.5,y*25+12.5+topbarHeight,size*25,size*25)
+    }
+    else {
+      noFill()
+      strokeWeight(2)
+      for (let i = size*25-1; i > 1; i-=3){
+        let d = alpha < 40 ? alpha-20 : (alpha-40)/(size*25)*i+20
+        stroke(0,0,0,d)
+        ellipse(x*25+12.5,y*25+12.5+topbarHeight,i,i)
+      }
+    }
+  }
+
   drawBadge(x,y,num,color){
     num = num+""
     noStroke()
@@ -209,7 +297,7 @@ class Board extends WemoObject {
     ellipseMode(CENTER)
     ellipse(x,y,10+(num.length*3),13)
     textAlign(CENTER, CENTER)
-    let textColor = color === "#000" ? 255 : 0
+    let textColor = color === "#B4D9D9" ? 0 : 255
     fill(textColor)
     textSize(10)
     text(num,x,y)
