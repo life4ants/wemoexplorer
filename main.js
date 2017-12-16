@@ -1,8 +1,34 @@
-let frameTime = Date.now()
+let world = {
+  frameTime: Date.now(),
+  width: null,
+  height: null,
+  topOffset: 0,
+  leftOffset: 0,
+  noKeys: false,
+  frameRate: 12,
 
-let tiles, man, canoe, active
-let noKeys, worldWidth, worldHeight
-let topOffset = 0, leftOffset = 0
+  resize(cols, rows){
+    this.width = cols * 25
+    this.height = game.mode === "play" ? rows * 25 + topbarHeight : rows * 25
+    resizeCanvas(this.width, this.height)
+  },
+
+  interval(num){
+    return frameCount % (this.frameRate/4*num)
+  },
+
+  checkFrameRate(){
+    let diff = this.frameRate-frameRate()
+    if (diff > 4){
+      this.frameRate = diff > 8 ? this.frameRate-8 : this.frameRate-4
+      frameRate(this.frameRate)
+      console.log("dropped frame rate to", this.frameRate)
+    }
+    else
+      console.log(diff, "off of", this.frameRate)
+  },
+}
+
 let showCount //man uses it to display falling in pit animation
 
 const topbarHeight = 55
@@ -36,6 +62,7 @@ function preload(){
     berries: loadImage("images/berries.png"),
     berryTree: loadImage("images/berryTree.png"),
     bone: loadImage("images/bone.png"),
+    bomb: loadImage("images/bomb1.png"),
     bones: loadImage("images/bone.png"),
     boneShovel: loadImage("images/boneShovel.png"),
     clouds: loadImage("images/clouds.png"),
@@ -61,6 +88,7 @@ function preload(){
     construction: {
       raft: loadImage("images/raftHB.png")
     },
+    explosion: loadImage("images/explosion.png"),
     fire: [
       loadImage("images/fire1.png"),
       loadImage("images/fire2.png"),
@@ -180,16 +208,15 @@ function preload(){
 function setup(){
   let cvs = createCanvas(window.innerWidth, window.innerHeight)
   cvs.parent("board")
-  $("#board").css("top", topOffset).css("left", leftOffset)
-  frameRate(12)
+  $("#board").css("top", world.topOffset).css("left", world.leftOffset)
   strokeJoin(ROUND)
   noLoop()
   game.mode = "welcome"
-  console.log("loaded in", Date.now()-frameTime)
+  console.log("loaded in", Date.now()-world.frameTime)
 }
 
 function draw(){
-  frameTime = Date.now()
+  world.frameTime = Date.now()
   background('green')
   if (game.started){
     board.display()
@@ -217,11 +244,6 @@ function playLoop(){
     popup.gameOver()
 }
 
-function resizeWorld(cols, rows){
-  worldWidth = cols * 25
-  worldHeight = game.mode === "play" ? rows * 25 + topbarHeight : rows * 25
-  resizeCanvas(worldWidth, worldHeight)
-}
 
 $("#board").contextmenu(function(e) {
     e.preventDefault();

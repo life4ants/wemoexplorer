@@ -86,7 +86,7 @@ let editor = {
 
   newWorld(cols, rows){
     board = new Board(cols, rows)
-    resizeWorld(cols, rows)
+    world.resize(cols, rows)
     this.islandMaker(cols, rows)
     this.floodFill(8,8,"water","water","random","random")
     this.treeFill()

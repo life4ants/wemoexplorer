@@ -84,7 +84,7 @@ let message = {
 
   showInfo(){
     let msg = "man dist: "+man.stepCount+" cells left to explore: "+board.revealCount+
-        " walking cost: "+(Math.round(backpack.walkingCost()*100)/100)+" frame Rate: "+Math.floor(frameRate())+" mils: "+(Date.now()-frameTime)
+        " walking cost: "+(Math.round(backpack.walkingCost()*100)/100)+" frame Rate: "+Math.floor(frameRate())+" mils: "+(Date.now()-world.frameTime)
     this.showFixed(msg, 18)
   }
 }

@@ -112,6 +112,13 @@ function build(type, pos){
       man.energy -= 150
     }
   }
+  else if (type === "bomb"){
+    if (man.energy <= 300)
+      return "Oops! you don't have enough energy!"
+    backpack.addItem("bomb")
+    man.energy -= 300
+    return "You now have a bomb in your backpack. Press T to throw it in the direction you are pointed."
+  }
   return false
 }
 
@@ -336,3 +343,13 @@ function grab(){
   }
 }
 
+function throwBomb(){
+  if (active === man){
+    if (backpack.removeItem("bomb", 1)){
+      let x = man.x*25-3
+      let y = man.y*25+topbarHeight-3
+      board.bombs = board.bombs || []
+      board.bombs.push(new Bomb(x,y,man.index))
+    }
+  }
+}

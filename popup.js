@@ -77,7 +77,9 @@ var popup = new Vue({
         {id: "raft", src: "images/raft0.png", title: "Raft",
                   cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true},
         {id: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones",
-                  cost: "150 energy, 3 rocks", info: "For crossing rivers", active: true}
+                  cost: "150 energy, 3 rocks", info: "For crossing rivers", active: true},
+        {id: "bomb", src: "images/bomb1.png", title: "Bomb",
+                  cost: "300 energy", info: "For clearing away clouds", active: false}
 
       ],
       showOptions: [],
@@ -99,6 +101,9 @@ var popup = new Vue({
             break
           case "raft":
             this.buildOptions[i].active = !vehicles.raft
+            break
+          case "bomb":
+            this.buildOptions[i].active = board.revealCount <= 100
         }
       }
     },
@@ -118,7 +123,7 @@ var popup = new Vue({
         this.selectId = 0
         this.show = true
         setTimeout(() => $(".build-menu").scrollTop(0), 0)
-        noKeys = true
+        world.noKeys = true
         noLoop()
       }
     },
@@ -182,7 +187,7 @@ var popup = new Vue({
         this.selectId = 0
         this.showOptions = output
         this.show = true
-        noKeys = true
+        world.noKeys = true
       }
     },
 
@@ -207,7 +212,7 @@ var popup = new Vue({
       this.title = "Game Over!!"
       this.size = "popup-center"
       this.type = "gameOver"
-      noKeys = true
+      world.noKeys = true
       noLoop()
     },
 
@@ -217,7 +222,7 @@ var popup = new Vue({
 
     close(){
       this.show = false
-      noKeys = false
+      world.noKeys = false
       loop()
     },
 
@@ -226,7 +231,7 @@ var popup = new Vue({
       this.title = content
       this.type = "alert"
       this.size = "popup-center"
-      noKeys = true
+      world.noKeys = true
       noLoop()
     },
 

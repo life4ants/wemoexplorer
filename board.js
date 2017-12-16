@@ -116,6 +116,13 @@ class Board extends WemoObject {
       if (this.fires[i].value > 0)
         this.drawProgressBar(this.fires[i].x, this.fires[i].y, this.fires[i].value)
     }
+    if (this.bombs){
+      for (var i = this.bombs.length - 1; i >= 0; i--) {
+        this.bombs[i].display()
+        if (this.bombs[i].move())
+          this.bombs.splice(i, 1)
+      }
+    }
   }
 
   showCell(x,y, cell, offset){
@@ -204,13 +211,24 @@ class Board extends WemoObject {
     }
   }
 
+  revealCell(x,y){
+    this.cells[x][y].revealed = true
+    this.revealCount--
+    if (this.revealCount === 100){
+      popup.setAlert("Only 100 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "bomb")].active = true
+    }
+    else if (this.revealCount === 0)
+      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 2000)
+  }
+
   showNight(){
     let alpha, time
     let mins = this.wemoMins%1440
     if (game.paused) {
       alpha = timer.timeOfDay === "day" ? 230 : 255
       fill(0,0,0,alpha)
-      rect(0,0,worldWidth,worldHeight)
+      rect(0,0,world.width,world.height)
       return
     }
 
@@ -237,9 +255,9 @@ class Board extends WemoObject {
     noStroke()
     beginShape()
     vertex(0,0)
-    vertex(worldWidth,0)
-    vertex(worldWidth,worldHeight)
-    vertex(0,worldHeight)
+    vertex(world.width,0)
+    vertex(world.width,world.height)
+    vertex(0,world.height)
     let fires = board.fires
     for (let i=0; i<fires.length; i++){
       if (fires[i].value > 0){

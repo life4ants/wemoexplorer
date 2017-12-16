@@ -33,7 +33,6 @@ class Man extends WemoObject {
       noFill()
       ellipseMode(CENTER)
       ellipse(this.x*25+12.5, this.y*25+topbarHeight+12.5, 200, 200)
-      ellipseMode(CORNER)
       this.drawImage(this.img, this.index, this.x*25, this.y*25+topbarHeight, 25, 25)
       return
     }
@@ -225,13 +224,8 @@ class Man extends WemoObject {
 
   revealCell(x,y){
     if (!board.cells[x][y].revealed){
-      board.cells[x][y].revealed = true
       this.energy-=.75
-      board.revealCount--
-      if (board.revealCount === 50)
-        popup.setAlert("Only 50 more cells to reaveal!")
-      else if (board.revealCount === 0)
-        popup.setAlert("You revealed the whole world!\nI guess that means you won.")
+      board.revealCell(x,y)
     }
   }
 

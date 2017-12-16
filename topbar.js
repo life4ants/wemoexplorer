@@ -19,9 +19,10 @@ let topbar = {
   },
 
   showTimer(){
+    let mins = board.wemoMins%1440
     let showMins = board.wemoMins%60 < 10 ? "0"+board.wemoMins%60 : board.wemoMins%60
     let showHours = Math.floor(board.wemoMins/60)%12 === 0 ? 12 : Math.floor(board.wemoMins/60)%12
-    let suffix = board.wemoMins%1440 < 720 ? " AM" : " PM"
+    let suffix = mins < 720 ? " AM" : " PM"
     let top = viewport.top+10
 
     textAlign(RIGHT, TOP)
@@ -29,7 +30,7 @@ let topbar = {
     fill(0)
     text(" Day "+ (Math.floor(board.wemoMins/1440)+1) + ", "+showHours+":"+showMins+suffix, viewport.right-40, top)
     image(tiles[timer.timeOfDay], viewport.right-35, top)
-    let sliderPos = game.mode === "build" ? board.wemoMins%1440 : board.wemoMins%1440+((frameCount%3)/3)
+    let sliderPos = game.mode === "build" ? mins : mins+(frameCount%3)/3
     image(tiles.timeOfDay, viewport.right-270, top+33, 270, 10, sliderPos, 0, 270, 10)
     strokeWeight(1)
     stroke(255)

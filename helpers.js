@@ -3,7 +3,7 @@ let helpers = {
     for (let i = -1; i <= 1; i++){
       for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
         let a = x+i, b = y+j;
-        if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
+        if (this.withinBounds(a,b)){
           if (type.includes(board.cells[a][b].type))
             return true
         }
@@ -16,7 +16,7 @@ let helpers = {
     for (let i = -1; i <= 1; i++){
       for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
         let a = x+i, b = y+j;
-        if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
+        if (this.withinBounds(a,b)){
           if (tile.includes(board.cells[a][b].tile))
             return {x: a, y: b}
         }
@@ -49,7 +49,7 @@ let helpers = {
   nearbyType(x,y, type){ //returns the cell data if found, otherwise false
     for (let i = x-1; i <= x+1; i++){
       for (let j = y-1; j <= y+1; j++){
-        if (i >= 0 && i < board.cols && j >= 0 && j < board.rows){
+        if (this.withinBounds(i,j)){
           if (board.cells[i][j].type === type)
             return Object.assign({x: i, y: j}, board.cells[i][j])
         }
@@ -62,6 +62,10 @@ let helpers = {
     let diff = toX-curX
     return diff >= 90 ? curX+Math.floor(diff/6)-5 : diff <= -90 ? curX+Math.floor(diff/6)+5 :
                diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
+  },
+
+  withinBounds(x,y){
+    return x >= 0 && x < board.cols && y >= 0 && y < board.rows
   },
 
   looker(id){
@@ -99,7 +103,7 @@ class WemoObject {
     let output = {}
     let items = Object.keys(this)
     for (let i = 0; i < items.length; i++){
-      if (typeof this[items[i]] !== "function" && items[i] !== "img")
+      if (typeof this[items[i]] !== "function" && !["img", "bombs"].includes(items[i]))
         output[items[i]] = this[items[i]]
     }
     return output

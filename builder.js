@@ -48,8 +48,10 @@ let builder = {
     strokeWeight(3)
     noFill()
     rect(this.x*25,this.y*25+topbarHeight,w,w)
-    if (this.allowed)
+    if (this.allowed){
+      ellipseMode(CORNER)
       ellipse(this.x*25,this.y*25+topbarHeight,w,w)
+    }
   },
 
   clicker(){
@@ -60,8 +62,6 @@ let builder = {
       else
         game.toggleBuildMode()
     }
-    else
-      console.log(this.x, this.y)
   },
 
   rules(x,y){

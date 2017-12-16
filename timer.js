@@ -13,10 +13,10 @@
       man.health++
     if (frameCount%239 === 0){
       this.savCyc++
-      if (Date.now()-frameTime < 18 || this.savCyc > 2){
+      if (Date.now()-world.frameTime < 18 || this.savCyc > 2){
         game.saveGame()
         if (this.savCyc > 2)
-          console.log("extra save", Date.now()-frameTime)
+          console.log("extra save", Date.now()-world.frameTime)
         else
           console.log("game saved")
         this.savCyc = 0

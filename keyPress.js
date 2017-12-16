@@ -1,5 +1,5 @@
 function keyPressed(){
-  if (game.mode === "play" && game.started && !game.paused && !noKeys){
+  if (game.mode === "play" && game.started && !game.paused && !world.noKeys){
     switch(keyCode){
       case LEFT_ARROW:
         active.move(-1, 0)
@@ -42,9 +42,9 @@ function keyPressed(){
 }
 
 function mousePressed(){
-  if (mouseX < 0 || mouseX > worldWidth || mouseY < 0 || mouseY > worldHeight)
+  if (mouseX < 0 || mouseX > world.width || mouseY < 0 || mouseY > world.height)
       return
-  if (game.mode === "edit" && winMouseY > topOffset )
+  if (game.mode === "edit" && winMouseY > world.topOffset )
     editor.mousePressed()
   else if (mouseX > viewport.left && mouseY > viewport.top+topbarHeight){
     if (game.mode === "play" && !popup.show){
@@ -59,16 +59,16 @@ function mousePressed(){
 }
 
 function mouseDragged(){
-  if (mouseX < 0 || mouseX >= worldWidth || mouseY < 0 || mouseY >= worldHeight)
+  if (mouseX < 0 || mouseX >= world.width || mouseY < 0 || mouseY >= world.height)
     return
-  if (game.mode === "edit" && winMouseY > topOffset)
+  if (game.mode === "edit" && winMouseY > world.topOffset)
     editor.mouseDragged()
 }
 
 function mouseReleased(){
-  if (mouseX < 0 || mouseX > worldWidth || mouseY < 0 || mouseY > worldHeight)
+  if (mouseX < 0 || mouseX > world.width || mouseY < 0 || mouseY > world.height)
     return
-  if (game.mode === "edit" && winMouseY > topOffset)
+  if (game.mode === "edit" && winMouseY > world.topOffset)
     editor.mouseReleased()
 }
 

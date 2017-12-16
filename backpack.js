@@ -8,7 +8,8 @@ class Backpack {
       rock: {weight: 15, quantity: 0},
       longGrass: {weight: 2, quantity: 0},
       bone: {weight: 4, quantity: 0},
-      clay: {weight: 10, quantity: 0}
+      clay: {weight: 10, quantity: 0},
+      bomb: {weight: 10, quantity: 0}
     }
     if (items){
       for (let i = items.length - 1; i >= 0; i--) {
@@ -19,7 +20,7 @@ class Backpack {
   }
 
   getAllItems(){
-    return this.includesItems(["stick", "log", "rock", "longGrass", "bone", "clay"])
+    return this.includesItems(["stick", "log", "rock", "longGrass", "bone", "clay", "bomb"])
   }
 
   addItem(e){

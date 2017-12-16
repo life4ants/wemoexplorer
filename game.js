@@ -29,7 +29,7 @@ let game = new Vue({
             <li>A red square means you can't build at that spot, a green circle inside a square means you can.</li>
             <li>Click to build!</li>
           </ul>
-          <button style="margin-left: 20px" @click="toggleBuildMode">Cancel</button>
+          <button style="margin-left: 20px" @click="toggleBuildMode" id="esc">Cancel</button>
         </div>
       </div>
     </div>
@@ -92,7 +92,8 @@ let game = new Vue({
           case "G": grab();               break;
           case "X": this.autoCenter = !this.autoCenter; break;
           case "J": man.dismount();       break;
-          case "S": man.goToSleep();          break;
+          case "S": man.goToSleep();      break;
+          case "T": throwBomb();          break;
         }
       }
     },
@@ -152,15 +153,15 @@ let game = new Vue({
       this.started = false
       this.paused = false
       popup.show = false
-      topOffset = 0
-      $("#board").css("top", topOffset+"px").css("left", leftOffset)
+      world.topOffset = 0
+      $("#board").css("top", world.topOffset+"px").css("left", world.leftOffset)
       $(window).scrollTop(0).scrollLeft(0)
       redraw()
     },
 
     edit(player){
-      topOffset = 100
-      $("#board").css("top", topOffset+"px").css("left", "0px")
+      world.topOffset = 100
+      $("#board").css("top", world.topOffset+"px").css("left", "0px")
       let cols = min(floor(window.innerWidth/25), 40)
       let rows = min(floor(window.innerHeight/25), 25)
       editor.newWorld(cols, rows)
@@ -196,10 +197,10 @@ let game = new Vue({
       delete b.vehicles
       active = man.ridingId ? vehicles[man.ridingId] : man
       board = new Board(b)
-      leftOffset = 37
+      world.leftOffset = 37
       topbar.health = man.health
       topbar.energy = man.energy
-      noKeys = false
+      world.noKeys = false
       message.reset()
       timer.setTime(board.wemoMins)
       if (!board.progress)
@@ -212,8 +213,9 @@ let game = new Vue({
       this.started = true
       this.autoCenter = false
       this.infoShown = false
-      resizeWorld(board.cols, board.rows)
+      world.resize(board.cols, board.rows)
       viewport.update(true)
+      frameRate(world.frameRate)
       loop()
     },
 
@@ -238,7 +240,7 @@ let game = new Vue({
 
       board.progress = true
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
-        Object.assign({man: man.export(), vehicles: vehicles.save(), backpack: backpack.getAllItems()}, board)
+        Object.assign({man: man.export(), vehicles: vehicles.save(), backpack: backpack.getAllItems()}, board.export())
       ))
     },
 
@@ -262,11 +264,11 @@ let game = new Vue({
     toggleBuildMode(){
       if (this.mode === "build"){
         this.mode = "play"
-        leftOffset = 37
+        world.leftOffset = 37
       }
       else if (this.mode === "play"){
         this.mode = "build"
-        leftOffset = 152
+        world.leftOffset = 152
       }
       viewport.update(true)
     }

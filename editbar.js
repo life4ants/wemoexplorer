@@ -182,7 +182,7 @@ let editBar = {
         board = new Board(JSON.parse(localStorage["board"+id]))
       else
         board = new Board(JSON.parse(JSON.stringify(gameBoards[id])))
-      resizeWorld(board.cols, board.rows)
+      world.resize(board.cols, board.rows)
     },
 
     grassAndTreeFill(){
