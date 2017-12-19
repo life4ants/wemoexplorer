@@ -112,12 +112,32 @@ function build(type, pos){
       man.energy -= 150
     }
   }
+  // buy a bomb:
   else if (type === "bomb"){
     if (man.energy <= 300)
       return "Oops! you don't have enough energy!"
     backpack.addItem("bomb")
     man.energy -= 300
     return "You now have a bomb in your backpack. Press T to throw it in the direction you are pointed."
+  }
+  //build a campsite:
+  else if (type === "campsite"){
+    if (man.energy <= 500)
+      return "Oops! you don't have enough energy!"
+    else {
+      let construction = {
+        type: "campsite",
+        needed: [
+          {type: "log", quantity: 5, color: "#582C0F"},
+          {type: "longGrass", quantity: 10, color: "#207414"},
+          {type: "stick", quantity: 10, color: "#B66500"},
+          {type: "clay", quantity: 2, color: "#804000"}
+        ]
+      }
+      cell.type = "construction"
+      cell.construction = construction
+      man.energy -= 500
+    }
   }
   return false
 }
@@ -240,12 +260,17 @@ function eat(){
 }
 
 function fling(){
-  if (man.isNextToFire){
+  let cell = board.cells[man.x][man.y]
+  if (man.isNextToFire || cell.type === "campsite"){
     let items = backpack.includesItems(["log", "stick", "longGrass"])
     if (items.length > 0){
-      let fire = board.fires[man.fireId]
-      fire.value = items[0].type === "log" ? Math.min(fire.value+13, 20) :
-                     items[0].type === "stick" ? Math.min(fire.value+5, 20) : Math.min(fire.value+2, 20)
+      let fireValue = cell.type === "campsite" ? board.buildings[cell.id].fireValue : board.fires[man.fireId].value
+      fireValue = items[0].type === "log" ? Math.min(fireValue+13, 20) :
+                     items[0].type === "stick" ? Math.min(fireValue+5, 20) : Math.min(fireValue+2, 20)
+      if (cell.type === "campsite")
+        board.buildings[cell.id].fireValue = fireValue
+      else
+        board.fires[man.fireId].value = fireValue
       backpack.removeItem(items[0].type, 1)
     }
   }
@@ -270,6 +295,17 @@ function fling(){
               else if (item.type === "steppingStones"){
                 cell = board.cells[cell.x][cell.y]
                 cell.type = "steppingStones"
+              }
+              else if (item.type === "campsite"){
+                let site = {type: "campsite", x: cell.x, y: cell.y, items: [], fireValue: 0}
+                let id = board.buildings.length
+                board.buildings.push(site)
+                for (let i = cell.x; i <= cell.x+1; i++){
+                  for (let j = cell.y; j <= cell.y+1; j++){
+                    board.cells[i][j].type = "campsite"
+                    board.cells[i][j].id = id
+                  }
+                }
               }
               delete cell.construction
             }

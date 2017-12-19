@@ -1,12 +1,13 @@
 class Board extends WemoObject {
   constructor(a,b){
     super()
-    if (arguments.length === 1 && typeof a === "object"){
+    this.buildings = []
+    if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       this.import(a)
       if (this.version !== 3)
         this.convertVersion2()
     }
-    else if (arguments.length === 2){
+    else if (arguments.length === 2){// creating a new game on editor
       this.cols = a
       this.rows = b
       let output = []
@@ -114,13 +115,23 @@ class Board extends WemoObject {
       let tile = this.fires[i].value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] : tiles.firepit
       image(tile, this.fires[i].x*25, this.fires[i].y*25+topbarHeight)
       if (this.fires[i].value > 0)
-        this.drawProgressBar(this.fires[i].x, this.fires[i].y, this.fires[i].value)
+        this.drawProgressBar(this.fires[i].x, this.fires[i].y, this.fires[i].value, 0)
     }
     if (this.bombs){
       for (var i = this.bombs.length - 1; i >= 0; i--) {
         this.bombs[i].display()
         if (this.bombs[i].move())
           this.bombs.splice(i, 1)
+      }
+    }
+    if (this.buildings){
+      for (let b of this.buildings){
+        image(tiles[b.type], b.x*25, b.y*25+topbarHeight)
+        if (b.fireValue > 0){
+          let tile = tiles.fire[Math.floor((frameCount%6)/2)]
+          image(tile, b.x*25+5, (b.y+1)*25+topbarHeight)
+          this.drawProgressBar(b.x, b.y+1, b.fireValue, 5)
+        }
       }
     }
   }
@@ -259,38 +270,48 @@ class Board extends WemoObject {
     vertex(world.width,world.height)
     vertex(0,world.height)
     let fires = board.fires
-    for (let i=0; i<fires.length; i++){
-      if (fires[i].value > 0){
-        let size = (fires[i].value/4)+3.1
-        let x = fires[i].x*25+12.5
-        let y = fires[i].y*25+12.5+topbarHeight
-        let r = size*25/2
-        let arm = r*0.54666
-        if (dark && man.inDark){
-          let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
-          man.inDark = d > r-10
-        }
-        beginContour()
-        vertex(x,y-r)
-        bezierVertex(x-arm,y-r,x-r,y-arm,x-r,y)
-        bezierVertex(x-r,y+arm,x-arm,y+r,x,y+r)
-        bezierVertex(x+arm,y+r,x+r,y+arm,x+r,y)
-        bezierVertex(x+r,y-arm,x+arm,y-r,x,y-r)
-        endContour()
-      }
+    for (let f of fires){
+      if (f.value > 0)
+        this.cutFireCircle(f.x, f.y, f.value, dark)
+    }
+    for (let b of this.buildings){
+      if (b.fireValue > 0)
+        this.cutFireCircle(b.x, b.y+1, b.fireValue, dark)
     }
     endShape(CLOSE)
-    for (let i =0; i<fires.length; i++){
-      if (fires[i].value > 0){
-        let size = (fires[i].value/4)+3.1
-        this.drawFireCircle(fires[i].x,fires[i].y,size,alpha)
-      }
+    for (let f of fires){
+      if (f.value > 0)
+        this.drawFireCircle(f.x,f.y,f.value,alpha)
+    }
+    for (let b of this.buildings){
+      if (b.fireValue > 0)
+        this.drawFireCircle(b.x,b.y+1,b.fireValue,alpha)
     }
     if (man.inDark && man.isSleeping)
       image(tiles.z, man.x*25, man.y*25+topbarHeight)
   }
 
-  drawFireCircle(x,y,size,alpha){
+  cutFireCircle(bx,by,value,dark){
+    let size = (value/4)+3.1
+    let x = bx*25+12.5
+    let y = by*25+12.5+topbarHeight
+    let r = size*25/2
+    let arm = r*0.54666
+    if (dark && man.inDark){
+      let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
+      man.inDark = d > r-10
+    }
+    beginContour()
+    vertex(x,y-r)
+    bezierVertex(x-arm,y-r,x-r,y-arm,x-r,y)
+    bezierVertex(x-r,y+arm,x-arm,y+r,x,y+r)
+    bezierVertex(x+arm,y+r,x+r,y+arm,x+r,y)
+    bezierVertex(x+r,y-arm,x+arm,y-r,x,y-r)
+    endContour()
+  }
+
+  drawFireCircle(x,y,value,alpha){
+    let size = (value/4)+3.1
     ellipseMode(CENTER)
     if (alpha < 20){
       fill(0,0,0,Math.floor(alpha/2))
@@ -330,16 +351,16 @@ class Board extends WemoObject {
     ellipse(x*25+12.5, y*25+offset+12.5,23,23)
   }
 
-  drawProgressBar(i,j,value){
+  drawProgressBar(i,j,value, Xoffset){
     fill(255)
     stroke(80)
     strokeWeight(1)
-    rect(i*25+2,j*25+19+topbarHeight, 21, 4)
+    rect(i*25+2+Xoffset,j*25+19+topbarHeight, 21, 4)
     let color = value > 12 ? "green" :
                  value > 6 ? "#e90" : "red"
     fill(color)
     noStroke()
-    rect(i*25+3, j*25+20+topbarHeight, value, 3)
+    rect(i*25+3+Xoffset, j*25+20+topbarHeight, value, 3)
   }
 
   convertVersion2(){

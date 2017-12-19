@@ -67,7 +67,7 @@ let editor = {
       board.cells[x][y].type = type
       board.cells[x][y].quantity = 5
     }
-    else if (["log", "randomLog", "bone", "randomRock", "randomStick"].includes(type))
+    else if (seeThru.includes(type))
       board.cells[x][y].type = type
     else
       board.cells[x][y] = {tile, type}

@@ -26,7 +26,6 @@ class Man extends WemoObject {
   }
 
   display() {
-    this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
     if (game.mode === "build"){
       strokeWeight(2)
       stroke(128)
@@ -36,22 +35,23 @@ class Man extends WemoObject {
       this.drawImage(this.img, this.index, this.x*25, this.y*25+topbarHeight, 25, 25)
       return
     }
-    if (this.inDark){
-      message.following.msg = "You're too far from a fire!"
-      message.following.frames = 1
-      this.health -= Math.floor((this.health+1500)/499)
-    }
-    else if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
-      message.following.msg = "Get off the fire! You're burning!"
-      message.following.frames = 1
-      this.health -=25
-    }
+    this.update()
+
     if (this.isRiding){
       let sx = (active.index%3)*25
       let sy = Math.floor(active.index/3)*25
       let h = active.type === "canoe" && [0,1].includes(active.index) ? 19 :
               active.type === "canoe" ? 21 : 25
       image(this.img, active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
+    }
+    else if (board.cells[this.x][this.y].type === "campsite"){
+      let id = board.cells[this.x][this.y].id
+      let x = board.buildings[id].x
+      let y = board.buildings[id].y
+      if (this.isSleeping)
+        image(tiles.z, (x+1)*25, y*25+topbarHeight+18)
+      else
+        this.drawImage(this.img, 10, (x+1)*25, y*25+topbarHeight+18, 25, 25)
     }
     else {
       let offset = backpack.weight > 0 ? 4 : 0
@@ -82,14 +82,34 @@ class Man extends WemoObject {
       }
       if (board.cells[this.x][this.y].byPit)
         this.drawPitLines(this.x, this.y)
-      if (this.isSleeping)
-       this.sleep()
+
+    }
+  }
+
+  update(){
+    this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
+    if (this.inDark){
+      message.following.msg = "You're too far from a fire!"
+      message.following.frames = 1
+      this.health -= Math.floor((this.health+1500)/499)
+    }
+    else if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
+      message.following.msg = "Get off the fire! You're burning!"
+      message.following.frames = 1
+      this.health -=25
+    }
+    if (this.isSleeping){
+       this.health = this.health < 4997 ? this.health+3 : 5000
+       this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
     }
   }
 
   move(x, y) {
     if (this.isClimbingOutOfPit || this.isFallingIntoPit || this.isSleeping)
       return
+    if (board.cells[this.x][this.y].type === "campsite" && board.cells[this.x+x][this.y+y].type === "campsite"){
+      x *= 2; y*= 2;
+    }
     //check for edge case
     if (this.x + x >= 0 && this.x + x < board.cols &&
       this.y + y >= 0 && this.y + y < board.rows){
@@ -146,11 +166,6 @@ class Man extends WemoObject {
     }
     this.isNextToFire = false
     this.fireId = null
-  }
-
-  sleep(){
-    this.health = this.health < 4997 ? this.health+3 : 5000
-    this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
   }
 
   dismount(){

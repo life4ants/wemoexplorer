@@ -78,6 +78,8 @@ var popup = new Vue({
                   cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true},
         {id: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones",
                   cost: "150 energy, 3 rocks", info: "For crossing rivers", active: true},
+        {id: "campsite", src: "images/campsite.png", title: "Campsite",
+                  cost: "500 energy, 5 logs, 10 sticks, 2 clay, 10 long grass", info: "To live in", active: true},
         {id: "bomb", src: "images/bomb1.png", title: "Bomb",
                   cost: "300 energy", info: "For clearing away clouds", active: false}
 

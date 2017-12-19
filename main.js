@@ -33,7 +33,7 @@ let showCount //man uses it to display falling in pit animation
 
 const topbarHeight = 55
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile", "stickpile", "log", "rock","stick", "clay"]
-const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle"]
+const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
 const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick"]
@@ -65,6 +65,7 @@ function preload(){
     bomb: loadImage("images/bomb1.png"),
     bones: loadImage("images/bone.png"),
     boneShovel: loadImage("images/boneShovel.png"),
+    campsite: loadImage("images/campsite.png"),
     clouds: loadImage("images/clouds.png"),
     cross: loadImage("images/cross.png"),
     day: loadImage("images/sun.png"),
@@ -86,7 +87,8 @@ function preload(){
     clay4: loadImage("images/clay4.png"),
     clay5: loadImage("images/clay5.png"),
     construction: {
-      raft: loadImage("images/raftHB.png")
+      raft: loadImage("images/raftHB.png"),
+      campsite: loadImage("images/campsiteHB.png")
     },
     explosion: loadImage("images/explosion.png"),
     fire: [

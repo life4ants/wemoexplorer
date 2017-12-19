@@ -58,6 +58,12 @@
       if (board.fires[i].value > 0)
         board.fires[i].value--
     }
+    if (x === 0){
+      for (let i=x; i<board.buildings.length; i++){
+        if (board.buildings[i].type === "campsite" && board.buildings[i].fireValue > 0)
+          board.buildings[i].fireValue--
+      }
+    }
   },
 
   growBerries(){
