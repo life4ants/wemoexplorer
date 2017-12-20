@@ -163,7 +163,7 @@ let game = new Vue({
       $("#board").css("top", world.topOffset+"px").css("left", "0px")
       let cols = min(floor(window.innerWidth/25), 40)
       let rows = min(floor(window.innerHeight/25), 25)
-      editor.newWorld(cols, rows)
+      editor.newWorld(cols, rows, "random")
       this.currentPlayer = player
       this.mode = "edit"
       this.started = true
@@ -186,7 +186,7 @@ let game = new Vue({
           b.type = "custom"
       }
       man = new Man(tiles.players[player.character], b.startX, b.startY)
-      backpack = new Backpack(b.backpack)
+      backpack = new Backpack("backpack", b.backpack)
       delete b.backpack
       if (b.man){
         man.import(b.man)

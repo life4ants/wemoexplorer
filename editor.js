@@ -84,12 +84,9 @@ let editor = {
     }
   },
 
-  newWorld(cols, rows){
-    board = new Board(cols, rows)
+  newWorld(cols, rows, fillType){
+    board = new Board(cols, rows, fillType)
     world.resize(cols, rows)
-    this.islandMaker(cols, rows)
-    this.floodFill(8,8,"water","water","random","random")
-    this.treeFill()
   },
 
   treeFill(){
@@ -99,9 +96,11 @@ let editor = {
         let h = random(12)
         let x = i%8 + j%8
         let type = (x > l && x < h) ? "tree" :
-            x < h ? "treeThin" : "grass"
-        if (board.cells[i][j].type === "random")
-          board.cells[i][j] = {tile: type, type}
+            x < l ? "treeThin" : random(10) > 7 ? "longGrass" : "grass"
+        if (board.cells[i][j].type === "random"){
+          let tile = type === "longGrass" ? "longGrass"+floor(random(3)+1) : type
+          board.cells[i][j] = {tile, type}
+        }
       }
     }
   },

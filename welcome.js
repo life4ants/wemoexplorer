@@ -6,7 +6,7 @@ let welcome = {
             <h1>Wemo Explorer</h1>
           </div>
           <div v-if="stage === 1" class="modal-body">
-            <h5>Hi there! Welcome to Wemo!</h5>
+            <h5>{{title}}</h5>
             <p>{{message}}</p>
             <div v-if="deleteMode" class="button-tiles">
               <div v-for="(player, id) in players" class="button-tiles-content">
@@ -98,6 +98,9 @@ let welcome = {
   computed: {
     message(){
       return this.players.length > 0 ? "Click on your name or make a new player:" : "Please enter your name to get started:"
+    },
+    title(){
+      return this.players.length > 0 ? "Welcome Back!" : "Hi there! Welcome to Wemo!"
     }
   },
   methods: {

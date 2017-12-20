@@ -56,6 +56,7 @@ let builder = {
 
   clicker(){
     if (this.allowed){
+      board.cells[this.x][this.y].revealed = 2
       let msg = build(this.type, {x: this.x, y: this.y})
       if (msg)
         popup.setAlert(msg)

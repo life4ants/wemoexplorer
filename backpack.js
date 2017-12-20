@@ -1,15 +1,24 @@
 class Backpack {
-  constructor(items){
-    this.maxWeight = 40
+  constructor(type,items){
     this.weight = 0
-    this.items = {
-      log: {weight: 15, quantity: 0},
-      stick: {weight: 6, quantity: 0},
-      rock: {weight: 15, quantity: 0},
-      longGrass: {weight: 2, quantity: 0},
-      bone: {weight: 4, quantity: 0},
-      clay: {weight: 10, quantity: 0},
-      bomb: {weight: 10, quantity: 0}
+    this.type = type
+    if (this.type === "backpack"){
+      this.maxWeight = 400
+      this.items = {
+        log: {weight: 150, quantity: 0},
+        stick: {weight: 60, quantity: 0},
+        rock: {weight: 150, quantity: 0},
+        longGrass: {weight: 20, quantity: 0},
+        bone: {weight: 40, quantity: 0},
+        clay: {weight: 100, quantity: 0},
+        bomb: {weight: 100, quantity: 0}
+      }
+    }
+    else if (this.type === "basket"){
+      this.maxWeight = 50
+      this.items = {
+        berries: {weight: 1, quantity: 0}
+      }
     }
     if (items){
       for (let i = items.length - 1; i >= 0; i--) {
@@ -20,7 +29,9 @@ class Backpack {
   }
 
   getAllItems(){
-    return this.includesItems(["stick", "log", "rock", "longGrass", "bone", "clay", "bomb"])
+    let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "bomb"] :
+            ["berries"]
+    return this.includesItems(ar)
   }
 
   addItem(e){
@@ -54,9 +65,5 @@ class Backpack {
         output.push({type: ar[i], quantity: this.items[ar[i]].quantity})
     }
     return output
-  }
-
-  walkingCost(){
-    return man.basket ? 3+(man.basket.quantity/10 + this.weight)/8 : 3+(this.weight/8)
   }
 }

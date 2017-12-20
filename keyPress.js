@@ -47,14 +47,10 @@ function mousePressed(){
   if (game.mode === "edit" && winMouseY > world.topOffset )
     editor.mousePressed()
   else if (mouseX > viewport.left && mouseY > viewport.top+topbarHeight){
-    if (game.mode === "play" && !popup.show){
-      let y = Math.floor((mouseY-topbarHeight)/25)
-      let x = Math.floor(mouseX/25)
-      console.log(x, y)
-    }
-    else if (game.mode === "build"){
+    if (game.mode === "play" && !popup.show)
+      board.clicker()
+    else if (game.mode === "build")
       builder.clicker()
-    }
   }
 }
 

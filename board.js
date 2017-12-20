@@ -1,5 +1,5 @@
 class Board extends WemoObject {
-  constructor(a,b){
+  constructor(a,b,fillType){
     super()
     this.buildings = []
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
@@ -7,14 +7,14 @@ class Board extends WemoObject {
       if (this.version !== 3)
         this.convertVersion2()
     }
-    else if (arguments.length === 2){// creating a new game on editor
+    else if (arguments.length === 3){// creating a new game on editor
       this.cols = a
       this.rows = b
       let output = []
       for (let x = 0; x<this.cols; x++){
         output.push([])
         for (let y = 0; y<this.rows; y++){
-          output[x].push({tile: "water", type: "water"})
+          output[x].push({tile: fillType, type: fillType})
         }
       }
       this.cells = output
@@ -31,9 +31,9 @@ class Board extends WemoObject {
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
         if (j === this.startY && [i,i+1,i-1].includes(this.startX))
-          cell.revealed = true
+          cell.revealed = 2
         else {
-          cell.revealed = false
+          cell.revealed = 0
           revealCount++
         }
         if (cell.type === "berryTree"){
@@ -52,8 +52,9 @@ class Board extends WemoObject {
     if (name !== null){
       this.name = name
       localStorage.setItem("board"+name, JSON.stringify(this))
-      alert("Game "+name+" was saved.")
     }
+    else
+      alert("You must enter a name!!")
   }
 
   display(){
@@ -127,10 +128,13 @@ class Board extends WemoObject {
     if (this.buildings){
       for (let b of this.buildings){
         image(tiles[b.type], b.x*25, b.y*25+topbarHeight)
-        if (b.fireValue > 0){
-          let tile = tiles.fire[Math.floor((frameCount%6)/2)]
-          image(tile, b.x*25+5, (b.y+1)*25+topbarHeight)
-          this.drawProgressBar(b.x, b.y+1, b.fireValue, 5)
+        if (b.type === "campsite"){
+          if (b.fireValue > 0){
+            let tile = tiles.fire[Math.floor((frameCount%6)/2)]
+            image(tile, b.x*25+5, (b.y+1)*25+topbarHeight)
+            this.drawProgressBar(b.x, b.y+1, b.fireValue, 5)
+          }
+          this.drawBadge(b.x*25+42, b.y*25+6+topbarHeight, b.items.length, "#000")
         }
       }
     }
@@ -159,6 +163,8 @@ class Board extends WemoObject {
     }
     if (cell.byPit && (cell.revealed || game.mode === 'edit'))
       this.drawRing(x,y)
+    if (cell.revealed === 1)
+      image(tiles.cloudsHalf, x*25, y*25+offset)
   }
 
   pickCell(x,y){
@@ -222,15 +228,31 @@ class Board extends WemoObject {
     }
   }
 
-  revealCell(x,y){
-    this.cells[x][y].revealed = true
-    this.revealCount--
-    if (this.revealCount === 100){
-      popup.setAlert("Only 100 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "bomb")].active = true
+  revealCell(x,y,fully){
+    if (fully){
+      this.cells[x][y].revealed = 2
+      this.revealCount--
+      if (this.revealCount === 40){
+        popup.setAlert("Only 40 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
+        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "bomb")].active = true
+      }
+      else if (this.revealCount === 0)
+        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 3000)
     }
-    else if (this.revealCount === 0)
-      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 2000)
+    else {
+      this.cells[x][y].revealed++
+      if (this.cells[x][y].revealed === 2)
+        this.revealCount --
+    }
+  }
+
+  clicker(){
+    let y = Math.floor((mouseY-topbarHeight)/25)
+    let x = Math.floor(mouseX/25)
+    let cell = this.cells[x][y]
+    if (cell.type === "campsite"){
+      console.log(this.buildings[cell.id])
+    }
   }
 
   showNight(){

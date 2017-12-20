@@ -23,6 +23,7 @@ class Man extends WemoObject {
     this.inDark = false
     this.isSleeping = false
     this.canSleep = false
+    this.standCount = 0
   }
 
   display() {
@@ -87,6 +88,19 @@ class Man extends WemoObject {
   }
 
   update(){
+    this.standCount++
+    if ([5,10].includes(this.standCount/world.frameRate)){
+      for (let i=-1; i<=1; i++){
+        for (let j = -1; j <= 1; j++){
+          let a = this.x+i
+          let b = this.y+j
+
+          if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
+            this.revealCell(a,b,false)
+          }
+        }
+      }
+    }
     this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
     if (this.inDark){
       message.following.msg = "You're too far from a fire!"
@@ -105,6 +119,7 @@ class Man extends WemoObject {
   }
 
   move(x, y) {
+    this.standCount = 0
     if (this.isClimbingOutOfPit || this.isFallingIntoPit || this.isSleeping)
       return
     if (board.cells[this.x][this.y].type === "campsite" && board.cells[this.x+x][this.y+y].type === "campsite"){
@@ -140,15 +155,15 @@ class Man extends WemoObject {
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        this.energy -= backpack.walkingCost()
+        this.energy -= this.walkingCost()
         this.health -= 1
         this.vomit = false
 
-        this.revealCell(this.x, this.y)
+        this.revealCell(this.x, this.y, true)
       }
       //reveal rockEdge cells
       else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type)){
-        this.revealCell(this.x+x, this.y+y)
+        this.revealCell(this.x+x, this.y+y, true)
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       }
       this.fireCheck()
@@ -212,7 +227,7 @@ class Man extends WemoObject {
       this.ridingId = ""
       active.index = [0,1].includes(active.index) ? 4 : 5
       active = man
-      this.revealCell(x,y)
+      this.revealCell(x,y,true)
       return true
     }
     return false
@@ -237,10 +252,14 @@ class Man extends WemoObject {
     image(img, x, y, w, h, sx, sy, 25, 25)
   }
 
-  revealCell(x,y){
-    if (!board.cells[x][y].revealed){
+  revealCell(x,y,fully){
+    if (fully && !board.cells[x][y].revealed){
       this.energy--
-      board.revealCell(x,y)
+      board.revealCell(x,y,fully)
+    }
+    else if (board.cells[x][y].revealed < 2){
+      this.energy -= 0.5
+      board.revealCell(x,y,false)
     }
   }
 
@@ -260,6 +279,10 @@ class Man extends WemoObject {
     }
     ellipseMode(CENTER)
     ellipse(x*25+12.5, y*25+12.5+offset,22,22)
+  }
+
+  walkingCost(){
+    return this.basket ? 3+(this.basket.quantity + backpack.weight)/120 : 3+(backpack.weight/120)
   }
 
 }

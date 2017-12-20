@@ -8,8 +8,9 @@ let editBar = {
             <span @click="saveBoard" title="save the current board">Save</span>
             <hr>
             <span @click="generateBoard" title="generate new board">New</span>
+            <span @click="previewBoard">Preview</span>
             <hr>
-            <span @click="previewBoard" style="width: 260px; border: solid #fff; border-width: 1px 0px;">Preview (save first)</span>
+            <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
             <hr>
             <span @click="() => load(false)">Load default</span>
@@ -163,7 +164,7 @@ let editBar = {
       if (cols != cols || rows != rows)
         alert("Please enter 2 numbers separated by a coma (\",\")")
       else
-        editor.newWorld(cols,rows)
+        editor.newWorld(cols,rows, "random")
     },
 
     previewBoard(){
@@ -172,6 +173,12 @@ let editBar = {
 
     saveBoard(){
       board.save()
+    },
+
+    island(){
+      editor.newWorld(board.cols, board.rows, "water")
+      editor.islandMaker(board.cols, board.rows)
+      editor.floodFill(8,8,board.cells[8][8].tile,board.cells[8][8].type,"random","random")
     },
 
     load(custom){

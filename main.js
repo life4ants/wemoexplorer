@@ -37,7 +37,7 @@ const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile"
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
-const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick"]
+const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake"]
 
 function preload(){
   tiles = {
@@ -68,6 +68,7 @@ function preload(){
     boneShovel: loadImage("images/boneShovel.png"),
     campsite: loadImage("images/campsite.png"),
     clouds: loadImage("images/clouds.png"),
+    cloudsHalf: loadImage("images/cloudsHalf.png"),
     cross: loadImage("images/cross.png"),
     day: loadImage("images/sun.png"),
     dawn: loadImage("images/dawn.png"),
@@ -179,6 +180,7 @@ function preload(){
     sand: loadImage("images/sand.png"),
     sandpit: loadImage("images/sandpit.png"),
     sleeping: loadImage("images/sleeping.png"),
+    snake: loadImage("images/snake.png"),
     steppingStones: loadImage("images/steppingStones.png"),
     stick: loadImage("images/stick.png"),
     sticks: loadImage("images/sticks.png"),

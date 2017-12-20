@@ -22,7 +22,7 @@ class Bomb {
       if (!helpers.withinBounds(x,y) || this.vel.mag() < 0.1)
         return true
       if (!board.cells[x][y].revealed){
-        board.revealCell(x,y)
+        board.revealCell(x,y,true)
         this.pos = createVector(x*25-3, y*25+topbarHeight-3)
         this.phase = "explode"
       }

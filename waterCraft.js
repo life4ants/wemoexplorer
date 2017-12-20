@@ -47,16 +47,16 @@ class WaterCraft extends WemoObject{
               let b = this.y+j
 
               if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
-                man.revealCell(a,b)
+                man.revealCell(a,b,true)
               }
             }
           }
         }
         else
-          man.revealCell(this.x, this.y)
+          man.revealCell(this.x, this.y,true)
       }
       else
-        man.revealCell(this.x+x, this.y+y)
+        man.revealCell(this.x+x, this.y+y,true)
     }
   }
 

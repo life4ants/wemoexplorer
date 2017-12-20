@@ -49,12 +49,15 @@ let topbar = {
     rect(viewport.left+10, top, Math.floor(5000/widthFactor)+3, 20)
     let color = value > 3333 ? "green" :
                  value > 1666 ? "#e90" : "red"
-    fill(color)
+    if (frameCount%10 < 5 && value < 1000)
+      fill(255)
+    else
+      fill(color)
     noStroke()
     rect(viewport.left+12, top+2, Math.floor(value/widthFactor), 17)
     let f, x
     if (value/widthFactor > 100){
-      f = 250, x = Math.floor(value/(widthFactor*2))
+      f = 255, x = Math.floor(value/(widthFactor*2))
       textAlign(CENTER,TOP)
     }
     else {
@@ -84,7 +87,7 @@ let topbar = {
       rect(left+55, top-1, 5, 21)
       fill("#6C3C00")
       noStroke()
-      rect(left+56, top+20-Math.floor(backpack.weight/2), 4, Math.floor(backpack.weight/2))
+      rect(left+56, top+20-Math.floor(backpack.weight/20), 4, Math.floor(backpack.weight/20))
     }
     if (man.basket){
       if (man.basket.quantity > 0){
