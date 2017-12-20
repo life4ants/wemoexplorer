@@ -159,41 +159,27 @@ function chop(){
 }
 
 function dump(type){
-  const _dumpable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock"]
+  const _dumpable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle"]
   let cell = board.cells[active.x][active.y]
   // long Grass:
   if (type === "longGrass"){
     backpack.removeItem("longGrass", 1)
     return false
   }
-  // clay:
-  else if (type === "clay"){
-    if (cell.type === "clay"){
-      if (cell.quantity < 5){
-        cell.quantity++
-        backpack.removeItem("clay", 1)
-      }
-    }
-    else if (_dumpable.includes(cell.type)){
-      cell.type = "clay"
-      cell.quantity = 1
-      backpack.removeItem("clay", 1)
-    }
-    else
-      return "Sorry, you can't dump clay on a "+cell.type+"!"
-  }
-  // log:
-  else if (["log", "stick"].includes(type)){
+  // log, stick, bone or clay:
+  else if (["log", "stick", "bone", "clay"].includes(type)){
     if (cell.type === type+"pile")
       cell.quantity++
     else if (cell.type === type){
       cell.type = type+"pile"
       cell.quantity = 2
     }
-    else if (_dumpable.includes(cell.type) || cell.type === "stump")
-      cell.type = type
+    else if (_dumpable.includes(cell.type) || ( ["log", "stick"].includes(type) && cell.type === "stump")){
+      cell.type = type+"pile"
+      cell.quantity = 1
+    }
     else
-      return "Sorry, you can't dump "+type+"s on a "+cell.type+"!"
+      return "Sorry, you can't dump a "+type+" on a "+cell.type+" square!"
     backpack.removeItem(type, 1)
   }
   // rock:
@@ -209,22 +195,8 @@ function dump(type){
       cell.quantity = 1
     }
     else
-      return "Sorry, you can't dump rock on a "+cell.type+"!"
+      return "Sorry, you can't dump rock on a "+cell.type+" square!"
     backpack.removeItem("rock", 1)
-  }
-  // bone:
-  else if (type === "bone"){
-    if (cell.type === "bonepile")
-      cell.quantity++
-    else if (cell.type === "bone"){
-      cell.type = "bonepile"
-      cell.quantity = 2
-    }
-    else if (_dumpable.includes(cell.type))
-      cell.type = "bone"
-    else
-      return "Sorry, you can't dump bone on a "+cell.type+"!"
-    backpack.removeItem("bone", 1)
   }
   return false
 }

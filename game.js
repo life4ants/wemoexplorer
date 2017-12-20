@@ -109,20 +109,19 @@ let game = new Vue({
         //build:
         this.icons[0].active = active === man
         //dump:
-        this.icons[1].active = backpack.weight > 0 && (dumpable.includes(cell.type) || cell.type === "clay")
+        this.icons[1].active = backpack.weight > 0 && (dumpable.includes(cell.type) || grabable.includes(cell.type))
         //grab:
-        this.icons[2].active = backpack.weight < backpack.maxWeight && ["longGrass", "rock", "logpile", "rockpile", "log"].includes(cell.type)
+        this.icons[2].active = backpack.weight < backpack.maxWeight && grabable.includes(cell.type)
         //feed fire:
-        this.icons[3].active = backpack.getAllItems().find((i) => i.type === "log") && man.isNextToFire
+        this.icons[3].active = backpack.includesItems(["log", "stick", "longGrass"]).length > 0 && man.isNextToFire
         //eat:
         this.icons[4].active = (("berryTree" === cell.type &&
-                board.berryTrees[cell.id].berries.length > 0)) ||
-                (man.basket && man.basket.quantity > 0)
+                board.berryTrees[cell.id].berries.length > 0)) || (man.basket && man.basket.quantity > 0)
         //jump:
         this.icons[5].active = (!man.isRiding && vehicles.canMount(man.x, man.y)) ||
                (man.isRiding && (active.landed || active.isBeside("dock") || "river" === board.cells[active.x][active.y].type))
         //chop:
-        this.icons[6].active = ["tree", "treeShore"].includes(cell.type)
+        this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type)
         //pick:
         this.icons[7].active = (man.basket && "berryTree" === cell.type &&
               board.berryTrees[cell.id].berries.length > 0)

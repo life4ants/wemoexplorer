@@ -239,7 +239,7 @@ class Man extends WemoObject {
 
   revealCell(x,y){
     if (!board.cells[x][y].revealed){
-      this.energy-=.75
+      this.energy--
       board.revealCell(x,y)
     }
   }

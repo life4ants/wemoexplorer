@@ -32,7 +32,8 @@ let world = {
 let showCount //man uses it to display falling in pit animation
 
 const topbarHeight = 55
-const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "logpile", "dock", "rockpile", "stickpile", "log", "rock","stick", "clay"]
+const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
+const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
@@ -205,6 +206,7 @@ function preload(){
   }
 
   tiles.construction.steppingStones = tiles.steppingStones
+  tiles.clays = tiles.clay
 }
 
 function setup(){

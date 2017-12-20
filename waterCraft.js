@@ -38,7 +38,7 @@ class WaterCraft extends WemoObject{
         this.landed = board.cells[this.x][this.y].type === "beach"
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
-        man.energy -= 1.5
+        man.energy -= 2
 
         if (this.type === "canoe"){
           for (let i=-1; i<=1; i++){
