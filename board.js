@@ -176,7 +176,7 @@ class Board extends WemoObject {
         cell.tile = "pit"
         for (let k = -1; k <=1; k++){
           for (let l = -1; l<=1; l++){
-            if (abs(l+k) === 1)
+            if (abs(l+k) === 1 && helpers.withinBounds(x+k,y+l))
               this.cells[x+k][y+l].byPit = true
           }
         }
@@ -232,18 +232,18 @@ class Board extends WemoObject {
     if (fully){
       this.cells[x][y].revealed = 2
       this.revealCount--
-      if (this.revealCount === 40){
-        popup.setAlert("Only 40 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
-        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "bomb")].active = true
-      }
-      else if (this.revealCount === 0)
-        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 3000)
     }
     else {
       this.cells[x][y].revealed++
-      if (this.cells[x][y].revealed === 2)
+      if (this.cells[x][y].revealed === 1)
         this.revealCount --
     }
+    if (this.revealCount === 40){
+      popup.setAlert("Only 40 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "bomb")].active = true
+    }
+    else if (this.revealCount === 0)
+      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 3000)
   }
 
   clicker(){

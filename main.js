@@ -33,7 +33,7 @@ let showCount //man uses it to display falling in pit animation
 
 const topbarHeight = 55
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
-const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile"]
+const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "veggies"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
@@ -202,6 +202,11 @@ function preload(){
     treeShore10: loadImage("images/treeShore10.png"),
     treeShore11: loadImage("images/treeShore11.png"),
     treeShore12: loadImage("images/treeShore12.png"),
+    veggies: loadImage("images/veggies.png"),
+    veggies1: loadImage("images/veggies1.png"),
+    veggies2: loadImage("images/veggies2.png"),
+    veggies3: loadImage("images/veggies3.png"),
+    veggies4: loadImage("images/veggies4.png"),
     water: loadImage("images/water.png"),
     wigwam: loadImage("images/wigwam.png"),
     z: loadImage("images/z's.png")

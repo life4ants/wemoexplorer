@@ -1,13 +1,38 @@
-class ToolBelt {
-  constructor(tools, c){
-    this.tools = tools || []
-    this.containers = c || []
+class Toolbelt {
+  constructor(items){
+    this.tools = []
+    this.containers = []
     this.maxTools = 2
-    this.maxConts = 1
+    this.maxContainers = 1
+    if (items){
+      for (let item of items){
+        if (item.type === "tool")
+          this.tools.push(item.name)
+        else if (item.type === "container")
+          this.containers.push(new Backpack(item.name, item.items))
+      }
+    }
   }
 
   getAllItems(){
-    return concat(this.tools, this.containers)
+    let output = []
+    for (let i = 0; i < this.tools.length; i++){
+      output.push({type: "tool", name: this.tools[i], id: i})
+    }
+    for (let i = 0; i < this.containers.length; i++){
+      output.push({type: "container", name: this.containers[i].type,
+                   items: this.containers[i].getAllItems(), id: i
+                  })
+    }
+    return output
+  }
+
+  getContainer(name){
+    for (let i = 0; i < this.containers.length; i++){
+      if (this.containers[i].type === name)
+        return this.containers[i]
+    }
+    return false
   }
 
   addItem(type, object){
@@ -15,34 +40,25 @@ class ToolBelt {
       this.tools.push(object)
       return true
     }
-    if (type === "container" && this.conts.length < this.maxConts){
+    if (type === "container" && this.containers.length < this.maxContainers){
       this.containers.push(object)
       return true
     }
     return false
   }
 
-  // removeItem(e, num){
-  //   if (this.items[e] && this.items[e].quantity >= num){
-  //     this.items[e].quantity -= num
-  //     this.weight -= this.items[e].weight*num
-  //     return true
-  //   }
-  //   return false
-  // }
-
-  // includesItem(s){ // returns the quantity of asked for item, or false if doesn't exist
-  //   if (this.items[s])
-  //     return this.items[s].quantity
-  //   return false
-  // }
-
-  // includesItems(ar){ // returns an object for each item that has quantity more than 0, in order asked for
-  //   let output = []
-  //   for (let i=0; i < ar.length; i++) {
-  //     if (this.items[ar[i]] && this.items[ar[i]].quantity > 0)
-  //       output.push({type: ar[i], quantity: this.items[ar[i]].quantity})
-  //   }
-  //   return output
-  // }
+  getWeight(){
+    let weight = 0
+    for (let i = 0; i < this.tools.length; i++){
+      switch (this.tools[i]){
+        case "stoneAx": weight += 10;     break;
+        case "boneShovel": weight += 15;  break;
+        case "bow":     weight += 8;     break;
+      }
+    }
+    for (let i = 0; i < this.containers.length; i++){
+      weight += this.containers[i].weight
+    }
+    return weight
+  }
 }

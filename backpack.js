@@ -3,21 +3,29 @@ class Backpack {
     this.weight = 0
     this.type = type
     if (this.type === "backpack"){
-      this.maxWeight = 400
+      this.maxWeight = 250
       this.items = {
-        log: {weight: 150, quantity: 0},
-        stick: {weight: 60, quantity: 0},
-        rock: {weight: 150, quantity: 0},
-        longGrass: {weight: 20, quantity: 0},
-        bone: {weight: 40, quantity: 0},
-        clay: {weight: 100, quantity: 0},
-        bomb: {weight: 100, quantity: 0}
+        log: {weight: 100, quantity: 0},
+        stick: {weight: 45, quantity: 0},
+        rock: {weight: 80, quantity: 0},
+        longGrass: {weight: 15, quantity: 0},
+        bone: {weight: 20, quantity: 0},
+        clay: {weight: 60, quantity: 0},
+        bomb: {weight: 50, quantity: 0}
       }
     }
     else if (this.type === "basket"){
       this.maxWeight = 50
       this.items = {
-        berries: {weight: 1, quantity: 0}
+        berries: {weight: 1, quantity: 0},
+        veggies: {weight: 2, quantity: 0}
+      }
+    }
+    else if (this.type === "claypot"){
+      this.maxWeight = 60
+      this.items = {
+        water: {weight: 15, quantity: 0},
+        stew: {weight: 15, quantity: 0}
       }
     }
     if (items){
@@ -30,7 +38,8 @@ class Backpack {
 
   getAllItems(){
     let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "bomb"] :
-            ["berries"]
+            this.type === "basket" ? ["berries", "veggies"] :
+            this.type === "claypot" ? ["water", "stew"] : []
     return this.includesItems(ar)
   }
 

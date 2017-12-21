@@ -87,19 +87,23 @@ let topbar = {
       rect(left+55, top-1, 5, 21)
       fill("#6C3C00")
       noStroke()
-      rect(left+56, top+20-Math.floor(backpack.weight/20), 4, Math.floor(backpack.weight/20))
+      rect(left+56, top+20-Math.floor(backpack.weight/12.5), 4, Math.floor(backpack.weight/12.5))
     }
-    if (man.basket){
-      if (man.basket.quantity > 0){
-        image(tiles.basketBerries, left+80, top+25)
-        board.drawBadge(left+110, top+25, man.basket.quantity, "#000")
-      }
-      else
+    for (let i = 0; i < toolbelt.tools.length; i++){
+      image(tiles[toolbelt.tools[i]], left+80+(i*26), top-1)
+    }
+    for (let i = 0; i < toolbelt.containers.length; i++){
+      if (toolbelt.containers[i].type === "basket"){
         image(tiles.basket, left+80, top+25)
-    }
-    if (man.tools.length > 0){
-      for (let i = 0; i < man.tools.length; i++){
-        image(tiles[man.tools[i]], left+80+(i*26), top-1)
+        let items = toolbelt.containers[i].getAllItems()
+        for (let i = 0; i < items.length; i++){
+          image(tiles[items[i].type], left+82+(i*13), top+25)
+          let col = items[i].type === "veggies" ? "#0B2D0C" : "#6B026C"
+          board.drawBadge(left+82+(i*24), top+25, items[i].quantity, col)
+        }
+      }
+      else if (toolbelt.containers[i].type === "claypot"){
+        image(tiles.claypot, left+111, top+25)
       }
     }
   }

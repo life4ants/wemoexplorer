@@ -116,14 +116,14 @@ let game = new Vue({
         this.icons[3].active = backpack.includesItems(["log", "stick", "longGrass"]).length > 0 && man.isNextToFire
         //eat:
         this.icons[4].active = (("berryTree" === cell.type &&
-                board.berryTrees[cell.id].berries.length > 0)) || (man.basket && man.basket.quantity > 0)
+                board.berryTrees[cell.id].berries.length > 0)) // or there are berries in your basket
         //jump:
         this.icons[5].active = (!man.isRiding && vehicles.canMount(man.x, man.y)) ||
                (man.isRiding && (active.landed || active.isBeside("dock") || "river" === board.cells[active.x][active.y].type))
         //chop:
         this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type)
         //pick:
-        this.icons[7].active = (man.basket && "berryTree" === cell.type &&
+        this.icons[7].active = (toolbelt.getContainer("basket") && "berryTree" === cell.type &&
               board.berryTrees[cell.id].berries.length > 0)
         //sleep:
         this.icons[8].active = (man.canSleep && !man.isSleeping && !man.isRiding)
@@ -188,7 +188,12 @@ let game = new Vue({
       man = new Man(tiles.players[player.character], b.startX, b.startY)
       backpack = new Backpack("backpack", b.backpack)
       delete b.backpack
+      toolbelt = new Toolbelt(b.toolbelt)
+      delete b.toolbelt
       if (b.man){
+        //patch to delete old stuff:
+        delete b.man.tools
+        delete b.man.basket
         man.import(b.man)
         delete b.man
       }
@@ -239,7 +244,9 @@ let game = new Vue({
 
       board.progress = true
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
-        Object.assign({man: man.export(), vehicles: vehicles.save(), backpack: backpack.getAllItems()}, board.export())
+        Object.assign({man: man.export(), vehicles: vehicles.save(),
+                        backpack: backpack.getAllItems(), toolbelt: toolbelt.getAllItems()
+                      }, board.export())
       ))
     },
 

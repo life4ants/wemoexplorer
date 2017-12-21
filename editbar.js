@@ -122,6 +122,7 @@ let editBar = {
       ],
       tiles5: [
         { id: "stick", src: "images/stick.png", type: "stick"},
+        { id: "veggies4", src: "images/veggies4.png", type: "veggies"},
         { id: "rockMiddle", src: "images/rockEdge13.png", type: "rockMiddle"},
         { id: "water", src: "images/water.png", type: "water"},
         { id: "random", src: "images/random.png", type: "random"},

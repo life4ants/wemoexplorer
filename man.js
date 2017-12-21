@@ -9,8 +9,6 @@ class Man extends WemoObject {
     this.index = 0
     this.isRiding = false
     this.ridingId = ""
-    this.basket = false
-    this.tools = []
     this.isNextToFire = false
     this.fireId = null
     this.stepCount = 0
@@ -155,7 +153,6 @@ class Man extends WemoObject {
         //move and set image index
         this.x += x
         this.y += y
-        this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
         this.energy -= this.walkingCost()
         this.health -= 1
@@ -164,10 +161,9 @@ class Man extends WemoObject {
         this.revealCell(this.x, this.y, true)
       }
       //reveal rockEdge cells
-      else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type)){
+      else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type))
         this.revealCell(this.x+x, this.y+y, true)
-        this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
-      }
+      this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
     }
   }
@@ -284,7 +280,7 @@ class Man extends WemoObject {
   }
 
   walkingCost(){
-    return this.basket ? 3+(this.basket.quantity + backpack.weight)/120 : 3+(backpack.weight/120)
+    return (backpack.weight+toolbelt.getWeight())/75+2.5
   }
 
 }

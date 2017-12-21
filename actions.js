@@ -19,12 +19,13 @@ function build(type, pos){
     if (man.energy <= 50)
       return "Oops! you don't have enough energy!"
     if (num >= 6){
-      //toolbelt.addItem("container", new Backpack("basket"))
-      //error checking if doesn't fit in toolbelt
-      backpack.removeItem("longGrass", 6)
-      man.basket = {quantity: 0}
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "basket")].active = false
-      return "Congratulations! You can now gather berries. Look for the Basket icon on the top bar."
+      if (toolbelt.addItem("container", new Backpack("basket"))){
+        backpack.removeItem("longGrass", 6)
+        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "basket")].active = false
+        return "Congratulations! You can now gather berries. Look for the Basket icon on the top bar."
+      }
+      else
+        return "Opps! You can only carry one container at a time. Put your claypot in your campsite before building a basket."
     }
     else {
       return "Oops! You need "+(6-num)+" more Long Grass!"
@@ -37,14 +38,15 @@ function build(type, pos){
     let needed = ["longGrass", "rock", "stick"]
     let ar = backpack.includesItems(needed)
     if (ar.length === 3){
-      backpack.removeItem("longGrass", 1)
-      backpack.removeItem("rock", 1)
-      backpack.removeItem("stick", 1)
-      man.tools.push("stoneAx")
-      //toolbelt.addItem("tool", "stoneAx")
-      //error checking if doesn't fit in toolbelt
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
-      return "Congratulations! You can now chop down trees at a cost of 300 energy. Look for the Stone Ax icon on the top bar."
+      if (toolbelt.addItem("tool", "stoneAx")){
+        backpack.removeItem("longGrass", 1)
+        backpack.removeItem("rock", 1)
+        backpack.removeItem("stick", 1)
+        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
+        return "Congratulations! You can now chop down trees at a cost of 300 energy. Look for the Stone Ax icon on the top bar."
+      }
+      else
+        return "Opps! You can only carry two tools at a time. Put one of your tools in a campsite before building a Stone Ax."
     }
     else {
       let out = "Opps! You still need "
@@ -64,14 +66,15 @@ function build(type, pos){
     let needed = ["longGrass", "bone", "stick"]
     let ar = backpack.includesItems(needed)
     if (ar.length === 3){
-      backpack.removeItem("longGrass", 1)
-      backpack.removeItem("bone", 1)
-      backpack.removeItem("stick", 1)
-      man.tools.push("boneShovel")
-      //toolbelt.addItem("tool", "boneShovel")
-      //error checking if doesn't fit in toolbelt
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "boneShovel")].active = false
-      return "Congratulations! You can now dig clay at a cost of 200 energy. Look for the Bone Shovel icon on the top bar."
+      if (toolbelt.addItem("tool", "boneShovel")){
+        backpack.removeItem("longGrass", 1)
+        backpack.removeItem("bone", 1)
+        backpack.removeItem("stick", 1)
+        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "boneShovel")].active = false
+        return "Congratulations! You can now dig clay at a cost of 200 energy. Look for the Bone Shovel icon on the top bar."
+      }
+      else
+        return "Opps! You can only carry two tools at a time. Put one of your tools in a campsite before building a Bone Shovel."
     }
     else {
       let out = "Opps! You still need "
@@ -153,8 +156,7 @@ function build(type, pos){
 function chop(){
   let cell = board.cells[active.x][active.y]
   if (["tree", "treeShore", "treeThin"].includes(cell.type)){
-    let t = man.tools.findIndex((e) => e === "stoneAx" || e === "steelAx")
-    //let t = toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx")
+    let t = toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx")
     if (t === -1){
       popup.setAlert("It looks like you don't have any tools for chopping down trees. Look for an ax on the Build Menu.")
     }
@@ -162,7 +164,7 @@ function chop(){
       cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
       cell.tile = "stump"
       cell.quantity = 5
-      man.energy = man.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
+      man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
     }
   }
 }
@@ -213,13 +215,25 @@ function dump(type){
 function eat(){
   let cell = board.cells[man.x][man.y]
   let tree = board.berryTrees[cell.id]
+  let kind = ""
   if (cell.type === "berryTree" && tree.berries.length > 0){
     let p = Math.floor(Math.random()*tree.berries.length)
     tree.berries.splice(p, 1)
+    kind = "berries"
   }
-  else if (man.basket && man.basket.quantity > 0 && cell.type !== "berryTree"){
-    //if toolbelt.containers.findIndex((e) => e.type === "basket")
-     man.basket.quantity--
+  else if (cell.type !== "berryTree"){
+    let basket = toolbelt.getContainer("basket")
+    if (basket){
+      let items = basket.includesItems(["berries", "veggies"])
+      if (items.length > 0){
+        basket.removeItem(items[0].type, 1)
+        kind = items[0].type
+      }
+      else
+        return
+    }
+    else
+      return
   }
   else
     return
@@ -231,8 +245,10 @@ function eat(){
     man.vomit = true
     return
   }
-  man.energy += 40
-  man.health = man.health < 4995 ? man.health+5 : 5000
+  let energy = kind === "berries" ? 40 : 30
+  man.energy += energy
+  if (kind === "berries")
+    man.health = man.health < 4995 ? man.health+5 : 5000
   if (man.energy > 5000)
     popup.setAlert("You are full. Stop eating!")
 }
@@ -244,7 +260,7 @@ function fling(){
     if (items.length > 0){
       let fireValue = cell.type === "campsite" ? board.buildings[cell.id].fireValue : board.fires[man.fireId].value
       fireValue = items[0].type === "log" ? Math.min(fireValue+13, 20) :
-                     items[0].type === "stick" ? Math.min(fireValue+5, 20) : Math.min(fireValue+2, 20)
+                     items[0].type === "stick" ? Math.min(fireValue+6, 20) : Math.min(fireValue+2, 20)
       if (cell.type === "campsite")
         board.buildings[cell.id].fireValue = fireValue
       else
@@ -330,17 +346,30 @@ function grab(){
     }
   }
   //pick berries:
-  else if (man.basket && man.basket.quantity < 50 && "berryTree" === cell.type &&
-              board.berryTrees[cell.id].berries.length > 0){
-    let tree = board.berryTrees[cell.id]
-    let p = Math.floor(Math.random()*tree.berries.length)
-    tree.berries.splice(p, 1)
-    man.basket.quantity++
+  else if ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0){
+    let basket = toolbelt.getContainer("basket")
+    if (basket && basket.addItem("berries")){
+      let tree = board.berryTrees[cell.id]
+      let p = Math.floor(Math.random()*tree.berries.length)
+      tree.berries.splice(p, 1)
+    }
+  }
+  //gather veggies:
+  else if ("veggies" === cell.type){
+    let basket = toolbelt.getContainer("basket")
+    if (basket){
+      if (basket.addItem("veggies")){
+        let quantity = Number(cell.tile.substr(7,1))
+        cell.tile = quantity > 1 ? "veggies"+(quantity-1) : "grass"
+        cell.type = quantity > 1 ? cell.type : "grass"
+      }
+    }
+    else
+      popup.setAlert("You can't gather veggies without a basket!")
   }
   //dig clay:
   else if (cell.type === "clay"){
-    let id = man.tools.findIndex((e) => e === "boneShovel" || e === "steelShovel")
-    //let id = toolbelt.tools.findIndex((e) => e === "boneShovel" || e === "steelShovel")
+    let id = toolbelt.tools.findIndex((e) => e === "boneShovel" || e === "steelShovel")
     if (id === -1){
       popup.setAlert("It looks like you don't have any tools for digging clay. Look for a Shovel on the Build Menu")
       return
@@ -351,7 +380,7 @@ function grab(){
         cell.type =  cell.tile.replace(/\d+$/, "")
         delete cell.quantity
       }
-      man.energy = man.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
+      man.energy = toolbelt.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
     }
   }
 }
