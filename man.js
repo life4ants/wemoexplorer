@@ -88,6 +88,13 @@ class Man extends WemoObject {
   }
 
   update(){
+    if (this.inDark){
+      message.following.msg = "You're too far from a fire!"
+      message.following.frames = 1
+      this.health -= Math.floor((this.health+1500)/499)
+    }
+    if (active !== this)
+      return
     this.standCount++
     if ([5,10].includes(this.standCount/world.frameRate)){
       for (let i=-1; i<=1; i++){
@@ -102,12 +109,7 @@ class Man extends WemoObject {
       }
     }
     this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
-    if (this.inDark){
-      message.following.msg = "You're too far from a fire!"
-      message.following.frames = 1
-      this.health -= Math.floor((this.health+1500)/499)
-    }
-    else if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
+    if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
       message.following.msg = "Get off the fire! You're burning!"
       message.following.frames = 1
       this.health -=25

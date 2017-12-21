@@ -136,6 +136,7 @@ let editBar = {
         {id: "treeShore", src: "images/treeShoreX.png", type: "auto"},
         {id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
         {id: "rockEdge", src: "images/rockX.png", type: "auto"},
+        {id: "river", src: "images/grassRiverX.png", type: "auto"},
         {id: "start", src: "images/player10icon.png", type: "start"}
       ],
       selected: "water"

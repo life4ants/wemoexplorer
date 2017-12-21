@@ -89,5 +89,17 @@ let helpers = {
       count++
     }
     return count
+  },
+
+  countTypes(b){
+    let output = {}
+    for (let i = 0; i <b.cells.length; i++) {
+      for (let j = 0; j< b.cells[i].length; j++){
+        let type = b.cells[i][j].type
+        output[type] = output[type] || 0
+        output[type]++
+      }
+    }
+    return output
   }
 }

@@ -106,7 +106,7 @@ let editor = {
   },
 
   parsePath(type){
-    let tiles = this.plotPath()
+    let tiles = type === "river" ? this.riverMaker() : this.beachMaker()
     if (tiles){
       for (let i = 0; i < this.path.length; i++){
         let ar = this.path[i].split("_")
@@ -119,7 +119,7 @@ let editor = {
     this.path = []
   },
 
-  plotPath(){
+  beachMaker(){
     if (this.path.length < 2)
       return false
     let ar = []
@@ -159,6 +159,47 @@ let editor = {
         tileNum[i] = ar[i-1][1] < y ? 4 :  //last is top
                        ar[i-1][0] > x ? 8 : //last is right
                          3 // last is left
+      }
+    }
+    return tileNum
+  },
+
+  riverMaker(){
+    if (this.path.length < 2)
+      return false
+    let ar = []
+    for (let i = 0; i < this.path.length; i++){
+      let id = this.path[i].split("_")
+      ar.push([Number(id[0]), Number(id[1])])
+    }
+    let tileNum = []
+    for (let i=0; i<ar.length; i++){
+      let x = ar[i][0], y = ar[i][1]
+      if (i === 0)
+        tileNum[i] = ar[i+1][0] === x ? 5 : 6
+
+      else if (i === ar.length-1)
+        tileNum[i] = ar[i-1][0] === x ? 5 : 6
+
+      else if (ar[i+1][0] < x) { //next is left
+        tileNum[i] = ar[i-1][1] < y ? 3 :  //last is top
+                       ar[i-1][0] > x ? 6 : //last is right
+                         2 // last is below
+      }
+      else if (ar[i+1][1] < y) { //next is top
+        tileNum[i] = ar[i-1][0] > x ? 4 : //last is right
+                       ar[i-1][1] > y ? 5 : // last is below
+                         3 // last is left
+      }
+      else if (ar[i+1][0] > x) { //next is right
+        tileNum[i] = ar[i-1][1] < y ? 4 :  //last is top
+                       ar[i-1][0] < x ? 6 : //last is left
+                         1 // last is below
+      }
+      else { //next is below
+        tileNum[i] = ar[i-1][1] < y ? 5 :  //last is top
+                       ar[i-1][0] > x ? 1 : //last is right
+                         2 // last is left
       }
     }
     return tileNum
