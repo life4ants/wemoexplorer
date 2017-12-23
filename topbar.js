@@ -103,7 +103,14 @@ let topbar = {
         }
       }
       else if (toolbelt.containers[i].type === "claypot"){
-        image(tiles.claypot, left+80, top+25)
+        let items = toolbelt.containers[i].getAllItems()
+        if (items.length > 0){
+          let tile = items[0].type === "water" ? "claypot_water" : "claypot_stew"
+          image(tiles[tile], left+80, top+25)
+          board.drawBadge(left+100, top+25, items[0].quantity, "#3649A1")
+        }
+        else
+          image(tiles.claypot, left+80, top+25)
       }
     }
   }

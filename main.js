@@ -85,6 +85,7 @@ function preload(){
     clay4: loadImage("images/clay4.png"),
     clay5: loadImage("images/clay5.png"),
     claypot: loadImage("images/claypot.png"),
+    claypot_water: loadImage("images/claypot_water.png"),
     construction: {
       raft: loadImage("images/raftHB.png"),
       campsite: loadImage("images/campsiteHB.png")

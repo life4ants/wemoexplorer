@@ -103,12 +103,6 @@ var popup = new Vue({
     reset(){
       for (var i = this.buildOptions.length - 1; i >= 0; i--) {
         switch (this.buildOptions[i].name) {
-          case "stoneAx":
-            this.buildOptions[i].active = !toolbelt.tools.includes("stoneAx")
-            break
-          case "boneShovel":
-            this.buildOptions[i].active = !toolbelt.tools.includes("boneShovel")
-            break
           case "raft":
             this.buildOptions[i].active = !vehicles.raft
             break

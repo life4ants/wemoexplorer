@@ -49,8 +49,10 @@ class Man extends WemoObject {
       let y = board.buildings[id].y
       if (this.isSleeping)
         image(tiles.z, (x+1)*25, y*25+topbarHeight+18)
-      else
+      else {
+        let index = this.vomit ? 8 : 10
         this.drawImage(this.img, 10, (x+1)*25, y*25+topbarHeight+18, 25, 25)
+      }
     }
     else {
       let offset = backpack.weight > 0 ? 4 : 0

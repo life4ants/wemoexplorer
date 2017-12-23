@@ -58,7 +58,6 @@ function build(type, pos){
         backpack.removeItem("longGrass", 1)
         backpack.removeItem("rock", 1)
         backpack.removeItem("stick", 1)
-        popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "stoneAx")].active = false
         return "Congratulations! You can now chop down trees at a cost of 300 energy. Look for the Stone Ax icon on the top bar."
       }
       else
@@ -86,7 +85,6 @@ function build(type, pos){
         backpack.removeItem("longGrass", 1)
         backpack.removeItem("bone", 1)
         backpack.removeItem("stick", 1)
-        popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "boneShovel")].active = false
         return "Congratulations! You can now dig clay at a cost of 200 energy. Look for the Bone Shovel icon on the top bar."
       }
       else
@@ -398,6 +396,11 @@ function grab(){
       }
       man.energy = toolbelt.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
     }
+  }
+  else if (helpers.isNextToType(active.x,active.y, "river")){
+    let pot = toolbelt.getContainer("claypot")
+    if (pot)
+      pot.addItem("water")
   }
 }
 
