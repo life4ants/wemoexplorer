@@ -86,10 +86,16 @@ let game = new Vue({
         switch(key){
           case "B": popup.buildMenu();    break;
           case "C": chop();               break;
-          case "D": popup.dumpMenu();     break;
+          case "D":
+            if (board.cells[active.x][active.y].type === "campsite"){ popup.dropMenu() }
+            else { popup.dumpMenu() }
+            break
           case "E": eat();                break;
           case "F": fling();              break;
-          case "G": grab();               break;
+          case "G":
+            if (board.cells[active.x][active.y].type === "campsite"){ popup.grabMenu() }
+            else { grab() }
+            break
           case "X": this.autoCenter = !this.autoCenter; break;
           case "J": man.dismount();       break;
           case "S": man.goToSleep();      break;
@@ -194,6 +200,7 @@ let game = new Vue({
         //patch to delete old stuff:
         delete b.man.tools
         delete b.man.basket
+        //end patch
         man.import(b.man)
         delete b.man
       }
@@ -205,7 +212,6 @@ let game = new Vue({
       topbar.health = man.health
       topbar.energy = man.energy
       world.noKeys = false
-      message.reset()
       timer.setTime(board.wemoMins)
       if (!board.progress)
         board.fill()
@@ -245,7 +251,8 @@ let game = new Vue({
       board.progress = true
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
         Object.assign({man: man.export(), vehicles: vehicles.save(),
-                        backpack: backpack.getAllItems(), toolbelt: toolbelt.getAllItems()
+                        backpack: backpack.items,
+                        toolbelt: toolbelt.getAllItems(),
                       }, board.export())
       ))
     },

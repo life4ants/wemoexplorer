@@ -87,8 +87,8 @@ class Man extends WemoObject {
 
   update(){
     if (this.inDark){
-      message.following.msg = "You're too far from a fire!"
-      message.following.frames = 1
+      msgs.following.msg = "You're too far from a fire!"
+      msgs.following.frames = 1
       this.health -= Math.floor((this.health+1500)/499)
     }
     if (active !== this)
@@ -108,8 +108,8 @@ class Man extends WemoObject {
     }
     this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
     if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
-      message.following.msg = "Get off the fire! You're burning!"
-      message.following.frames = 1
+      msgs.following.msg = "Get off the fire! You're burning!"
+      msgs.following.frames = 1
       this.health -=25
     }
     if (this.isSleeping){
@@ -147,8 +147,8 @@ class Man extends WemoObject {
             this.health -= 800
             showCount = 5
             let name = board.cells[this.x+x][this.y+y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
-            message.following.msg = "You fell in "+name
-            message.following.frames = 18
+            msgs.following.msg = "You fell in "+name
+            msgs.following.frames = 18
         }
         //move and set image index
         this.x += x

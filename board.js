@@ -6,6 +6,9 @@ class Board extends WemoObject {
       this.import(a)
       if (this.version !== 3)
         this.convertVersion2()
+      if (this.buildings){
+        this.initializeBuildings()
+      }
     }
     else if (arguments.length === 3){// creating a new game on editor
       this.cols = a
@@ -58,22 +61,9 @@ class Board extends WemoObject {
   }
 
   display(){
-    let left, right, top, bottom
-    if (game.mode === "edit"){
-      top = 0
-      left = 0
-      bottom = this.rows
-      right = this.cols
-    }
-    else {
-      top = floor(viewport.top/25)
-      left = floor(viewport.left/25)
-      right = min(floor(viewport.right/25)+1, this.cols)
-      bottom = min(floor((viewport.bottom-topbarHeight)/25)+1, this.rows)
-    }
-
-    for (let i = left; i < right; i++) {
-      for (let j = top; j< bottom; j++){
+    let edge = viewport.screenEdges()
+    for (let i = edge.left; i < edge.right; i++) {
+      for (let j = edge.top; j< edge.bottom; j++){
         let cell = this.cells[i][j]
         let offset = game.mode === "edit" ? 0 : topbarHeight
         let img = game.mode === "edit" || cell.revealed ? tiles[cell.tile]: tiles["clouds"]
@@ -100,10 +90,22 @@ class Board extends WemoObject {
     }
   }
 
+  initializeBuildings(){
+    for (let i = 0; i < this.buildings.length; i++){
+      for (let j = 0; j < this.buildings[i].items.length; j++){
+        let item = this.buildings[i].items[j]
+        if (typeof item === "object"){
+          let container = new Backpack(item.type, item.items)
+          this.buildings[i].items[j] = container
+        }
+      }
+    }
+  }
+
   showObjects(){
     for (let i=0; i<this.berryTrees.length; i++){
       let tree = this.berryTrees[i]
-      if (this.cells[tree.x][tree.y].revealed){
+      if (viewport.onScreen(tree.x, tree.y) && this.cells[tree.x][tree.y].revealed){
         noStroke()
         fill(128,0,128)
         ellipseMode(CORNER)
@@ -125,7 +127,7 @@ class Board extends WemoObject {
           this.bombs.splice(i, 1)
       }
     }
-    if (this.buildings){
+    if (this.buildings){//PATCH: check in case it's an old game
       for (let b of this.buildings){
         image(tiles[b.type], b.x*25, b.y*25+topbarHeight)
         if (b.type === "campsite"){
@@ -251,7 +253,7 @@ class Board extends WemoObject {
     let x = Math.floor(mouseX/25)
     let cell = this.cells[x][y]
     if (cell.type === "campsite"){
-      console.log(this.buildings[cell.id])
+      popup.setInfo(cell.id)
     }
   }
 
@@ -261,7 +263,7 @@ class Board extends WemoObject {
     if (game.paused) {
       alpha = timer.timeOfDay === "day" ? 230 : 255
       fill(0,0,0,alpha)
-      rect(0,0,world.width,world.height)
+      rect(0,0,width,height)
       return
     }
 
@@ -288,9 +290,9 @@ class Board extends WemoObject {
     noStroke()
     beginShape()
     vertex(0,0)
-    vertex(world.width,0)
-    vertex(world.width,world.height)
-    vertex(0,world.height)
+    vertex(width,0)
+    vertex(width,height)
+    vertex(0,height)
     let fires = board.fires
     for (let f of fires){
       if (f.value > 0)

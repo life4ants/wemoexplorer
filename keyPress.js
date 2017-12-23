@@ -42,7 +42,7 @@ function keyPressed(){
 }
 
 function mousePressed(){
-  if (mouseX < 0 || mouseX > world.width || mouseY < 0 || mouseY > world.height)
+  if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height)
       return
   if (game.mode === "edit" && winMouseY > world.topOffset )
     editor.mousePressed()
@@ -55,14 +55,14 @@ function mousePressed(){
 }
 
 function mouseDragged(){
-  if (mouseX < 0 || mouseX >= world.width || mouseY < 0 || mouseY >= world.height)
+  if (mouseX < 0 || mouseX >= width || mouseY < 0 || mouseY >= height)
     return
   if (game.mode === "edit" && winMouseY > world.topOffset)
     editor.mouseDragged()
 }
 
 function mouseReleased(){
-  if (mouseX < 0 || mouseX > world.width || mouseY < 0 || mouseY > world.height)
+  if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height)
     return
   if (game.mode === "edit" && winMouseY > world.topOffset)
     editor.mouseReleased()

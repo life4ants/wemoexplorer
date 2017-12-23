@@ -29,9 +29,9 @@ class Backpack {
       }
     }
     if (items){
-      for (let i = items.length - 1; i >= 0; i--) {
-        this.items[items[i].type].quantity = items[i].quantity
-        this.weight += this.items[items[i].type].weight*items[i].quantity
+      for (let key in items) {
+        this.items[key].quantity = items[key].quantity
+        this.weight += this.items[key].weight*items[key].quantity
       }
     }
   }

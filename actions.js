@@ -21,7 +21,6 @@ function build(type, pos){
     if (num >= 6){
       if (toolbelt.addItem("container", new Backpack("basket"))){
         backpack.removeItem("longGrass", 6)
-        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "basket")].active = false
         return "Congratulations! You can now gather berries. Look for the Basket icon on the top bar."
       }
       else
@@ -29,6 +28,23 @@ function build(type, pos){
     }
     else {
       return "Oops! You need "+(6-num)+" more Long Grass!"
+    }
+  }
+  // build claypot:
+  else if (type === "claypot"){
+    let num = backpack.includesItem("clay")
+    if (man.energy <= 150)
+      return "Oops! you don't have enough energy!"
+    if (num >= 2){
+      if (toolbelt.addItem("container", new Backpack("claypot"))){
+        backpack.removeItem("clay", 2)
+        return "Congratulations! You can now cook soup. Look for the Clay Pot icon on the top bar."
+      }
+      else
+        return "Opps! You can only carry one container at a time. Put your basket in your campsite before building a claypot."
+    }
+    else {
+      return "Oops! You need "+(2-num)+" more Clay!"
     }
   }
   // build stoneAx:
@@ -42,7 +58,7 @@ function build(type, pos){
         backpack.removeItem("longGrass", 1)
         backpack.removeItem("rock", 1)
         backpack.removeItem("stick", 1)
-        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "stoneAx")].active = false
+        popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "stoneAx")].active = false
         return "Congratulations! You can now chop down trees at a cost of 300 energy. Look for the Stone Ax icon on the top bar."
       }
       else
@@ -70,7 +86,7 @@ function build(type, pos){
         backpack.removeItem("longGrass", 1)
         backpack.removeItem("bone", 1)
         backpack.removeItem("stick", 1)
-        popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "boneShovel")].active = false
+        popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "boneShovel")].active = false
         return "Congratulations! You can now dig clay at a cost of 200 energy. Look for the Bone Shovel icon on the top bar."
       }
       else
@@ -102,7 +118,7 @@ function build(type, pos){
       cell.type = "construction"
       cell.construction = construction
       man.energy -= 400
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "raft")].active = false
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "raft")].active = false
     }
   }
   // build stepping stones:
@@ -142,7 +158,7 @@ function build(type, pos){
           {type: "log", quantity: 5, color: "#582C0F"},
           {type: "longGrass", quantity: 10, color: "#207414"},
           {type: "stick", quantity: 10, color: "#B66500"},
-          {type: "clay", quantity: 2, color: "#804000"}
+          {type: "clay", quantity: 5, color: "#804000"}
         ]
       }
       cell.type = "construction"
@@ -240,8 +256,8 @@ function eat(){
   if (man.energy > 5000){
     man.energy -= Math.floor((Math.random()*5+1)*100)
     man.health -= Math.floor((Math.random()*5+1)*10)
-    message.following.msg = "You ate too much!!!"
-    message.following.frames = 30
+    msgs.following.msg = "You ate too much!!!"
+    msgs.following.frames = 30
     man.vomit = true
     return
   }

@@ -1,16 +1,12 @@
 let world = {
   frameTime: Date.now(),
-  width: null,
-  height: null,
   topOffset: 0,
   leftOffset: 0,
   noKeys: false,
   frameRate: 12,
 
   resize(cols, rows){
-    this.width = cols * 25
-    this.height = game.mode === "play" ? rows * 25 + topbarHeight : rows * 25
-    resizeCanvas(this.width, this.height)
+    resizeCanvas(cols*25, game.mode === "play" ? rows*25+topbarHeight : rows*25)
   },
 
   interval(num){
@@ -88,6 +84,7 @@ function preload(){
     clay3: loadImage("images/clay3.png"),
     clay4: loadImage("images/clay4.png"),
     clay5: loadImage("images/clay5.png"),
+    claypot: loadImage("images/claypot.png"),
     construction: {
       raft: loadImage("images/raftHB.png"),
       campsite: loadImage("images/campsiteHB.png")
@@ -248,7 +245,7 @@ function playLoop(){
   man.display()
   board.showNight()
   topbar.display()
-  message.display()
+  msgs.display()
   if (showCount > 0)
     showCount--
   if (man.energy <= 0 || man.health <= 0 )

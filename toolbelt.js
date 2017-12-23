@@ -21,7 +21,7 @@ class Toolbelt {
     }
     for (let i = 0; i < this.containers.length; i++){
       output.push({type: "container", name: this.containers[i].type,
-                   items: this.containers[i].getAllItems(), id: i
+                   items: this.containers[i].items, id: i
                   })
     }
     return output

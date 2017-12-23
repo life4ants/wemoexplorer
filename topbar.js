@@ -98,14 +98,13 @@ let topbar = {
         let items = toolbelt.containers[i].getAllItems()
         for (let i = 0; i < items.length; i++){
           image(tiles[items[i].type], left+82+(i*13), top+25)
-          let col = items[i].type === "veggies" ? "#0B2D0C" : "#6B026C"
+          let col = items[i].type === "veggies" ? "#0B2D0C" : "#3A0E12"
           board.drawBadge(left+82+(i*24), top+25, items[i].quantity, col)
         }
       }
       else if (toolbelt.containers[i].type === "claypot"){
-        image(tiles.claypot, left+111, top+25)
+        image(tiles.claypot, left+80, top+25)
       }
     }
   }
-
 }
