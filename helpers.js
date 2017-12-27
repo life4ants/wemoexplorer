@@ -59,8 +59,10 @@ let helpers = {
   },
 
   smoothChange(curX, toX){
+    let base = 75
+    let div = base/15
     let diff = toX-curX
-    return diff >= 90 ? curX+Math.floor(diff/6)-5 : diff <= -90 ? curX+Math.floor(diff/6)+5 :
+    return diff >= base ? curX+Math.floor(diff/div)-5 : diff <= -base ? curX+Math.floor(diff/div)+5 :
                diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
   },
 

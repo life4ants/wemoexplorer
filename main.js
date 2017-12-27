@@ -25,8 +25,6 @@ let world = {
   },
 }
 
-let showCount //man uses it to display falling in pit animation
-
 const topbarHeight = 55
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "veggies"]
@@ -123,6 +121,9 @@ function preload(){
     players: [ loadImage("images/player10.png"),
                loadImage("images/player11.png")
              ],
+    playersAnimated: [ loadImage("images/player10animation.png"),
+                       loadImage("images/player11animation.png")
+             ],
     raft: [ loadImage("images/raft0.png"),
             loadImage("images/raft1.png"),
           ],
@@ -210,6 +211,19 @@ function preload(){
     z: loadImage("images/z's.png")
   }
 
+  sounds.files = {
+    //chop: new Audio("sounds/chop.mp3"),
+    //eat: new Audio("sounds/eat.mp3"),
+    //dig: new Audio("sounds/dig.mp3"),
+    //dump: new Audio("sounds/dump.mp3"),
+    //fling: new Audio("sounds/fling.mp3"),
+    //grab: new Audio("sounds/grab.mp3"),
+    pit: new Audio("sounds/pitShort.mp3"),
+    //water: new Audio("sounds/water.wav"),
+    walk1: new Audio("sounds/walk1.mp3"),
+    walk2: new Audio("sounds/walk2.mp3")
+  }
+
   tiles.construction.steppingStones = tiles.steppingStones
   tiles.clays = tiles.clay
 }
@@ -243,13 +257,11 @@ function playLoop(){
   viewport.update(false)
   //display:
   vehicles.display()
-  man.display()
+  man.update()
   board.showNight()
   topbar.display()
   msgs.display()
-  if (showCount > 0)
-    showCount--
-  if (man.energy <= 0 || man.health <= 0 )
+  if ((man.energy <= 0 || man.health <= 0) && !man.isAnimated)
     popup.gameOver()
 }
 

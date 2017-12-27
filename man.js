@@ -1,100 +1,52 @@
 class Man extends WemoObject {
-  constructor(img, x, y){
+  constructor(characterId, x, y){
     super()
     this.x = x
     this.y = y
     this.oldX = 0
     this.oldY = 0
-    this.img = img
     this.index = 0
+    this.energy = 5000
+    this.health = 5000
+    this.stepCount = 0
+    this.standCount = 0
+    this.img = [tiles.players[characterId], tiles.playersAnimated[characterId]]
     this.isRiding = false
     this.ridingId = ""
     this.isNextToFire = false
     this.fireId = null
-    this.stepCount = 0
-    this.energy = 5000
-    this.health = 5000
-    this.isInPit = false
-    this.isClimbingOutOfPit = false
-    this.isFallingIntoPit = false
     this.vomit = false
     this.inDark = false
     this.isSleeping = false
     this.canSleep = false
-    this.standCount = 0
+    this.isAnimated = false
+    this.animation = {frame: 0, type: "", end: 0, action: null}
   }
 
-  display() {
+  update(){
     if (game.mode === "build"){
       strokeWeight(2)
       stroke(128)
       noFill()
       ellipseMode(CENTER)
       ellipse(this.x*25+12.5, this.y*25+topbarHeight+12.5, 200, 200)
-      this.drawImage(this.img, this.index, this.x*25, this.y*25+topbarHeight, 25, 25)
+      this.drawImage(this.img[0], this.index, this.x*25, this.y*25+topbarHeight, 25, 25)
       return
     }
-    this.update()
 
-    if (this.isRiding){
-      let sx = (active.index%3)*25
-      let sy = Math.floor(active.index/3)*25
-      let h = active.type === "canoe" && [0,1].includes(active.index) ? 19 :
-              active.type === "canoe" ? 21 : 25
-      image(this.img, active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
-    }
-    else if (board.cells[this.x][this.y].type === "campsite"){
-      let id = board.cells[this.x][this.y].id
-      let x = board.buildings[id].x
-      let y = board.buildings[id].y
-      if (this.isSleeping)
-        image(tiles.z, (x+1)*25, y*25+topbarHeight+18)
-      else {
-        let index = this.vomit ? 8 : 10
-        this.drawImage(this.img, 10, (x+1)*25, y*25+topbarHeight+18, 25, 25)
-      }
-    }
-    else {
-      let offset = backpack.weight > 0 ? 4 : 0
-      if (this.isInPit){
-        imageMode(CENTER)
-        this.drawImage(this.img, this.index+offset, this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
-        imageMode(CORNER)
-      }
-      else if (this.isClimbingOutOfPit || this.isFallingIntoPit){
-        let num = 30-Math.round(this.energy/200)
-        let size = this.isClimbingOutOfPit ? (num-showCount)*(15/num)+10 : showCount*3+10
-        let speed = this.isClimbingOutOfPit ? (num-showCount)*25/num : Math.floor((5-showCount)*5)
-        let x = (this.x-this.oldX)*speed
-        let y = (this.y-this.oldY)*speed
-        imageMode(CENTER)
-        this.drawImage(this.img, this.index+offset, this.oldX*25+12.5+x, this.oldY*25+topbarHeight+12.5+y, size, size)
-        imageMode(CORNER)
-        if (showCount === 0){
-          this.isInPit = this.isFallingIntoPit ? true : false
-          this.isFallingIntoPit = false
-          this.isClimbingOutOfPit = false
-          showCount = 30
-        }
-      }
-      else {
-        let id = this.vomit ? 8 : this.isSleeping ? 9 : this.index+offset
-        this.drawImage(this.img, id, this.x*25, this.y*25+topbarHeight, 25, 25)
-      }
-      if (board.cells[this.x][this.y].byPit)
-        this.drawPitLines(this.x, this.y)
-
-    }
-  }
-
-  update(){
     if (this.inDark){
       msgs.following.msg = "You're too far from a fire!"
       msgs.following.frames = 1
       this.health -= Math.floor((this.health+1500)/499)
     }
-    if (active !== this)
+    if (this.isRiding){
+      let sx = (active.index%3)*25
+      let sy = Math.floor(active.index/3)*25
+      let h = active.type === "canoe" && [0,1].includes(active.index) ? 19 :
+              active.type === "canoe" ? 21 : 25
+      image(this.img[0], active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
       return
+    }
     this.standCount++
     if ([5,10].includes(this.standCount/world.frameRate)){
       for (let i=-1; i<=1; i++){
@@ -118,11 +70,68 @@ class Man extends WemoObject {
        this.health = this.health < 4997 ? this.health+3 : 5000
        this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
     }
+    this.display()
+  }
+
+  display() {
+    let offset = backpack.weight > 0 ? 4 : 0
+    let index = this.vomit ? 8 : this.isSleeping ? 9 : this.index+offset
+    let dx = this.x*25
+    let dy = this.y*25+topbarHeight
+
+    if (board.cells[this.x][this.y].type === "campsite"){
+      let id = board.cells[this.x][this.y].id
+      dx = (board.buildings[id].x+1)*25
+      dy = board.buildings[id].y*25+topbarHeight+18
+      index = this.vomit ? 8 : 10
+      if (this.isSleeping){
+        image(tiles.z, dx, dy)
+        return
+      }
+    }
+    else if (this.isAnimated){
+      if (["shrinking", "growing"].includes(this.animation.type)){
+        let length = this.animation.type === "growing" ? 30-Math.round(this.energy/200) : 5
+        let size = this.animation.type === "growing" ?
+                  map(this.animation.frame, 0, length, 10, 25) :
+                  map(this.animation.frame, 0, length, 25, 10)
+        let pos = map(this.animation.frame, 0, length, 0, 25)
+        let x = (this.x-this.oldX)*pos
+        let y = (this.y-this.oldY)*pos
+        imageMode(CENTER)
+        this.drawImage(this.img[0], this.index+offset, this.oldX*25+12.5+x, this.oldY*25+topbarHeight+12.5+y, size, size)
+        imageMode(CORNER)
+        if (this.animation.frame >= length)
+          this.isAnimated = false
+      }
+      else if ("building" === this.animation.type){
+        let id = floor(map(frameCount%(world.frameRate/3), 0, world.frameRate/3, 0, 3))
+        let sx = (id%3)*35
+        let sy = floor(id/3)*25
+        image(this.img[1], dx, dy, 35, 25, sx, sy, 35, 25)
+        if (this.animation.frame >= this.animation.end){
+          this.isAnimated = false
+          this.animation.action()
+        }
+      }
+      this.animation.frame++
+      return
+    }
+    else if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
+      imageMode(CENTER)
+      this.drawImage(this.img[0], this.index+offset, this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
+      imageMode(CORNER)
+      return
+    }
+
+    this.drawImage(this.img[0], index, dx, dy, 25, 25)
+    if (board.cells[this.x][this.y].byPit)
+      this.drawPitLines(this.x, this.y)
   }
 
   move(x, y) {
     this.standCount = 0
-    if (this.isClimbingOutOfPit || this.isFallingIntoPit || this.isSleeping)
+    if (this.isSleeping)
       return
     if (board.cells[this.x][this.y].type === "campsite" && board.cells[this.x+x][this.y+y].type === "campsite"){
       x *= 2; y*= 2;
@@ -134,23 +143,27 @@ class Man extends WemoObject {
       if (!["water", "rockEdge", "river", "construction"].includes(board.cells[this.x+x][this.y+y].type)){
         if ("firepit" === board.cells[this.x+x][this.y+y].type && board.fires[board.cells[this.x+x][this.y+y].id].value > 0)
           return
-        if (this.isInPit){
-          this.oldX = this.x
-          this.oldY = this.y
-          this.energy -= 600-(Math.floor(this.energy/10))
-          showCount = 30-Math.round(this.energy/200)
-          this.isClimbingOutOfPit = true
-          this.isInPit = false
-        }
         if (["pit", "sandpit"].includes(board.cells[this.x+x][this.y+y].type)){
-            this.isFallingIntoPit = true
-            this.oldX = this.x
-            this.oldY = this.y
             this.health -= 800
-            showCount = 5
             let name = board.cells[this.x+x][this.y+y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
             msgs.following.msg = "You fell in "+name
             msgs.following.frames = 18
+            sounds.play("pit")
+            if (!["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
+              this.oldX = this.x
+              this.oldY = this.y
+              this.animation.frame = 0
+              this.animation.type = "shrinking"
+              this.isAnimated = true
+            }
+        }
+        else if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
+          this.oldX = this.x
+          this.oldY = this.y
+          this.energy -= 600-(Math.floor(this.energy/10))
+          this.animation.frame = 0
+          this.isAnimated = true
+          this.animation.type = "growing"
         }
         //move and set image index
         this.x += x
@@ -161,6 +174,7 @@ class Man extends WemoObject {
         this.vomit = false
 
         this.revealCell(this.x, this.y, true)
+        sounds.play("walk")
       }
       //reveal rockEdge cells
       else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type))

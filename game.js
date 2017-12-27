@@ -191,7 +191,7 @@ let game = new Vue({
           b.level = board.level || 10
           b.type = "custom"
       }
-      man = new Man(tiles.players[player.character], b.startX, b.startY)
+      man = new Man(player.character, b.startX, b.startY)
       backpack = new Backpack("backpack", b.backpack)
       delete b.backpack
       toolbelt = new Toolbelt(b.toolbelt)

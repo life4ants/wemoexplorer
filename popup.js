@@ -78,9 +78,9 @@ var popup = new Vue({
         {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax",
                   cost: "100 energy, 1 long grass, 1 rock, 1 stick", info: "For chopping down trees so you have logs to burn. Very important.", active: true},
         {name: "firepit", src: "images/firepitIcon.png", title: "Firepit",
-                  cost: "200 energy", info: "For building fires in. Very important for staying alive every night.", active: true},
+                  cost: "15 Wemo minutes, 200 energy", info: "For building fires in. Very important for staying alive every night.", active: true},
         {name: "basket", src: "images/basket.png", title: "Basket",
-                  cost: "50 energy, 6 long grass", info: "For picking berries and veggies in.", active: true},
+                  cost: "30 Wemo minutes, 50 energy, 6 long grass", info: "For picking berries and veggies in.", active: true},
         {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel",
                   cost: "120 energy, 1 stick, 1 long grass, 1 bone", info: "For digging up clay and ore.", active: true},
         {name: "claypot", src: "images/claypot.png", title: "Clay Pot",
@@ -150,7 +150,7 @@ var popup = new Vue({
     },
 
     build(){
-      if (["steppingStones", "raft", "campsite", "firepit"].includes(this.selected.name)){
+      if (["steppingStones", "raft", "campsite"].includes(this.selected.name)){
         builder.type = this.selected.name
         builder.size = this.selected.name === "campsite" ? 2 : 1
         game.toggleBuildMode()

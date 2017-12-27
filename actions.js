@@ -3,15 +3,22 @@ function build(type, pos){
   let cell = board.cells[pos.x][pos.y]
   // build firepit:
   if (type === "firepit"){
-    let fires = board.fires
     if (man.energy <= 200)
       return "Oops! You don't have enough energy!"
-    let id = fires.length > 0 ? fires[fires.length-1].id+1 : 0
-    cell.type = "firepit"
-    cell.id = id
-    fires.push({id: id, x: pos.x, y: pos.y, value: 0})
-    man.fireCheck()
-    man.energy -= 200
+    if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
+      man.isAnimated = true
+      man.animation = {frame: 0, type: "building", end: world.frameRate*4, action: () => {
+        let fires = board.fires
+        let id = fires.length > 0 ? fires[fires.length-1].id+1 : 0
+        fires.push({id: id, x: pos.x, y: pos.y, value: 0})
+        man.energy -= 200
+        cell.type = "firepit"
+        cell.id = id
+        man.fireCheck()
+      }}
+    }
+    else
+      return "Sorry, you can't build a firepit on a "+cell.type+" square!"
   }
   // build basket:
   else if (type === "basket"){
@@ -19,9 +26,13 @@ function build(type, pos){
     if (man.energy <= 50)
       return "Oops! you don't have enough energy!"
     if (num >= 6){
-      if (toolbelt.addItem("container", new Backpack("basket"))){
-        backpack.removeItem("longGrass", 6)
-        return "Congratulations! You can now gather berries. Look for the Basket icon on the top bar."
+      if (toolbelt.containers.length < toolbelt.maxContainers){
+        man.isAnimated = true
+        man.animation = {frame: 0, type: "building", end: world.frameRate*7.5, action: () => {
+          toolbelt.addItem("container", new Backpack("basket"))
+          backpack.removeItem("longGrass", 6)
+          popup.setAlert("Congratulations! You can now gather berries. Look for the Basket icon on the top bar.")
+        }}
       }
       else
         return "Opps! You can only carry one container at a time. Put your claypot in your campsite before building a basket."
@@ -179,6 +190,7 @@ function chop(){
       cell.tile = "stump"
       cell.quantity = 5
       man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
+      sounds.play("chop")
     }
   }
 }
@@ -195,7 +207,9 @@ function dump(type){
   else if (["log", "stick", "bone", "clay"].includes(type)){
     if (cell.type === type+"pile")
       cell.quantity++
-    else if (cell.type === type && type !== "clay"){
+    else if (cell.type === type){
+      if (type === "clay")
+        return "Sorry, you can't start a clay pile on a hill of clay."
       cell.type = type+"pile"
       cell.quantity = 2
     }
@@ -223,6 +237,7 @@ function dump(type){
       return "Sorry, you can't dump rock on a "+cell.type+" square!"
     backpack.removeItem("rock", 1)
   }
+  sounds.play("dump")
   return false
 }
 
@@ -259,6 +274,7 @@ function eat(){
     man.vomit = true
     return
   }
+  sounds.play("eat")
   let energy = kind === "berries" ? 40 : 30
   man.energy += energy
   if (kind === "berries")
@@ -335,11 +351,15 @@ function grab(){
         delete cell.quantity
       }
     }
+    else
+      return
   }
   //gather a log, bone or stick:
   else if (["log", "bone", "stick"].includes(cell.type)){
     if (backpack.addItem(cell.type))
       cell.type = cell.tile.replace(/\d+$/, "")
+    else
+      return
   }
   //gather a rock:
   else if ("rock" === cell.type){
@@ -350,6 +370,8 @@ function grab(){
         delete cell.quantity
       }
     }
+    else
+      return
   }
   //gather grass:
   else if ("longGrass" === cell.type){
@@ -358,6 +380,8 @@ function grab(){
       cell.tile = quantity > 1 ? "longGrass"+(quantity-1) : "grass"
       cell.type = quantity > 1 ? cell.type : "grass"
     }
+    else
+      return
   }
   //pick berries:
   else if ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0){
@@ -367,6 +391,8 @@ function grab(){
       let p = Math.floor(Math.random()*tree.berries.length)
       tree.berries.splice(p, 1)
     }
+    else
+      return
   }
   //gather veggies:
   else if ("veggies" === cell.type){
@@ -377,9 +403,13 @@ function grab(){
         cell.tile = quantity > 1 ? "veggies"+(quantity-1) : "grass"
         cell.type = quantity > 1 ? cell.type : "grass"
       }
+      else
+        return
     }
-    else
+    else {
       popup.setAlert("You can't gather veggies without a basket!")
+      return
+    }
   }
   //dig clay:
   else if (cell.type === "clay"){
@@ -395,13 +425,23 @@ function grab(){
         delete cell.quantity
       }
       man.energy = toolbelt.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
+      sounds.play("dig")
+      return
     }
+    else
+      return
   }
   else if (helpers.isNextToType(active.x,active.y, "river")){
     let pot = toolbelt.getContainer("claypot")
-    if (pot)
+    if (pot){
       pot.addItem("water")
+      //sounds.play("water")
+      return
+    }
   }
+  else
+    return
+  sounds.play("grab")
 }
 
 function throwBomb(){

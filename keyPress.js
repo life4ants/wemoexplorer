@@ -1,5 +1,5 @@
 function keyPressed(){
-  if (game.mode === "play" && game.started && !game.paused && !world.noKeys){
+  if (game.mode === "play" && game.started && !game.paused && !world.noKeys && !man.isAnimated){
     switch(keyCode){
       case LEFT_ARROW:
         active.move(-1, 0)

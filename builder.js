@@ -7,7 +7,7 @@ let builder = {
 
   loop(){
     vehicles.display()
-    man.display()
+    man.update()
     topbar.display()
     if (this.getPos()){
       this.allowed = this.checkAllowed()
@@ -74,8 +74,6 @@ let builder = {
         return (cell.type === "beach" && helpers.isNextToType(x, y, "water")) || cell.type === "river"
       case "campsite":
         return buildable.includes(cell.type) && !cell.byPit
-      case "firepit":
-        return ["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)
       default:
         return false
     }
