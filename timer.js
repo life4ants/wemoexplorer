@@ -60,8 +60,17 @@
     }
     if (x === 0){
       for (let i=x; i<board.buildings.length; i++){
-        if (board.buildings[i].type === "campsite" && board.buildings[i].fireValue > 0)
+        if (board.buildings[i].type === "campsite" && board.buildings[i].fireValue > 0){
           board.buildings[i].fireValue--
+          if (board.buildings[i].isCooking){//REFACTOR this into a building object
+            board.buildings[i].cookTime--
+            if (board.buildings[i].cookTime === 0){
+              board.buildings[i].isCooking = false
+              if (typeof board.buildings[i].action === "function")
+                board.buildings[i].action()
+            }
+          }
+        }
       }
     }
   },

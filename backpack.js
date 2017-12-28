@@ -25,7 +25,7 @@ class Backpack {
       this.maxWeight = 60
       this.items = {
         water: {weight: 15, quantity: 0},
-        stew: {weight: 15, quantity: 0}
+        veggyStew: {weight: 15, quantity: 0}
       }
     }
     if (items){
@@ -39,8 +39,16 @@ class Backpack {
   getAllItems(){
     let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "bomb"] :
             this.type === "basket" ? ["berries", "veggies"] :
-            this.type === "claypot" ? ["water", "stew"] : []
+            this.type === "claypot" ? ["water", "veggyStew"] : []
     return this.includesItems(ar)
+  }
+
+  getQuantity(){
+    let r = 0
+    for (let k in this.items){
+      r += this.items[k].quantity
+    }
+    return r
   }
 
   addItem(e){

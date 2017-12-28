@@ -29,6 +29,9 @@ let game = new Vue({
             <li>A red square means you can't build at that spot, a green circle inside a square means you can.</li>
             <li>Click to build!</li>
           </ul>
+          <p style="margin-left: 5px">
+            You are building: <br><b>{{buildType}}</b>
+          </p>
           <button style="margin-left: 20px" @click="toggleBuildMode" id="esc">Cancel</button>
         </div>
       </div>
@@ -76,6 +79,18 @@ let game = new Vue({
       localStorage.setItem("wemoUpToDate", "8pmDec122017")
     }
   },
+  computed: {
+    buildType(){
+      if (builder.item.name){
+        switch(builder.item.name){
+          case "raft": return "A Raft"
+          case "steppingStones": return "Stepping Stones"
+          case "campsite": return "A Campsite"
+        }
+      }
+      return ""
+    }
+  },
   methods: {
     action(key){
       if (man.isSleeping){
@@ -85,30 +100,31 @@ let game = new Vue({
       else {
         switch(key){
           case "B": popup.buildMenu();    break;
-          case "C": chop();               break;
+          case "C": actions.chop();       break;
           case "D":
             if (board.cells[active.x][active.y].type === "campsite"){ popup.dropMenu() }
             else { popup.dumpMenu() }
             break
-          case "E": eat();                break;
-          case "F": fling();              break;
+          case "E": actions.eat();        break;
+          case "F": actions.fling();      break;
           case "G":
-            if (board.cells[active.x][active.y].type === "campsite"){ popup.grabMenu() }
-            else { grab() }
+            if (board.cells[active.x][active.y].type === "campsite"){ popup.grabMenu("grab") }
+            else { actions.grab() }
             break
-          case "X": this.autoCenter = !this.autoCenter; break;
           case "J": man.dismount();       break;
+          case "K": popup.cookMenu();     break;
           case "S": man.goToSleep();      break;
-          case "T": throwBomb();          break;
+          case "T": actions.throwBomb();  break;
+          case "X": this.autoCenter = !this.autoCenter; break;
         }
       }
     },
     checkActive(){
-      if (man.isSleeping){
+      if (man.isSleeping || this.paused){
         for (let i = 0; i<this.icons.length; i++){
           this.icons[i].active = false
         }
-        this.icons[9].active = true
+        this.icons[9].active = man.isSleeping
       }
       else {
         let cell = board.cells[man.x][man.y]

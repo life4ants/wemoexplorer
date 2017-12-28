@@ -115,7 +115,8 @@ class Board extends WemoObject {
       }
     }
     for (let i=0; i<this.fires.length; i++){
-      let tile = this.fires[i].value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] : tiles.firepit
+      let tile = this.fires[i].value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] :
+        man.fireId === i ? tiles.firepitOutlined : tiles.firepit
       image(tile, this.fires[i].x*25, this.fires[i].y*25+topbarHeight)
       if (this.fires[i].value > 0)
         this.drawProgressBar(this.fires[i].x, this.fires[i].y, this.fires[i].value, 0)
@@ -131,9 +132,13 @@ class Board extends WemoObject {
       for (let b of this.buildings){
         image(tiles[b.type], b.x*25, b.y*25+topbarHeight)
         if (b.type === "campsite"){
+          if (b.isCooking){
+            image(tiles.claypot_water, b.x*25+12, (b.y+1)*25+topbarHeight, 10,10)
+            this.drawBadge(b.x*25+4, b.y*25+6+topbarHeight, "C", bootstrapColors.info)
+          }
           if (b.fireValue > 0){
             let tile = tiles.fire[Math.floor((frameCount%6)/2)]
-            image(tile, b.x*25+5, (b.y+1)*25+topbarHeight)
+            image(tile, b.x*25+5, (b.y+1)*25+topbarHeight+5, 25, 15, 0, 0, 25, 15)
             this.drawProgressBar(b.x, b.y+1, b.fireValue, 5)
           }
           this.drawBadge(b.x*25+42, b.y*25+6+topbarHeight, b.items.length, "#000")
@@ -253,7 +258,7 @@ class Board extends WemoObject {
     let x = Math.floor(mouseX/25)
     let cell = this.cells[x][y]
     if (cell.type === "campsite"){
-      popup.setInfo(cell.id)
+      popup.grabMenu("info", cell.id)
     }
   }
 

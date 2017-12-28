@@ -13,33 +13,80 @@ var popup = new Vue({
               <h6>Out of focus</h6>
               <p class="center-grey">click anywhere to close this</p>
             </div>
+            <div v-else-if="['build', 'cook'].includes(type)" class="modal-header">
+              <h4>{{title}}</h4>
+            </div>
             <div v-else class="modal-header">
               <h6>{{title}}</h6>
             </div>
-            <div v-if="type === 'build'" class="modal-body build-menu">
-              <div class="build-option-container">
-                <div v-for="(item, k) in showOptions" :id="item.name" :key="item.name"
-                          :class="{'red-border': selected.name === item.name, 'build-option': true}" @click="() => select(k)">
-                  <h5>{{item.title}}</h5>
-                  <img :src="item.src" height="50" width="50" >
-                  <p>cost: {{item.cost}}</p>
-                  <p>{{item.info}}</p>
+
+            <div v-if="type === 'build'" class="modal-body">
+              <div class="build-preview">
+                <img :src="selected.src" height="50" width="50">
+                <h5>{{selected.title}}</h5>
+                <p>{{selected.dist}}</p>
+                <p><b>Time it takes to build:</b> {{selected.time}} Wemo Minutes</p>
+                <p><b>Energy Needed:</b> {{selected.energy}}</p>
+                <p><b>Resources Needed:</b> {{selected.resources}}</p>
+                <p><b>Instructions:</b> {{selected.inst}}</p>
+              </div>
+              <div class="build-menu">
+                <div class="build-option-container">
+                  <div v-for="(item, k) in showOptions" :id="item.name" :key="item.name" @click="() => select(k)"
+                            :class="{'build-option-selected': selected.name === item.name, 'build-option': true}">
+                    <img :src="item.src" height="35" width="35" >
+                    <h6>{{item.title}}</h6>
+                    <p>{{item.dist}}</p>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <div v-if="type === 'cook'" class="modal-body">
+              <p>In order to cook anything, you must have a campsite and a clay pot.</p>
+              <div class="build-preview">
+                <img :src="selected.src" height="50" width="50">
+                <h5>{{selected.title}}</h5>
+                <p>{{selected.dist}}</p>
+                <p>Makes {{selected.servings}} servings</p>
+                <p><b>Time it takes to cook:</b> {{selected.time}} Wemo Minutes</p>
+                <p><b>Each Serving gives you:</b> {{selected.benefits}}</p>
+                <p><b>Ingredients Needed:</b> {{selected.resources}}</p>
+                <p><b>Instructions:</b> {{selected.inst}}</p>
+              </div>
+              <div class="build-menu">
+                <div class="build-option-container">
+                  <div v-for="(item, k) in showOptions" :id="item.name" :key="item.name" @click="() => select(k)"
+                            :class="{'build-option-selected': selected.name === item.name, 'build-option': true}">
+                    <img :src="item.src" height="35" width="35" >
+                    <h6>{{item.title}}</h6>
+                    <p>{{item.dist}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div v-else-if="type === 'gameOver'" class="modal-body">
               <p>Your energy and/or health reached 0, and you died.</p>
             </div>
+
             <div v-else-if="'dumpMenu' === type" class="modal-body">
               <p>Use arrow keys or click:</p>
-              <div style="display: flex">
-                <img v-for="(item, k) in showOptions" :key="item.name" :src="item.src" height="50" width="50"
-                          :class="selected.name === item.name ? 'red-border' : 'no-border'" @click="() => select(k)">
+              <div class="flex">
+                <div v-for="(item, k) in showOptions" :key="item.id" style="position: relative">
+                  <img :src="item.src" height="35" width="35" @click="() => select(k)"
+                    :class="selectId === k ? 'red-border' : 'no-border'">
+                  <div v-if="item.num" class="img-badge">{{item.num}}</div>
+                </div>
               </div>
             </div>
+
             <div v-else-if="'info' === type" class="modal-body">
-              <div style="display: flex">
-                <img v-for="item in showOptions" :key="item.name" :src="item.src" height="50" width="50" class="no-border">
+              <div class="flex">
+                <div v-for="item in showOptions" :key="item.id" style="position: relative">
+                  <img :src="item.src" height="35" width="35" class="no-border">
+                  <div v-if="item.num" class="img-badge">{{item.num}}</div>
+                </div>
               </div>
             </div>
 
@@ -47,16 +94,25 @@ var popup = new Vue({
               <button type="button" id="esc" @click="close">Cancel</button>
               <button type="button" class="button-primary" id="etr" @click="build">Build</button>
             </div>
+
+            <div v-else-if="'cook' === type" class="modal-footer">
+              <button type="button" id="esc" @click="close">Cancel</button>
+              <button type="button" class="button-primary" id="etr" @click="cook">Cook</button>
+            </div>
+
             <div v-else-if="'alert' === type" class="modal-footer">
               <button type="button" id="etr" @click="close">Ok</button>
             </div>
+
             <div v-else-if="'dumpMenu' === type" class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
               <button type="button" class="button-primary" id="etr" @click="action">{{actionTitle}}</button>
             </div>
+
             <div v-else-if="'info' === type" class="modal-footer">
               <button type="button" id="etr" @click="close">Ok</button>
             </div>
+
             <div v-else-if="'gameOver' === type" class="modal-footer">
               <button type="button" id="etr" @click="exit">Ok</button>
             </div>
@@ -75,25 +131,60 @@ var popup = new Vue({
       type: "",
       selected: null,
       buildOptions: [
-        {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax",
-                  cost: "100 energy, 1 long grass, 1 rock, 1 stick", info: "For chopping down trees so you have logs to burn. Very important.", active: true},
-        {name: "firepit", src: "images/firepitIcon.png", title: "Firepit",
-                  cost: "15 Wemo minutes, 200 energy", info: "For building fires in. Very important for staying alive every night.", active: true},
-        {name: "basket", src: "images/basket.png", title: "Basket",
-                  cost: "30 Wemo minutes, 50 energy, 6 long grass", info: "For picking berries and veggies in.", active: true},
-        {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel",
-                  cost: "120 energy, 1 stick, 1 long grass, 1 bone", info: "For digging up clay and ore.", active: true},
-        {name: "claypot", src: "images/claypot.png", title: "Clay Pot",
-                  cost: "150 energy, 2 clay", info: "For cooking food and carrying water", active: true},
-        {name: "raft", src: "images/raft0.png", title: "Raft",
-                  cost: "400 energy, 8 logs, 8 long grass", info: "For exploring water", active: true},
-        {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones",
-                  cost: "150 energy, 3 rocks", info: "For crossing rivers", active: true},
-        {name: "campsite", src: "images/campsite.png", title: "Campsite",
-                  cost: "500 energy, 5 logs, 10 sticks, 5 clay, 10 long grass", info: "A place to store tools, cook meals, and more!", active: true},
-        {name: "bomb", src: "images/bomb1.png", title: "Bomb",
-                  cost: "300 energy", info: "For clearing away clouds", active: false}
+        {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", active: true,
+            time: 15, energy: 100,
+            resources: "1 long grass, 1 rock, 1 stick",
+            dist: "For chopping down trees.",
+            inst: "Gather the needed resources in your backpack, then click build."},
+        {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", active: true,
+            time: 15, energy: 200,
+            resources: "none",
+            dist: "For building fires in.",
+            inst: "Go to the spot where you want to build a firepit, then click build." },
+        {name: "basket", src: "images/basket.png", title: "Basket", active: true,
+            time: 30, energy: 50,
+            resources: "6 long grass",
+            dist: "For gathering berries and veggies in.",
+            inst: "Gather 6 long grass in your backpack, then click build."},
+        {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel", active: true,
+            time: 20, energy: 120,
+            resources: "1 stick, 1 long grass, 1 bone",
+            dist: "For digging up clay and ore.",
+            inst: "Gather the needed resources in your backpack, then click build."},
+        {name: "claypot", src: "images/claypot.png", title: "Clay Pot", active: true,
+            time: 60, energy: 150,
+            resources: "2 clay",
+            dist: "For cooking food and carrying water",
+            inst: "Gather the clay in your backpack, go to a campsite, feed the fire enough to last on hour, then click build."},
+        {name: "raft", src: "images/raft0.png", title: "Raft", active: true,
+            time: 0, energy: 400,
+            resources: "8 logs, 8 long grass",
+            dist: "For exploring water",
+            inst: "Click build to select a location."},
+        {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", active: true,
+            time: 0, energy: 150,
+            resources: "3 rocks",
+            dist: "For crossing rivers",
+            inst: "Click build to select a location."},
+        {name: "campsite", src: "images/campsite.png", title: "Campsite", active: true,
+            time: 0, energy: 500,
+            resources: "5 logs, 10 sticks, 5 clay, 10 long grass",
+            dist: "A place to store tools, cook meals, and more!",
+            inst: "Click build to select a location."},
+        {name: "bomb", src: "images/bomb1.png", title: "Bomb", active: false,
+            time: 5, energy: 300,
+            resources: "none",
+            dist: "For clearing away clouds",
+            inst: "Click build, then select how many bombs you want added to your backpack."}
 
+      ],
+      cookOptions: [
+        {name: "veggyStew", src: "images/veggyStew.png", title: "Veggy Stew", active: true,
+            time: 40, benefits: "800 health, 400 energy", servings: 4,
+            resources: "4 units water, 4 veggies",
+            dist: "Nutritious Vegetable Stew",
+            inst: `Gather the water in a Clay Pot and the veggies in a Basket.
+              Put both containers in your campsite, then click cook.` }
       ],
       showOptions: [],
       selectId: null
@@ -117,8 +208,7 @@ var popup = new Vue({
       this.selected = this.showOptions[id]
       if (this.type === "build"){
         $(".build-menu").scrollTop(
-          $("#"+this.selected.name).offset().top-$(".build-menu").offset().top+$(".build-menu").scrollTop()-
-          $(".build-menu").height()+$("#"+this.selected.name).height()
+          $("#"+this.selected.name).offset().top-$(".build-menu").offset().top+$(".build-menu").scrollTop()-25
         );
       }
     },
@@ -150,14 +240,19 @@ var popup = new Vue({
     },
 
     build(){
+      if (man.energy <= this.selected.energy){
+        this.title = "Opps! You don't have enough energy!"
+        this.type = "alert"
+        return
+      }
       if (["steppingStones", "raft", "campsite"].includes(this.selected.name)){
-        builder.type = this.selected.name
+        builder.item = this.selected
         builder.size = this.selected.name === "campsite" ? 2 : 1
         game.toggleBuildMode()
         this.close()
       }
       else {
-        let message = build(this.selected.name, {x: active.x, y: active.y})
+        let message = actions.build(this.selected, {x: active.x, y: active.y})
         if (!message)
           this.close()
         else {
@@ -167,12 +262,40 @@ var popup = new Vue({
       }
     },
 
+    cookMenu(){
+      if (active === man){
+        let ar = []
+        for (let i = 0; i<this.cookOptions.length; i++){
+          if (this.cookOptions[i].active)
+            ar.push(this.cookOptions[i])
+        }
+        this.showOptions = ar
+        this.title = "Cook Book"
+        this.type = "cook"
+        this.size = "popup-center"
+        this.selected = this.showOptions[0]
+        this.selectId = 0
+        this.show = true
+        setTimeout(() => $(".build-menu").scrollTop(0), 0)
+        world.noKeys = true
+        noLoop()
+      }
+    },
+
+    cook(){
+      let msg = actions.cook(this.selected)
+      if (msg)
+        this.setAlert(msg)
+      else
+        this.close()
+    },
+
     dumpMenu(){
       let items = backpack.getAllItems()
       if (items.length === 0)
         return
       if (items.length === 1){
-        let msg = dump(items[0].type)
+        let msg = actions.dump(items[0].type)
         if (msg)
           this.setAlert(msg)
         return
@@ -226,8 +349,9 @@ var popup = new Vue({
       this.close()
     },
 
-    grabMenu(){
-      let items = board.buildings[board.cells[active.x][active.y].id].items
+    grabMenu(type, cellId){
+      let id = type === "info" ? cellId : board.cells[active.x][active.y].id
+      let items = board.buildings[id].items
       if (items.length === 0)
         return
       let options = [
@@ -237,14 +361,20 @@ var popup = new Vue({
         {name: "basket", src: "images/basket.png", type: "container"}
       ]
       let output = []
-      for (let i = 0; i < options.length; i++){
-        let t = items.findIndex((e) => e === options[i].name || e.type === options[i].name)
+      for (let i = 0; i < items.length; i++){
+        let t = options.findIndex((e) => e.name === items[i] || e.name === items[i].type)
         if (t !== -1){
-          options[i].id = t
-          output.push(options[i])
+          let o = typeof items[i] === "object" ? {id: i, num: items[i].getQuantity()} : {id: i}
+          let x = Object.assign(o, options[t])
+          output.push(x)
         }
       }
-      this.setMenu(output, "What would you like to grab from your campsite?", "Grab")
+      if (type === "grab" && !board.buildings[id].isCooking)
+        this.setMenu(output, "What would you like to grab from your campsite?", "Grab")
+      else if (type === "info")
+        this.setMenu(output, "Items in this campsite:", "info")
+      else
+        this.setAlert("Sorry, you can't grab anything from your campsite while you are cooking.")
     },
 
     grab(x){
@@ -268,39 +398,17 @@ var popup = new Vue({
     },
 
     setMenu(items, title, actionTitle){
-      this.type = "dumpMenu"
-      this.title = title
-      this.actionTitle = actionTitle
-      this.selected = items[0]
-      this.selectId = 0
       this.showOptions = items
+      this.title = title
       this.size = "popup-tiny"
-      this.show = true
-      world.noKeys = true
-      noLoop()
-    },
-
-    setInfo(id){
-      let items = board.buildings[id].items
-      if (items.length === 0)
-        return
-      let options = [
-        {name: "stoneAx", src: "images/stoneAx.png", type: "tool"},
-        {name: "boneShovel", src: "images/boneShovel.png", type: "tool"},
-        {name: "claypot", src: "images/claypot.png", type: "container"},
-        {name: "basket", src: "images/basket.png", type: "container"}
-      ]
-      let output = []
-      for (let i = 0; i < options.length; i++){
-        let t = items.findIndex((e) => e === options[i].name || e.type === options[i].name)
-        if (t !== -1){
-          output.push(options[i])
-        }
+      if (actionTitle === "info")
+        this.type = "info"
+      else {
+        this.type = "dumpMenu"
+        this.actionTitle = actionTitle
+        this.selected = items[0]
+        this.selectId = 0
       }
-      this.showOptions = output
-      this.type = "info"
-      this.title = "Items in this campsite:"
-      this.size = "popup-tiny"
       this.show = true
       world.noKeys = true
       noLoop()
@@ -308,7 +416,7 @@ var popup = new Vue({
 
     action(){
       if (this.actionTitle === "Dump"){
-        let msg = dump(this.selected.name)
+        let msg = actions.dump(this.selected.name)
         if (msg)
           this.setAlert(msg)
         else

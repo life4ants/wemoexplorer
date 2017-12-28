@@ -96,6 +96,7 @@ function preload(){
       loadImage("images/fire4.png")
     ],
     firepit: loadImage("images/firepit.png"),
+    firepitOutlined: loadImage("images/firepitOutlined.png"),
     grass: loadImage("images/grass.png"),
     log: loadImage("images/log.png"),
     logs: loadImage("images/logs.png"),
@@ -206,6 +207,7 @@ function preload(){
     veggies2: loadImage("images/veggies2.png"),
     veggies3: loadImage("images/veggies3.png"),
     veggies4: loadImage("images/veggies4.png"),
+    veggyStew: loadImage("images/veggyStew.png"),
     water: loadImage("images/water.png"),
     wigwam: loadImage("images/wigwam.png"),
     z: loadImage("images/z's.png")

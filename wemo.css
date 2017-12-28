@@ -193,28 +193,44 @@ body {
 
            /* ---------------------------- Build Menu: -------------------------*/
 .build-menu {
-  max-height: 350px;
+  max-height: 150px;
   overflow: scroll;
-}
-.build-option-container {
   border: 1px solid #666;
-  border-bottom-width: 0;
+}
+
+.build-preview {
+  margin-bottom: 10px;
+  /*border: 1px solid #333;*/
+  background-color: #ddd;
+  min-height: 200px;
+}
+
+.build-preview img {
+  float: left;
+  margin: 5px;
 }
 
 .build-option {
   cursor: pointer;
   background-color: #ffe;
   border-bottom: 2px solid #888;
-  min-height: 100px;
 }
 
 .build-option:hover {
-  background-color: #eeeed0;
+  background-color: #ffd;
+}
+
+.build-option-selected{
+  background-color: #eea !important;
 }
 
 .build-option img {
-  float: left;
-  margin-right: 8px;
+  float: right;
+  margin: 6px;
+}
+
+.build-option p {
+  text-align: center;
 }
 
           /* ------------------------------ General: -------------------------- */
@@ -280,6 +296,19 @@ body {
 .center-grey {
   text-align: center;
   color: #777;
+}
+
+.img-badge {
+  background-color: #000;
+  color: #fff;
+  line-height: 15px;
+  font-size: 10px;
+  text-align: center;
+  top: 0px;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  border-radius: 50%;
 }
 
             /* ----------------------- Modals: --------------------- */

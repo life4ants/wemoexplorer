@@ -105,9 +105,9 @@ let topbar = {
       else if (toolbelt.containers[i].type === "claypot"){
         let items = toolbelt.containers[i].getAllItems()
         if (items.length > 0){
-          let tile = items[0].type === "water" ? "claypot_water" : "claypot_stew"
+          let tile = items[0].type === "water" ? "claypot_water" : items[0].type
           image(tiles[tile], left+80, top+25)
-          board.drawBadge(left+100, top+25, items[0].quantity, "#3649A1")
+          board.drawBadge(left+100, top+25, items[0].quantity, "#04253F")
         }
         else
           image(tiles.claypot, left+80, top+25)

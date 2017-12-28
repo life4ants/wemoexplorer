@@ -2,29 +2,29 @@ let builder = {
   size: 1,
   x: 0,
   y: 0,
-  type: "",
-  allowed: false,
+  color: "red",
+  item: {},
 
   loop(){
     vehicles.display()
     man.update()
     topbar.display()
     if (this.getPos()){
-      this.allowed = this.checkAllowed()
+      this.color = this.checkAllowed()
       this.show()
     }
   },
 
   checkAllowed(){
     if (dist(this.x+(this.size/2), this.y+(this.size/2), man.x+0.5, man.y+0.5) > 4)
-      return false
+      return "orange"
     for (let i = this.x; i<this.x+this.size; i++){
       for (let j = this.y; j<this.y+this.size; j++){
         if (!this.rules(i,j) || (man.x === i && man.y === j) || !board.cells[i][j].revealed)
-          return false
+          return "red"
       }
     }
-    return true
+    return "green"
   },
 
   getPos(){
@@ -43,31 +43,27 @@ let builder = {
 
   show(){
     let w = this.size*25
-    let c = this.allowed ? "green" : "red"
-    stroke(c)
+    stroke(this.color)
     strokeWeight(3)
     noFill()
     rect(this.x*25,this.y*25+topbarHeight,w,w)
-    if (this.allowed){
+    if (this.color === "green"){
       ellipseMode(CORNER)
       ellipse(this.x*25,this.y*25+topbarHeight,w,w)
     }
   },
 
   clicker(){
-    if (this.allowed){
+    if (this.color === "green"){
       board.cells[this.x][this.y].revealed = 2
-      let msg = build(this.type, {x: this.x, y: this.y})
-      if (msg)
-        popup.setAlert(msg)
-      else
-        game.toggleBuildMode()
+      actions.addConstructionSite(this.item, board.cells[this.x][this.y])
+      game.toggleBuildMode()
     }
   },
 
   rules(x,y){
     let cell = board.cells[x][y]
-    switch(this.type){
+    switch(this.item.name){
       case "steppingStones":
         return fordable.includes(cell.tile)
       case "raft":

@@ -111,7 +111,8 @@ class Man extends WemoObject {
         image(this.img[1], dx, dy, 35, 25, sx, sy, 35, 25)
         if (this.animation.frame >= this.animation.end){
           this.isAnimated = false
-          this.animation.action()
+          if (typeof this.animation.action === "function")
+            this.animation.action()
         }
       }
       this.animation.frame++
