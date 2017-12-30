@@ -3,7 +3,7 @@
   savCyc: 0,
 
   update(){
-    if (frameCount%3 === 0)
+    if (frameCount%(world.frameRate/4) === 0)
       this.increment()
     if (frameCount%20 === 0)
       this.updateFires()
@@ -16,9 +16,9 @@
       if (Date.now()-world.frameTime < 18 || this.savCyc > 2){
         game.saveGame()
         if (this.savCyc > 2)
-          console.log("extra save", Date.now()-world.frameTime)
-        else
           console.log("game saved")
+        else
+          console.log("extra save", Date.now()-world.frameTime)
         this.savCyc = 0
       }
     }

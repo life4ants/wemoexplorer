@@ -1,4 +1,4 @@
-let editBar = {
+const editBar = {
   template: `
     <div class="topbar">
       <div class="side-buttons">
@@ -114,14 +114,14 @@ let editBar = {
       tiles4: [
         { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
         { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
-        { id: "log", src: "images/log.png", type: "log"},
+        { id: "stick", src: "images/stick.png", type: "stick"},
         { id: "rock", src: "images/rock4.png", type: "rock"},
         { id: "clay", src: "images/clay5.png", type: "clay"},
         { id: "bone", src: "images/bone.png", type: "bone"},
         { id: "grass", src: "images/grass.png", type: "grass"}
       ],
       tiles5: [
-        { id: "stick", src: "images/stick.png", type: "stick"},
+        { id: "cactus", src: "images/cactus.png", type: "cactus"},
         { id: "veggies4", src: "images/veggies4.png", type: "veggies"},
         { id: "rockMiddle", src: "images/rockEdge13.png", type: "rockMiddle"},
         { id: "water", src: "images/water.png", type: "water"},

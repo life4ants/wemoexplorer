@@ -241,6 +241,11 @@ let actions = {
         return "Sorry, you can't dump rock on a "+cell.type+" square!"
       backpack.removeItem("rock", 1)
     }
+    // rabbit:
+    else if (type === "rabbitLive"){
+      board.rabbits.push(new Animal("rabbit", tiles.rabbit, {x: man.x, y: man.y}))
+      backpack.removeItem("rabbitLive", 1)
+    }
     sounds.play("dump")
     return false
   },
@@ -352,6 +357,14 @@ let actions = {
   },
 
   grab(){
+    for (let i = board.rabbits.length - 1; i >= 0; i--) {
+      let r = board.rabbits[i]
+      if (r.x === man.x && r.y === man.y){
+        backpack.addItem("rabbitLive")
+        board.rabbits.splice(i, 1)
+        return
+      }
+    }
     let cell = board.cells[man.x][man.y]
     //grab a something from a pile:
     if (cell.type.substr(-4,4) === "pile"){
@@ -410,7 +423,7 @@ let actions = {
     else if ("veggies" === cell.type){
       let basket = toolbelt.getContainer("basket")
       if (basket){
-        if (basket.addItem("veggies")){
+        if (basket.addItem("veggies")){ //this code is copied in animal.js
           let quantity = Number(cell.tile.substr(7,1))
           cell.tile = quantity > 1 ? "veggies"+(quantity-1) : "grass"
           cell.type = quantity > 1 ? cell.type : "grass"
@@ -443,6 +456,7 @@ let actions = {
       else
         return
     }
+    //gather water:
     else if (helpers.isNextToType(active.x,active.y, "river")){
       let pot = toolbelt.getContainer("claypot")
       if (pot){

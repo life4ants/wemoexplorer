@@ -2,13 +2,12 @@ class Board extends WemoObject {
   constructor(a,b,fillType){
     super()
     this.buildings = []
+    this.rabbits = []
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       this.import(a)
       if (this.version !== 3)
         this.convertVersion2()
-      if (this.buildings){
-        this.initializeBuildings()
-      }
+      this.initializeObjects()
     }
     else if (arguments.length === 3){// creating a new game on editor
       this.cols = a
@@ -78,8 +77,13 @@ class Board extends WemoObject {
     }
     if (game.mode === "edit")
       image(tiles.players[0], this.startX*25, this.startY*25, 25, 25, 0, 25, 25, 25)
-    else
+    else {
       this.showObjects()
+      for (let r of this.rabbits){
+        if (typeof r.update === "function")
+          r.update()
+      }
+    }
   }
 
   fill(){
@@ -90,7 +94,7 @@ class Board extends WemoObject {
     }
   }
 
-  initializeBuildings(){
+  initializeObjects(){
     for (let i = 0; i < this.buildings.length; i++){
       for (let j = 0; j < this.buildings[i].items.length; j++){
         let item = this.buildings[i].items[j]
@@ -99,6 +103,19 @@ class Board extends WemoObject {
           this.buildings[i].items[j] = container
         }
       }
+    }
+    for (let i = 0; i < this.rabbits.length; i++){
+      let rabbit = new Animal("rabbit", tiles.rabbit, {x: this.rabbits[i].x, y: this.rabbits[i].y})
+      this.rabbits[i] = rabbit
+    }
+  }
+
+ addRabbits(){
+    let types = helpers.countTypes(board)
+    let total = this.rows*this.cols
+    let land = total - types.water - types.river
+    for (let i = 0; i < land/300; i++){
+      this.rabbits.push(new Animal("rabbit", tiles.rabbit))
     }
   }
 
@@ -247,7 +264,7 @@ class Board extends WemoObject {
     }
     if (this.revealCount === 40){
       popup.setAlert("Only 40 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.id === "bomb")].active = true
+      popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "bomb")].active = true
     }
     else if (this.revealCount === 0)
       setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 3000)

@@ -1,7 +1,13 @@
-let game = new Vue({
+var game = new Vue({
   el: '#game',
   template: `
     <div>
+      <div v-if="mode === 'play' && isMobile">
+        <div class="rightButton" @click="() => moveAction(0)"></div>
+        <div class="leftButton" @click="() => moveAction(1)"></div>
+        <div class="upButton" @click="() => moveAction(2)"></div>
+        <div class="downButton" @click="() => moveAction(3)"></div>
+      </div>
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
         :player="currentPlayer" :edit="edit"></welcome-menu>
       <edit-bar v-else-if="mode === 'edit'" :exit="exit"></edit-bar>
@@ -70,7 +76,7 @@ let game = new Vue({
           delete localStorage[s[i]]
         }
       }
-      let players = JSON.parse(localStorage.wemoPlayers)
+      let players = JSON.parse(localStorage.wemoPlayers || "[]")
       let newPlayers = []
       for (let i=0; i<players.length; i++){
         newPlayers.push({name: players[i].name, unlockedLevel: 1, games: [], character: 0})
@@ -89,6 +95,9 @@ let game = new Vue({
         }
       }
       return ""
+    },
+    isMobile(){
+      return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1)
     }
   },
   methods: {
@@ -119,8 +128,21 @@ let game = new Vue({
         }
       }
     },
+
+    moveAction(dir){
+      console.log(dir)
+      if (!world.noKeys && !this.paused && !man.isAnimated){
+        switch(dir){
+          case 0: active.move(1,0);  break;
+          case 1: active.move(-1,0); break;
+          case 2: active.move(0,-1); break;
+          case 3: active.move(0, 1); break;
+        }
+      }
+    },
+
     checkActive(){
-      if (man.isSleeping || this.paused){
+      if (man.isSleeping || this.paused || man.isAnimated){
         for (let i = 0; i<this.icons.length; i++){
           this.icons[i].active = false
         }
@@ -229,8 +251,10 @@ let game = new Vue({
       topbar.energy = man.energy
       world.noKeys = false
       timer.setTime(board.wemoMins)
-      if (!board.progress)
+      if (!board.progress){
         board.fill()
+        board.addRabbits()
+      }
       popup.reset()
       $(window).scrollTop(0).scrollLeft(0)
       $("body").addClass("full-screen")

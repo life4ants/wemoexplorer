@@ -11,7 +11,9 @@ class Backpack {
         longGrass: {weight: 15, quantity: 0},
         bone: {weight: 20, quantity: 0},
         clay: {weight: 60, quantity: 0},
-        bomb: {weight: 50, quantity: 0}
+        bomb: {weight: 50, quantity: 0},
+        rabbitLive: {weight: 50, quantity: 0},
+        rabbitDead: {weight: 50, quantity: 0}
       }
     }
     else if (this.type === "basket"){
@@ -37,7 +39,7 @@ class Backpack {
   }
 
   getAllItems(){
-    let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "bomb"] :
+    let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "bomb", "rabbitLive", "rabbitDead"] :
             this.type === "basket" ? ["berries", "veggies"] :
             this.type === "claypot" ? ["water", "veggyStew"] : []
     return this.includesItems(ar)

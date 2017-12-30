@@ -232,6 +232,52 @@ body {
 .build-option p {
   text-align: center;
 }
+          /* ------------------------------ Mobile Buttons: -------------------- */
+.rightButton {
+  position: fixed;
+  height: 200px;
+  width: 200px;
+  background-color: rgba(200,200,200,0.4);
+  border-radius: 50% 0 0 50%;
+  top: 50%;
+  right: 0px;
+  transform: translate(50%,-50%);
+  z-index: 10;
+}
+
+.leftButton {
+  position: fixed;
+  height: 200px;
+  width: 200px;
+  background-color: rgba(200,200,200,0.4);
+  border-radius: 0 50% 50% 0;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 1;
+}
+
+.upButton {
+  position: fixed;
+  height: 200px;
+  width: 200px;
+  background-color: rgba(200,200,200,0.4);
+  border-radius: 0 0 50% 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 10;
+}
+
+.downButton {
+  position: fixed;
+  height: 200px;
+  width: 200px;
+  background-color: rgba(200,200,200,0.4);
+  border-radius: 50% 50% 0 0;
+  bottom: 0px;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  z-index: 10;
+}
 
           /* ------------------------------ General: -------------------------- */
 .hidden {

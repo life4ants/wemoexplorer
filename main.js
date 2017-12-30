@@ -1,37 +1,11 @@
-let world = {
-  frameTime: Date.now(),
-  topOffset: 0,
-  leftOffset: 0,
-  noKeys: false,
-  frameRate: 12,
-
-  resize(cols, rows){
-    resizeCanvas(cols*25, game.mode === "play" ? rows*25+topbarHeight : rows*25)
-  },
-
-  interval(num){
-    return frameCount % (this.frameRate/4*num)
-  },
-
-  checkFrameRate(){
-    let diff = this.frameRate-frameRate()
-    if (diff > 4){
-      this.frameRate = diff > 8 ? this.frameRate-8 : this.frameRate-4
-      frameRate(this.frameRate)
-      console.log("dropped frame rate to", this.frameRate)
-    }
-    else
-      console.log(diff, "off of", this.frameRate)
-  },
-}
-
 const topbarHeight = 55
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "veggies"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
-const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake"]
+const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus"]
+const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "rockpile"]
 
 function preload(){
   tiles = {
@@ -60,6 +34,7 @@ function preload(){
     bomb: loadImage("images/bomb1.png"),
     bones: loadImage("images/bone.png"),
     boneShovel: loadImage("images/boneShovel.png"),
+    cactus: loadImage("images/cactus.png"),
     campsite: loadImage("images/campsite.png"),
     clouds: loadImage("images/clouds.png"),
     cloudsHalf: loadImage("images/cloudsHalf.png"),
@@ -128,6 +103,9 @@ function preload(){
     raft: [ loadImage("images/raft0.png"),
             loadImage("images/raft1.png"),
           ],
+    rabbit: loadImage("images/rabbit.png"),
+    rabbitLive: loadImage("images/rabbitLive.png"),
+    rabbitDead: loadImage("images/rabbitDead.png"),
     random: loadImage("images/random.png"),
     randomBerries: loadImage("images/randomBerries.png"),
     randomGrass: loadImage("images/randomGrass.png"),
@@ -215,7 +193,7 @@ function preload(){
 
   sounds.files = {
     //chop: new Audio("sounds/chop.mp3"),
-    //eat: new Audio("sounds/eat.mp3"),
+    eat: new Audio("sounds/eat.mp3"),
     //dig: new Audio("sounds/dig.mp3"),
     //dump: new Audio("sounds/dump.mp3"),
     //fling: new Audio("sounds/fling.mp3"),

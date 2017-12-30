@@ -80,12 +80,12 @@ let helpers = {
 
   },
 
-  randomPicker(type){
+  randomPicker(type){//string or array
     let count = 0
     while (count < 80){
       let x = floor(random(0, board.cols))
       let y = floor(random(0, board.rows))
-      if (board.cells[x][y].type === type){
+      if (type.includes(board.cells[x][y].type)){
         return {x: x, y: y, cell: board.cells[x][y], count: count}
       }
       count++
@@ -101,6 +101,30 @@ let helpers = {
         output[type] = output[type] || 0
         output[type]++
       }
+    }
+    return output
+  },
+
+  removeDir(d, dirs){//given a current direction and a list of directions, remove the opposite of the current direction
+    let nd = d > 1 ? (!(d-2))+2 : (!d)+0
+    let t = dirs.findIndex(e => e === nd)
+    if (t !== -1)
+      dirs.splice(t,1)
+    return dirs
+  },
+
+  walkableDirs(x,y){
+    let pdirs = [
+      [1,0],//right
+      [-1,0],//left
+      [0,-1],//up
+      [0,1]//down
+    ]
+    let output = []
+    for (let i = 0; i < pdirs.length; i++){
+      let a = x+pdirs[i][0], b = y+pdirs[i][1]
+      if (this.withinBounds(a,b) && !nonWalkable.includes(board.cells[a][b].type))
+        output.push(i)
     }
     return output
   }

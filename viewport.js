@@ -13,7 +13,7 @@ let viewport = {
       position = this.centerOn(active, center)
     else
       position = this.follow(active)
-    if (position)
+    if (position || center)
       this.position()
   },
 

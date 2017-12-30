@@ -3,11 +3,11 @@ let sounds = {
   files: {},
 
   play(file){ //only play walk and pit for now
-    // if (["eat", "dump", "grab", "dig"].includes(file)){
-    //   if (this.files[file].currentTime != 0)
-    //     this.files[file].currentTime = 0
-    //   this.files[file].play()
-    // }
+    if (["eat"/*, "dump", "grab", "dig"*/].includes(file)){
+      if (this.files[file].currentTime != 0)
+        this.files[file].currentTime = 0
+      this.files[file].play()
+    }
     if ("walk" === file){
       let num1 = this.odd ? 1 : 2
       let num2 = this.odd ? 2 : 1
