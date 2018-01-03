@@ -113,7 +113,7 @@ class Board extends WemoObject {
  addRabbits(){
     let types = helpers.countTypes(board)
     let total = this.rows*this.cols
-    let land = total - types.water - types.river
+    let land = total - (types.water || 0 ) - (types.river || 0)
     for (let i = 0; i < land/300; i++){
       this.rabbits.push(new Animal("rabbit", tiles.rabbit))
     }

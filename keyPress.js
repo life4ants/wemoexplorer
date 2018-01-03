@@ -41,6 +41,14 @@ function keyPressed(){
   }
 }
 
+function keyReleased(){
+  if (window.event.shiftKey){
+    console.log("shift+"+ keyCode)
+  }
+  else if (keyCode === 16)
+    console.log("shift was released")
+}
+
 function mousePressed(){
   if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height)
       return

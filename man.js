@@ -89,12 +89,11 @@ class Man extends WemoObject {
         return
       }
     }
-    else if (this.isAnimated){
+    if (this.isAnimated){
       if (["shrinking", "growing"].includes(this.animation.type)){
         let length = this.animation.type === "growing" ? 30-Math.round(this.energy/200) : 5
-        let size = this.animation.type === "growing" ?
-                  map(this.animation.frame, 0, length, 10, 25) :
-                  map(this.animation.frame, 0, length, 25, 10)
+        let size = this.animation.type === "growing" ?  map(this.animation.frame, 0, length, 10, 25) :
+              map(this.animation.frame, 0, length, 25, 10)
         let pos = map(this.animation.frame, 0, length, 0, 25)
         let x = (this.x-this.oldX)*pos
         let y = (this.y-this.oldY)*pos
@@ -243,6 +242,7 @@ class Man extends WemoObject {
       active.index = [0,1].includes(active.index) ? 4 : 5
       active = man
       this.revealCell(x,y,true)
+      this.fireCheck()
       return true
     }
     return false

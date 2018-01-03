@@ -215,6 +215,7 @@ function setup(){
   strokeJoin(ROUND)
   noLoop()
   game.mode = "welcome"
+  frameRate(world.frameRate)
   console.log("loaded in", Date.now()-world.frameTime)
 }
 

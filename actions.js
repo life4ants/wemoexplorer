@@ -357,12 +357,18 @@ let actions = {
   },
 
   grab(){
+    // catch a rabbit:
     for (let i = board.rabbits.length - 1; i >= 0; i--) {
       let r = board.rabbits[i]
       if (r.x === man.x && r.y === man.y){
-        backpack.addItem("rabbitLive")
-        board.rabbits.splice(i, 1)
-        return
+        if (backpack.addItem("rabbitLive")){
+          board.rabbits.splice(i, 1)
+          return
+        }
+        else {
+          popup.setAlert("your backpack is already full of rabbits")
+          returns
+        }
       }
     }
     let cell = board.cells[man.x][man.y]

@@ -57,6 +57,7 @@ var game = new Vue({
       {code: "J", active: false, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
       {code: "C", active: false, selected: false, id: "chop", src: "images/chop.png", title: "Chop down Tree (C)"},
       {code: "G", active: false, selected: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
+      {code: "F", active: false, selected: false, id: "fling", src: "images/fling.png", title: "Fling (F)"},
       {code: "S", active: false, selected: false, id: "sleep", src: "images/sleepIcon.png", title: "Go to Sleep (S)"},
       {code: "S", active: false, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
     ],
@@ -146,33 +147,38 @@ var game = new Vue({
         for (let i = 0; i<this.icons.length; i++){
           this.icons[i].active = false
         }
-        this.icons[9].active = man.isSleeping
+        this.icons[10].active = man.isSleeping
       }
       else {
         let cell = board.cells[man.x][man.y]
         //build:
         this.icons[0].active = active === man
         //dump:
-        this.icons[1].active = backpack.weight > 0 && (dumpable.includes(cell.type) || grabable.includes(cell.type))
+        this.icons[1].active = (backpack.weight > 0 && (dumpable.includes(cell.type) || grabable.includes(cell.type))) ||
+              (cell.type === "campsite" && toolbelt.getAllItems().length > 0)
         //grab:
-        this.icons[2].active = backpack.weight < backpack.maxWeight && grabable.includes(cell.type)
+        this.icons[2].active = (backpack.weight < backpack.maxWeight && grabable.includes(cell.type)) || cell.type === "campsite"
         //feed fire:
-        this.icons[3].active = backpack.includesItems(["log", "stick", "longGrass"]).length > 0 && man.isNextToFire
+        this.icons[3].active = backpack.includesItems(["log", "stick", "longGrass"]).length > 0 &&
+              (man.isNextToFire || cell.type === "campsite")
         //eat:
-        this.icons[4].active = (("berryTree" === cell.type &&
-                board.berryTrees[cell.id].berries.length > 0)) // or there are berries in your basket
+        let basket = toolbelt.getContainer("basket")
+        this.icons[4].active = (("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0)) ||
+              (basket && cell.type !== "berryTree" && basket.includesItems(["berries", "veggies"]).length > 0 )
         //jump:
-        this.icons[5].active = (!man.isRiding && vehicles.canMount(man.x, man.y)) ||
-               (man.isRiding && (active.landed || active.isBeside("dock") || "river" === board.cells[active.x][active.y].type))
+        this.icons[5].active = (man.isRiding && (active.landed || active.isBeside("dock") ||
+              "river" === board.cells[active.x][active.y].type)) ||  (!man.isRiding && vehicles.canMount(man.x, man.y))
         //chop:
         this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type)
         //pick:
         this.icons[7].active = (toolbelt.getContainer("basket") && "berryTree" === cell.type &&
               board.berryTrees[cell.id].berries.length > 0)
+        //fling:
+        this.icons[8].active = !!helpers.nearbyType(active.x, active.y, "construction")
         //sleep:
-        this.icons[8].active = (man.canSleep && !man.isSleeping && !man.isRiding)
+        this.icons[9].active = (man.canSleep && !man.isSleeping && !man.isRiding)
         //wake up:
-        this.icons[9].active = man.isSleeping
+        this.icons[10].active = man.isSleeping
       }
     },
 
