@@ -2,15 +2,8 @@ class Animal {
   constructor(type, img, pos){
     this.img = img
     this.type = type
-    if (pos){
-      this.x = pos.x
-      this.y = pos.y
-    }
-    else {
-      let spot = helpers.randomPicker(["grass","longGrass","sand"])
-      this.x = spot.x
-      this.y = spot.y
-    }
+    this.x = pos.x
+    this.y = pos.y
     this.dir = 0
     this.ateLast = board.wemoMins
   }

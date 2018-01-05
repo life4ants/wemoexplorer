@@ -130,79 +130,11 @@ var popup = new Vue({
       actionTitle: "",
       type: "",
       selected: null,
-      buildOptions: [
-        {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", active: true,
-            time: 15, energy: 100,
-            resources: "1 long grass, 1 rock, 1 stick",
-            dist: "For chopping down trees.",
-            inst: "Gather the needed resources in your backpack, then click build."},
-        {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", active: true,
-            time: 15, energy: 200,
-            resources: "none",
-            dist: "For building fires in.",
-            inst: "Go to the spot where you want to build a firepit, then click build." },
-        {name: "basket", src: "images/basket.png", title: "Basket", active: true,
-            time: 30, energy: 50,
-            resources: "6 long grass",
-            dist: "For gathering berries and veggies in.",
-            inst: "Gather 6 long grass in your backpack, then click build."},
-        {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel", active: true,
-            time: 20, energy: 120,
-            resources: "1 stick, 1 long grass, 1 bone",
-            dist: "For digging up clay and ore.",
-            inst: "Gather the needed resources in your backpack, then click build."},
-        {name: "claypot", src: "images/claypot.png", title: "Clay Pot", active: true,
-            time: 60, energy: 150,
-            resources: "2 clay",
-            dist: "For cooking food and carrying water",
-            inst: "Gather the clay in your backpack, go to a campsite, feed the fire enough to last on hour, then click build."},
-        {name: "raft", src: "images/raft0.png", title: "Raft", active: true,
-            time: 0, energy: 400,
-            resources: "8 logs, 8 long grass",
-            dist: "For exploring water",
-            inst: "Click build to select a location."},
-        {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", active: true,
-            time: 0, energy: 150,
-            resources: "3 rocks",
-            dist: "For crossing rivers",
-            inst: "Click build to select a location."},
-        {name: "campsite", src: "images/campsite.png", title: "Campsite", active: true,
-            time: 0, energy: 500,
-            resources: "5 logs, 10 sticks, 5 clay, 10 long grass",
-            dist: "A place to store tools, cook meals, and more!",
-            inst: "Click build to select a location."},
-        {name: "bomb", src: "images/bomb1.png", title: "Bomb", active: false,
-            time: 5, energy: 300,
-            resources: "none",
-            dist: "For clearing away clouds",
-            inst: "Click build, then select how many bombs you want added to your backpack."}
-
-      ],
-      cookOptions: [
-        {name: "veggyStew", src: "images/veggyStew.png", title: "Veggy Stew", active: true,
-            time: 40, benefits: "800 health, 400 energy", servings: 4,
-            resources: "4 units water, 4 veggies",
-            dist: "Nutritious Vegetable Stew",
-            inst: `Gather the water in a Clay Pot and the veggies in a Basket.
-              Put both containers in your campsite, then click cook.` }
-      ],
       showOptions: [],
       selectId: null
     }
   },
   methods: {
-    reset(){
-      for (var i = this.buildOptions.length - 1; i >= 0; i--) {
-        switch (this.buildOptions[i].name) {
-          case "raft":
-            this.buildOptions[i].active = !vehicles.raft
-            break
-          case "bomb":
-            this.buildOptions[i].active = board.revealCount <= 100
-        }
-      }
-    },
-
     select(id){
       this.selectId = id
       this.selected = this.showOptions[id]
@@ -221,12 +153,7 @@ var popup = new Vue({
 
     buildMenu(){
       if (active === man){
-        let ar = []
-        for (let i = 0; i<this.buildOptions.length; i++){
-          if (this.buildOptions[i].active)
-            ar.push(this.buildOptions[i])
-        }
-        this.showOptions = ar
+        this.showOptions = JSON.parse(JSON.stringify(options.build.filter(e => e.active)))
         this.title = "Build Menu"
         this.type = "build"
         this.size = "popup-center"
@@ -264,12 +191,7 @@ var popup = new Vue({
 
     cookMenu(){
       if (active === man){
-        let ar = []
-        for (let i = 0; i<this.cookOptions.length; i++){
-          if (this.cookOptions[i].active)
-            ar.push(this.cookOptions[i])
-        }
-        this.showOptions = ar
+        this.showOptions = JSON.parse(JSON.stringify(options.cook.filter(e => e.active)))
         this.title = "Cook Book"
         this.type = "cook"
         this.size = "popup-center"
@@ -300,20 +222,7 @@ var popup = new Vue({
           this.setAlert(msg)
         return
       }
-      let options = [
-        {name: "log", src: "images/logs.png"},
-        {name: "rock", src: "images/rocks.png"},
-        {name: "longGrass", src: "images/longGrass.png"},
-        {name: "bone", src: "images/bone.png"},
-        {name: "clay", src: "images/clay.png"},
-        {name: "stick", src: "images/sticks.png"}
-      ]
-      let output = []
-      for (let i = 0; i < options.length; i++){
-        if (items.find((e) => e.type === options[i].name)){
-          output.push(options[i])
-        }
-      }
+      let output = options.resources.filter(i => items.find((e) => e.type === i.name))
       this.setMenu(output, "What would you like to Dump?", "Dump")
     },
 
@@ -321,17 +230,11 @@ var popup = new Vue({
       let items = toolbelt.getAllItems()
       if (items.length === 0)
         return
-      let options = [
-        {name: "stoneAx", src: "images/stoneAx.png"},
-        {name: "boneShovel", src: "images/boneShovel.png"},
-        {name: "claypot", src: "images/claypot.png"},
-        {name: "basket", src: "images/basket.png"}
-      ]
       let output = []
-      for (let i = 0; i < options.length; i++){
-        let toolId = items.findIndex((e) => e.name === options[i].name)
-        if (toolId !== -1){
-          let item = Object.assign(options[i], items[toolId])
+      for (let i = 0; i < items.length; i++){
+        let t = options.tools.findIndex((e) => e.name === items[i].name)
+        if (t !== -1){
+          let item = Object.assign(options.tools[t], items[i])
           output.push(item)
         }
       }
@@ -354,18 +257,12 @@ var popup = new Vue({
       let items = board.buildings[id].items
       if (items.length === 0)
         return
-      let options = [
-        {name: "stoneAx", src: "images/stoneAx.png", type: "tool"},
-        {name: "boneShovel", src: "images/boneShovel.png", type: "tool"},
-        {name: "claypot", src: "images/claypot.png", type: "container"},
-        {name: "basket", src: "images/basket.png", type: "container"}
-      ]
       let output = []
       for (let i = 0; i < items.length; i++){
-        let t = options.findIndex((e) => e.name === items[i] || e.name === items[i].type)
+        let t = options.tools.findIndex((e) => e.name === items[i] || e.name === items[i].type)
         if (t !== -1){
           let o = typeof items[i] === "object" ? {id: i, num: items[i].getQuantity()} : {id: i}
-          let x = Object.assign(o, options[t])
+          let x = Object.assign(o, options.tools[t])
           output.push(x)
         }
       }
@@ -398,7 +295,7 @@ var popup = new Vue({
     },
 
     setMenu(items, title, actionTitle){
-      this.showOptions = items
+      this.showOptions = JSON.parse(JSON.stringify(items))
       this.title = title
       this.size = "popup-tiny"
       if (actionTitle === "info")

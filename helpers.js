@@ -70,19 +70,20 @@ let helpers = {
     return x >= 0 && x < board.cols && y >= 0 && y < board.rows
   },
 
-  looker(id){
+  looker(id,y){
     if (id === "active")
       return board.cells[active.x][active.y]
     if (id === "man")
       return board.cells[man.x][man.y]
     if (id === "mouse")
       return board.cells[floor(mouseX/25)][floor((mouseY-topbarHeight)/25)]
-
+    else if (y)
+      return board.cells[id][y]
   },
 
   randomPicker(type){//string or array
     let count = 0
-    while (count < 80){
+    while (count < 100){
       let x = floor(random(0, board.cols))
       let y = floor(random(0, board.rows))
       if (type.includes(board.cells[x][y].type)){
@@ -90,10 +91,10 @@ let helpers = {
       }
       count++
     }
-    return count
+    return false
   },
 
-  countTypes(b){
+  countTypes(b){//count num of each type of cell in the board
     let output = {}
     for (let i = 0; i <b.cells.length; i++) {
       for (let j = 0; j< b.cells[i].length; j++){
@@ -103,6 +104,15 @@ let helpers = {
       }
     }
     return output
+  },
+
+  sortedTypes(){
+    let t = this.countTypes(board)
+    let output = []
+    for (k in t){
+      output.push({type: k, num: t[k]})
+    }
+    return output.sort((a,b) => a.num-b.num)
   },
 
   removeDir(d, dirs){//given a current direction and a list of directions, remove the opposite of the current direction

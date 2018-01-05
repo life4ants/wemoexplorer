@@ -19,30 +19,34 @@ let topbar = {
   },
 
   showTimer(){
+    let midSize = viewport.width > 780
     let mins = board.wemoMins%1440
     let showMins = board.wemoMins%60 < 10 ? "0"+board.wemoMins%60 : board.wemoMins%60
     let showHours = Math.floor(board.wemoMins/60)%12 === 0 ? 12 : Math.floor(board.wemoMins/60)%12
     let suffix = mins < 720 ? " AM" : " PM"
     let top = viewport.top+10
-
     textAlign(RIGHT, TOP)
-    textSize(26)
+    textSize(midSize ? 26 : 18)
     fill(0)
     text(" Day "+ (Math.floor(board.wemoMins/1440)+1) + ", "+showHours+":"+showMins+suffix, viewport.right-40, top)
     image(tiles[timer.timeOfDay], viewport.right-35, top)
-    let sliderPos = game.mode === "build" ? mins : mins+(frameCount%3)/3
-    image(tiles.timeOfDay, viewport.right-270, top+33, 270, 10, sliderPos, 0, 270, 10)
+
+    let sWidth = midSize ? 270 : 160
+    let sOffset = game.mode === "build" ? mins : mins+(frameCount%(world.frameRate/4))/(world.frameRate/4)
+    sOffset = midSize ? sOffset : sOffset+55
+    image(tiles.timeOfDay, viewport.right-sWidth, top+33, sWidth, 10, sOffset, 0, sWidth, 10)
     strokeWeight(1)
     stroke(255)
-    triangle(viewport.right-140, top+32, viewport.right-130, top+32, viewport.right-135, top+38)
+    let tr = midSize ? viewport.right : viewport.right+55
+    triangle(tr-140, top+32, tr-130, top+32, tr-135, top+38)
     noFill()
     stroke(0)
-    rect(viewport.right-271, top+32,270,11)
+    rect(viewport.right-sWidth-1, top+32, sWidth, 11)
   },
 
   showEnergyBar(title, value, offset){
     let top = viewport.top+offset
-    let widthFactor = viewport.width > 1000 ? 10 : 16
+    let widthFactor = viewport.width > 1000 ? 10 : viewport.width > 780 ? 16 : 24
     fill(255)
     stroke(80)
     strokeWeight(3)
@@ -70,7 +74,7 @@ let topbar = {
   },
 
   showBackpack(){
-    let left = viewport.width > 1000 ? viewport.left+530 : viewport.left+340
+    let left = viewport.width > 1000 ? viewport.left+530 : viewport.width > 780 ? viewport.left+340 : viewport.left+240
     let top = viewport.top+3
     image(tiles.backpack, left, top)
     if (backpack.weight > 0){

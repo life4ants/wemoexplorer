@@ -130,7 +130,7 @@ var game = new Vue({
       }
     },
 
-    moveAction(dir){
+    moveAction(dir){//responds to mobile buttons for moving
       console.log(dir)
       if (!world.noKeys && !this.paused && !man.isAnimated){
         switch(dir){
@@ -261,7 +261,7 @@ var game = new Vue({
         board.fill()
         board.addRabbits()
       }
-      popup.reset()
+      options.reset()
       $(window).scrollTop(0).scrollLeft(0)
       $("body").addClass("full-screen")
       this.currentPlayer = player

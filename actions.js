@@ -1,5 +1,4 @@
 let actions = {
-
   addConstructionSite(item, cell){
     //build a campsite:
     if (item.name === "campsite"){
@@ -26,7 +25,7 @@ let actions = {
       }
       cell.type = "construction"
       cell.construction = construction
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "raft")].active = false
+      options.build[options.build.findIndex((e) => e.name === "raft")].active = false
     }
     // build stepping stones:
     else if (item.name === "steppingStones"){
@@ -89,17 +88,13 @@ let actions = {
       let num = backpack.includesItem("clay")
       if (num >= 2){
         if (cell.type === "campsite" && board.buildings[cell.id].fireValue >= 5){
-          if (toolbelt.containers.length < toolbelt.maxContainers){
-            backpack.removeItem("clay", 2)
-            board.buildings[cell.id].isCooking = true
-            board.buildings[cell.id].cookTime = 5
-            board.buildings[cell.id].action = function (){
-              toolbelt.addItem("container", new Backpack("claypot"))
-              popup.setAlert("Congratulations! You can now cook soup. Look for the Clay Pot icon on the top bar.")
-            }
+          backpack.removeItem("clay", 2)
+          board.buildings[cell.id].isCooking = true
+          board.buildings[cell.id].cookTime = 5
+          board.buildings[cell.id].action = function (){
+            board.buildings[cell.id].items.push(new Backpack("claypot"))
+            popup.setAlert("Your Clay Pot is now available to grab from your campsite")
           }
-          else
-            return "Opps! You can only carry one container at a time. Put your basket in your campsite before building a claypot."
         }
         else
           return "Opps! Your fire isn't big enough or you aren't in a campsite."
@@ -127,7 +122,7 @@ let actions = {
           }}
         }
         else
-          return "Opps! You can only carry two tools at a time. Put one of your tools in a campsite before building a "+item.title
+          return "Opps! You can only carry two tools at a time. Put one of your tools in a campsite before building a "+item.title+"."
       }
       else {
         let out = "Opps! You still need "
@@ -139,6 +134,55 @@ let actions = {
         }
         return out.slice(0, -5)+"!"
       }
+    }
+    // build a bow:
+    else if (["bow"].includes(item.name)){
+      let msg = "Your bow is done being built, and has been added to your toolbelt."
+      let needed = ["stick", "longGrass"]
+      let ar = backpack.includesItems(needed)
+      if (ar.length === 2 && ar[1].quantity >= 2){
+        if (toolbelt.tools.length < toolbelt.maxTools){
+          man.isAnimated = true
+          man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
+            toolbelt.addItem("tool", "bow")
+            backpack.removeItem("stick", 1)
+            backpack.removeItem("longGrass", 2)
+            popup.setAlert(msg)
+          }}
+        }
+        else
+          return "Opps! You can only carry two tools at a time. Put one of your tools in a campsite before building a Bow."
+      }
+      else {
+        let r
+        switch (ar.length){
+          case 0: r = "a stick and 2 long grass!"; break;
+          case 1:
+            r = ar[0].type === "longGrass" ? "a stick!" : "some long grass!"
+            break
+          default:
+            r = "another long grass!"
+        }
+        return "Opps! You still need "+r
+      }
+    }
+    // make some arrows:
+    else if ("arrows" === item.name){
+       let msg = "Your arrows are now in your backpack"
+      let needed = ["stick", "longGrass", "rock"]
+      let ar = backpack.includesItems(needed)
+      if (ar.length === 3 && ar[0].quantity >= 2 && ar[1].quantity >= 4 && ar[2].quantity >= 2){
+        man.isAnimated = true
+        man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
+          backpack.removeItem("stick", 2)
+          backpack.removeItem("longGrass", 4)
+          backpack.removeItem("rock", 2)
+          backpack.addItem("arrow", 5)
+          popup.setAlert(msg)
+        }}
+      }
+      else
+        return "Opps! You don't have all the needed resources!"
     }
     // buy a bomb:
     else if (item.name === "bomb"){
@@ -208,7 +252,7 @@ let actions = {
       return false
     }
     // log, stick, bone or clay:
-    else if (["log", "stick", "bone", "clay"].includes(type)){
+    else if (["log", "stick", "bone", "clay", "arrow"].includes(type)){
       if (cell.type === type+"pile")
         cell.quantity++
       else if (cell.type === type){
@@ -274,9 +318,8 @@ let actions = {
         let claypot = toolbelt.getContainer("claypot")
         if (claypot && claypot.includesItem("veggyStew")){
           claypot.removeItem("veggyStew", 1)
-          man.health = min(man.health+800, 5000)
-          man.energy = min(man.energy+400, 5000)
-          sounds.play("eat")
+
+          kind = "veggyStew"
         }
         return
       }
@@ -289,13 +332,19 @@ let actions = {
       msgs.following.msg = "You ate too much!!!"
       msgs.following.frames = 30
       man.vomit = true
+      sounds.play("vomit")
       return
     }
     sounds.play("eat")
-    let energy = kind === "berries" ? 40 : 30
-    man.energy += energy
-    if (kind === "berries")
-      man.health = man.health < 4995 ? man.health+5 : 5000
+    let e,h
+    switch (kind){
+      case "berries": e = 40, h = 5;       break;
+      case "veggies": e = 30, h = 2;       break;
+      case "veggyStew": e = 400, h = 800;  break;
+      default: e = 0, h = 0;
+    }
+    man.health = min(man.health+h, 5000)
+    man.energy = min(man.energy+e, 5025)
     if (man.energy > 5000)
       popup.setAlert("You are full. Stop eating!")
   },
@@ -386,7 +435,7 @@ let actions = {
         return
     }
     //gather a log, bone or stick:
-    else if (["log", "bone", "stick"].includes(cell.type)){
+    else if (["log", "bone", "stick", "arrow"].includes(cell.type)){
       if (backpack.addItem(cell.type))
         cell.type = cell.tile.replace(/\d+$/, "")
       else

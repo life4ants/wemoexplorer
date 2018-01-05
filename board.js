@@ -115,7 +115,9 @@ class Board extends WemoObject {
     let total = this.rows*this.cols
     let land = total - (types.water || 0 ) - (types.river || 0)
     for (let i = 0; i < land/300; i++){
-      this.rabbits.push(new Animal("rabbit", tiles.rabbit))
+      let pos = helpers.randomPicker(["grass", "longGrass", "sand", "veggies"])
+      if (pos)
+        this.rabbits.push(new Animal("rabbit", tiles.rabbit, pos))
     }
   }
 
@@ -264,7 +266,7 @@ class Board extends WemoObject {
     }
     if (this.revealCount === 40){
       popup.setAlert("Only 40 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
-      popup.buildOptions[popup.buildOptions.findIndex((e) => e.name === "bomb")].active = true
+      options.build[options.build.findIndex((e) => e.name === "bomb")].active = true
     }
     else if (this.revealCount === 0)
       setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 3000)

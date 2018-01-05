@@ -8,7 +8,7 @@ let sounds = {
         this.files[file].currentTime = 0
       this.files[file].play()
     }
-    if ("walk" === file){
+    else if ("walk" === file){
       let num1 = this.odd ? 1 : 2
       let num2 = this.odd ? 2 : 1
       if (this.files[file+num1].currentTime != 0){
@@ -18,7 +18,7 @@ let sounds = {
       this.files[file+num2].play()
       this.odd = !this.odd
     }
-    else if ("pit" === file)
+    else if (["pit", "vomit"].includes(file))
       this.files[file].play()
   }
 

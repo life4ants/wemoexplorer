@@ -7,13 +7,14 @@ class Backpack {
       this.items = {
         log: {weight: 100, quantity: 0},
         stick: {weight: 45, quantity: 0},
-        rock: {weight: 80, quantity: 0},
+        rock: {weight: 40, quantity: 0},
         longGrass: {weight: 15, quantity: 0},
         bone: {weight: 20, quantity: 0},
         clay: {weight: 60, quantity: 0},
         bomb: {weight: 50, quantity: 0},
         rabbitLive: {weight: 50, quantity: 0},
-        rabbitDead: {weight: 50, quantity: 0}
+        rabbitDead: {weight: 50, quantity: 0},
+        arrow: {weight: 10, quantity: 0}
       }
     }
     else if (this.type === "basket"){
@@ -39,7 +40,7 @@ class Backpack {
   }
 
   getAllItems(){
-    let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "bomb", "rabbitLive", "rabbitDead"] :
+    let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "arrow", "bomb", "rabbitLive", "rabbitDead"] :
             this.type === "basket" ? ["berries", "veggies"] :
             this.type === "claypot" ? ["water", "veggyStew"] : []
     return this.includesItems(ar)
@@ -53,13 +54,17 @@ class Backpack {
     return r
   }
 
-  addItem(e){
-    if (this.items[e] && this.weight+this.items[e].weight <= this.maxWeight){
-      this.items[e].quantity++
-      this.weight+=this.items[e].weight
+  addItem(e, num = 1){
+    if (this.items[e] && this.weight+(this.items[e].weight*num) <= this.maxWeight){
+      this.items[e].quantity+=num
+      this.weight+=this.items[e].weight*num
       return true
     }
     return false
+  }
+
+  itemFits(e, num){
+    return (this.items[e] && this.weight+(this.items[e].weight*num) <= this.maxWeight)
   }
 
   removeItem(e, num){

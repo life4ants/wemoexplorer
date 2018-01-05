@@ -6,9 +6,107 @@ const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMidd
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
 const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus"]
 const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "rockpile"]
+const options = {
+  reset(){
+    for (var i = this.build.length - 1; i >= 0; i--) {
+      switch (this.build[i].name) {
+        case "raft":
+          this.build[i].active = !vehicles.raft
+          break
+        case "bomb":
+          this.build[i].active = board.revealCount <= 100
+      }
+    }
+  },
+  build: [
+    {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", active: true,
+        time: 15, energy: 200,
+        resources: "none",
+        dist: "A bonfire to spend the night next to",
+        inst: "Go to the spot where you want to build a firepit, then click build." },
+    {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", active: true,
+        time: 0, energy: 150,
+        resources: "3 rocks",
+        dist: "For crossing rivers",
+        inst: "Click build to select a location."},
+    {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", active: true,
+        time: 15, energy: 100,
+        resources: "1 stick, 1 long grass, 1 rock",
+        dist: "A primitive ax for chopping trees and other things",
+        inst: "Gather the needed resources in your backpack, then click build."},
+    {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel", active: true,
+        time: 20, energy: 120,
+        resources: "1 stick, 1 long grass, 1 bone",
+        dist: "A primitive shovel for digging clay and ore",
+        inst: "Gather the needed resources in your backpack, then click build."},
+    {name: "bow", src: "images/bow.png", title: "Bow", active: true,
+        time: 45, energy: 80,
+        resources: "1 stick, 2 long grass",
+        dist: "For hunting",
+        inst: "Gather the needed resources in your backpack, then click build."},
+    {name: "arrows", src: "images/arrow.png", title: "Arrows", active: true,
+        time: 25, energy: 200,
+        resources: "2 sticks, 4 long grass, 2 rocks",
+        dist: "Flint head arrows for hunting",
+        inst: "Makes 5 arrows. Gather the needed resources in your backpack, then click build. Must have an Ax with you."},
+    {name: "basket", src: "images/basket.png", title: "Basket", active: true,
+        time: 30, energy: 50,
+        resources: "6 long grass",
+        dist: "For gathering berries and veggies in",
+        inst: "Gather 6 long grass in your backpack, then click build."},
+    {name: "claypot", src: "images/claypot.png", title: "Clay Pot", active: true,
+        time: 60, energy: 150,
+        resources: "2 clay",
+        dist: "For cooking food and carrying water",
+        inst: "Gather the clay in your backpack, go to a campsite, feed the fire enough to last on hour, then click build."},
+    {name: "raft", src: "images/raft0.png", title: "Raft", active: true,
+        time: 0, energy: 400,
+        resources: "8 logs, 8 long grass",
+        dist: "For exploring water",
+        inst: "Click build to select a location."},
+    {name: "campsite", src: "images/campsite.png", title: "Campsite", active: true,
+        time: 0, energy: 500,
+        resources: "5 logs, 10 sticks, 5 clay, 10 long grass",
+        dist: "A place to store tools, cook meals, and more!",
+        inst: "Click build to select a location."},
+    {name: "bomb", src: "images/bomb1.png", title: "Bomb", active: false,
+        time: 5, energy: 300,
+        resources: "none",
+        dist: "For clearing away clouds",
+        inst: "Click build, then select how many bombs you want added to your backpack."}
+  ],
+  cook: [
+    {name: "veggyStew", src: "images/veggyStew.png", title: "Veggy Stew", active: true,
+        time: 40, benefits: "800 health, 400 energy", servings: 4,
+        resources: "4 units water, 4 veggies",
+        dist: "Nutritious Vegetable Stew",
+        inst: `Gather the water in a Clay Pot and the veggies in a Basket.
+          Put both containers in your campsite, then click cook.` }
+  ],
+  resources: [
+    {name: "log", src: "images/logs.png"},
+    {name: "rock", src: "images/rocks.png"},
+    {name: "longGrass", src: "images/longGrass.png"},
+    {name: "bone", src: "images/bone.png"},
+    {name: "clay", src: "images/clay.png"},
+    {name: "stick", src: "images/sticks.png"},
+    {name: "arrow", src: "images/arrow.png"},
+    {name: "rabbitLive", src: "images/rabbitLive.png"},
+    {name: "rabbitDead", src: "images/rabbitDead.png"}
+  ],
+  tools: [
+    {name: "stoneAx", type: "tool", src: "images/stoneAx.png"},
+    {name: "bow", type: "tool", src: "images/bow.png"},
+    {name: "boneShovel", type: "tool", src: "images/boneShovel.png"},
+    {name: "claypot", type: "container", src: "images/claypot.png"},
+    {name: "basket", type: "container", src: "images/basket.png"}
+  ]
+}
 
 function preload(){
   tiles = {
+    arrow: loadImage("images/arrow.png"),
+    arrow1: loadImage("images/arrow2.png"),
     backpack: loadImage("images/carrying.png"),
     basket: loadImage("images/basket.png"),
     basketBerries: loadImage("images/basketBerries.png"),
@@ -34,6 +132,7 @@ function preload(){
     bomb: loadImage("images/bomb1.png"),
     bones: loadImage("images/bone.png"),
     boneShovel: loadImage("images/boneShovel.png"),
+    bow: loadImage("images/bow.png"),
     cactus: loadImage("images/cactus.png"),
     campsite: loadImage("images/campsite.png"),
     clouds: loadImage("images/clouds.png"),
@@ -199,6 +298,7 @@ function preload(){
     //fling: new Audio("sounds/fling.mp3"),
     //grab: new Audio("sounds/grab.mp3"),
     pit: new Audio("sounds/pitShort.mp3"),
+    vomit: new Audio("sounds/vomit.mp3"),
     //water: new Audio("sounds/water.wav"),
     walk1: new Audio("sounds/walk1.mp3"),
     walk2: new Audio("sounds/walk2.mp3")
@@ -206,6 +306,7 @@ function preload(){
 
   tiles.construction.steppingStones = tiles.steppingStones
   tiles.clays = tiles.clay
+  tiles.arrows = tiles.arrow
 }
 
 function setup(){
