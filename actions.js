@@ -352,11 +352,12 @@ let actions = {
   fling(){
     let cell = board.cells[man.x][man.y]
     if (man.isNextToFire || cell.type === "campsite"){
-      let items = backpack.includesItems(["log", "stick", "longGrass"])
+      let items = backpack.includesItems(["log", "stick", "longGrass", "rabbitLive"])
       if (items.length > 0){
         let fireValue = cell.type === "campsite" ? board.buildings[cell.id].fireValue : board.fires[man.fireId].value
         fireValue = items[0].type === "log" ? Math.min(fireValue+13, 20) :
-                       items[0].type === "stick" ? Math.min(fireValue+6, 20) : Math.min(fireValue+2, 20)
+                      items[0].type === "stick" ? Math.min(fireValue+6, 20) : 
+                        items[0].type === "longGrass" ? Math.min(fireValue+2, 20) : Math.min(fireValue+8,20)
         if (cell.type === "campsite")
           board.buildings[cell.id].fireValue = fireValue
         else
