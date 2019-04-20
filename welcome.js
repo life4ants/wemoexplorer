@@ -24,6 +24,7 @@ let welcome = {
             </div>
             <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
             <input type="text" v-model="name" placeholder="enter name">
+            <div class="version">version {{version}}</div>
           </div>
           <div v-else class="modal-body">
             <div class="links">
@@ -82,6 +83,7 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
+      version: "1.0.1"
     }
   },
   props: [
@@ -100,7 +102,7 @@ let welcome = {
       return this.players.length > 0 ? "Click on your name or make a new player:" : "Please enter your name to get started:"
     },
     title(){
-      return this.players.length > 0 ? "Welcome Back!" : "Hi there! Welcome to Wemo!"
+      return this.players.length > 0 ? "Welcome Back!" : "Hi There! Welcome to Wemo!"
     }
   },
   methods: {

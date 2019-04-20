@@ -191,6 +191,11 @@ body {
   justify-content: space-around;
 }
 
+.version {
+  margin-top: 15px;
+  font-size: 10px;
+  text-align: center;
+}
            /* ---------------------------- Build Menu: -------------------------*/
 .build-menu {
   max-height: 150px;
