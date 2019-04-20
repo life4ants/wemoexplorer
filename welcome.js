@@ -83,7 +83,7 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.0.1"
+      version: "1.0.2"
     }
   },
   props: [

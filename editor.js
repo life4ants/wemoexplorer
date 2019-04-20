@@ -74,8 +74,8 @@ let editor = {
   },
 
   floodFill(x,y, tile1, type1, tile2, type2){
-    board.cells[x][y] = {tile: tile2, type: type2}
-
+    this.changeTile(x,y,tile2, type2)
+    
     for (let i = x-1; i <= x+1; i++){
       for (let j = y-1; j <= y+1; j++){
         if (i >= 0 && i < board.cols && j >= 0 && j < board.rows && board.cells[i][j].type === type1)
