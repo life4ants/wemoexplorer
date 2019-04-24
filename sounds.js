@@ -3,7 +3,7 @@ let sounds = {
   files: {},
 
   play(file){ //only play walk and pit for now
-    if (["eat"/*, "dump", "grab", "dig"*/].includes(file)){
+    if (["eat", /*"dump", "grab", */"dig", "chop"].includes(file)){
       if (this.files[file].currentTime != 0)
         this.files[file].currentTime = 0
       this.files[file].play()

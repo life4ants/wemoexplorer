@@ -387,7 +387,7 @@ body {
 
 #grow.large {
   transition: max-height 1.5s linear;
-  max-height: 1000px;
+  max-height: 5000px;
   border: 1px solid #999;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
   box-shadow: 0 3px 9px rgba(0, 0, 0, .5);

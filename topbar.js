@@ -3,12 +3,15 @@ let topbar = {
   health: 0,
 
   display(){
+    let backpackPos = viewport.width > 1200 ? viewport.left+530 : viewport.width > 1000 ? viewport.left+340 : viewport.left+240
+    let widthFactor = viewport.width > 1200 ? 10 : viewport.width > 1000 ? 16 : 24
     this.showSelf()
     this.energy = helpers.smoothChange(this.energy, man.energy)
     this.health = helpers.smoothChange(this.health, man.health)
-    this.showEnergyBar("Energy: ", Math.round(this.energy), 3)
-    this.showEnergyBar("Health: ", Math.round(this.health), 30)
-    this.showBackpack()
+    this.showEnergyBar("Energy: ", Math.round(this.energy), 3, widthFactor)
+    this.showEnergyBar("Health: ", Math.round(this.health), 30, widthFactor)
+    this.showBackpack(backpackPos, viewport.top+3)
+    this.showWorldName(backpackPos+150)
     this.showTimer()
   },
 
@@ -44,9 +47,8 @@ let topbar = {
     rect(viewport.right-sWidth-1, top+32, sWidth, 11)
   },
 
-  showEnergyBar(title, value, offset){
+  showEnergyBar(title, value, offset, widthFactor){
     let top = viewport.top+offset
-    let widthFactor = viewport.width > 1000 ? 10 : viewport.width > 780 ? 16 : 24
     fill(255)
     stroke(80)
     strokeWeight(3)
@@ -73,10 +75,10 @@ let topbar = {
     text(title+value, viewport.left+12+x, top+2)
   },
 
-  showBackpack(){
-    let left = viewport.width > 1000 ? viewport.left+530 : viewport.width > 780 ? viewport.left+340 : viewport.left+240
-    let top = viewport.top+3
+  showBackpack(left, top){
+    // draw backpack:
     image(tiles.backpack, left, top)
+    // draw backpack items:
     if (backpack.weight > 0){
       let items = backpack.getAllItems()
       for (let i = 0; i<items.length; i++){
@@ -85,17 +87,20 @@ let topbar = {
         image(tiles[items[i].type], col*25+left+2, top+row)
         board.drawBadge(col*25+left+22, top+5+row, items[i].quantity, "#000")
       }
+      // draw weight bar:
       fill(255)
       stroke(80)
       strokeWeight(1)
       rect(left+55, top-1, 5, 21)
-      fill("#6C3C00")
+      fill("#6C3C00") // brown color
       noStroke()
       rect(left+56, top+20-Math.floor(backpack.weight/12.5), 4, Math.floor(backpack.weight/12.5))
     }
+    // draw tools:
     for (let i = 0; i < toolbelt.tools.length; i++){
       image(tiles[toolbelt.tools[i]], left+80+(i*26), top-1)
     }
+    // draw contaniners:
     for (let i = 0; i < toolbelt.containers.length; i++){
       if (toolbelt.containers[i].type === "basket"){
         image(tiles.basket, left+80, top+25)
@@ -117,5 +122,12 @@ let topbar = {
           image(tiles.claypot, left+80, top+25)
       }
     }
+  },
+
+  showWorldName(left){
+    fill(0)
+    textSize(20)
+    textAlign(LEFT,TOP)
+    text("World: "+board.name, left, viewport.top+20)
   }
 }

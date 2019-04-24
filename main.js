@@ -291,19 +291,21 @@ function preload(){
   }
 
   sounds.files = {
-    //chop: new Audio("sounds/chop.mp3"),
+    chop: new Audio("sounds/chop.mp3"),
     eat: new Audio("sounds/eat.mp3"),
-    //dig: new Audio("sounds/dig.mp3"),
+    dig: new Audio("sounds/dig.mp3"),
     //dump: new Audio("sounds/dump.mp3"),
     //fling: new Audio("sounds/fling.mp3"),
     //grab: new Audio("sounds/grab.mp3"),
     pit: new Audio("sounds/pitShort.mp3"),
+    sleep: new Audio("sounds/sleeping.mp3"),
     vomit: new Audio("sounds/vomit.mp3"),
     //water: new Audio("sounds/water.wav"),
     walk1: new Audio("sounds/walk1.mp3"),
     walk2: new Audio("sounds/walk2.mp3")
   }
 
+  sounds.files.sleep.loop = true
   tiles.construction.steppingStones = tiles.steppingStones
   tiles.clays = tiles.clay
   tiles.arrows = tiles.arrow

@@ -417,7 +417,7 @@ let actions = {
         }
         else {
           popup.setAlert("your backpack is already full of rabbits")
-          returns
+          return
         }
       }
     }

@@ -249,10 +249,14 @@ class Man extends WemoObject {
   }
 
   goToSleep(){
-    if (this.isSleeping)
+    if (this.isSleeping){
       this.isSleeping = false
-    else if (this.canSleep && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding)
-      this.isSleeping = !this.isSleeping
+      sounds.files['sleep'].pause()
+    }
+    else if (this.canSleep && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding){
+      this.isSleeping = true
+      sounds.files['sleep'].play()
+    }
     else {
       let message = this.isRiding ? "Sorry, no sleeping in your canoe!" :
                       !this.canSleep ? "Sorry, no sleeping during the day!" :
