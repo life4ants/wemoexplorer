@@ -126,7 +126,7 @@ class Board extends WemoObject {
     let types = helpers.countTypes(board)
     let total = this.rows*this.cols
     let land = total - (types.water || 0 ) - (types.river || 0)
-    for (let i = 0; i < land/300; i++){
+    for (let i = 0; i < land/600; i++){
       let pos = helpers.randomPicker(["grass", "longGrass", "sand", "veggies"])
       if (pos)
         this.rabbits.push(new Animal("rabbit", tiles.rabbit, pos))
