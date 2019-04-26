@@ -301,7 +301,7 @@ var popup = new Vue({
       if (actionTitle === "info")
         this.type = "info"
       else {
-        this.type = "dumpMenu"
+        this.type = "dumpMenu" // this might be the problem *******************************
         this.actionTitle = actionTitle
         this.selected = items[0]
         this.selectId = 0

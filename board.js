@@ -64,20 +64,32 @@ class Board extends WemoObject {
     for (let i = edge.left; i < edge.right; i++) {
       for (let j = edge.top; j< edge.bottom; j++){
         let cell = this.cells[i][j]
-        let offset = game.mode === "edit" ? 0 : topbarHeight
-        let img = game.mode === "edit" || cell.revealed ? tiles[cell.tile]: tiles["clouds"]
         try {
-          image(img, i*25, j*25+offset)
+          this.showCell(i, j, cell, cell.revealed)
         }
         catch(error){
           console.error(i,j,this.cells[i][j])
         }
-        this.showCell(i, j, cell, offset)
       }
     }
+
     if (game.mode === "edit")
       image(tiles.players[0], this.startX*25, this.startY*25, 25, 25, 0, 25, 25, 25)
     else {
+      // show cells surround the man if needed:
+      let n = 1
+      for (let i = -1; i <= 1; i++){
+        for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
+          let a = man.x+i
+          let b = man.y+j
+          let cell = this.cells[a][b]
+          if (a >= 0 && a < this.cols && b >= 0 && b < this.rows && !cell.revealed){
+            this.showCell(a, b, cell, true)
+            image(tiles["clouds"+n], a*25, b*25+topbarHeight)
+          }
+          n++
+        }
+      }
       this.showObjects()
       for (let r of this.rabbits){
         if (typeof r.update === "function")
@@ -166,7 +178,11 @@ class Board extends WemoObject {
     }
   }
 
-  showCell(x,y, cell, offset){
+  showCell(x,y, cell, revealed){
+    let offset = game.mode === "edit" ? 0 : topbarHeight
+    let img = game.mode === "edit" || revealed ? tiles[cell.tile]: tiles["clouds"]
+    image(img, x*25, y*25+offset)
+        
     if (["rock", "clay"].includes(cell.type) && (cell.revealed || game.mode === "edit")){
       image(tiles[cell.type+cell.quantity], x*25, y*25+offset)
     }
@@ -187,7 +203,7 @@ class Board extends WemoObject {
         this.drawBadge(x*25+a*14+4, y*25+offset+(b*14)+4, item.quantity, item.color)
       }
     }
-    if (cell.byPit && (cell.revealed || game.mode === 'edit'))
+    if (cell.byPit && (revealed || game.mode === 'edit'))
       this.drawRing(x,y)
     if (cell.revealed === 1)
       image(tiles.cloudsHalf, x*25, y*25+offset)
@@ -279,6 +295,7 @@ class Board extends WemoObject {
     if (cell.type === "campsite"){
       popup.grabMenu("info", cell.id)
     }
+    console.log(cell)
   }
 
   showNight(){
