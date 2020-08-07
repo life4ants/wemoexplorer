@@ -25,7 +25,7 @@ let actions = {
       }
       cell.type = "construction"
       cell.construction = construction
-      options.build[options.build.findIndex((e) => e.name === "raft")].active = false
+      //EXTRA CODE options.build[options.build.findIndex((e) => e.name === "raft")].active = false
     }
     // build stepping stones:
     else if (item.name === "steppingStones"){
