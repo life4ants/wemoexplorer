@@ -82,9 +82,8 @@ class Board extends WemoObject {
         for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
           let a = man.x+i
           let b = man.y+j
-          let cell = this.cells[a][b]
-          if (a >= 0 && a < this.cols && b >= 0 && b < this.rows && !cell.revealed){
-            this.showCell(a, b, cell, true)
+          if (a >= 0 && a < this.cols && b >= 0 && b < this.rows && !this.cells[a][b].revealed){
+            this.showCell(a, b, this.cells[a][b], true)
             image(tiles["clouds"+n], a*25, b*25+topbarHeight)
           }
           n++
