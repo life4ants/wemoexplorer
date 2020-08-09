@@ -261,8 +261,9 @@ var popup = new Vue({
       for (let i = 0; i < items.length; i++){
         let t = options.tools.findIndex((e) => e.name === items[i] || e.name === items[i].type)
         if (t !== -1){
-          let o = typeof items[i] === "object" ? {id: i, num: items[i].getQuantity()} : {id: i}
-          let x = Object.assign(o, options.tools[t])
+          let x = options.tools[t]
+          if(typeof items[i] === "object")
+            x.num = items[i].getQuantity()
           output.push(x)
         }
       }
@@ -274,11 +275,11 @@ var popup = new Vue({
         this.setAlert("Sorry, you can't grab anything from your campsite while you are cooking.")
     },
 
-    grab(x){
+    grab(x, selID){
       let items = board.buildings[board.cells[active.x][active.y].id].items
       if (x.type === "tool"){
         if (toolbelt.tools.length < toolbelt.maxTools){
-          toolbelt.tools.push(items.splice(x.id, 1)[0])
+          toolbelt.tools.push(items.splice(selID, 1)[0])
           this.close()
         }
         else
@@ -286,7 +287,7 @@ var popup = new Vue({
       }
       else if (x.type === "container"){
         if (toolbelt.containers.length < toolbelt.maxContainers){
-          toolbelt.containers.push(items.splice(x.id, 1)[0])
+          toolbelt.containers.push(items.splice(selID, 1)[0])
           this.close()
         }
         else
@@ -301,7 +302,7 @@ var popup = new Vue({
       if (actionTitle === "info")
         this.type = "info"
       else {
-        this.type = "dumpMenu" // this might be the problem *******************************
+        this.type = "dumpMenu" 
         this.actionTitle = actionTitle
         this.selected = items[0]
         this.selectId = 0
@@ -322,7 +323,7 @@ var popup = new Vue({
       else if (this.actionTitle === "Drop")
         this.drop(this.selected)
       else if (this.actionTitle === "Grab")
-        this.grab(this.selected)
+        this.grab(this.selected, this.selectId)
     },
 
     gameOver(){

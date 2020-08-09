@@ -18,7 +18,7 @@ class Man extends WemoObject {
     this.vomit = false
     this.inDark = false
     this.isSleeping = false
-    this.canSleep = false
+    this.canSleep = true // ***allow sleeping all the time
     this.isAnimated = false
     this.animation = {frame: 0, type: "", end: 0, action: null}
   }
@@ -60,7 +60,8 @@ class Man extends WemoObject {
         }
       }
     }
-    this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
+    // ****allow sleeping all the time
+    //this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
     if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
       msgs.following.msg = "Get off the fire! You're burning!"
       msgs.following.frames = 1

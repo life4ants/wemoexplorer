@@ -201,6 +201,7 @@ var game = new Vue({
       noLoop()
       this.started = false
       this.paused = false
+      sounds.files['sleep'].pause()
       popup.show = false
       world.topOffset = 0
       $("#board").css("top", world.topOffset+"px").css("left", world.leftOffset)
@@ -236,6 +237,8 @@ var game = new Vue({
           b.type = "custom"
       }
       man = new Man(player.character, b.startX, b.startY)
+      if (man.isSleeping)
+        sounds.files['sleep'].play()
       backpack = new Backpack("backpack", b.backpack)
       delete b.backpack
       toolbelt = new Toolbelt(b.toolbelt)
@@ -308,6 +311,8 @@ var game = new Vue({
         if (this.paused){
           timer.resume()
           this.paused = false
+          if (man.isSleeping)
+            sounds.files['sleep'].play()
           popup.close()
         }
         else {
@@ -315,6 +320,7 @@ var game = new Vue({
           popup.size = "popup-tiny"
           popup.show = true
           this.paused = true
+          sounds.files['sleep'].pause()
           noLoop()
         }
       }

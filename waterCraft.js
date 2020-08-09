@@ -29,13 +29,13 @@ class WaterCraft extends WemoObject{
     if (this.x + x >= 0 && this.x + x < board.cols &&
       this.y + y >= 0 && this.y + y < board.rows) {
       if (["water", "river", "steppingStones"].includes(board.cells[this.x+x][this.y+y].type) ||
-          (board.cells[this.x+x][this.y+y].type === "beach" &&
-           ["water", "river"].includes(board.cells[this.x][this.y].type))
+          ["grassBeach", "beach"].includes(board.cells[this.x+x][this.y+y].type) &&
+           ["water", "river"].includes(board.cells[this.x][this.y].type)
         ) {
 
         this.x += x
         this.y += y
-        this.landed = board.cells[this.x][this.y].type === "beach"
+        this.landed = ["grassBeach", "beach"].includes(board.cells[this.x][this.y].type)
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
         man.energy -= 2

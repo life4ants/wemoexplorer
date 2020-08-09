@@ -25,7 +25,7 @@ let actions = {
       }
       cell.type = "construction"
       cell.construction = construction
-      //EXTRA CODE options.build[options.build.findIndex((e) => e.name === "raft")].active = false
+      //**** allow more than 1 raft*** options.build[options.build.findIndex((e) => e.name === "raft")].active = false
     }
     // build stepping stones:
     else if (item.name === "steppingStones"){
@@ -318,10 +318,10 @@ let actions = {
         let claypot = toolbelt.getContainer("claypot")
         if (claypot && claypot.includesItem("veggyStew")){
           claypot.removeItem("veggyStew", 1)
-
           kind = "veggyStew"
         }
-        return
+        else
+          return
       }
     }
     else
