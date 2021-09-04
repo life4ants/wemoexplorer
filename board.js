@@ -116,7 +116,7 @@ class Board extends WemoObject {
       }
     }
     for (let i = 0; i < this.rabbits.length; i++){
-      let rabbit = new Animal("rabbit", tiles.rabbit, {x: this.rabbits[i].x, y: this.rabbits[i].y})
+      let rabbit = new Rabbit({x: this.rabbits[i].x, y: this.rabbits[i].y})
       this.rabbits[i] = rabbit
     }
   }
@@ -128,7 +128,7 @@ class Board extends WemoObject {
     for (let i = 0; i < land/600; i++){
       let pos = helpers.randomPicker(["grass", "longGrass", "sand", "veggies"])
       if (pos)
-        this.rabbits.push(new Animal("rabbit", tiles.rabbit, pos))
+        this.rabbits.push(new Rabbit(pos))
     }
   }
 
