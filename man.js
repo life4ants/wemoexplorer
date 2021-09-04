@@ -37,7 +37,7 @@ class Man extends WemoObject {
     if (this.inDark){
       msgs.following.msg = "You're too far from a fire!"
       msgs.following.frames = 1
-      this.health -= Math.floor((this.health+1500)/499)
+      this.health -= Math.floor((this.health+1000)/499)
     }
     if (this.isRiding){
       let sx = (active.index%3)*25
@@ -68,8 +68,8 @@ class Man extends WemoObject {
       this.health -=25
     }
     if (this.isSleeping){
-       this.health = this.health < 4997 ? this.health+3 : 5000
-       this.energy = frameCount%3 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
+       this.health = this.health < 4997 ? this.health+2 : 5000
+       this.energy = frameCount%5 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
     }
     this.display()
   }

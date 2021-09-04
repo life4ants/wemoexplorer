@@ -22,6 +22,8 @@
         this.savCyc = 0
       }
     }
+    if (frameCount%317 === 0)
+      this.growVeggies()
   },
 
   increment(){
@@ -70,6 +72,18 @@
                 board.buildings[i].action()
             }
           }
+        }
+      }
+    }
+  },
+
+  growVeggies(){
+    for (let i = 0; i<board.cols; i++){
+      for(let j=0; j<board.rows; j++){
+        if (board.cells[i][j].type === "veggies"){
+          let cell = board.cells[i][j]
+          let q = Number(cell.tile.substr(7,1))
+          cell.tile = q < 4 ? "veggies"+(q+1): cell.tile 
         }
       }
     }

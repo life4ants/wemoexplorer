@@ -303,29 +303,29 @@ let actions = {
       tree.berries.splice(p, 1)
       kind = "berries"
     }
-    else if (cell.type !== "berryTree"){
+    else if (cell.type === "veggies"){
+      let quantity = Number(cell.tile.substr(7,1))
+      cell.tile = quantity > 1 ? "veggies"+(quantity-1) : "grass"
+      cell.type = quantity > 1 ? cell.type : "grass"
+      kind = "veggies"
+    }
+    else {
       let basket = toolbelt.getContainer("basket")
+      let claypot = toolbelt.getContainer("claypot")
       if (basket){
         let items = basket.includesItems(["berries", "veggies"])
         if (items.length > 0){
           basket.removeItem(items[0].type, 1)
           kind = items[0].type
         }
-        else
-          return
       }
-      else {
-        let claypot = toolbelt.getContainer("claypot")
-        if (claypot && claypot.includesItem("veggyStew")){
-          claypot.removeItem("veggyStew", 1)
-          kind = "veggyStew"
-        }
-        else
-          return
+      if (claypot && claypot.includesItem("veggyStew")){
+        claypot.removeItem("veggyStew", 1)
+        kind = "veggyStew"
       }
     }
-    else
-      return
+    if (kind === "") return
+
     if (man.energy > 5000){
       man.energy -= Math.floor((Math.random()*5+1)*100)
       man.health -= Math.floor((Math.random()*5+1)*10)
@@ -338,8 +338,8 @@ let actions = {
     sounds.play("eat")
     let e,h
     switch (kind){
-      case "berries": e = 40, h = 5;       break;
-      case "veggies": e = 30, h = 2;       break;
+      case "berries": e = 40, h = 2;       break;
+      case "veggies": e = 50, h = 5;       break;
       case "veggyStew": e = 400, h = 800;  break;
       default: e = 0, h = 0;
     }
