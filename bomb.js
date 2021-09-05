@@ -10,14 +10,14 @@ class Bomb {
       case 3: dx = 0, dy = 1;
     }
     this.vel = createVector(dx*speed, dy*speed)
-    this.acc = createVector(-dx*0.1, -dy*0.1)
+    this.acc = createVector(-dx*0.11, -dy*0.11)
     this.phase = "fly"
     this.frame = 0
   }
 
-  move(){
-    let x = floor((this.pos.x+3)/25)
-    let y = floor((this.pos.y+3-topbarHeight)/25)
+  update(){//returns true if flight is over, false otherwise
+    let x = floor((this.pos.x)/25)
+    let y = floor((this.pos.y-topbarHeight)/25)
     if (this.phase === "fly"){
       if (!helpers.withinBounds(x,y) || this.vel.mag() < 0.1)
         return true
@@ -25,32 +25,30 @@ class Bomb {
         board.revealCell(x,y,true)
         this.pos = createVector(x*25-3, y*25+topbarHeight-3)
         this.phase = "explode"
+        return false
       }
-      else {
-        this.pos.add(this.vel)
-        this.vel.add(this.acc)
-      }
+      this.move()
+      return false
     }
-    else {
+    else if (this.phase === "explode"){
       this.frame++
-      if (this.frame > 14)
-        return true
+      return this.frame > 14
     }
-    return false
+  }
+
+  move(){
+    this.pos.add(this.vel)
+    this.vel.add(this.acc)
   }
 
   display(){
     if (this.phase === "fly"){
       fill(0)
       ellipseMode(CENTER)
-      ellipse(this.pos.x+16, this.pos.y+16, 10,10)
+      ellipse(this.pos.x+10, this.pos.y+10, 10,10)
     }
-    else
+    else if (this.phase === "explode")
       this.drawExplosion()
-  }
-
-  delete(){
-    delete this
   }
 
   drawExplosion(){

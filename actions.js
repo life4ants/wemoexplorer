@@ -45,9 +45,8 @@ let actions = {
       ", gather the needed resources, go near the construction site, and press F.")
   },
 
-  build(item, pos){
+  build(item, pos, quantity){
     let cell = board.cells[pos.x][pos.y]
-    let successMsg = false // return false if there is no message
     // build firepit:
     if (item.name === "firepit"){
       if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
@@ -90,7 +89,7 @@ let actions = {
         if (cell.type === "campsite" && board.buildings[cell.id].fireValue >= 5){
           backpack.removeItem("clay", 2)
           board.buildings[cell.id].isCooking = true
-          board.buildings[cell.id].cookTime = 5
+          board.buildings[cell.id].cookTime = 5 //4-5 periods of 13.33 wemo mins
           board.buildings[cell.id].action = function (){
             board.buildings[cell.id].items.push(new Backpack("claypot"))
             popup.setAlert("Your Clay Pot is now available to grab from your campsite")
@@ -168,7 +167,7 @@ let actions = {
     }
     // make some arrows:
     else if ("arrows" === item.name){
-       let msg = "Your arrows are now in your backpack"
+      let msg = "Your arrows are now in your backpack"
       let needed = ["stick", "longGrass", "rock"]
       let ar = backpack.includesItems(needed)
       if (ar.length === 3 && ar[0].quantity >= 2 && ar[1].quantity >= 4 && ar[2].quantity >= 2){
@@ -186,16 +185,23 @@ let actions = {
     }
     // buy a bomb:
     else if (item.name === "bomb"){
-      if (backpack.addItem("bomb"))
-        successMsg = "You now have a bomb in your backpack. Press T to throw it in the direction you are pointed."
+      if (backpack.itemFits("bomb", quantity) && man.energy > item.energy*quantity){
+        man.energy -= item.energy*(quantity-1)
+        man.isAnimated = true
+        man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
+          backpack.addItem("bomb", quantity)
+          popup.setAlert("The "+ (quantity > 1) ? "bombs have" : "bomb has" +" been added to your backpack. Press T to throw a bomb in the direction you are pointed.")
+        }}
+      }
       else
-        return "Sorry, no room in your backpack."
+        return "Sorry, there is not enough room in your backpack for "+quantity+" bombs."
     }
-    else
+
+    else // error catch
       return "Sorry, not available yet!"
 
     man.energy -= item.energy
-    return successMsg
+    return false //no message to send
   },
 
   cook(item){
@@ -529,8 +535,8 @@ let actions = {
   throwBomb(){
     if (active === man){
       if (backpack.removeItem("bomb", 1)){
-        let x = man.x*25-3
-        let y = man.y*25+topbarHeight-3
+        let x = man.x*25
+        let y = man.y*25+topbarHeight
         board.bombs = board.bombs || []
         board.bombs.push(new Bomb(x,y,man.index))
       }

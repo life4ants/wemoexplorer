@@ -237,8 +237,6 @@ var game = new Vue({
           b.type = "custom"
       }
       man = new Man(player.character, b.startX, b.startY)
-      if (man.isSleeping)
-        sounds.files['sleep'].play()
       backpack = new Backpack("backpack", b.backpack)
       delete b.backpack
       toolbelt = new Toolbelt(b.toolbelt)
@@ -251,6 +249,8 @@ var game = new Vue({
         man.import(b.man)
         delete b.man
       }
+      if (man.isSleeping)
+        sounds.files['sleep'].play()
       vehicles = new Vehicle(b.vehicles)
       delete b.vehicles
       active = man.ridingId ? vehicles[man.ridingId] : man

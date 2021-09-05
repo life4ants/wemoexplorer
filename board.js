@@ -154,7 +154,7 @@ class Board extends WemoObject {
     if (this.bombs){
       for (var i = this.bombs.length - 1; i >= 0; i--) {
         this.bombs[i].display()
-        if (this.bombs[i].move())
+        if (this.bombs[i].update())
           this.bombs.splice(i, 1)
       }
     }

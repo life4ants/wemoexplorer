@@ -55,7 +55,7 @@
   },
 
   updateFires(){
-    let x = Math.round(frameCount%40/20)
+    let x = Math.round(frameCount%40/20)//gives either 0 or 1
     for (let i=x; i<board.fires.length; i+=2){
       if (board.fires[i].value > 0)
         board.fires[i].value--

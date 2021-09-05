@@ -90,6 +90,11 @@ var popup = new Vue({
               </div>
             </div>
 
+            <div v-else-if="'pickBombs' === type" class="modal-body">
+              <label style="display: inline">Enter number:</label>
+              <input type="number" min="1" max="5" id="bombQuantity" value="1">
+            </div>
+
             <div      v-if="'build' === type" class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
               <button type="button" class="button-primary" id="etr" @click="build">Build</button>
@@ -100,7 +105,7 @@ var popup = new Vue({
               <button type="button" class="button-primary" id="etr" @click="cook">Cook</button>
             </div>
 
-            <div v-else-if="'alert' === type" class="modal-footer">
+            <div v-else-if="['alert', 'info'].includes(type)" class="modal-footer">
               <button type="button" id="etr" @click="close">Ok</button>
             </div>
 
@@ -109,8 +114,9 @@ var popup = new Vue({
               <button type="button" class="button-primary" id="etr" @click="action">{{actionTitle}}</button>
             </div>
 
-            <div v-else-if="'info' === type" class="modal-footer">
-              <button type="button" id="etr" @click="close">Ok</button>
+            <div v-else-if="'pickBombs' === type" class="modal-footer">
+              <button type="button" id="esc" @click="close">Cancel</button>
+              <button type="button" class="button-primary" id="etr" @click="action">Ok</button>
             </div>
 
             <div v-else-if="'gameOver' === type" class="modal-footer">
@@ -177,6 +183,10 @@ var popup = new Vue({
         builder.size = this.selected.name === "campsite" ? 2 : 1
         game.toggleBuildMode()
         this.close()
+      }
+      else if (this.selected.name === "bomb"){
+        this.type = "pickBombs"
+        this.title = "How many bombs do you want to get?"
       }
       else {
         let message = actions.build(this.selected, {x: active.x, y: active.y})
@@ -324,6 +334,13 @@ var popup = new Vue({
         this.drop(this.selected)
       else if (this.actionTitle === "Grab")
         this.grab(this.selected, this.selectId)
+      else if (this.type === "pickBombs"){
+        let msg = actions.build(this.selected, {x: active.x, y: active.y}, Number(bombQuantity.value))
+        if (msg)
+          this.setAlert(msg)
+        else
+          this.close()
+      }
     },
 
     gameOver(){
