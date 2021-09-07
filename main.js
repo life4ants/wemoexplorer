@@ -1,11 +1,11 @@
 const topbarHeight = 55
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
-const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "veggies"]
+const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "veggies"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
 const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus"]
-const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "rockpile"]
+const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
 const options = {
   reset(){
     for (var i = this.build.length - 1; i >= 0; i--) {
@@ -107,6 +107,7 @@ function preload(){
   tiles = {
     arrow: loadImage("images/arrow.png"),
     arrow1: loadImage("images/arrow2.png"),
+    arrowInFlight: loadImage("images/arrows.png"),
     backpack: loadImage("images/carrying.png"),
     basket: loadImage("images/basket.png"),
     basketBerries: loadImage("images/basketBerries.png"),
@@ -130,7 +131,6 @@ function preload(){
     berryTree: loadImage("images/berryTree.png"),
     bone: loadImage("images/bone.png"),
     bomb: loadImage("images/bomb1.png"),
-    bones: loadImage("images/bone.png"),
     boneShovel: loadImage("images/boneShovel.png"),
     bow: loadImage("images/bow.png"),
     cactus: loadImage("images/cactus.png"),
@@ -243,7 +243,6 @@ function preload(){
     rock2: loadImage("images/rock2.png"),
     rock3: loadImage("images/rock3.png"),
     rock4: loadImage("images/rock4.png"),
-    rock: loadImage("images/rock1.png"),
     rocks: loadImage("images/rocks.png"),
     rockEdge1: loadImage("images/rockEdge1.png"),
     rockEdge2: loadImage("images/rockEdge2.png"),
@@ -311,8 +310,10 @@ function preload(){
 
   sounds.files.sleep.loop = true
   tiles.construction.steppingStones = tiles.steppingStones
-  tiles.clays = tiles.clay
   tiles.arrows = tiles.arrow
+  tiles.bones = tiles.bone
+  tiles.clays = tiles.clay
+  tiles.rock = tiles.rock1
 }
 
 function setup(){

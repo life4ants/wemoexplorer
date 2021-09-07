@@ -141,7 +141,6 @@ body {
   padding: 10px;
   background-color: #ffa;
   border-bottom: 1px solid #E1E1E1;
-  min-height: 28px;
   overflow: hidden;
 }
 
@@ -198,16 +197,22 @@ body {
 }
            /* ---------------------------- Build Menu: -------------------------*/
 .build-menu {
-  max-height: 150px;
+  height: 150px;
   overflow: scroll;
   border: 1px solid #666;
 }
 
+@media (min-width: 600px){
+  .build-preview {
+    min-height: 200px;
+  }
+}
+
 .build-preview {
   margin-bottom: 10px;
-  /*border: 1px solid #333;*/
+  border: 1px solid #333;
   background-color: #ddd;
-  min-height: 200px;
+  min-height: 150px;
 }
 
 .build-preview img {
@@ -419,18 +424,16 @@ body {
   transform: translateY(-50%);
 }
 
-@media (min-width: 450px) {
-  #popup-small .modal-dialog{
-    width: 400px;
-    margin: 30px auto;
-  }
+#popup-small .modal-dialog{
+  width: 400px;
+  margin: 30px auto;
+}
 
-  #popup-center .modal-dialog {
-    width: 400px;
-    top: 50%;
-    margin: 0 auto;
-    transform: translateY(-50%);
-  }
+#popup-center .modal-dialog {
+  width: 400px;
+  top: 50%;
+  margin: 0 auto;
+  transform: translateY(-50%);
 }
 
 @media (min-width: 600px){

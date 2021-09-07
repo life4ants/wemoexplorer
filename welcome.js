@@ -22,8 +22,8 @@ let welcome = {
             <div v-if="players.length > 0" class="links">
               <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete players'}}</a>
             </div>
-            <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
             <input type="text" v-model="name" placeholder="enter name">
+            <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
             <div class="version">version {{version}}</div>
           </div>
           <div v-else class="modal-body">

@@ -90,10 +90,6 @@ class Board extends WemoObject {
         }
       }
       this.showObjects()
-      for (let r of this.rabbits){
-        if (typeof r.update === "function")
-          r.update()
-      }
     }
   }
 
@@ -133,6 +129,7 @@ class Board extends WemoObject {
   }
 
   showObjects(){
+    //berry Trees:
     for (let i=0; i<this.berryTrees.length; i++){
       let tree = this.berryTrees[i]
       if (viewport.onScreen(tree.x, tree.y) && this.cells[tree.x][tree.y].revealed){
@@ -144,6 +141,7 @@ class Board extends WemoObject {
         }
       }
     }
+    // Fires:
     for (let i=0; i<this.fires.length; i++){
       let tile = this.fires[i].value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] :
         man.fireId === i ? tiles.firepitOutlined : tiles.firepit
@@ -151,6 +149,11 @@ class Board extends WemoObject {
       if (this.fires[i].value > 0)
         this.drawProgressBar(this.fires[i].x, this.fires[i].y, this.fires[i].value, 0)
     }
+    //Rabbits:
+    for (let r of this.rabbits){
+      r.update()
+    }
+    //Bombs:
     if (this.bombs){
       for (var i = this.bombs.length - 1; i >= 0; i--) {
         this.bombs[i].display()
@@ -158,6 +161,21 @@ class Board extends WemoObject {
           this.bombs.splice(i, 1)
       }
     }
+    //Arrows:
+    if (this.arrows){
+      for (var i = this.arrows.length - 1; i >= 0; i--) {
+        this.arrows[i].display()
+        let a = this.arrows[i].update()
+        if (a.result === "continue")
+          continue
+        else if (a.result === "stopped"){
+          this.cells[a.x][a.y].type
+        }
+        if (a.result === "outOfBounds")
+          this.arrows.splice(i, 1)
+      }
+    }
+    //Campsites:
     if (this.buildings){//PATCH: check in case it's an old game
       for (let b of this.buildings){
         image(tiles[b.type], b.x*25, b.y*25+topbarHeight)

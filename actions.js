@@ -422,7 +422,7 @@ let actions = {
           return
         }
         else {
-          popup.setAlert("your backpack is already full of rabbits")
+          popup.setAlert("your backpack is full")
           return
         }
       }
@@ -533,12 +533,18 @@ let actions = {
   },
 
   throwBomb(){
-    if (active === man){
-      if (backpack.removeItem("bomb", 1)){
-        let x = man.x*25
-        let y = man.y*25+topbarHeight
-        board.bombs = board.bombs || []
-        board.bombs.push(new Bomb(x,y,man.index))
+    let x = man.x*25
+    let y = man.y*25+topbarHeight
+
+    if (backpack.removeItem("bomb", 1)){
+      board.bombs = board.bombs || []
+      board.bombs.push(new Projectile("bomb", x+3,y+3,man.index))// offset by 3 to move bomb coordinates towards center of cell
+    }
+    else if (backpack.removeItem("arrow", 1)){
+      let id = toolbelt.tools.findIndex((e) => e === "bow")
+      if (id >= 0){
+        board.arrows = board.arrows || []
+        board.arrows.push(new Projectile("arrow", x+12,y+1,man.index))
       }
     }
   }
