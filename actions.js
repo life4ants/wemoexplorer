@@ -208,18 +208,19 @@ let actions = {
     if (board.cells[man.x][man.y].type === "campsite"){
       let camp = board.buildings[board.cells[man.x][man.y].id]
       if (camp.fireValue >= floor(item.time/13.333)){
-        if (item.name === "veggyStew"){
+        if (item.name === "rabbitStew"){
           let w = camp.items.findIndex((e) => e.type === "claypot" && e.items.water.quantity === 4)
-          let v = camp.items.findIndex((e) => e.type === "basket" && e.items.veggies.quantity >= 4)
-          if (w === -1 || v === -1)
+          let v = camp.items.findIndex((e) => e.type === "basket" && e.items.veggies.quantity >= 8)
+          if (w === -1 || v === -1 || backpack.includesItem("rabbitDead") < 1)
             return "Opps! looks like you don't have the needed ingredients. Make sure you dropped the claypot and basket in your campsite."
           else {
-            camp.items[v].removeItem("veggies", 4)
+            camp.items[v].removeItem("veggies", 8)
             camp.isCooking = true
             camp.cookTime = 3
             camp.action = function(){
               camp.items[w].items.water.quantity = 0
-              camp.items[w].items.veggyStew.quantity = 4
+              camp.items[w].items.rabbitStew.quantity = 8
+              backpack.removeItem("rabbitDead", 1)
               popup.setAlert("Your stew is done!")
             }
           }
@@ -240,11 +241,13 @@ let actions = {
         popup.setAlert("It looks like you don't have any tools for chopping down trees. Look for an ax on the Build Menu.")
       }
       else {
-        cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
-        cell.tile = "stump"
-        cell.quantity = 5
-        man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
-        sounds.play("chop")
+        man.isAnimated = true
+        man.animation = {frame: 0, type: "chopping", end: world.frameRate*15/3, action: () => {
+          cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
+          cell.tile = "stump"
+          cell.quantity = 5
+          man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
+        }}
       }
     }
   },
@@ -325,9 +328,9 @@ let actions = {
           kind = items[0].type
         }
       }
-      if (claypot && claypot.includesItem("veggyStew")){
-        claypot.removeItem("veggyStew", 1)
-        kind = "veggyStew"
+      if (claypot && claypot.includesItem("rabbitStew")){
+        claypot.removeItem("rabbitStew", 1)
+        kind = "rabbitStew"
       }
     }
     if (kind === "") return
@@ -344,9 +347,9 @@ let actions = {
     sounds.play("eat")
     let e,h
     switch (kind){
-      case "berries": e = 40, h = 2;       break;
-      case "veggies": e = 50, h = 5;       break;
-      case "veggyStew": e = 400, h = 800;  break;
+      case "berries": e = 25, h = 2;       break;
+      case "veggies": e = 40, h = 5;       break;
+      case "rabbitStew": e = 200, h = 500;  break;
       default: e = 0, h = 0;
     }
     man.health = min(man.health+h, 5000)
@@ -429,8 +432,24 @@ let actions = {
       }
     }
     let cell = board.cells[man.x][man.y]
+    //grab dead rabbit:
+    if (cell.rabbits){
+      if(backpack.addItem("rabbitDead"), 1){
+        cell.rabbits -= 1
+        if (cell.rabbits === 0)
+          delete cell.rabbits
+      }
+    }
+    //grab arrow:
+    else if (cell.arrows){
+      if(backpack.addItem("arrow"), 1){
+        cell.arrows -= 1
+        if (cell.arrows === 0)
+          delete cell.arrows
+      }
+    }
     //grab a something from a pile:
-    if (cell.type.substr(-4,4) === "pile"){
+    else if (cell.type.substr(-4,4) === "pile"){
       let item = cell.type.substr(0, cell.type.length-4)
       if (backpack.addItem(item)){
         cell.quantity--

@@ -13,6 +13,7 @@ class Projectile {
     this.phase = "fly"
     this.frame = 0
     this.type = type
+    this.dir = dir
   }
 
   move(){
@@ -71,19 +72,24 @@ class Projectile {
     return false
   }
 
-  updateArrow(x,y){
+  updateArrow(x,y){ //return true if flight is over, false otherwise
     if (!helpers.withinBounds(x,y))
-      return {result: "outOfBounds"}
-    if (this.vel.mag() < 0.1)
-        return {result: "stopped", x, y}
+      return true
+    let cell = board.cells[x][y]
     for (let i = board.rabbits.length - 1; i >= 0; i--) {
       let r = board.rabbits[i]
       if (r.x === x && r.y === y){
         board.rabbits.splice(i, 1)
-        return {result: "hitRabbit", x, y} 
+        cell.rabbits = cell.rabbits ? cell.rabbits + 1 : 1
+        cell.arrows = cell.arrows ? cell.arrows + 1 : 1
+        return true
       }
     }
+    if (this.vel.mag() < 0.1){
+      cell.arrows = cell.arrows ? cell.arrows + 1 : 1
+      return true
+    } 
     this.move()
-    return {result: "contine"} 
+    return false 
   }
 }

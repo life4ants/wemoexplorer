@@ -104,11 +104,13 @@ class Man extends WemoObject {
         if (this.animation.frame >= length)
           this.isAnimated = false
       }
-      else if ("building" === this.animation.type){
+      else if (["building", "chopping"].includes(this.animation.type)){
         let id = floor(map(frameCount%(world.frameRate/3), 0, world.frameRate/3, 0, 3))
         let sx = (id%3)*35
         let sy = floor(id/3)*25
         image(this.img[1], dx, dy, 35, 25, sx, sy, 35, 25)
+        if (this.animation.type === "chopping" && frameCount%6 === 0)
+          sounds.play("chop")
         if (this.animation.frame >= this.animation.end){
           this.isAnimated = false
           if (typeof this.animation.action === "function")

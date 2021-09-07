@@ -68,7 +68,8 @@ class Board extends WemoObject {
           this.showCell(i, j, cell, cell.revealed)
         }
         catch(error){
-          console.error(i,j,this.cells[i][j])
+          console.error(i,j,this.cells[i][j], error)
+          noLoop()
         }
       }
     }
@@ -165,13 +166,7 @@ class Board extends WemoObject {
     if (this.arrows){
       for (var i = this.arrows.length - 1; i >= 0; i--) {
         this.arrows[i].display()
-        let a = this.arrows[i].update()
-        if (a.result === "continue")
-          continue
-        else if (a.result === "stopped"){
-          this.cells[a.x][a.y].type
-        }
-        if (a.result === "outOfBounds")
+        if (this.arrows[i].update())
           this.arrows.splice(i, 1)
       }
     }
@@ -198,8 +193,10 @@ class Board extends WemoObject {
   showCell(x,y, cell, revealed){
     let offset = game.mode === "edit" ? 0 : topbarHeight
     let img = game.mode === "edit" || revealed ? tiles[cell.tile]: tiles["clouds"]
+    // print the tile:
     image(img, x*25, y*25+offset)
-        
+    
+    // print the type:
     if (["rock", "clay"].includes(cell.type) && (cell.revealed || game.mode === "edit")){
       image(tiles[cell.type+cell.quantity], x*25, y*25+offset)
     }
@@ -220,6 +217,13 @@ class Board extends WemoObject {
         this.drawBadge(x*25+a*14+4, y*25+offset+(b*14)+4, item.quantity, item.color)
       }
     }
+    //print dead rabbits and arrows:
+    if (cell.rabbits && cell.revealed)
+      image(tiles["rabbitDead"], x*25, y*25+offset)
+    if (cell.arrows && cell.revealed)
+      image(tiles["arrow"], x*25, y*25+offset)
+      
+    //print pit rings: 
     if (cell.byPit && (revealed || game.mode === 'edit'))
       this.drawRing(x,y)
     if (cell.revealed === 1)

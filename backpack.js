@@ -25,10 +25,10 @@ class Backpack {
       }
     }
     else if (this.type === "claypot"){
-      this.maxWeight = 60
+      this.maxWeight = 64
       this.items = {
-        water: {weight: 15, quantity: 0},
-        veggyStew: {weight: 15, quantity: 0}
+        water: {weight: 16, quantity: 0},
+        rabbitStew: {weight: 8, quantity: 0}
       }
     }
     if (items){
@@ -42,7 +42,7 @@ class Backpack {
   getAllItems(){
     let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "arrow", "bomb", "rabbitLive", "rabbitDead"] :
             this.type === "basket" ? ["berries", "veggies"] :
-            this.type === "claypot" ? ["water", "veggyStew"] : []
+            this.type === "claypot" ? ["water", "rabbitStew"] : []
     return this.includesItems(ar)
   }
 

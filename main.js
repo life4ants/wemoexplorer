@@ -79,11 +79,12 @@ const options = {
         inst: "Click build, then select how many bombs you want added to your backpack."}
   ],
   cook: [
-    {name: "veggyStew", src: "images/veggyStew.png", title: "Veggy Stew", active: true,
-        time: 40, benefits: "800 health, 400 energy", servings: 4,
-        resources: "4 units water, 4 veggies",
-        dist: "Nutritious Vegetable Stew",
-        inst: `Gather the water in a Clay Pot and the veggies in a Basket.
+    {name: "rabbitStew", src: "images/veggyStew.png", title: "Rabbit Stew", active: true,
+        time: 40, benefits: "800 health, 400 energy", servings: 8,
+        resources: "4 units water, 8 veggies, 1 dead rabbit",
+        dist: "Nutritious Rabbit Stew",
+        inst: `Gather the water in a Clay Pot and the veggies in a Basket. Have the rabbit in your backpack. 
+          Feed the fire to last 40 minutes.
           Put both containers in your campsite, then click cook.` }
   ],
   resources: [
@@ -212,6 +213,7 @@ function preload(){
     rabbit: loadImage("images/rabbit.png"),
     rabbitLive: loadImage("images/rabbitLive.png"),
     rabbitDead: loadImage("images/rabbitDead.png"),
+    rabbitStew: loadImage("images/veggyStew.png"),
     random: loadImage("images/random.png"),
     randomBerries: loadImage("images/randomBerries.png"),
     randomGrass: loadImage("images/randomGrass.png"),
@@ -290,7 +292,6 @@ function preload(){
     veggies2: loadImage("images/veggies2.png"),
     veggies3: loadImage("images/veggies3.png"),
     veggies4: loadImage("images/veggies4.png"),
-    veggyStew: loadImage("images/veggyStew.png"),
     water: loadImage("images/water.png"),
     wigwam: loadImage("images/wigwam.png"),
     z: loadImage("images/z's.png")
