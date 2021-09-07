@@ -24,7 +24,14 @@ let welcome = {
             </div>
             <input type="text" v-model="name" placeholder="enter name">
             <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
-            <div class="version">version {{version}}</div>
+            <div class="whatsNew">
+              <h5>Version {{version}}</h5>
+              <h6>Published {{publicationDate}}</h6>
+              <ul>
+                <li>You can now hunt rabbits with bow and arrows, and cook rabbit stew!</li>
+                <li>Bow and Arrows, Claypot not available until you have a campsite.</li>
+              </ul>
+            </div>
           </div>
           <div v-else class="modal-body">
             <div class="links">
@@ -83,7 +90,8 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.0.7"
+      version: "1.1",
+      publicationDate: "Sept 7, 2021"
     }
   },
   props: [

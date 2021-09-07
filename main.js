@@ -17,6 +17,8 @@ const options = {
           this.build[i].active = board.revealCount <= 100
           break
         case "claypot":
+        case "bow":
+        case "arrows":
           this.build[i].active = board.buildings.length > 0
       }
     }
@@ -42,12 +44,12 @@ const options = {
         resources: "1 stick, 1 long grass, 1 bone",
         dist: "A primitive shovel for digging clay and ore",
         inst: "Gather the needed resources in your backpack, then click build."},
-    {name: "bow", src: "images/bow.png", title: "Bow", active: true,
+    {name: "bow", src: "images/bow.png", title: "Bow", active: false,
         time: 45, energy: 80,
         resources: "1 stick, 2 long grass",
         dist: "For hunting",
         inst: "Gather the needed resources in your backpack, then click build."},
-    {name: "arrows", src: "images/arrow.png", title: "Arrows", active: true,
+    {name: "arrows", src: "images/arrow.png", title: "Arrows", active: false,
         time: 25, energy: 200,
         resources: "2 sticks, 4 long grass, 2 rocks",
         dist: "Flint head arrows for hunting",

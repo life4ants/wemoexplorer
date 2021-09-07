@@ -190,10 +190,22 @@ body {
   justify-content: space-around;
 }
 
-.version {
+.whatsNew {
   margin-top: 15px;
-  font-size: 10px;
+  background-color: #ddd;
+  border-radius: 10px;
+  padding: 5px;
   text-align: center;
+}
+
+@media (min-width:  550px){
+  .whatsNew h5 {
+    display: inline;
+    margin-right: 20px;
+  }
+  .whatsNew h6 {
+    display: inline;
+  }
 }
            /* ---------------------------- Build Menu: -------------------------*/
 .build-menu {

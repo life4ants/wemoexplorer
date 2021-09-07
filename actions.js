@@ -404,7 +404,11 @@ let actions = {
                       board.cells[i][j].id = id
                     }
                   }
-                  options.build[options.build.findIndex((e) => e.name === "claypot")].active = true
+                  for (var k = options.build.length - 1; k >= 0; i--) {
+                    if (["bow", "arrows", "claypot"].includes(options.build[k].name)){
+                      options.build[k].active = true
+                    }
+                  }
                 }
                 delete cell.construction
               }
