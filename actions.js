@@ -190,7 +190,7 @@ let actions = {
         man.isAnimated = true
         man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
           backpack.addItem("bomb", quantity)
-          popup.setAlert("The "+ (quantity > 1) ? "bombs have" : "bomb has" +" been added to your backpack. Press T to throw a bomb in the direction you are pointed.")
+          popup.setAlert("The "+ ((quantity > 1) ? "bombs have" : "bomb has" ) +" been added to your backpack. Press T to throw a bomb in the direction you are pointed.")
         }}
       }
       else

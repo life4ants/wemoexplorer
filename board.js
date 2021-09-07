@@ -294,7 +294,7 @@ class Board extends WemoObject {
     if (cell.type === "campsite"){
       popup.grabMenu("info", cell.id)
     }
-    console.log(cell)
+    console.log(x,y,cell)
   }
 
   showNight(){

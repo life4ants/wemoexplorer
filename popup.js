@@ -187,6 +187,7 @@ var popup = new Vue({
       else if (this.selected.name === "bomb"){
         this.type = "pickBombs"
         this.title = "How many bombs do you want to get?"
+        setTimeout( () => document.getElementById("bombQuantity").focus(),0)
       }
       else {
         let message = actions.build(this.selected, {x: active.x, y: active.y})
