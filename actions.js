@@ -401,6 +401,7 @@ let actions = {
                       board.cells[i][j].id = id
                     }
                   }
+                  options.build[options.build.findIndex((e) => e.name === "claypot")].active = true
                 }
                 delete cell.construction
               }
@@ -532,7 +533,7 @@ let actions = {
     sounds.play("grab")
   },
 
-  throwBomb(){
+  throw(){
     let x = man.x*25
     let y = man.y*25+topbarHeight
 

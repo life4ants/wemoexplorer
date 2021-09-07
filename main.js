@@ -1,6 +1,6 @@
 const topbarHeight = 55
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
-const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "veggies"]
+const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
@@ -15,6 +15,9 @@ const options = {
           break
         case "bomb":
           this.build[i].active = board.revealCount <= 100
+          break
+        case "claypot":
+          this.build[i].active = board.buildings.length > 0
       }
     }
   },
@@ -54,7 +57,7 @@ const options = {
         resources: "6 long grass",
         dist: "For gathering berries and veggies in",
         inst: "Gather 6 long grass in your backpack, then click build."},
-    {name: "claypot", src: "images/claypot.png", title: "Clay Pot", active: true,
+    {name: "claypot", src: "images/claypot.png", title: "Clay Pot", active: false,
         time: 60, energy: 150,
         resources: "2 clay",
         dist: "For cooking food and carrying water",

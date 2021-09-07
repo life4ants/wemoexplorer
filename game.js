@@ -124,7 +124,7 @@ var game = new Vue({
           case "J": man.dismount();       break;
           case "K": popup.cookMenu();     break;
           case "S": man.goToSleep();      break;
-          case "T": actions.throwBomb();  break;
+          case "T": actions.throw();      break;
           case "X": this.autoCenter = !this.autoCenter; break;
         }
       }
@@ -164,15 +164,15 @@ var game = new Vue({
         //eat:
         let basket = toolbelt.getContainer("basket")
         this.icons[4].active = (("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0)) ||
-              (basket && cell.type !== "berryTree" && basket.includesItems(["berries", "veggies"]).length > 0 )
+              (basket && basket.includesItems(["berries", "veggies"]).length > 0 )
         //jump:
         this.icons[5].active = (man.isRiding && (active.landed || active.isBeside("dock") ||
               "river" === board.cells[active.x][active.y].type)) ||  (!man.isRiding && vehicles.canMount(man.x, man.y))
         //chop:
         this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type)
         //pick:
-        this.icons[7].active = (toolbelt.getContainer("basket") && "berryTree" === cell.type &&
-              board.berryTrees[cell.id].berries.length > 0)
+        this.icons[7].active = (toolbelt.getContainer("basket") && ("berryTree" === cell.type &&
+              board.berryTrees[cell.id].berries.length > 0) || "veggies" === cell.type)
         //fling:
         this.icons[8].active = !!helpers.nearbyType(active.x, active.y, "construction")
         //sleep:
