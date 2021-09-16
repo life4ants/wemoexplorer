@@ -20,7 +20,7 @@ var popup = new Vue({
               <h6>{{title}}</h6>
             </div>
 
-            <div v-if="type === 'build'" class="modal-body">
+            <div v-if="type === 'build'" class="modal-body horizonal">
               <div class="build-preview">
                 <img :src="selected.src" height="50" width="50">
                 <h5>{{selected.title}}</h5>
@@ -187,7 +187,7 @@ var popup = new Vue({
       else if (this.selected.name === "bomb"){
         this.type = "pickBombs"
         this.title = "How many bombs do you want to get?"
-        setTimeout( () => document.getElementById("bombQuantity").focus(),0)
+        setTimeout( () => $("#bombQuantity").focus(),0)
       }
       else {
         let message = actions.build(this.selected, {x: active.x, y: active.y})

@@ -110,6 +110,7 @@ const options = {
 }
 
 function preload(){
+  console.log("preload", Date.now()-world.frameTime)
   tiles = {
     arrow: loadImage("images/arrow.png"),
     arrow1: loadImage("images/arrow2.png"),

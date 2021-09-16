@@ -17,7 +17,7 @@ class WemoObject {
 }
 
 let world = {
-  frameTime: Date.now(),
+  frameTime: startTime,
   topOffset: 0,
   leftOffset: 0,
   noKeys: false,
@@ -27,7 +27,7 @@ let world = {
     resizeCanvas(cols*25, game.mode === "play" ? rows*25+topbarHeight : rows*25)
   },
 
-  interval(num){
+  interval(num){//not used
     return frameCount % (this.frameRate/4*num)
   },
 
@@ -43,3 +43,4 @@ let world = {
   }
 
 }
+console.log(Date.now() - world.frameTime)

@@ -316,7 +316,25 @@ class Board extends WemoObject {
     if (cell.type === "campsite"){
       popup.grabMenu("info", cell.id)
     }
-    console.log(x,y,cell)
+    // else if(game.isMobile){
+    //   let mx = map(winMouseX, world.leftOffset, window.innerWidth, 0, 100)
+    //   let my = map(winMouseY, topbarHeight, window.innerHeight, 0, 100)
+
+    //   if (mx > my){
+    //     if (mx < 100-my) //up
+    //       active.move(0, -1)
+    //     else
+    //       active.move(1, 0) //right
+    //   }
+    //   else {
+    //     if (mx < 100-my)
+    //       active.move(-1, 0) //left
+    //     else
+    //       active.move(0, 1) //down
+    //   }
+    // }
+    if (mouseButton === RIGHT)
+      console.log(x,y,cell)
   }
 
   showNight(){

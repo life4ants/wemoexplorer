@@ -5,6 +5,7 @@ body {
 }
 
 .full-screen {
+  position: absolute;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -62,6 +63,8 @@ body {
 .fa-info-circle {
   position: absolute;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .tilebox {
@@ -208,23 +211,43 @@ body {
   }
 }
            /* ---------------------------- Build Menu: -------------------------*/
+.horizonal {
+  display: flex;
+}
+
 .build-menu {
-  height: 150px;
+  height: 280px;
   overflow: scroll;
   border: 1px solid #666;
+  margin: 5px;
+  width: 250px;
+}
+
+.build-preview {
+  border: 1px solid #333;
+  background-color: #ddd;
+  min-height: 150px;
+  margin: 5px;
+  width: 250px;
+}
+
+@media(min-height: 450px){
+  .horizonal { display: block; }
+  .build-menu { 
+    height: 150px; 
+    margin: 0;
+    width: auto;
+  }
+  .build-preview {
+    margin: 0 0 10px 0;
+    width: auto;
+  }
 }
 
 @media (min-width: 600px){
   .build-preview {
     min-height: 200px;
   }
-}
-
-.build-preview {
-  margin-bottom: 10px;
-  border: 1px solid #333;
-  background-color: #ddd;
-  min-height: 150px;
 }
 
 .build-preview img {
@@ -382,8 +405,7 @@ body {
             /* ----------------------- Modals: --------------------- */
 
 .modal {
-  overflow: scroll;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -436,22 +458,16 @@ body {
   transform: translateY(-50%);
 }
 
-#popup-small .modal-dialog{
-  width: 400px;
-  margin: 30px auto;
-}
-
-#popup-center .modal-dialog {
-  width: 400px;
-  top: 50%;
-  margin: 0 auto;
-  transform: translateY(-50%);
-}
-
 @media (min-width: 600px){
   #popup-lg {
     width: 550px;
     margin: 30px auto;
+  }
+  #popup-center .modal-dialog {
+    width: 400px;
+    top: 50%;
+    margin: 0 auto;
+    transform: translateY(-50%);
   }
 }
 

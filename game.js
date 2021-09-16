@@ -7,7 +7,7 @@ var game = new Vue({
         <div class="leftButton" @click="() => moveAction(1)"></div>
         <div class="upButton" @click="() => moveAction(2)"></div>
         <div class="downButton" @click="() => moveAction(3)"></div>
-      </div>
+      </div> 
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
         :player="currentPlayer" :edit="edit"></welcome-menu>
       <edit-bar v-else-if="mode === 'edit'" :exit="exit"></edit-bar>
@@ -197,7 +197,7 @@ var game = new Vue({
         }
       }
       this.mode = "welcome"
-      $("body").removeClass("full-screen")
+      $("#boardWrapper").removeClass("full-screen")
       noLoop()
       this.started = false
       this.paused = false
@@ -266,7 +266,7 @@ var game = new Vue({
       }
       options.reset()
       $(window).scrollTop(0).scrollLeft(0)
-      $("body").addClass("full-screen")
+      $("#boardWrapper").addClass("full-screen")
       this.currentPlayer = player
       this.mode = "play"
       this.started = true

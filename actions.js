@@ -404,7 +404,7 @@ let actions = {
                       board.cells[i][j].id = id
                     }
                   }
-                  for (var k = options.build.length - 1; k >= 0; i--) {
+                  for (var k = options.build.length - 1; k >= 0; k--) {
                     if (["bow", "arrows", "claypot"].includes(options.build[k].name)){
                       options.build[k].active = true
                     }
