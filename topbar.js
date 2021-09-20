@@ -82,7 +82,7 @@ let topbar = {
     if (backpack.weight > 0){
       let items = backpack.getAllItems()
       for (let i = 0; i<items.length; i++){
-        let row = i > 1 ? 22 : -1
+        let row = i > 1 ? -1 : 22
         let col = i > 1 ? i-2 : i
         image(tiles[items[i].type], col*25+left+2, top+row)
         board.drawBadge(col*25+left+22, top+5+row, items[i].quantity, "#000")

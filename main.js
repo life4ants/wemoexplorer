@@ -210,7 +210,7 @@ function preload(){
     players: [ loadImage("images/player10.png"),
                loadImage("images/player11.png")
              ],
-    playerIcon: loadImage("images/player10Icon.png"),
+    playerIcon: loadImage("images/player10icon.png"),
     playersAnimated: [ loadImage("images/player10animation.png"),
                        loadImage("images/player11animation.png")
              ],
