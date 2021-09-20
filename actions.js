@@ -295,11 +295,11 @@ let actions = {
       backpack.removeItem("rock", 1)
     }
     // rabbit:
-    else if (type === "rabbitLive"){
-      board.rabbits.push(new Rabbit({x: man.x, y: man.y}))
-      backpack.removeItem("rabbitLive", 1)
+    else if (type === "rabbitDead"){
+      cell.rabbits = cell.rabbits +1 || 1
+      backpack.removeItem("rabbitDead", 1)
     }
-    sounds.play("dump")
+    //sounds.play("dump")
     return false
   },
 
@@ -421,20 +421,6 @@ let actions = {
   },
 
   grab(){
-    // catch a rabbit:
-    for (let i = board.rabbits.length - 1; i >= 0; i--) {
-      let r = board.rabbits[i]
-      if (r.x === man.x && r.y === man.y){
-        if (backpack.addItem("rabbitLive")){
-          board.rabbits.splice(i, 1)
-          return
-        }
-        else {
-          popup.setAlert("your backpack is full")
-          return
-        }
-      }
-    }
     let cell = board.cells[man.x][man.y]
     //grab dead rabbit:
     if (cell.rabbits){

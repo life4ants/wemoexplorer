@@ -77,8 +77,16 @@ let viewport = {
   },
 
   screenEdges(){
-    if (game.mode === "edit")
-      return {top: 0, left: 0, bottom: board.rows, right: board.cols}
+    if (game.mode === "edit"){
+      let l = window.pageXOffset
+      let t = window.pageYOffset
+      let r = l + window.innerWidth - world.leftOffset
+      let b = t + window.innerHeight
+      return {top: floor(t/25), 
+              left: floor(l/25), 
+              bottom: min(floor(b/25), board.rows), 
+              right: min(floor(r/25), board.cols) }
+    }
     else {
       return { top: floor(this.top/25),
               left: floor(this.left/25),

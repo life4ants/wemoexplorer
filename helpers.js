@@ -37,13 +37,7 @@ let helpers = {
   },
 
   isNearSquare(x1, y1, x2, y2){ //with diagonals
-    for (let x = x1-1; x <= x1+1; x++){
-      for (let y = y1-1; y <= y1+1; y++){
-        if (x === x2 && y === y2)
-          return true
-      }
-    }
-    return false
+    return (abs(x1-x2) < 2) && (abs(y1-y2) < 2)
   },
 
   nearbyType(x,y, type){ //returns the cell data if found, otherwise false

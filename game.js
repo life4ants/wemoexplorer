@@ -204,20 +204,23 @@ var game = new Vue({
       sounds.files['sleep'].pause()
       popup.show = false
       world.topOffset = 0
-      $("#board").css("top", world.topOffset+"px").css("left", world.leftOffset)
       $(window).scrollTop(0).scrollLeft(0)
       redraw()
+      editor.undoList = []
+      $("#defaultCanvas0").css("cursor", "default")
     },
 
     edit(player){
-      world.topOffset = 100
-      $("#board").css("top", world.topOffset+"px").css("left", "0px")
+      world.leftOffset = 106
+      $("#board").css("top", world.topOffset+"px").css("left", world.leftOffset+"px")
+      $("#defaultCanvas0").css("cursor", "none")
       let cols = min(floor(window.innerWidth/25), 40)
       let rows = min(floor(window.innerHeight/25), 25)
       editor.newWorld(cols, rows, "random")
       this.currentPlayer = player
       this.mode = "edit"
       this.started = true
+      frameRate(60)
       loop()
     },
 
@@ -265,7 +268,7 @@ var game = new Vue({
         board.addRabbits()
       }
       options.reset()
-      $(window).scrollTop(0).scrollLeft(0)
+      $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
       $("#boardWrapper").addClass("full-screen")
       this.currentPlayer = player
       this.mode = "play"

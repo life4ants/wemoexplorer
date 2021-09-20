@@ -74,8 +74,10 @@ class Board extends WemoObject {
       }
     }
 
-    if (game.mode === "edit")
-      image(tiles.players[0], this.startX*25, this.startY*25, 25, 25, 0, 25, 25, 25)
+    if (game.mode === "edit"){
+      image(tiles.playerIcon, this.startX*25, this.startY*25)
+      editor.showMouse()
+    }
     else {
       // show cells surround the man if needed:
       let n = 1
@@ -192,7 +194,8 @@ class Board extends WemoObject {
 
   showCell(x,y, cell, revealed){
     let offset = game.mode === "edit" ? 0 : topbarHeight
-    let img = game.mode === "edit" || revealed ? tiles[cell.tile]: tiles["clouds"]
+    let t = tiles[cell.tile] || tiles["random"]
+    let img = game.mode === "edit" || revealed ? t : tiles["clouds"]
     // print the tile:
     image(img, x*25, y*25+offset)
     
@@ -239,7 +242,7 @@ class Board extends WemoObject {
         cell.tile = "pit"
         for (let k = -1; k <=1; k++){
           for (let l = -1; l<=1; l++){
-            if (abs(l+k) === 1 && helpers.withinBounds(x+k,y+l))
+            if ((abs(l+k) === 1) && (helpers.withinBounds(x+k,y+l)))
               this.cells[x+k][y+l].byPit = true
           }
         }

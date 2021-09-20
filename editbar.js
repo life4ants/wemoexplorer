@@ -1,49 +1,95 @@
 const editBar = {
   template: `
-    <div class="topbar">
-      <div class="side-buttons">
+    <div class="editbar">
+      <div class="menu-buttons">
+        <div class="menu" @click='exit'>Exit</div>
         <div class="menu">
           <span>Menu</span>
           <div class="menu-content">
             <span @click="saveBoard" title="save the current board">Save</span>
-            <hr>
             <span @click="generateBoard" title="generate new board">New</span>
             <span @click="previewBoard">Preview</span>
-            <hr>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
-            <hr>
-            <span @click="() => load(false)">Load default</span>
+            <span @click="load">Load</span>
+            <span @click="() => load(false)">Load Default</span>
           </div>
         </div>
-        <div class="menu" @click='exit'>Exit</div>
-        <div class="menu" @click='() => load(true)' title="load a saved board">Load</div>
       </div>
-      <div class="flex">
+      <div class="editbar-top">
+        <button @click= 'undo'>Undo</button>
+        <div class="layer-buttons">
+          <span :class = "{activelayer: set === 1}"
+          class="layer-button"
+          @click="() => changeSet(1)">Set 1</span>
+          <span :class = "{activelayer: set === 2}"
+          class="layer-button"
+          @click="() => changeSet(2)">Set 2</span>
+        </div>
         <div class="tilebox">
+          <img v-for="pic in tools" :key="pic.id" :src="pic.src"
+          height="25" width="25" class="tile" :class="{selected: tool === pic.id}" 
+          @click="() => changeTool(pic.id)">
+        </div>
+      </div>
+      <div class="editbar-bottom">
+        <div v-if = 'set === 1' class="tilebox">
           <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+          height="25" width="25" class="tile" :class="{selected: selected === pic.id}" 
+          @click="() => setCurrent(pic.id, pic.type)">
         </div>
-        <div class="tilebox">
+        <div v-if = 'set === 2' class="tilebox">
           <img v-for="pic in tiles2" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
+          height="25" width="25" class="tile" :class="{selected: selected === pic.id}" 
+          @click="() => setCurrent(pic.id, pic.type)">
         </div>
-        <div class="tilebox-short">
-          <img v-for="pic in tiles3" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
-        </div>
-        <div class="tilebox-short">
-          <img v-for="pic in tiles4" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
-        </div>
-        <img v-for="pic in tiles5" :key="pic.id" :src="pic.src"
-          height="25" width="25" class="tile" :class="{selected: selected === pic.id}" @click="() => setCurrent(pic.id, pic.type)">
       </div>
     </div>
     `,
   data(){
     return {
       tiles1: [
+        { id: "water", src: "images/water.png", type: "water"},
+        { id: "sand", src: "images/sand.png", type: "sand"},
+        { id: "grass", src: "images/grass.png", type: "grass"},
+        { id: "rockMiddle", src: "images/rockEdge13.png", type: "rockMiddle"},
+        { id: "random", src: "images/random.png", type: "random"},
+        { id: "playerIcon", src: "images/player10icon.png", type: "start"},
+        { id: "randomPit", src: "images/randomPit.png", type: "randomPit"},
+        { id: "randomGrass", src: "images/randomGrass.png", type: "randomGrass"},
+        { id: "randomLog", src: "images/randomLog.png", type: "randomLog"},
+        { id: "randomRock", src: "images/randomRock.png", type: "randomRock"},
+        { id: "randomTree", src: "images/randomTree.png", type: "randomTree"},
+        { id: "randomStick", src: "images/randomStick.png", type: "randomStick"},
+        { id: "randomBerries", src: "images/randomBerries.png", type: "randomBerries"},
+        { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
+        { id: "pit", src: "images/pit.png", type: "pit"},
+        { id: "dock1", src: "images/dock1.png", type: "dock"},
+        { id: "dock2", src: "images/dock2.png", type: "dock"},
+        { id: "dock3", src: "images/dock3.png", type: "dock"},
+        { id: "dock4", src: "images/dock4.png", type: "dock"},
+        { id: "dock5", src: "images/dock5.png", type: "dock"},
+        { id: "dock6", src: "images/dock6.png", type: "dock"},
+        { id: "beachEdge1", src: "images/beachEdge1.png", type: "beachEdge"},
+        { id: "beachEdge2", src: "images/beachEdge2.png", type: "beachEdge"},
+        { id: "beachEdge3", src: "images/beachEdge3.png", type: "beachEdge"},
+        { id: "beachEdge4", src: "images/beachEdge4.png", type: "beachEdge"},
+        { id: "treeThin", src: "images/tree-thin.png", type: "treeThin"},
+        { id: "tree", src: "images/tree.png", type: "tree"},
+        { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
+        { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
+        { id: "veggies4", src: "images/veggies4.png", type: "veggies"},
+        { id: "stick", src: "images/stick.png", type: "stick"},
+        { id: "rock", src: "images/rock4.png", type: "rock"},
+        { id: "clay", src: "images/clay5.png", type: "clay"},
+        { id: "bone", src: "images/bone.png", type: "bone"},
+        { id: "palm", src: "images/palm.png", type: "palm"},
+        { id: "cactus", src: "images/cactus.png", type: "cactus"}
+      ],
+      tiles2: [
+        { id: "beach", src: "images/beachX.png", type: "auto"},
+        { id: "rockEdge", src: "images/rockX.png", type: "auto"},
+        { id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
         { id: "beach1", src: "images/beach1.png", type: "beach"},
         { id: "beach2", src: "images/beach2.png", type: "beach"},
         { id: "beach3", src: "images/beach3.png", type: "beach"},
@@ -67,80 +113,38 @@ const editBar = {
         { id: "rockEdge9", src: "images/rockEdge9.png", type: "rockEdge"},
         { id: "rockEdge10", src: "images/rockEdge10.png", type: "rockEdge"},
         { id: "rockEdge11", src: "images/rockEdge11.png", type: "rockEdge"},
-        { id: "rockEdge12", src: "images/rockEdge12.png", type: "rockEdge"}
-      ],
-      tiles2: [
+        { id: "rockEdge12", src: "images/rockEdge12.png", type: "rockEdge"},
         { id: "river1", src: "images/grassRiver1.png", type: "river"},
         { id: "river2", src: "images/grassRiver2.png", type: "river"},
+        { id: "river5", src: "images/grassRiver5.png", type: "river"},
         { id: "river3", src: "images/grassRiver3.png", type: "river"},
         { id: "river4", src: "images/grassRiver4.png", type: "river"},
         { id: "river6", src: "images/grassRiver6.png", type: "river"},
-        { id: "river5", src: "images/grassRiver5.png", type: "river"},
-        { id: "river7", src: "images/beachRiver1.png", type: "river"},
-        { id: "river8", src: "images/beachRiver2.png", type: "river"},
-        { id: "river9", src: "images/beachRiver3.png", type: "river"},
-        { id: "river10", src: "images/beachRiver4.png", type: "river"},
-        { id: "river11", src: "images/beachRiver5.png", type: "river"},
-        { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
         { id: "river13", src: "images/rockRiver1.png", type: "river"},
         { id: "river14", src: "images/rockRiver2.png", type: "river"},
+        { id: "river17", src: "images/rockRiver5.png", type: "river"},
         { id: "river15", src: "images/rockRiver3.png", type: "river"},
         { id: "river16", src: "images/rockRiver4.png", type: "river"},
-        { id: "river17", src: "images/rockRiver5.png", type: "river"},
         { id: "river18", src: "images/rockRiver6.png", type: "river"},
         { id: "river19", src: "images/rockRiver7.png", type: "river"},
         { id: "river20", src: "images/rockRiver8.png", type: "river"},
         { id: "river21", src: "images/rockRiver9.png", type: "river"},
         { id: "river22", src: "images/rockRiver10.png", type: "river"},
+        { id: "river7", src: "images/beachRiver1.png", type: "river"},
+        { id: "river8", src: "images/beachRiver2.png", type: "river"},
+        { id: "river9", src: "images/beachRiver3.png", type: "river"},
+        { id: "river10", src: "images/beachRiver4.png", type: "river"},
+        { id: "river11", src: "images/beachRiver5.png", type: "river"},
         { id: "river12", src: "images/beachRiver6.png", type: "river"},
-        { id: "pit", src: "images/pit.png", type: "pit"}
+        { id: "river", src: "images/grassRiverX.png", type: "auto"}
       ],
-      tiles3: [
-        { id: "dock1", src: "images/dock1.png", type: "dock"},
-        { id: "dock3", src: "images/dock3.png", type: "dock"},
-        { id: "dock4", src: "images/dock4.png", type: "dock"},
-        { id: "beachEdge2", src: "images/beachEdge2.png", type: "beachEdge"},
-        { id: "beachEdge3", src: "images/beachEdge3.png", type: "beachEdge"},
-        { id: "sand", src: "images/sand.png", type: "sand"},
-        { id: "treeThin", src: "images/tree-thin.png", type: "treeThin"},
-        { id: "dock6", src: "images/dock6.png", type: "dock"},
-        { id: "dock2", src: "images/dock2.png", type: "dock"},
-        { id: "dock5", src: "images/dock5.png", type: "dock"},
-        { id: "beachEdge1", src: "images/beachEdge1.png", type: "beachEdge"},
-        { id: "beachEdge4", src: "images/beachEdge4.png", type: "beachEdge"},
-        { id: "palm", src: "images/palm.png", type: "palm"},
-        { id: "tree", src: "images/tree.png", type: "tree"}
+      tools: [
+        { id: "floodFill", src: "images/floodFill.png"},
+        { id: "brush",     src: "images/brush.png"}
       ],
-      tiles4: [
-        { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
-        { id: "berryTree", src: "images/berryTree.png", type: "berryTree"},
-        { id: "stick", src: "images/stick.png", type: "stick"},
-        { id: "rock", src: "images/rock4.png", type: "rock"},
-        { id: "clay", src: "images/clay5.png", type: "clay"},
-        { id: "bone", src: "images/bone.png", type: "bone"},
-        { id: "grass", src: "images/grass.png", type: "grass"}
-      ],
-      tiles5: [
-        { id: "cactus", src: "images/cactus.png", type: "cactus"},
-        { id: "veggies4", src: "images/veggies4.png", type: "veggies"},
-        { id: "rockMiddle", src: "images/rockEdge13.png", type: "rockMiddle"},
-        { id: "water", src: "images/water.png", type: "water"},
-        { id: "random", src: "images/random.png", type: "random"},
-        { id: "randomPit", src: "images/randomPit.png", type: "randomPit"},
-        { id: "randomGrass", src: "images/randomGrass.png", type: "randomGrass"},
-        { id: "randomLog", src: "images/randomLog.png", type: "randomLog"},
-        { id: "randomRock", src: "images/randomRock.png", type: "randomRock"},
-        { id: "randomTree", src: "images/randomTree.png", type: "randomTree"},
-        { id: "randomStick", src: "images/randomStick.png", type: "randomStick"},
-        { id: "randomBerries", src: "images/randomBerries.png", type: "randomBerries"},
-        {id: "beach", src: "images/beachX.png", type: "auto"},
-        {id: "treeShore", src: "images/treeShoreX.png", type: "auto"},
-        {id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
-        {id: "rockEdge", src: "images/rockX.png", type: "auto"},
-        {id: "river", src: "images/grassRiverX.png", type: "auto"},
-        {id: "start", src: "images/player10icon.png", type: "start"}
-      ],
-      selected: "water"
+      selected: "water",
+      set: 1, 
+      tool: "brush"
     }
   },
   props: [
@@ -148,11 +152,31 @@ const editBar = {
   ],
   methods: {
     setCurrent(id, type){
-      this.selected = id
-      editor.tile = id
+      editor.tile = this.selected = id
       editor.type = type
-      editor.auto = type === "auto" ? true : false
+      if (["auto", "start"].includes(type))
+        editor.tool = this.tool = "brush"
     },
+
+    changeSet(id){
+      this.set = id
+      if (id === 1){
+        editor.tile = this.selected = "water"
+        editor.type = "water"
+      }
+      else {
+        editor.tile = this.selected = "beach"
+        editor.type = "auto"
+        editor.tool = this.tool = "brush"
+      }
+    },
+
+    changeTool(id){
+      if (id === "floodFill" && ["auto", "start"].includes(editor.type))
+        return
+      editor.tool = this.tool = id
+    },
+
     generateBoard(){
       let wcols = Math.floor((window.innerWidth-37)/25)
       let wrows = Math.floor((window.innerHeight-55)/25)
@@ -175,6 +199,10 @@ const editBar = {
 
     saveBoard(){
       board.save()
+    },
+
+    undo(){
+      editor.undo()
     },
 
     island(){

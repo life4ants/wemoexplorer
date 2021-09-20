@@ -2,25 +2,32 @@ let editor = {
   path: [],
   tile: "water",
   type: "water",
-  auto: false,
+  tool: "brush",
+  undoList: [],
 
   mousePressed(){
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
     let id = x+"_"+y
-    if (mouseButton === LEFT){
-      if (this.auto){
-        this.path = [id]
-        this.changeTile(x,y, "cross", "cross")
-      }
-      else if (this.type === "start"){
+    if (this.tool === "brush"){
+      if (this.type === "start"){
         if (board.cells[x][y].type !== "water"){
           board.startX = x
           board.startY = y
         }
       }
-      else
-        this.changeTile(x,y, this.tile, this.type)
+      else {
+        this.path = [id]
+        this.undoList = [{x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type}]
+        if (this.type === "auto")
+          this.changeTile(x,y, "cross", "cross")
+        else
+          this.changeTile(x,y, this.tile, this.type)
+      }
+    }
+    else if (this.tool === "floodFill"){
+      let cell = board.cells[x][y]
+      this.undoList = this.floodFill(x, y, cell.tile, cell.type, this.tile, this.type)
     }
   },
 
@@ -28,29 +35,34 @@ let editor = {
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
     let id = x+"_"+y
-    if (this.auto){
-      if (!this.path.includes(id)){
+    if (this.type === "start")
+      return
+    if (!this.path.includes(id)){
+      this.path.push(id)
+      this.undoList.push({x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type})
+      if (this.type === "auto")
         this.changeTile(x,y, "cross", "cross")
-        this.path.push(id)
-      }
-    }
-    else if (this.type !== "start"){
-      this.changeTile(x,y, this.tile, this.type)
+      else
+        this.changeTile(x,y, this.tile, this.type)
     }
   },
 
   mouseReleased(){
-    if (mouseButton === RIGHT && !this.auto){
-      let x = Math.floor(mouseX/25)
-      let y = Math.floor(mouseY/25)
-      let id = x+"_"+y
-      if (confirm("are you sure you want to flood fill?")){
-        let cell = board.cells[x][y]
-        this.floodFill(x, y, cell.tile, cell.type, this.tile, this.type)
-      }
-    }
-    else if (this.auto)
+    if (this.type === "auto")
       this.parsePath(this.tile)
+  },
+
+  showMouse(){
+    if (this.tool === "brush"){
+      image(tiles[this.type === "auto" ? this.tile + "X" : this.tile], mouseX-12, mouseY-12, 24,24)
+      rectMode(CENTER)
+      stroke(0)
+      strokeWeight(1)
+      noFill()
+      rect(mouseX,mouseY, 25, 25)
+    }
+    else
+      image(tiles[this.tool], mouseX-13, mouseY-13, 26,26)
   },
 
   changeTile(x,y, tile, type){
@@ -74,14 +86,23 @@ let editor = {
   },
 
   floodFill(x,y, tile1, type1, tile2, type2){
+    let list = [{x,y,tile: tile1, type: type1}]
     this.changeTile(x,y,tile2, type2)
     
     for (let i = x-1; i <= x+1; i++){
       for (let j = y-1; j <= y+1; j++){
         if (i >= 0 && i < board.cols && j >= 0 && j < board.rows && board.cells[i][j].type === type1)
-          this.floodFill(i,j, tile1, type1, tile2, type2)
+          list = list.concat(this.floodFill(i,j, tile1, type1, tile2, type2))
       }
     }
+    return list
+  },
+
+  undo(){
+    for (e of this.undoList){
+      this.changeTile(e.x, e.y, e.tile, e.type)
+    }
+    this.undoList = []
   },
 
   newWorld(cols, rows, fillType){
