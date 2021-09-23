@@ -55,7 +55,6 @@ let editor = {
   showMouse(){
     if (this.tool === "brush"){
       image(tiles[this.type === "auto" ? this.tile + "X" : this.tile], mouseX-12, mouseY-12, 24,24)
-      rectMode(CENTER)
       stroke(0)
       strokeWeight(1)
       noFill()

@@ -76,7 +76,9 @@ class Board extends WemoObject {
 
     if (game.mode === "edit"){
       image(tiles.playerIcon, this.startX*25, this.startY*25)
+      rectMode(CENTER)
       editor.showMouse()
+      rectMode(CORNER)
     }
     else {
       // show cells surround the man if needed:
