@@ -28,8 +28,7 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>Updated World Editor, bug fixes and tweaks</li>
-                <li>Scrollable Build Menu on Moblie</li>
+                <li>Bug fixes and tweaks</li>
               </ul>
             </div>
             <div class="whatsNew">
@@ -98,8 +97,8 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.1.1",
-      publicationDate: "Sept 20, 2021"
+      version: "1.1.2",
+      publicationDate: "Sept 23, 2021"
     }
   },
   props: [
