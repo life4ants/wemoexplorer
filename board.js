@@ -311,7 +311,7 @@ class Board extends WemoObject {
       options.build[options.build.findIndex((e) => e.name === "bomb")].active = true
     }
     else if (this.revealCount === 0)
-      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4)+" wemo hours."), 3000)
+      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 3000)
   }
 
   clicker(){
