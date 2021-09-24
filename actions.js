@@ -105,8 +105,8 @@ let actions = {
     // build stoneAx or boneShovel:
     else if (["stoneAx", "boneShovel"].includes(item.name)){
       let msg = "Congratulations! You can now " +
-          (item.name === "stoneAx" ? "chop down trees at a cost of 300" : "dig clay at a cost of 200") +
-          " energy. Look for the " + item.title + " icon on the top bar."
+          (item.name === "stoneAx" ? "chop down trees at a cost of 80" : "dig clay at a cost of 50") +
+          " Tiredness. Look for the " + item.title + " icon on the top bar."
       let needed = ["stick", "longGrass", (item.name === "stoneAx" ? "rock" : "bone")]
       let ar = backpack.includesItems(needed)
       if (ar.length === 3){
@@ -242,11 +242,11 @@ let actions = {
       }
       else {
         man.isAnimated = true
-        man.animation = {frame: 0, type: "chopping", end: world.frameRate*15/3, action: () => {
+        man.animation = {frame: 0, type: "chopping", end: world.frameRate*5/3, action: () => {
           cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
           cell.tile = "stump"
           cell.quantity = 5
-          man.hunger = toolbelt.tools[t] === "stoneAx" ? man.hunger+300 : man.hunger+150
+          man.tiredness = toolbelt.tools[t] === "stoneAx" ? man.tiredness+80 : man.tiredness+50
         }}
       }
     }
@@ -519,7 +519,7 @@ let actions = {
           cell.type =  cell.tile.replace(/\d+$/, "")
           delete cell.quantity
         }
-        man.hunger = toolbelt.tools[id] === "boneShovel" ? man.hunger+200 : man.hunger+100
+        man.tiredness = toolbelt.tools[id] === "boneShovel" ? man.tiredness+50 : man.tiredness+30
         sounds.play("dig")
         return
       }
@@ -537,7 +537,7 @@ let actions = {
     }
     else
       return
-    sounds.play("grab")
+    //sounds.play("grab")
   },
 
   throw(){

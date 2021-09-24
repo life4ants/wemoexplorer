@@ -26,6 +26,7 @@ class Man extends WemoObject {
   }
 
   update(){
+    let cell = board.cells[this.x][this.y]
     if (game.mode === "build"){
       strokeWeight(2)
       stroke(128)
@@ -37,7 +38,7 @@ class Man extends WemoObject {
     }
 
     if (this.inDark){
-      if (!this.isNextToFire){
+      if (!this.isNextToFire || !cell.type === "campsite"){
         msgs.following.msg = "You're too far from a fire!"
         msgs.following.frames = 1
       }
@@ -65,9 +66,10 @@ class Man extends WemoObject {
         }
       }
     }
-    this.canSleep = this.isNextToFire && board.fires[this.fireId].value > 0
+    this.canSleep = (this.isNextToFire && board.fires[this.fireId].value > 0) 
+        || (cell.type === "campsite" && board.buildings[cell.id].fireValue > 0)
 
-    if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
+    if (cell.type === "firepit" && board.fires[this.fireId].value > 0){
       msgs.following.msg = "Get off the fire! You're burning!"
       msgs.following.frames = 1
       this.injury +=200
@@ -86,17 +88,17 @@ class Man extends WemoObject {
       this.delay = a[floor(this.tiredness/12)+1]
     else
       this.delay = 14
-    this.display()
+    this.display(cell)
   }
 
-  display() {
+  display(cell) {
     let offset = backpack.weight > 0 ? 4 : 0
     let index = this.vomit ? 8 : this.isSleeping ? 9 : this.index+offset
     let dx = this.x*25
     let dy = this.y*25+topbarHeight
 
-    if (board.cells[this.x][this.y].type === "campsite"){
-      let id = board.cells[this.x][this.y].id
+    if (cell.type === "campsite"){
+      let id = cell.id
       dx = (board.buildings[id].x+1)*25
       dy = board.buildings[id].y*25+topbarHeight+18
       index = this.vomit ? 8 : 10
@@ -141,17 +143,19 @@ class Man extends WemoObject {
 
   move(x, y) {
     this.standCount = 0
+    let cell = board.cells[this.x][this.y]
+    let newCell = board.cells[this.x+x][this.y+y]
     if (this.isSleeping)
       return
-    if (board.cells[this.x][this.y].type === "campsite" && board.cells[this.x+x][this.y+y].type === "campsite"){
+    if (cell.type === "campsite" && newCell.type === "campsite"){
       x *= 2; y*= 2;
     }
     //check for edge case
     if (this.x + x >= 0 && this.x + x < board.cols &&
       this.y + y >= 0 && this.y + y < board.rows){
        //check for forbidden cells
-      if (!["water", "rockEdge", "river", "construction"].includes(board.cells[this.x+x][this.y+y].type)){
-        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.fires[board.cells[this.x+x][this.y+y].id].value > 0)
+      if (!["water", "rockEdge", "river", "construction"].includes(newCell.type)){
+        if ("firepit" === newCell.type && board.fires[newCell.id].value > 0)
           return
         if (this.delay === 0){
           this.x +=x
@@ -173,7 +177,7 @@ class Man extends WemoObject {
         sounds.play("walk")
       }
       //reveal rockEdge cells
-      else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type))
+      else if (["river", "rockEdge"].includes(newCell.type))
         this.revealCell(this.x+x, this.y+y, true)
       //change index
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
@@ -246,18 +250,19 @@ class Man extends WemoObject {
   }
 
   goToSleep(){
+    let type = board.cells[this.x][this.y].type
     if (this.isSleeping){
       this.isSleeping = false
       sounds.files['sleep'].pause()
     }
-    else if (this.canSleep && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding){
+    else if (this.canSleep && sleepable.includes(type) && !this.isRiding){
       this.isSleeping = true
       sounds.files['sleep'].play()
     }
     else {
       let message = this.isRiding ? "Sorry, no sleeping in your canoe!" :
                       !this.canSleep ? "You can only sleep next to a fire" :
-                        "You can't sleep on a "+board.cells[this.x][this.y].type+"!"
+                        "You can't sleep on a "+type+"!"
       popup.setAlert(message)
     }
   }
