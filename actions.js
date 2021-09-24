@@ -40,7 +40,7 @@ let actions = {
     }
     else
       return
-    man.energy -= item.energy
+    man.hunger += item.energy
     popup.setAlert("A construction site has been started. To finish building your "+item.title+
       ", gather the needed resources, go near the construction site, and press F.")
   },
@@ -185,8 +185,8 @@ let actions = {
     }
     // buy a bomb:
     else if (item.name === "bomb"){
-      if (backpack.itemFits("bomb", quantity) && man.energy > item.energy*quantity){
-        man.energy -= item.energy*(quantity-1)
+      if (backpack.itemFits("bomb", quantity)){
+        man.hunger += item.energy*(quantity-1)
         man.isAnimated = true
         man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
           backpack.addItem("bomb", quantity)
@@ -200,7 +200,7 @@ let actions = {
     else // error catch
       return "Sorry, not available yet!"
 
-    man.energy -= item.energy
+    man.hunger += item.energy
     return false //no message to send
   },
 
@@ -246,7 +246,7 @@ let actions = {
           cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
           cell.tile = "stump"
           cell.quantity = 5
-          man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
+          man.hunger = toolbelt.tools[t] === "stoneAx" ? man.hunger+300 : man.hunger+150
         }}
       }
     }
@@ -335,9 +335,8 @@ let actions = {
     }
     if (kind === "") return
 
-    if (man.energy > 5000){
-      man.energy -= Math.floor((Math.random()*5+1)*100)
-      man.health -= Math.floor((Math.random()*5+1)*10)
+    if (man.hunger < 0){
+      man.hunger += Math.floor((Math.random()*5+1)*100)
       msgs.following.msg = "You ate too much!!!"
       msgs.following.frames = 30
       man.vomit = true
@@ -345,16 +344,15 @@ let actions = {
       return
     }
     sounds.play("eat")
-    let e,h
+    let e
     switch (kind){
-      case "berries": e = 25, h = 2;       break;
-      case "veggies": e = 40, h = 5;       break;
-      case "rabbitStew": e = 200, h = 500;  break;
-      default: e = 0, h = 0;
+      case "berries": e = 25;      break;
+      case "veggies": e = 40;      break;
+      case "rabbitStew": e = 200;  break;
+      default: e = 0;
     }
-    man.health = min(man.health+h, 5000)
-    man.energy = min(man.energy+e, 5025)
-    if (man.energy > 5000)
+    man.hunger = max(man.hunger-e, -5)
+    if (man.hunger < 0)
       popup.setAlert("You are full. Stop eating!")
   },
 
@@ -521,7 +519,7 @@ let actions = {
           cell.type =  cell.tile.replace(/\d+$/, "")
           delete cell.quantity
         }
-        man.energy = toolbelt.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
+        man.hunger = toolbelt.tools[id] === "boneShovel" ? man.hunger+200 : man.hunger+100
         sounds.play("dig")
         return
       }

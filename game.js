@@ -259,8 +259,8 @@ var game = new Vue({
       active = man.ridingId ? vehicles[man.ridingId] : man
       board = new Board(b)
       world.leftOffset = 37
-      topbar.health = man.health
-      topbar.energy = man.energy
+      topbar.tiredness = man.tiredness
+      topbar.hunger = man.hunger
       world.noKeys = false
       timer.setTime(board.wemoMins)
       if (!board.progress){

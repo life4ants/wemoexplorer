@@ -28,15 +28,7 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>Bug fixes and tweaks</li>
-              </ul>
-            </div>
-            <div class="whatsNew">
-              <h5>Version 1.1</h5>
-              <h6>Published Sept 7, 2021</h6>
-              <ul>
-                <li>You can now hunt rabbits with bow and arrows, and cook rabbit stew!</li>
-                <li>Bow and Arrows, Claypot not available until you have a campsite.</li>
+                <li>Delay in walking, Hunger and Tiredness</li>
               </ul>
             </div>
           </div>
@@ -97,8 +89,8 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.1.2",
-      publicationDate: "Sept 23, 2021"
+      version: "1.2.0",
+      publicationDate: "Sept 24, 2021"
     }
   },
   props: [

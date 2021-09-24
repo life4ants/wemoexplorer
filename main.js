@@ -355,7 +355,7 @@ function playLoop(){
   board.showNight()
   topbar.display()
   msgs.display()
-  if ((man.energy <= 0 || man.health <= 0) && !man.isAnimated)
+  if ((man.hunger > 5000 || man.tiredness > 150) && !man.isAnimated)
     popup.gameOver()
 }
 

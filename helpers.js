@@ -25,16 +25,16 @@ let helpers = {
     return false
   },
 
-  isNextToSquare(x1, y1, x2, y2){ //no diagonals      NOT USED YET
-    for (let i = -1; i <= 1; i++){
-      for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
-        let a = x1+i, b = y1+j;
-        if (a === x2 && b === y2)
-          return true
-      }
-    }
-    return false
-  },
+  // isNextToSquare(x1, y1, x2, y2){ //no diagonals      **NOT USED YET
+  //   for (let i = -1; i <= 1; i++){
+  //     for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
+  //       let a = x1+i, b = y1+j;
+  //       if (a === x2 && b === y2)
+  //         return true
+  //     }
+  //   }
+  //   return false
+  // },
 
   isNearSquare(x1, y1, x2, y2){ //with diagonals
     return (abs(x1-x2) < 2) && (abs(y1-y2) < 2)
@@ -53,10 +53,9 @@ let helpers = {
   },
 
   smoothChange(curX, toX){
-    let base = 75
-    let div = base/15
+    let div = 5
     let diff = toX-curX
-    return diff >= base ? curX+Math.floor(diff/div)-5 : diff <= -base ? curX+Math.floor(diff/div)+5 :
+    return diff >= 75 ? curX+Math.floor(diff/div)-5 : diff <= -75 ? curX+Math.floor(diff/div)+5 :
                diff >= 10 ? curX+10 : diff <= -10 ? curX-10 : toX
   },
 
@@ -131,5 +130,10 @@ let helpers = {
         output.push(i)
     }
     return output
+  },
+
+  skip(hours){
+    board.wemoMins += (hours*60)
+    timer.resume()
   }
 }

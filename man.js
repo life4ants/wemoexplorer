@@ -3,11 +3,13 @@ class Man extends WemoObject {
     super()
     this.x = x
     this.y = y
-    this.oldX = 0
-    this.oldY = 0
+    this.newX = 0
+    this.newY = 0
+    this.delay = 0
     this.index = 0
-    this.energy = 5000
-    this.health = 5000
+    this.hunger = 0
+    this.tiredness = 0
+    this.injury = 0
     this.stepCount = 0
     this.standCount = 0
     this.img = [tiles.players[characterId], tiles.playersAnimated[characterId]]
@@ -18,7 +20,7 @@ class Man extends WemoObject {
     this.vomit = false
     this.inDark = false
     this.isSleeping = false
-    this.canSleep = true // ***allow sleeping all the time
+    this.canSleep = false
     this.isAnimated = false
     this.animation = {frame: 0, type: "", end: 0, action: null}
   }
@@ -35,9 +37,12 @@ class Man extends WemoObject {
     }
 
     if (this.inDark){
-      msgs.following.msg = "You're too far from a fire!"
-      msgs.following.frames = 1
-      this.health -= Math.floor((this.health+1000)/499)
+      if (!this.isNextToFire){
+        msgs.following.msg = "You're too far from a fire!"
+        msgs.following.frames = 1
+      }
+      if (!this.isSleeping)
+        this.tiredness +=0.7
     }
     if (this.isRiding){
       let sx = (active.index%3)*25
@@ -60,17 +65,27 @@ class Man extends WemoObject {
         }
       }
     }
-    // ****allow sleeping all the time
-    //this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
+    this.canSleep = this.isNextToFire && board.fires[this.fireId].value > 0
+
     if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
       msgs.following.msg = "Get off the fire! You're burning!"
       msgs.following.frames = 1
-      this.health -=25
+      this.injury +=200
     }
     if (this.isSleeping){
-       this.health = this.health < 4997 ? this.health+2 : 5000
-       this.energy = frameCount%5 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
+       if (this.tiredness > 1) this.tiredness -= 0.8
+       if (this.injury > 0) this.injury -= 1
+       if (!this.canSleep)  this.goToSleep()
     }
+    //adjust tiredness
+    if (this.tiredness > 1) this.tiredness -= 0.4
+    if (frameCount % 24 === 0)
+      this.hunger += floor(this.tiredness/4)+1
+    let a = [0,0,1,2,3,4,5,6,8,10,12]
+    if (this.tiredness < 100)
+      this.delay = a[floor(this.tiredness/12)+1]
+    else
+      this.delay = 14
     this.display()
   }
 
@@ -91,20 +106,21 @@ class Man extends WemoObject {
       }
     }
     if (this.isAnimated){
-      if (["shrinking", "growing"].includes(this.animation.type)){
-        let length = this.animation.type === "growing" ? 30-Math.round(this.energy/200) : 5
-        let size = this.animation.type === "growing" ?  map(this.animation.frame, 0, length, 10, 25) :
-              map(this.animation.frame, 0, length, 25, 10)
-        let pos = map(this.animation.frame, 0, length, 0, 25)
-        let x = (this.x-this.oldX)*pos
-        let y = (this.y-this.oldY)*pos
-        imageMode(CENTER)
-        this.drawImage(this.img[0], this.index+offset, this.oldX*25+12.5+x, this.oldY*25+topbarHeight+12.5+y, size, size)
-        imageMode(CORNER)
-        if (this.animation.frame >= length)
+      if (["moving"].includes(this.animation.type)){
+        
+        let pos = map(this.animation.frame, 0, this.animation.length, 0, 25)
+        let x = (this.newX-this.x)*pos
+        let y = (this.newY-this.y)*pos
+        this.drawImage(this.img[0], index, this.x*25+x, this.y*25+topbarHeight+y, 25, 25)
+        pos > 12 && this.revealCell(this.newX, this.newY, true)
+        
+        if (this.animation.frame >= this.animation.length){
           this.isAnimated = false
+          this.x = this.newX
+          this.y = this.newY
+        }
       }
-      else if (["building", "chopping"].includes(this.animation.type)){
+      if (["building", "chopping"].includes(this.animation.type)){
         let id = floor(map(frameCount%(world.frameRate/3), 0, world.frameRate/3, 0, 3))
         let sx = (id%3)*35
         let sy = floor(id/3)*25
@@ -120,16 +136,7 @@ class Man extends WemoObject {
       this.animation.frame++
       return
     }
-    else if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-      imageMode(CENTER)
-      this.drawImage(this.img[0], this.index+offset, this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
-      imageMode(CORNER)
-      return
-    }
-
     this.drawImage(this.img[0], index, dx, dy, 25, 25)
-    if (board.cells[this.x][this.y].byPit)
-      this.drawPitLines(this.x, this.y)
   }
 
   move(x, y) {
@@ -146,42 +153,29 @@ class Man extends WemoObject {
       if (!["water", "rockEdge", "river", "construction"].includes(board.cells[this.x+x][this.y+y].type)){
         if ("firepit" === board.cells[this.x+x][this.y+y].type && board.fires[board.cells[this.x+x][this.y+y].id].value > 0)
           return
-        if (["pit", "sandpit"].includes(board.cells[this.x+x][this.y+y].type)){
-            this.health -= 800
-            let name = board.cells[this.x+x][this.y+y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
-            msgs.following.msg = "You fell in "+name
-            msgs.following.frames = 18
-            sounds.play("pit")
-            if (!["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-              this.oldX = this.x
-              this.oldY = this.y
-              this.animation.frame = 0
-              this.animation.type = "shrinking"
-              this.isAnimated = true
-            }
+        if (this.delay === 0){
+          this.x +=x
+          this.y +=y
+          this.revealCell(this.x, this.y, true)
         }
-        else if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-          this.oldX = this.x
-          this.oldY = this.y
-          this.energy -= 600-(Math.floor(this.energy/10))
-          this.animation.frame = 0
+        else {
+          this.newX = this.x+x
+          this.newY = this.y+y
           this.isAnimated = true
-          this.animation.type = "growing"
+          this.animation.type = "moving"
+          this.animation.length = this.delay
+          this.animation.frame = 0
         }
-        //move and set image index
-        this.x += x
-        this.y += y
-        this.stepCount++
-        this.energy -= this.walkingCost()
-        this.health -= 1
-        this.vomit = false
 
-        this.revealCell(this.x, this.y, true)
+        this.stepCount++
+        this.tiredness += this.walkingCost()
+        this.vomit = false
         sounds.play("walk")
       }
       //reveal rockEdge cells
       else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type))
         this.revealCell(this.x+x, this.y+y, true)
+      //change index
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
     }
@@ -262,7 +256,7 @@ class Man extends WemoObject {
     }
     else {
       let message = this.isRiding ? "Sorry, no sleeping in your canoe!" :
-                      !this.canSleep ? "Sorry, no sleeping during the day!" :
+                      !this.canSleep ? "You can only sleep next to a fire" :
                         "You can't sleep on a "+board.cells[this.x][this.y].type+"!"
       popup.setAlert(message)
     }
@@ -276,35 +270,15 @@ class Man extends WemoObject {
 
   revealCell(x,y,fully){
     if (fully && !board.cells[x][y].revealed){
-      this.energy--
       board.revealCell(x,y,fully)
     }
     else if (board.cells[x][y].revealed < 2){
-      this.energy -= 0.5
       board.revealCell(x,y,false)
     }
   }
 
-  drawPitLines(x,y){
-    noFill()
-    stroke(255,0,0)
-    strokeWeight(1)
-    let offset = game.mode === 'edit' ? 0 : topbarHeight
-    let basex = x*25+2
-    let basey = y*25+2+offset
-    for (let i = 0; i < 5; i++){
-      let x1 = i < 2 ? 2-i : i == 2 ? 0.57 : 0
-      let y1 = i < 2 ? 0 : i == 2 ? 0.57 : i-2
-      let x2 = i < 2 ? 3 : i == 2 ? 2.57 : 5-i
-      let y2 = i > 2 ? 3: i == 2 ? 2.57 : i+1
-      line(Math.round(x1*7)+basex, Math.round(y1*7)+basey, Math.round(x2*7)+basex, Math.round(y2*7)+basey)
-    }
-    ellipseMode(CENTER)
-    ellipse(x*25+12.5, y*25+12.5+offset,22,22)
-  }
-
   walkingCost(){
-    return (backpack.weight+toolbelt.getWeight())/75+2.5
+    return (backpack.weight+toolbelt.getWeight())/100+2
   }
 
 }

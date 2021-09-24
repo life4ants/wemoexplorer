@@ -9,21 +9,12 @@
       this.updateFires()
     if (frameCount % 75 === 0)
       this.growBerries()
-    if (frameCount % 180 === 0 && man.health < 5000)
-      man.health++
-    if (frameCount%239 === 0){
-      this.savCyc++
-      if (Date.now()-world.frameTime < 18 || this.savCyc > 2){
-        game.saveGame()
-        if (this.savCyc > 2)
-          console.log("game saved")
-        else
-          console.log("extra save", Date.now()-world.frameTime)
-        this.savCyc = 0
-      }
-    }
     if (frameCount%317 === 0)
       this.growVeggies()
+    if (frameCount%437 === 0){
+      game.saveGame()
+      console.log("game saved")
+    }
   },
 
   increment(){
