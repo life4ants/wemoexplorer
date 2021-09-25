@@ -17,12 +17,16 @@ class Toolbelt {
   getAllItems(){
     let output = []
     for (let i = 0; i < this.tools.length; i++){
-      output.push({type: "tool", name: this.tools[i], id: i})
+      output.push({type: "tool", name: this.tools[i], id: i, src: "images/"+this.tools[i]+".png"})
     }
     for (let i = 0; i < this.containers.length; i++){
-      output.push({type: "container", name: this.containers[i].type,
-                   items: this.containers[i].items, id: i
-                  })
+      output.push({ id: i, 
+        type: "container", 
+        name: this.containers[i].type,
+        items: this.containers[i].items, 
+        src: this.containers[i].getPhoto(),
+        num: this.containers[i].getQuantity()
+        })
     }
     return output
   }

@@ -89,7 +89,7 @@ const options = {
           Feed the fire to last 40 minutes.
           Put both containers in your campsite, then click cook.` }
   ],
-  resources: [
+  resources: [ //used by popup.dumpMenu
     {name: "log", src: "images/logs.png"},
     {name: "rock", src: "images/rocks.png"},
     {name: "longGrass", src: "images/longGrass.png"},
@@ -99,13 +99,6 @@ const options = {
     {name: "arrow", src: "images/arrow.png"},
     {name: "rabbitLive", src: "images/rabbitLive.png"},
     {name: "rabbitDead", src: "images/rabbitDead.png"}
-  ],
-  tools: [
-    {name: "stoneAx", type: "tool", src: "images/stoneAx.png"},
-    {name: "bow", type: "tool", src: "images/bow.png"},
-    {name: "boneShovel", type: "tool", src: "images/boneShovel.png"},
-    {name: "claypot", type: "container", src: "images/claypot.png"},
-    {name: "basket", type: "container", src: "images/basket.png"}
   ]
 }
 

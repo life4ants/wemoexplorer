@@ -89,7 +89,7 @@ let editor = {
     this.changeTile(x,y,tile2, type2)
     
     for (let i = x-1; i <= x+1; i++){
-      for (let j = y-1; j <= y+1; j++){
+      for (let j = i === x ? y-1 : y; j <= y+1; j+=2){
         if (i >= 0 && i < board.cols && j >= 0 && j < board.rows && board.cells[i][j].type === type1)
           list = list.concat(this.floodFill(i,j, tile1, type1, tile2, type2))
       }
@@ -112,11 +112,9 @@ let editor = {
   treeFill(){
     for (let i=0; i<board.cols; i++){
       for (let j =0; j<board.rows; j++){
-        let l = random(6)
-        let h = random(12)
-        let x = i%8 + j%8
-        let type = (x > l && x < h) ? "tree" :
-            x < l ? "treeThin" : random(10) > 7 ? "longGrass" : "grass"
+        let r = random(22)
+        let type = r < 2 ? "tree" : r < 4 ? "treeThin" : r < 6 ? "bush4" :
+        r < 8 ? "bush1" : r < 8.5 ? "berryTree" : r < 15 ? "longGrass" : "grass"
         if (board.cells[i][j].type === "random"){
           let tile = type === "longGrass" ? "longGrass"+floor(random(3)+1) : type
           board.cells[i][j] = {tile, type}

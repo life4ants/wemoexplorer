@@ -46,12 +46,25 @@ class Backpack {
     return this.includesItems(ar)
   }
 
-  getQuantity(){ //counting total items in a basket
+  getQuantity(){ //counting total items in a basket or claypot
     let q = 0
     for (let k in this.items){
       q += this.items[k].quantity
     }
     return q
+  }
+
+  getPhoto(){
+    if (this.type === "basket")
+      return "images/basket.png"
+    if (this.type === "claypot"){
+      if (this.items.rabbitStew.quantity > 0)
+        return "images/veggyStew.png"
+      if (this.items.water.quantity > 0)
+        return "images/stewpot.png"
+      return "images/claypot.png"
+    }
+    return false
   }
 
   addItem(e, num = 1){

@@ -40,12 +40,12 @@ let helpers = {
     return (abs(x1-x2) < 2) && (abs(y1-y2) < 2)
   },
 
-  nearbyType(x,y, type){ //returns the cell data if found, otherwise false
+  nearbyType(x,y, type){ //returns the cell coordiants if found, otherwise false
     for (let i = x-1; i <= x+1; i++){
       for (let j = y-1; j <= y+1; j++){
         if (this.withinBounds(i,j)){
           if (board.cells[i][j].type === type)
-            return Object.assign({x: i, y: j}, board.cells[i][j])
+            return {x: i, y: j}
         }
       }
     }
@@ -130,43 +130,5 @@ let helpers = {
         output.push(i)
     }
     return output
-  },
-
-  skip(hours){
-    board.wemoMins += (hours*60)
-    timer.resume()
-  },
-
-  cheat(){
-    let cell = this.nearbyType(active.x, active.y, "construction")
-    if (cell){
-      let item = cell.construction
-      if (item.type === "raft"){
-        vehicles.addRaft(cell.x, cell.y)
-        cell = board.cells[cell.x][cell.y]
-        cell.type = cell.tile.replace(/\d+$/, "")
-      }
-      else if (item.type === "steppingStones"){
-        cell = board.cells[cell.x][cell.y]
-        cell.type = "steppingStones"
-      }
-      else if (item.type === "campsite"){
-        let site = {type: "campsite", x: cell.x, y: cell.y, items: [], fireValue: 0}
-        let id = board.buildings.length
-        board.buildings.push(site)
-        for (let i = cell.x; i <= cell.x+1; i++){
-          for (let j = cell.y; j <= cell.y+1; j++){
-            board.cells[i][j].type = "campsite"
-            board.cells[i][j].id = id
-          }
-        }
-        for (var k = options.build.length - 1; k >= 0; k--) {
-          if (["bow", "arrows", "claypot"].includes(options.build[k].name)){
-            options.build[k].active = true
-          }
-        }
-      }
-      delete cell.construction
-    }
   }
 }
