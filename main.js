@@ -130,6 +130,7 @@ function preload(){
     beachEdge4: loadImage("images/beachEdge4.png"),
     berries: loadImage("images/berries.png"),
     berryTree: loadImage("images/berryTree.png"),
+    berryBush: loadImage("images/berryBush.png"),
     bone: loadImage("images/bone.png"),
     bomb: loadImage("images/bomb1.png"),
     boneShovel: loadImage("images/boneShovel.png"),
