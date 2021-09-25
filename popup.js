@@ -241,15 +241,7 @@ var popup = new Vue({
       let items = toolbelt.getAllItems()
       if (items.length === 0)
         return
-      let output = []
-      for (let i = 0; i < items.length; i++){
-        let t = options.tools.findIndex((e) => e.name === items[i].name)
-        if (t !== -1){
-          let item = Object.assign(options.tools[t], items[i])
-          output.push(item)
-        }
-      }
-      this.setMenu(output, "What would you like to drop in your campsite?", "Drop")
+      this.setMenu(items, "What would you like to drop in your campsite?", "Drop")
     },
 
     drop(item){
@@ -270,13 +262,16 @@ var popup = new Vue({
         return
       let output = []
       for (let i = 0; i < items.length; i++){
-        let t = options.tools.findIndex((e) => e.name === items[i] || e.name === items[i].type)
-        if (t !== -1){
-          let x = options.tools[t]
-          if(typeof items[i] === "object")
-            x.num = items[i].getQuantity()
-          output.push(x)
+        let type = items[i].type || items[i]
+        let x
+        if (["claypot", "basket"].includes(type)){
+          x = {src: items[i].getPhoto(), num: items[i].getQuantity(), type: "container"}
         }
+        else {
+          x = {src: "images/"+type+".png", type: "tool"}
+        }
+        output.push(x)
+        
       }
       if (type === "grab" && !board.buildings[id].isCooking)
         this.setMenu(output, "What would you like to grab from your campsite?", "Grab")

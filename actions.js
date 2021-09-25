@@ -375,8 +375,9 @@ let actions = {
       }
     }
     else {
-      let cell = helpers.nearbyType(active.x, active.y, "construction")
-      if (cell){
+      let o = helpers.nearbyType(active.x, active.y, "construction")
+      if (o){
+        let cell = board.cells[o.x][o.y]
         let item = cell.construction
         for (let i = item.needed.length - 1; i >= 0; i--) {
           if (backpack.includesItem(item.needed[i].type)){
@@ -386,16 +387,14 @@ let actions = {
               item.needed.splice(i, 1)
               if (item.needed.length === 0){
                 if (item.type === "raft"){
-                  vehicles.addRaft(cell.x, cell.y)
-                  cell = board.cells[cell.x][cell.y]
+                  vehicles.addRaft(o.x, o.y)
                   cell.type = cell.tile.replace(/\d+$/, "")
                 }
                 else if (item.type === "steppingStones"){
-                  cell = board.cells[cell.x][cell.y]
                   cell.type = "steppingStones"
                 }
                 else if (item.type === "campsite"){
-                  let site = {type: "campsite", x: cell.x, y: cell.y, items: [], fireValue: 0}
+                  let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
                   let id = board.buildings.length
                   board.buildings.push(site)
                   for (let i = cell.x; i <= cell.x+1; i++){

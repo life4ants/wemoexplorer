@@ -211,7 +211,7 @@ var game = new Vue({
     },
 
     edit(player){
-      world.leftOffset = 106
+      world.leftOffset = 120
       $("#board").css("top", world.topOffset+"px").css("left", world.leftOffset+"px")
       $("#defaultCanvas0").css("cursor", "none")
       let cols = min(floor(window.innerWidth/25), 40)

@@ -133,15 +133,18 @@ class Man extends WemoObject {
   }
 
   move(x, y) {
-    this.standCount = 0
     if (this.isSleeping)
       return
-    if (board.cells[this.x][this.y].type === "campsite" && board.cells[this.x+x][this.y+y].type === "campsite"){
-      x *= 2; y*= 2;
-    }
     //check for edge case
     if (this.x + x >= 0 && this.x + x < board.cols &&
       this.y + y >= 0 && this.y + y < board.rows){
+      
+      this.standCount = 0
+      let cell = board.cells[this.x][this.y]
+      let newCell = board.cells[this.x+x][this.y+y]
+      if (cell.type === "campsite" && newCell.type === "campsite"){
+        x *= 2; y*= 2;
+      }
        //check for forbidden cells
       if (!["water", "rockEdge", "river", "construction"].includes(board.cells[this.x+x][this.y+y].type)){
         if ("firepit" === board.cells[this.x+x][this.y+y].type && board.fires[board.cells[this.x+x][this.y+y].id].value > 0)

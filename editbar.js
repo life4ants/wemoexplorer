@@ -8,7 +8,6 @@ const editBar = {
           <div class="menu-content">
             <span @click="saveBoard" title="save the current board">Save</span>
             <span @click="generateBoard" title="generate new board">New</span>
-            <span @click="previewBoard">Preview</span>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
             <span @click="load">Load</span>
@@ -93,6 +92,7 @@ const editBar = {
         { id: "beach", src: "images/beachX.png", type: "auto"},
         { id: "rockEdge", src: "images/rockX.png", type: "auto"},
         { id: "grassBeach", src: "images/grassBeachX.png", type: "auto"},
+        { id: "river", src: "images/grassRiverX.png", type: "auto"},
         { id: "beach1", src: "images/beach1.png", type: "beach"},
         { id: "beach2", src: "images/beach2.png", type: "beach"},
         { id: "beach3", src: "images/beach3.png", type: "beach"},
@@ -138,8 +138,7 @@ const editBar = {
         { id: "river9", src: "images/beachRiver3.png", type: "river"},
         { id: "river10", src: "images/beachRiver4.png", type: "river"},
         { id: "river11", src: "images/beachRiver5.png", type: "river"},
-        { id: "river12", src: "images/beachRiver6.png", type: "river"},
-        { id: "river", src: "images/grassRiverX.png", type: "auto"}
+        { id: "river12", src: "images/beachRiver6.png", type: "river"}
       ],
       tools: [
         { id: "floodFill", src: "images/floodFill.png"},
@@ -194,10 +193,6 @@ const editBar = {
         alert("Please enter 2 numbers separated by a coma (\",\")")
       else
         editor.newWorld(cols,rows, "random")
-    },
-
-    previewBoard(){
-      board.fill()
     },
 
     saveBoard(){

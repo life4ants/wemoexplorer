@@ -40,12 +40,12 @@ let helpers = {
     return (abs(x1-x2) < 2) && (abs(y1-y2) < 2)
   },
 
-  nearbyType(x,y, type){ //returns the cell data if found, otherwise false
+  nearbyType(x,y, type){ //returns the cell coordiants if found, otherwise false
     for (let i = x-1; i <= x+1; i++){
       for (let j = y-1; j <= y+1; j++){
         if (this.withinBounds(i,j)){
           if (board.cells[i][j].type === type)
-            return Object.assign({x: i, y: j}, board.cells[i][j])
+            return {x: i, y: j}
         }
       }
     }
