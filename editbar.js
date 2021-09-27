@@ -7,11 +7,10 @@ const editBar = {
           <span>Menu</span>
           <div class="menu-content">
             <span @click="saveBoard" title="save the current board">Save</span>
-            <span @click="generateBoard" title="generate new board">New</span>
+            <span @click="newBoard" title="generate new board">New</span>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
             <span @click="load">Load</span>
-            <span @click="() => load(false)">Load Default</span>
           </div>
         </div>
       </div>
@@ -180,20 +179,8 @@ const editBar = {
       editor.tool = this.tool = id
     },
 
-    generateBoard(){
-      let wcols = Math.floor((window.innerWidth-37)/25)
-      let wrows = Math.floor((window.innerHeight-55)/25)
-      let p = prompt("How big would you like your world to be?\nSize of screen is "+wcols+" by "+wrows+". Max suggested size is 80 by 50.\n"+
-        "Please enter width and height separated by a coma:")
-      if (p === null)
-        return
-      p = p.split(",")
-      let cols = Number(p[0])
-      let rows = Number(p[1])
-      if (cols != cols || rows != rows)
-        alert("Please enter 2 numbers separated by a coma (\",\")")
-      else
-        editor.newWorld(cols,rows, "random")
+    newBoard(){
+      popup.setInput("Enter size for new World", "newBoard","getSize")
     },
 
     saveBoard(){
@@ -210,16 +197,17 @@ const editBar = {
       editor.floodFill(8,8,board.cells[8][8].tile,board.cells[8][8].type,"random","random")
     },
 
-    load(custom){
-      let message = custom ? "enter name of custom world to load" : "enter id of default world to load"
-      let id = prompt(message)
-      if (id === null)
-        return
-      if (custom)
-        board = new Board(JSON.parse(localStorage["board"+id]))
-      else
-        board = new Board(JSON.parse(JSON.stringify(gameBoards[id])))
-      world.resize(board.cols, board.rows)
+    load(){
+      let items = []
+      let saved = Object.keys(localStorage)
+      for (let i = 0; i < saved.length; i++){
+        if (saved[i].substr(0, 5) === "board")
+          items.push({name: saved[i].substring(5, saved[i].length), type: "custom"})
+      }
+      for (let i = 0; i < gameBoards.length; i++){
+        items.push({id: i, name: "Level "+(i+1), type: "default"})
+      }
+      popup.setMenu(items, "Select a world to load:", "load")
     },
 
     grassAndTreeFill(){

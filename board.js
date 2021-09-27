@@ -42,21 +42,16 @@ class Board extends WemoObject {
           cell.id = trees.length
           trees.push({x: i, y: j, berries: []})
         }
-        if (helpers.isNextToType(i,j, ["pit", "sandpit"]))
-          cell.byPit = true
-        else
-          delete cell.byPit
       }
     }
     this.revealCount = revealCount
     this.berryTrees = trees
-    let name = prompt("enter name for game")
-    if (name !== null){
-      this.name = name
-      localStorage.setItem("board"+name, JSON.stringify(this))
+    if (this.name){
+      popup.setInput("Do you want to save the game as "+this.name+"?", "saveBoard", "yesno")
     }
-    else
-      alert("You must enter a name!!")
+    else {
+      popup.setInput("Enter a new name for this world:", "saveBoard", "input")
+    }
   }
 
   display(){
