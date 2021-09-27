@@ -36,7 +36,7 @@ function keyReleased(){
 function mousePressed(){
   if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height)
       return
-  if (game.mode === "edit" && winMouseX > world.leftOffset )
+  if (game.mode === "edit" && winMouseX > world.leftOffset && !popup.show)
     editor.mousePressed()
   else if (mouseX > viewport.left && mouseY > viewport.top+topbarHeight){
     if (game.mode === "play" && !popup.show)

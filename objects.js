@@ -50,7 +50,7 @@ let cheat = {
     timer.resume()
   },
 
-  cheat(){
+  build(){
     let o = helpers.nearbyType(active.x, active.y, "construction")
     if (o){
       let cell = board.cells[o.x][o.y]
@@ -83,12 +83,11 @@ let cheat = {
   },
 
   add(item){
-    switch(item){
-      case "claypot":
-        toolbelt.addItem("container",new Backpack("claypot")); break;
-      case "bow":
-        toolbelt.addItem("tool", "bow"); break
-    }
+    if (["claypot", "basket"].includes(item))
+      return toolbelt.addItem("container",new Backpack(item))
+    if (["stoneAx", "boneShovel", "bow"].includes(item))
+      return toolbelt.addItem("tool", item)
+    return false
   }
 }
 
