@@ -31,14 +31,6 @@ let welcome = {
                 <li>Bug fixes and tweaks</li>
               </ul>
             </div>
-            <div class="whatsNew">
-              <h5>Version 1.1</h5>
-              <h6>Published Sept 7, 2021</h6>
-              <ul>
-                <li>You can now hunt rabbits with bow and arrows, and cook rabbit stew!</li>
-                <li>Bow and Arrows, Claypot not available until you have a campsite.</li>
-              </ul>
-            </div>
           </div>
           <div v-else class="modal-body">
             <div class="links">
@@ -97,7 +89,7 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.1.2",
+      version: "1.2.1",
       publicationDate: "Sept 23, 2021"
     }
   },
