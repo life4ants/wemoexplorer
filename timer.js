@@ -91,25 +91,43 @@
 
   growBerries(){
     let trees = board.berryTrees
+    let bushes = board.berryBushes || []
     let x = Math.round(frameCount%300/75)
     for (let i=x; i<trees.length; i+=4){
-      this.addBerry(trees[i])
+      this.addApple(trees[i])
+    }
+    for (let i=x; i<bushes.length; i+=4){
+      this.addBerry(bushes[i])
     }
   },
 
-  addBerry(berryTree){
-    if (berryTree.berries.length >= 5)
+  addApple(tree){
+    if (tree.berries.length >= 5)
       return
     let p = Math.floor(Math.random()*5)
-    for (let i=0; i<berryTree.berries.length; i++){
-      if (p === berryTree.berries[i].id){
+    for (let i=0; i<tree.berries.length; i++){
+      if (p === tree.berries[i].id){
         p = Math.floor(Math.random()*5)
         i = -1
       }
     }
     let x = p === 3 ? 3 : p === 1 ? 9 : p === 0 ? 2 : 18
     let y = p === 2 ? 3 : p === 1 ? 0 : p === 0 ? 3 : 14
-    berryTree.berries.push({id: p, x, y})
+    tree.berries.push({id: p, x, y})
+  },
+
+  addBerry(bush){
+    if (bush.berries.length >= 9)
+      return
+    let a = [[16,8],[3,13],[7,14],[15,15],[21,15],[4,20],[7,20],[16,20],[22,22]]
+    let p = Math.floor(Math.random()*9)
+    for (let i=0; i<bush.berries.length; i++){
+      if (p === bush.berries[i].id){
+        p = Math.floor(Math.random()*9)
+        i = -1
+      }
+    }
+    bush.berries.push({id: p, x: a[p][0], y: a[p][1]})
   }
 }
 

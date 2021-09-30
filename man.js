@@ -24,6 +24,10 @@ class Man extends WemoObject {
   }
 
   update(){
+    // if (keyIsPressed && !this.isAnimated && !this.isSleeping && frameCount - keyDelay > 4){
+    //   keyHandler()
+    // }
+    let cell = board.cells[this.x][this.y]
     if (game.mode === "build"){
       strokeWeight(2)
       stroke(128)

@@ -1,12 +1,8 @@
 function keyPressed(){
   if (game.mode === "play" && !game.paused && !world.noKeys && !man.isAnimated && !window.event.shiftKey){//code is also in game.js
-    switch(keyCode){
-      case LEFT_ARROW:  active.move(-1, 0); break;
-      case RIGHT_ARROW: active.move(1,0);   break;
-      case UP_ARROW:    active.move(0,-1);  break;
-      case DOWN_ARROW:  active.move(0,1);   break;
-      default:          game.action(key);
-    }
+    //keyDelay = frameCount
+    if (!keyHandler())
+      game.action(key)
   }
   else if (["dumpMenu", "build"].includes(popup.type)){
     switch(keyCode){
@@ -25,13 +21,31 @@ function keyPressed(){
   }
 }
 
-function keyReleased(){
-  if (window.event.shiftKey){
-    console.log("shift+"+ keyCode)
-  }
-  else if (keyCode === 16)
-    console.log("shift was released")
+// function keyReleased(){
+//   if (window.event.shiftKey){
+//     console.log("shift+"+ keyCode)
+//   }
+//   else if (keyCode === 16)
+//     console.log("shift was released")
+// }
+
+function keyHandler(){
+  switch(keyCode){
+      case LEFT_ARROW:  active.move(-1, 0); return true;
+      case RIGHT_ARROW: active.move(1,0);   return true;
+      case UP_ARROW:    active.move(0,-1);  return true;
+      case DOWN_ARROW:  active.move(0,1);   return true;
+      default:          return false
+    }
 }
+
+// function keyReleased(){
+//   if (window.event.shiftKey){
+//     console.log("shift+"+ keyCode)
+//   }
+//   else if (keyCode === 16)
+//     console.log("shift was released")
+// }
 
 function mousePressed(){
   if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height)

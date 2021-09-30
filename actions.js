@@ -306,10 +306,16 @@ let actions = {
   eat(){
     let cell = board.cells[man.x][man.y]
     let tree = board.berryTrees[cell.id]
+    let bush = board.berryBushes[cell.id]
     let kind = ""
     if (cell.type === "berryTree" && tree.berries.length > 0){
       let p = Math.floor(Math.random()*tree.berries.length)
       tree.berries.splice(p, 1)
+      kind = "apples"
+    }
+     if (cell.type === "berryBush" && bush.berries.length > 0){
+      let p = Math.floor(Math.random()*bush.berries.length)
+      bush.berries.splice(p, 1)
       kind = "berries"
     }
     else if (cell.type === "veggies"){
@@ -322,7 +328,7 @@ let actions = {
       let basket = toolbelt.getContainer("basket")
       let claypot = toolbelt.getContainer("claypot")
       if (basket){
-        let items = basket.includesItems(["berries", "veggies"])
+        let items = basket.includesItems(["berries", "veggies", "apples"])
         if (items.length > 0){
           basket.removeItem(items[0].type, 1)
           kind = items[0].type
@@ -347,7 +353,8 @@ let actions = {
     sounds.play("eat")
     let e,h
     switch (kind){
-      case "berries": e = 25, h = 2;       break;
+      case "berries": e = 20, h = 2;       break;
+      case "apples": e = 35, h = 3;        break;
       case "veggies": e = 40, h = 5;       break;
       case "rabbitStew": e = 200, h = 500;  break;
       default: e = 0, h = 0;
