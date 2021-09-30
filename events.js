@@ -1,12 +1,8 @@
 function keyPressed(){
   if (game.mode === "play" && !game.paused && !world.noKeys && !man.isAnimated && !window.event.shiftKey){//code is also in game.js
-    switch(keyCode){
-      case LEFT_ARROW:  active.move(-1, 0); break;
-      case RIGHT_ARROW: active.move(1,0);   break;
-      case UP_ARROW:    active.move(0,-1);  break;
-      case DOWN_ARROW:  active.move(0,1);   break;
-      default:          game.action(key);
-    }
+    //keyDelay = frameCount
+    if (!keyHandler())
+      game.action(key)
   }
   else if (["dumpMenu", "build"].includes(popup.type)){
     switch(keyCode){
@@ -23,6 +19,16 @@ function keyPressed(){
     case ESCAPE: $('#esc').click();   break;
     case 32:     game.pauseGame();
   }
+}
+
+function keyHandler(){
+  switch(keyCode){
+      case LEFT_ARROW:  active.move(-1, 0); return true;
+      case RIGHT_ARROW: active.move(1,0);   return true;
+      case UP_ARROW:    active.move(0,-1);  return true;
+      case DOWN_ARROW:  active.move(0,1);   return true;
+      default:          return false
+    }
 }
 
 // function keyReleased(){

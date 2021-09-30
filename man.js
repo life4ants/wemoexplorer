@@ -26,6 +26,9 @@ class Man extends WemoObject {
   }
 
   update(){
+    // if (keyIsPressed && !this.isAnimated && !this.isSleeping && frameCount - keyDelay > 4){
+    //   keyHandler()
+    // }
     let cell = board.cells[this.x][this.y]
     if (game.mode === "build"){
       strokeWeight(2)
@@ -87,7 +90,7 @@ class Man extends WemoObject {
     if (this.tiredness < 100)
       this.delay = a[floor(this.tiredness/12)+1]
     else
-      this.delay = 14
+     this.delay = 14
     this.display(cell)
   }
 

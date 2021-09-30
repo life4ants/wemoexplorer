@@ -21,7 +21,7 @@ class Board extends WemoObject {
       }
       this.cells = output
       this.import({
-        berryTrees: [], fires: [], startX: 8, startY: 8, progress: false, version: 3, wemoMins: 120, type: "custom", level: 10
+        berryTrees: [], berryBushes: [], fires: [], startX: 8, startY: 8, progress: false, version: 3, wemoMins: 120, type: "custom", level: 10
       })
     }
   }
@@ -29,6 +29,7 @@ class Board extends WemoObject {
   save(){
     let revealCount = 0
     let trees = []
+    let bushes = []
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
@@ -42,10 +43,15 @@ class Board extends WemoObject {
           cell.id = trees.length
           trees.push({x: i, y: j, berries: []})
         }
+        if (cell.type === "berryBush"){
+          cell.id = bushes.length
+          bushes.push({x: i, y: j, berries: []})
+        }
       }
     }
     this.revealCount = revealCount
     this.berryTrees = trees
+    this.berryBushes = bushes
     if (this.name){
       popup.setInput("Do you want to save the game as "+this.name+"?", "saveBoard", "yesno")
     }
@@ -129,15 +135,29 @@ class Board extends WemoObject {
   }
 
   showObjects(){
-    //berry Trees:
+    //apple Trees:
     for (let i=0; i<this.berryTrees.length; i++){
       let tree = this.berryTrees[i]
       if (viewport.onScreen(tree.x, tree.y) && this.cells[tree.x][tree.y].revealed){
-        noStroke()
-        fill(128,0,128)
-        ellipseMode(CORNER)
+        // noStroke()
+        // fill(148,34,0)
+        // ellipseMode(CORNER)
         for (let j = 0; j< tree.berries.length; j++){
-          ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 5, 5)
+          image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
+          //ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 5, 5)
+        }
+      }
+    }
+    if (this.berryBushes){
+      for (let i=0; i<this.berryBushes.length; i++){
+        let tree = this.berryBushes[i]
+        if (viewport.onScreen(tree.x, tree.y) && this.cells[tree.x][tree.y].revealed){
+          noStroke()
+          fill(128,0,128)
+          ellipseMode(CENTER)
+          for (let j = 0; j< tree.berries.length; j++){
+            ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 4, 4)
+          }
         }
       }
     }

@@ -1,10 +1,11 @@
 const topbarHeight = 55
+// let keyDelay = 0
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
-const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus"]
+const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus", "berryBush"]
 const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
 const options = {
   reset(){
@@ -105,6 +106,7 @@ const options = {
 function preload(){
   console.log("preload", Date.now()-world.frameTime)
   tiles = {
+    apple: loadImage("images/apple.png"),
     arrow: loadImage("images/arrow.png"),
     arrow1: loadImage("images/arrow2.png"),
     arrowInFlight: loadImage("images/arrows.png"),
