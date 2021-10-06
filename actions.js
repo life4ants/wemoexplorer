@@ -404,8 +404,8 @@ let actions = {
                   let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
                   let id = board.buildings.length
                   board.buildings.push(site)
-                  for (let i = cell.x; i <= cell.x+1; i++){
-                    for (let j = cell.y; j <= cell.y+1; j++){
+                  for (let i = o.x; i <= o.x+1; i++){
+                    for (let j = o.y; j <= o.y+1; j++){
                       board.cells[i][j].type = "campsite"
                       board.cells[i][j].id = id
                     }
