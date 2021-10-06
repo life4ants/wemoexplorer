@@ -215,7 +215,7 @@ var popup = new Vue({
     },
 
     build(){
-      if (5000-man.hunger <= this.selected.energy){
+      if (man.energy <= this.selected.energy){
         this.title = "Opps! You don't have enough energy!"
         this.type = "alert"
         return

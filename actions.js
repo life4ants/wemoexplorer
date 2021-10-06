@@ -40,7 +40,7 @@ let actions = {
     }
     else
       return
-    man.hunger += item.energy
+    man.energy -= item.energy
     popup.setAlert("A construction site has been started. To finish building your "+item.title+
       ", gather the needed resources, go near the construction site, and press F.")
   },
@@ -105,8 +105,8 @@ let actions = {
     // build stoneAx or boneShovel:
     else if (["stoneAx", "boneShovel"].includes(item.name)){
       let msg = "Congratulations! You can now " +
-          (item.name === "stoneAx" ? "chop down trees at a cost of 80" : "dig clay at a cost of 50") +
-          " Tiredness. Look for the " + item.title + " icon on the top bar."
+          (item.name === "stoneAx" ? "chop down trees at a cost of 300" : "dig clay at a cost of 200") +
+          " energy. Look for the " + item.title + " icon on the top bar."
       let needed = ["stick", "longGrass", (item.name === "stoneAx" ? "rock" : "bone")]
       let ar = backpack.includesItems(needed)
       if (ar.length === 3){
@@ -185,8 +185,8 @@ let actions = {
     }
     // buy a bomb:
     else if (item.name === "bomb"){
-      if (backpack.itemFits("bomb", quantity)){
-        man.hunger += item.energy*(quantity-1)
+      if (backpack.itemFits("bomb", quantity) && man.energy > item.energy*quantity){
+        man.energy -= item.energy*(quantity-1)
         man.isAnimated = true
         man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
           backpack.addItem("bomb", quantity)
@@ -200,7 +200,7 @@ let actions = {
     else // error catch
       return "Sorry, not available yet!"
 
-    man.hunger += item.energy
+    man.energy -= item.energy
     return false //no message to send
   },
 
@@ -242,11 +242,11 @@ let actions = {
       }
       else {
         man.isAnimated = true
-        man.animation = {frame: 0, type: "chopping", end: world.frameRate*5/3, action: () => {
+        man.animation = {frame: 0, type: "chopping", end: world.frameRate*15/3, action: () => {
           cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
           cell.tile = "stump"
           cell.quantity = 5
-          man.tiredness = toolbelt.tools[t] === "stoneAx" ? man.tiredness+80 : man.tiredness+50
+          man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
         }}
       }
     }
@@ -341,8 +341,9 @@ let actions = {
     }
     if (kind === "") return
 
-    if (man.hunger < 0){
-      man.hunger += Math.floor((Math.random()*5+1)*100)
+    if (man.energy > 5000){
+      man.energy -= Math.floor((Math.random()*5+1)*100)
+      man.health -= Math.floor((Math.random()*5+1)*10)
       msgs.following.msg = "You ate too much!!!"
       msgs.following.frames = 30
       man.vomit = true
@@ -350,16 +351,17 @@ let actions = {
       return
     }
     sounds.play("eat")
-    let e
+    let e,h
     switch (kind){
-      case "berries": e = 10;      break;
-      case "veggies": e = 40;      break;
-      case "apples": e = 40;  break;
-      case "rabbitStew": e = 200;  break;
-      default: e = 0;
+      case "berries": e = 20, h = 2;       break;
+      case "apples": e = 35, h = 3;        break;
+      case "veggies": e = 40, h = 5;       break;
+      case "rabbitStew": e = 200, h = 500;  break;
+      default: e = 0, h = 0;
     }
-    man.hunger = max(man.hunger-e, 0)
-    if (man.hunger < 0)
+    man.health = min(man.health+h, 5000)
+    man.energy = min(man.energy+e, 5025)
+    if (man.energy > 5000)
       popup.setAlert("You are full. Stop eating!")
   },
 
@@ -402,8 +404,8 @@ let actions = {
                   let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
                   let id = board.buildings.length
                   board.buildings.push(site)
-                  for (let i = cell.x; i <= cell.x+1; i++){
-                    for (let j = cell.y; j <= cell.y+1; j++){
+                  for (let i = o.x; i <= o.x+1; i++){
+                    for (let j = o.y; j <= o.y+1; j++){
                       board.cells[i][j].type = "campsite"
                       board.cells[i][j].id = id
                     }
@@ -525,7 +527,7 @@ let actions = {
           cell.type =  cell.tile.replace(/\d+$/, "")
           delete cell.quantity
         }
-        man.tiredness = toolbelt.tools[id] === "boneShovel" ? man.tiredness+50 : man.tiredness+30
+        man.energy = toolbelt.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
         sounds.play("dig")
         return
       }
@@ -543,7 +545,7 @@ let actions = {
     }
     else
       return
-    //sounds.play("grab")
+    sounds.play("grab")
   },
 
   throw(){

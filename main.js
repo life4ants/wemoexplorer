@@ -301,7 +301,7 @@ function preload(){
     //dump: new Audio("sounds/dump.mp3"),
     //fling: new Audio("sounds/fling.mp3"),
     //grab: new Audio("sounds/grab.mp3"),
-    //pit: new Audio("sounds/pitShort.mp3"),
+    pit: new Audio("sounds/pitShort.mp3"),
     sleep: new Audio("sounds/sleeping.mp3"),
     vomit: new Audio("sounds/vomit.mp3"),
     //water: new Audio("sounds/water.wav"),
@@ -351,7 +351,7 @@ function playLoop(){
   board.showNight()
   topbar.display()
   msgs.display()
-  if ((man.hunger > 5000 || man.tiredness > 150) && !man.isAnimated)
+  if ((man.energy <= 0 || man.health <= 0) && !man.isAnimated)
     popup.gameOver()
 }
 

@@ -107,6 +107,7 @@ let editor = {
   newWorld(cols, rows, fillType){
     board = new Board(cols, rows, fillType)
     world.resize(cols, rows)
+    this.undoList = []
   },
 
   treeFill(){
@@ -121,6 +122,7 @@ let editor = {
         }
       }
     }
+    this.undoList = []
   },
 
   parsePath(type){

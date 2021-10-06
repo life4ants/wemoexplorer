@@ -1,17 +1,15 @@
 let topbar = {
-  hunger: 0,
-  tiredness: 0,
+  energy: 0,
+  health: 0,
 
   display(){
     let backpackPos = viewport.width > 1200 ? viewport.left+530 : viewport.width > 1000 ? viewport.left+340 : viewport.left+240
     let widthFactor = viewport.width > 1200 ? 10 : viewport.width > 1000 ? 16 : 24
     this.showSelf()
-    this.hunger = helpers.smoothChange(this.hunger, man.hunger)
-    let h = Math.round(this.hunger)
-    this.tiredness = Math.round(man.tiredness)
-    let t = map(this.tiredness, 0, 150, 0, 5000)
-    this.showEnergyBar("Hunger: ", h, h, 3, widthFactor)
-    this.showEnergyBar("Tiredness: ", t, this.tiredness, 30, widthFactor)
+    this.energy = helpers.smoothChange(this.energy, man.energy)
+    this.health = helpers.smoothChange(this.health, man.health)
+    this.showEnergyBar("Energy: ", Math.round(this.energy), 3, widthFactor)
+    this.showEnergyBar("Health: ", Math.round(this.health), 30, widthFactor)
     this.showBackpack(backpackPos, viewport.top+3)
     this.showWorldName(backpackPos+150)
     this.showTimer()
@@ -49,15 +47,15 @@ let topbar = {
     rect(viewport.right-sWidth-1, top+32, sWidth, 11)
   },
 
-  showEnergyBar(title, value, displayValue,offset, widthFactor){
+  showEnergyBar(title, value, offset, widthFactor){
     let top = viewport.top+offset
     fill(255)
     stroke(80)
     strokeWeight(3)
     rect(viewport.left+10, top, Math.floor(5000/widthFactor)+3, 20)
-    let color = value > 3333 ? "red" :
-                 value > 1666 ? "#e90" : "green"
-    if (frameCount%10 < 5 && value > 4000)
+    let color = value > 3333 ? "green" :
+                 value > 1666 ? "#e90" : "red"
+    if (frameCount%10 < 5 && value < 1000)
       fill(255)
     else
       fill(color)
@@ -74,7 +72,7 @@ let topbar = {
     }
     fill(f)
     textSize(14)
-    text(title+displayValue, viewport.left+12+x, top+2)
+    text(title+value, viewport.left+12+x, top+2)
   },
 
   showBackpack(left, top){

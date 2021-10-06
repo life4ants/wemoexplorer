@@ -413,6 +413,8 @@ class Board extends WemoObject {
       if (b.fireValue > 0)
         this.drawFireCircle(b.x,b.y+1,b.fireValue,alpha)
     }
+    if (man.inDark && man.isSleeping)
+      image(tiles.z, man.x*25, man.y*25+topbarHeight)
   }
 
   cutFireCircle(bx,by,value,dark){
@@ -421,10 +423,10 @@ class Board extends WemoObject {
     let y = by*25+12.5+topbarHeight
     let r = size*25/2
     let arm = r*0.54666
-    // if (dark && man.inDark){
-    //   let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
-    //   man.inDark = d > r-10
-    // }
+    if (dark && man.inDark){
+      let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
+      man.inDark = d > r-10
+    }
     beginContour()
     vertex(x,y-r)
     bezierVertex(x-arm,y-r,x-r,y-arm,x-r,y)

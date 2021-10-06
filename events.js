@@ -21,6 +21,14 @@ function keyPressed(){
   }
 }
 
+// function keyReleased(){
+//   if (window.event.shiftKey){
+//     console.log("shift+"+ keyCode)
+//   }
+//   else if (keyCode === 16)
+//     console.log("shift was released")
+// }
+
 function keyHandler(){
   switch(keyCode){
       case LEFT_ARROW:  active.move(-1, 0); return true;
