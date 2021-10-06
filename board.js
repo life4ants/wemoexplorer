@@ -5,6 +5,8 @@ class Board extends WemoObject {
     this.rabbits = []
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       this.import(a)
+      if (!this.berryBushes)
+        this.berryBushes = []
       if (this.version !== 3)
         this.convertVersion2()
       this.initializeObjects()
