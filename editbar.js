@@ -152,6 +152,11 @@ const editBar = {
   props: [
     'exit'
   ],
+  mounted(){
+    editor.tool = "brush"
+    editor.tile = editor.type = "water"
+    editor.undoList = []
+  },
   methods: {
     setCurrent(id, type){
       editor.tile = this.selected = id
