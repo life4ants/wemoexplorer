@@ -64,17 +64,6 @@ let helpers = {
     return x >= 0 && x < board.cols && y >= 0 && y < board.rows
   },
 
-  looker(id,y){
-    if (id === "active")
-      return board.cells[active.x][active.y]
-    if (id === "man")
-      return board.cells[man.x][man.y]
-    if (id === "mouse")
-      return board.cells[floor(mouseX/25)][floor((mouseY-topbarHeight)/25)]
-    else if (y)
-      return board.cells[id][y]
-  },
-
   randomPicker(type){//string or array
     let count = 0
     while (count < 100){
