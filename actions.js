@@ -311,7 +311,7 @@ let actions = {
       tree.berries.splice(p, 1)
       kind = "apples"
     }
-     if (cell.type === "berryBush" && bush.berries.length > 0){
+    else if (cell.type === "berryBush" && bush.berries.length > 0){
       let p = Math.floor(Math.random()*bush.berries.length)
       bush.berries.splice(p, 1)
       kind = "berries"
@@ -364,6 +364,47 @@ let actions = {
   },
 
   fling(){
+    let o = helpers.nearbyType(active.x, active.y, "construction")
+    if (o){
+      let cell = board.cells[o.x][o.y]
+      let item = cell.construction
+      for (let i = item.needed.length - 1; i >= 0; i--) {
+        if (backpack.includesItem(item.needed[i].type)){
+          backpack.removeItem(item.needed[i].type, 1)
+          item.needed[i].quantity --
+          if (item.needed[i].quantity === 0){
+            item.needed.splice(i, 1)
+            if (item.needed.length === 0){
+              if (item.type === "raft"){
+                vehicles.addRaft(o.x, o.y)
+                cell.type = cell.tile.replace(/\d+$/, "")
+              }
+              else if (item.type === "steppingStones"){
+                cell.type = "steppingStones"
+              }
+              else if (item.type === "campsite"){
+                let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
+                let id = board.buildings.length
+                board.buildings.push(site)
+                for (let i = o.x; i <= o.x+1; i++){
+                  for (let j = o.y; j <= o.y+1; j++){
+                    board.cells[i][j].type = "campsite"
+                    board.cells[i][j].id = id
+                  }
+                }
+                for (var k = options.build.length - 1; k >= 0; k--) {
+                  if (["bow", "arrows", "claypot"].includes(options.build[k].name)){
+                    options.build[k].active = true
+                  }
+                }
+              }
+              delete cell.construction
+            }
+          }
+          break
+        }
+      }
+    }
     let cell = board.cells[man.x][man.y]
     if (man.isNextToFire || cell.type === "campsite"){
       let items = backpack.includesItems(["log", "stick", "longGrass", "rabbitLive"])
@@ -377,49 +418,6 @@ let actions = {
         else
           board.fires[man.fireId].value = fireValue
         backpack.removeItem(items[0].type, 1)
-      }
-    }
-    else {
-      let o = helpers.nearbyType(active.x, active.y, "construction")
-      if (o){
-        let cell = board.cells[o.x][o.y]
-        let item = cell.construction
-        for (let i = item.needed.length - 1; i >= 0; i--) {
-          if (backpack.includesItem(item.needed[i].type)){
-            backpack.removeItem(item.needed[i].type, 1)
-            item.needed[i].quantity --
-            if (item.needed[i].quantity === 0){
-              item.needed.splice(i, 1)
-              if (item.needed.length === 0){
-                if (item.type === "raft"){
-                  vehicles.addRaft(o.x, o.y)
-                  cell.type = cell.tile.replace(/\d+$/, "")
-                }
-                else if (item.type === "steppingStones"){
-                  cell.type = "steppingStones"
-                }
-                else if (item.type === "campsite"){
-                  let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
-                  let id = board.buildings.length
-                  board.buildings.push(site)
-                  for (let i = o.x; i <= o.x+1; i++){
-                    for (let j = o.y; j <= o.y+1; j++){
-                      board.cells[i][j].type = "campsite"
-                      board.cells[i][j].id = id
-                    }
-                  }
-                  for (var k = options.build.length - 1; k >= 0; k--) {
-                    if (["bow", "arrows", "claypot"].includes(options.build[k].name)){
-                      options.build[k].active = true
-                    }
-                  }
-                }
-                delete cell.construction
-              }
-            }
-            break
-          }
-        }
       }
     }
   },
