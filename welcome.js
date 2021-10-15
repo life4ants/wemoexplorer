@@ -28,7 +28,7 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>Bug fixes and tweaks</li>
+                <li>Back to Health and Energy</li>
               </ul>
             </div>
           </div>
@@ -89,8 +89,8 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.2.1",
-      publicationDate: "Sept 23, 2021"
+      version: "1.2.2",
+      publicationDate: "Oct 15, 2021"
     }
   },
   props: [

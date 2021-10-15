@@ -12,29 +12,29 @@ let helpers = {
     return false
   },
 
-  isNextToTile(x, y, tile){ //accepts a string or array as type
-    for (let i = -1; i <= 1; i++){
-      for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
-        let a = x+i, b = y+j;
-        if (this.withinBounds(a,b)){
-          if (tile.includes(board.cells[a][b].tile))
-            return {x: a, y: b}
-        }
-      }
-    }
-    return false
-  },
+  // isNextToTile(x, y, tile){ //accepts a string or array as type
+  //   for (let i = -1; i <= 1; i++){
+  //     for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
+  //       let a = x+i, b = y+j;
+  //       if (this.withinBounds(a,b)){
+  //         if (tile.includes(board.cells[a][b].tile))
+  //           return {x: a, y: b}
+  //       }
+  //     }
+  //   }
+  //   return false
+  // },
 
-  isNextToSquare(x1, y1, x2, y2){ //no diagonals      NOT USED YET
-    for (let i = -1; i <= 1; i++){
-      for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
-        let a = x1+i, b = y1+j;
-        if (a === x2 && b === y2)
-          return true
-      }
-    }
-    return false
-  },
+  // isNextToSquare(x1, y1, x2, y2){ //no diagonals      NOT USED YET
+  //   for (let i = -1; i <= 1; i++){
+  //     for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
+  //       let a = x1+i, b = y1+j;
+  //       if (a === x2 && b === y2)
+  //         return true
+  //     }
+  //   }
+  //   return false
+  // },
 
   isNearSquare(x1, y1, x2, y2){ //with diagonals
     return (abs(x1-x2) < 2) && (abs(y1-y2) < 2)

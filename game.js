@@ -245,10 +245,6 @@ var game = new Vue({
       toolbelt = new Toolbelt(b.toolbelt)
       delete b.toolbelt
       if (b.man){
-        //patch to delete old stuff:
-        delete b.man.tools
-        delete b.man.basket
-        //end patch
         man.import(b.man)
         delete b.man
       }

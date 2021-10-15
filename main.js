@@ -11,9 +11,6 @@ const options = {
   reset(){
     for (var i = this.build.length - 1; i >= 0; i--) {
       switch (this.build[i].name) {
-        case "raft":
-          this.build[i].active = !vehicles.raft
-          break
         case "bomb":
           this.build[i].active = board.revealCount <= 100
           break

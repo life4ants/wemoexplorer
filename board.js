@@ -7,8 +7,6 @@ class Board extends WemoObject {
       this.import(a)
       if (!this.berryBushes)
         this.berryBushes = []
-      if (this.version !== 3)
-        this.convertVersion2()
       this.initializeObjects()
     }
     else if (arguments.length === 3){// creating a new game on editor
@@ -141,12 +139,8 @@ class Board extends WemoObject {
     for (let i=0; i<this.berryTrees.length; i++){
       let tree = this.berryTrees[i]
       if (viewport.onScreen(tree.x, tree.y) && this.cells[tree.x][tree.y].revealed){
-        // noStroke()
-        // fill(148,34,0)
-        // ellipseMode(CORNER)
         for (let j = 0; j< tree.berries.length; j++){
           image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
-          //ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 5, 5)
         }
       }
     }
@@ -245,9 +239,6 @@ class Board extends WemoObject {
     if (cell.arrows && cell.revealed)
       image(tiles["arrow"], x*25, y*25+offset)
       
-    //print pit rings: 
-    if (cell.byPit && (revealed || game.mode === 'edit'))
-      this.drawRing(x,y)
     if (cell.revealed === 1)
       image(tiles.cloudsHalf, x*25, y*25+offset)
   }
@@ -256,17 +247,7 @@ class Board extends WemoObject {
     let cell = this.cells[x][y]
     if (cell.type.substr(0,6) === "random"){
       let roll = Math.random()
-      if (cell.type === "randomPit" && roll < .5){
-        cell.type = "pit"
-        cell.tile = "pit"
-        for (let k = -1; k <=1; k++){
-          for (let l = -1; l<=1; l++){
-            if ((abs(l+k) === 1) && (helpers.withinBounds(x+k,y+l)))
-              this.cells[x+k][y+l].byPit = true
-          }
-        }
-      }
-      else if (cell.type === "randomGrass" && roll < .8){
+      if (cell.type === "randomGrass" && roll < .8){
         let a = Math.floor(Math.random()*3)+1
         cell.type = "longGrass"
         cell.tile = "longGrass"+a
@@ -470,15 +451,6 @@ class Board extends WemoObject {
     text(num,x,y)
   }
 
-  drawRing(x,y){
-    noFill()
-    stroke(255,0,0)
-    strokeWeight(3)
-    let offset = game.mode === 'edit' ? 0 : topbarHeight
-    ellipseMode(CENTER)
-    ellipse(x*25+12.5, y*25+offset+12.5,23,23)
-  }
-
   drawProgressBar(i,j,value, Xoffset){
     fill(255)
     stroke(80)
@@ -489,16 +461,5 @@ class Board extends WemoObject {
     fill(color)
     noStroke()
     rect(i*25+3+Xoffset, j*25+20+topbarHeight, value, 3)
-  }
-
-  convertVersion2(){
-    this.cols = this.cells.length
-    this.rows = this.cells[0].length
-    this.berryTrees = this.objectsToShow.berryTrees
-    this.fires = this.objectsToShow.fires
-    this.type = "custom"
-    this.level = 10
-    delete this.objectsToShow
-    this.version = 3
   }
 }
