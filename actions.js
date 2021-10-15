@@ -25,7 +25,6 @@ let actions = {
       }
       cell.type = "construction"
       cell.construction = construction
-      //**** allow more than 1 raft*** options.build[options.build.findIndex((e) => e.name === "raft")].active = false
     }
     // build stepping stones:
     else if (item.name === "steppingStones"){
@@ -299,7 +298,6 @@ let actions = {
       cell.rabbits = cell.rabbits +1 || 1
       backpack.removeItem("rabbitDead", 1)
     }
-    //sounds.play("dump")
     return false
   },
 
@@ -539,13 +537,12 @@ let actions = {
       let pot = toolbelt.getContainer("claypot")
       if (pot){
         pot.addItem("water")
-        //sounds.play("water")
+        sounds.play("water")
         return
       }
     }
     else
       return
-    sounds.play("grab")
   },
 
   throw(){

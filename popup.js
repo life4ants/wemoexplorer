@@ -428,6 +428,7 @@ var popup = new Vue({
       this.size = "popup-center"
       this.type = "gameOver"
       world.noKeys = true
+      sounds.play("lose")
       noLoop()
     },
 

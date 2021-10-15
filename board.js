@@ -327,8 +327,10 @@ class Board extends WemoObject {
       popup.setAlert("Only 40 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
       options.build[options.build.findIndex((e) => e.name === "bomb")].active = true
     }
-    else if (this.revealCount === 0)
-      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 3000)
+    else if (this.revealCount === 0){
+      sounds.play("win")
+      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)
+    }
   }
 
   clicker(){
