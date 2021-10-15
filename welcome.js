@@ -29,6 +29,8 @@ let welcome = {
               <h6>Published {{publicationDate}}</h6>
               <ul>
                 <li>Back to Health and Energy</li>
+                <li>Can Build Campsite on top of firepit</li>
+                <li>Sound will play when you win or die</li>
               </ul>
             </div>
           </div>
