@@ -124,16 +124,7 @@ class Man extends WemoObject {
       this.animation.frame++
       return
     }
-    else if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-      imageMode(CENTER)
-      this.drawImage(this.img[0], this.index+offset, this.x*25+12.5, this.y*25+topbarHeight+12.5, 10, 10)
-      imageMode(CORNER)
-      return
-    }
-
     this.drawImage(this.img[0], index, dx, dy, 25, 25)
-    if (board.cells[this.x][this.y].byPit)
-      this.drawPitLines(this.x, this.y)
   }
 
   move(x, y) {
@@ -150,31 +141,9 @@ class Man extends WemoObject {
         x *= 2; y*= 2;
       }
        //check for forbidden cells
-      if (!["water", "rockEdge", "river", "construction"].includes(board.cells[this.x+x][this.y+y].type)){
-        if ("firepit" === board.cells[this.x+x][this.y+y].type && board.fires[board.cells[this.x+x][this.y+y].id].value > 0)
+      if (!["water", "rockEdge", "river", "construction"].includes(newCell.type)){
+        if ("firepit" === newCell.type && board.fires[newCell.id].value > 0)
           return
-        if (["pit", "sandpit"].includes(board.cells[this.x+x][this.y+y].type)){
-            this.health -= 800
-            let name = board.cells[this.x+x][this.y+y].type === "sandpit" ? "sinking sand!!" : "a pit!!"
-            msgs.following.msg = "You fell in "+name
-            msgs.following.frames = 18
-            sounds.play("pit")
-            if (!["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-              this.oldX = this.x
-              this.oldY = this.y
-              this.animation.frame = 0
-              this.animation.type = "shrinking"
-              this.isAnimated = true
-            }
-        }
-        else if (["pit", "sandpit"].includes(board.cells[this.x][this.y].type)){
-          this.oldX = this.x
-          this.oldY = this.y
-          this.energy -= 600-(Math.floor(this.energy/10))
-          this.animation.frame = 0
-          this.isAnimated = true
-          this.animation.type = "growing"
-        }
         //move and set image index
         this.x += x
         this.y += y
@@ -187,7 +156,7 @@ class Man extends WemoObject {
         sounds.play("walk")
       }
       //reveal rockEdge cells
-      else if (["river", "rockEdge"].includes(board.cells[this.x+x][this.y+y].type))
+      else if (["river", "rockEdge"].includes(newCell.type))
         this.revealCell(this.x+x, this.y+y, true)
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
@@ -290,24 +259,6 @@ class Man extends WemoObject {
       this.energy -= 0.5
       board.revealCell(x,y,false)
     }
-  }
-
-  drawPitLines(x,y){
-    noFill()
-    stroke(255,0,0)
-    strokeWeight(1)
-    let offset = game.mode === 'edit' ? 0 : topbarHeight
-    let basex = x*25+2
-    let basey = y*25+2+offset
-    for (let i = 0; i < 5; i++){
-      let x1 = i < 2 ? 2-i : i == 2 ? 0.57 : 0
-      let y1 = i < 2 ? 0 : i == 2 ? 0.57 : i-2
-      let x2 = i < 2 ? 3 : i == 2 ? 2.57 : 5-i
-      let y2 = i > 2 ? 3: i == 2 ? 2.57 : i+1
-      line(Math.round(x1*7)+basex, Math.round(y1*7)+basey, Math.round(x2*7)+basex, Math.round(y2*7)+basey)
-    }
-    ellipseMode(CENTER)
-    ellipse(x*25+12.5, y*25+12.5+offset,22,22)
   }
 
   walkingCost(){
