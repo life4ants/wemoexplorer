@@ -102,6 +102,7 @@ const options = {
 
 function preload(){
   console.log("preload", Date.now()-world.frameTime)
+  document.getElementById("p5_loading").innerHTML = "Loading Images ..."
   tiles = {
     apple: loadImage("images/apple.png"),
     arrow: loadImage("images/arrow.png"),
