@@ -344,7 +344,6 @@ class Board extends WemoObject {
 
   showNight(){
     let alpha, time
-    let mins = this.wemoMins%1440
     if (game.paused) {
       alpha = timer.timeOfDay === "day" ? 230 : 255
       fill(0,0,0,alpha)
@@ -356,20 +355,19 @@ class Board extends WemoObject {
       case "day":
         return
       case "dusk":
-        time = mins-1320
+        time = timer.mins-1320
         alpha = Math.floor(255-pow((60-time)*.266, 2))
         break
       case "night":
         alpha = 255
         break
       case "dawn":
-        time = mins-60
+        time = timer.mins-60
         alpha = Math.round(255-pow((time+1)*.266, 2))
         break
     }
 
-    let dark = (mins >= 1360 || mins < 80)
-    man.inDark = dark
+    man.inDark = timer.dark
 
     fill(0,0,0,alpha)
     noStroke()
@@ -381,11 +379,11 @@ class Board extends WemoObject {
     let fires = board.fires
     for (let f of fires){
       if (f.value > 0)
-        this.cutFireCircle(f.x, f.y, f.value, dark)
+        this.cutFireCircle(f.x, f.y, f.value)
     }
     for (let b of this.buildings){
       if (b.fireValue > 0)
-        this.cutFireCircle(b.x, b.y+1, b.fireValue, dark)
+        this.cutFireCircle(b.x, b.y+1, b.fireValue)
     }
     endShape(CLOSE)
     for (let f of fires){
@@ -400,13 +398,13 @@ class Board extends WemoObject {
       image(tiles.z, man.x*25, man.y*25+topbarHeight)
   }
 
-  cutFireCircle(bx,by,value,dark){
+  cutFireCircle(bx,by,value){
     let size = (value/4)+3.1
     let x = bx*25+12.5
     let y = by*25+12.5+topbarHeight
     let r = size*25/2
     let arm = r*0.54666
-    if (dark && man.inDark){
+    if (timer.dark && man.inDark){
       let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
       man.inDark = d > r-10
     }

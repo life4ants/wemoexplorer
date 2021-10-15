@@ -1,6 +1,5 @@
  let timer = {
   startTime: null,
-  savCyc: 0,
 
   update(){
     if (frameCount%(world.frameRate/4) === 0)
@@ -11,19 +10,12 @@
       this.growBerries()
     if (frameCount % 180 === 0 && man.health < 5000)
       man.health++
-    if (frameCount%239 === 0){
-      this.savCyc++
-      if (Date.now()-world.frameTime < 18 || this.savCyc > 2){
-        game.saveGame()
-        if (this.savCyc > 2)
-          console.log("game saved")
-        else
-          console.log("extra save", Date.now()-world.frameTime)
-        this.savCyc = 0
-      }
-    }
     if (frameCount%317 === 0)
       this.growVeggies()
+    if (frameCount%437 === 0){
+      game.saveGame()
+      console.log("game saved")
+    }
   },
 
   increment(){
@@ -33,10 +25,15 @@
     else
       board.wemoMins = newMins
 
-    let mins = board.wemoMins%1440
-    this.timeOfDay = mins >= 60 && mins <= 119 ? "dawn" :
-                  mins >= 1320 && mins <= 1379 ? "dusk" :
-                    mins >= 1380 || mins <= 59 ? "night" :
+    this.setTimeOfDay()
+  },
+
+  setTimeOfDay(){
+    this.mins = board.wemoMins%1440
+    this.dark = (this.mins >= 1360 || this.mins < 80)
+    this.timeOfDay = this.mins >= 60 && this.mins <= 119 ? "dawn" :
+                  this.mins >= 1320 && this.mins <= 1379 ? "dusk" :
+                  this.mins >= 1380 || this.mins <= 59 ? "night" :
                       "day"
   },
 
@@ -49,9 +46,7 @@
   setTime(smins){
     this.startTime = Date.now() - (smins*250)
     board.wemoMins = smins
-    let mins = smins%1440
-    this.timeOfDay = mins >= 60 && mins <= 119 ? "dawn" : mins >= 1320 && mins <= 1379 ? "dusk" :
-            mins >= 1380 || mins <= 59 ? "night" : "day"
+    this.setTimeOfDay()
   },
 
   updateFires(){

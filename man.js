@@ -18,7 +18,7 @@ class Man extends WemoObject {
     this.vomit = false
     this.inDark = false
     this.isSleeping = false
-    this.canSleep = true // ***allow sleeping all the time
+    this.canSleep = false
     this.isAnimated = false
     this.animation = {frame: 0, type: "", end: 0, action: null}
   }
@@ -64,8 +64,12 @@ class Man extends WemoObject {
         }
       }
     }
-    // ****allow sleeping all the time
-    //this.canSleep = board.wemoMins%1440 >= 1290 || board.wemoMins%1440 < 150
+    this.canSleep = (timer.dark && !this.inDark || 
+        this.isNextToFire && board.fires[this.fireId].value > 0 ||
+        cell.type === "campsite")
+    if (this.isSleeping && !this.canSleep)
+      this.goToSleep()
+
     if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
       msgs.following.msg = "Get off the fire! You're burning!"
       msgs.following.frames = 1
@@ -237,8 +241,8 @@ class Man extends WemoObject {
       sounds.files['sleep'].play()
     }
     else {
-      let message = this.isRiding ? "Sorry, no sleeping in your canoe!" :
-                      !this.canSleep ? "Sorry, no sleeping during the day!" :
+      let message = this.isRiding ? "Sorry, no sleeping on your raft!" :
+                      !this.canSleep ? "You can only sleep near a fire or in a campsite." :
                         "You can't sleep on a "+board.cells[this.x][this.y].type+"!"
       popup.setAlert(message)
     }
