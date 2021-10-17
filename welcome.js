@@ -120,7 +120,6 @@ let welcome = {
         this.players.push({name: this.name, unlockedLevel: 1, games: [], character: 0})
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
-        this.updateMessage = false
       }
     },
 
