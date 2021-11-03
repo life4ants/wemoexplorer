@@ -21,7 +21,7 @@ let test = {
       let cell = board.cells[o.x][o.y]
       let item = cell.construction
       if (item.type === "raft"){
-        vehicles.addRaft(cell.x, cell.y)
+        vehicles.addRaft(o.x, o.y)
         cell.type = cell.tile.replace(/\d+$/, "")
       }
       else if (item.type === "steppingStones"){

@@ -30,27 +30,34 @@ let viewport = {
   },
 
   follow(object) {
-    let newLeft = this.boardLeft
-    let newTop = this.boardTop
-    let step = 10
+    let newLeft, newTop
 
-    if (window.innerWidth < width+world.leftOffset){
-      if ((object.x*25) + this.boardLeft < 100 + world.leftOffset) // left
-        newLeft = this.boardLeft+step > world.leftOffset ? world.leftOffset : this.boardLeft+step
-      else if ((object.x*25) + this.boardLeft > window.innerWidth - 125) //right
-        newLeft = this.boardLeft-step < window.innerWidth - width ? window.innerWidth - width : this.boardLeft-step
+    if (window.innerWidth < width+world.leftOffset){ //board is wider than screen
+      newLeft = this.checkEdge(this.boardLeft, (object.x*25) + this.boardLeft, 
+                              world.leftOffset, window.innerWidth, width)
     }
-    if (window.innerHeight < height+world.topOffset){
-      if (object.y*25+topbarHeight - (topbarHeight - this.boardTop) < 100) //top
-        newTop = this.boardTop+step > world.topOffset ? world.topOffset : this.boardTop+step
-      else if ((object.y*25+topbarHeight) + this.boardTop > window.innerHeight - 125) //bottom
-        newTop = this.boardTop-step < window.innerHeight - height ? window.innerHeight - height : this.boardTop-step
+    if (window.innerHeight < height+world.topOffset){//board is taller than screen
+      newTop = this.checkEdge(this.boardTop,
+        object.y*25+topbarHeight - (topbarHeight - this.boardTop), 
+        0, window.innerHeight, height)
     }
 
     if (newTop === this.boardTop && newLeft === this.boardLeft)
       return false
     $("#board").css("top", newTop).css("left", newLeft)
     return true
+  },
+
+  checkEdge(boardLeft, manPos, leftEdge, rightEdge, width){
+    if (manPos < leftEdge)
+      return boardLeft+20
+    if (manPos < leftEdge+100)
+      return boardLeft+10 > leftEdge ? leftEdge : boardLeft+10
+    if (manPos > rightEdge)
+      return boardLeft-20
+    if (manPos > rightEdge-125)
+      return boardLeft-10 < rightEdge-width ? rightEdge-width : boardLeft-10
+    return boardLeft
   },
 
   centerOn(object, fly) {
