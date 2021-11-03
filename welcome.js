@@ -125,7 +125,7 @@ let welcome = {
 
     pickPlayer(id){
       let p = this.players[id]
-      p.index = id
+      p.index = id   // player not created with an index, must get one somehow
       this.selected = p.character || 0
       this.currentPlayer = p
       this.matchWorlds()

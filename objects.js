@@ -24,7 +24,10 @@ let world = {
   frameRate: 12,
 
   resize(cols, rows){
-    resizeCanvas(cols*25, game.mode === "play" ? rows*25+topbarHeight : rows*25)
+    let offset = game.mode === "play" ? topbarHeight : 0
+    resizeCanvas(
+      max(cols*25,window.innerWidth), 
+      max(rows*25+offset, window.innerHeight))
   }
 }
 
