@@ -66,15 +66,15 @@ let viewport = {
     let newLeft = left-object.x*25+13 // the left value to set #board in order to center the man in the viewport
     let maxLeft = world.leftOffset
     let minLeft = window.innerWidth - width
-    newLeft = width < window.innerWidth-world.leftOffset ? Math.floor((window.innerWidth-world.leftOffset-width)/2)+world.leftOffset :
-                fly ? constrain(newLeft, minLeft, maxLeft) :
-                  constrain(helpers.smoothChange(this.boardLeft, newLeft), minLeft, maxLeft)
+    newLeft = width < window.innerWidth-world.leftOffset ? world.leftOffset:
+        fly ? constrain(newLeft, minLeft, maxLeft) :
+        constrain(helpers.smoothChange(this.boardLeft, newLeft), minLeft, maxLeft)
     // center in the y direction:
     let top = Math.floor((window.innerHeight+world.topOffset)/2)
     let newTop = top-object.y*25+13-topbarHeight
     let maxTop = world.topOffset
     let minTop = window.innerHeight - height
-    newTop = height < window.innerHeight ? Math.floor((window.innerHeight - height)/2) :
+    newTop = height < window.innerHeight ? 0 :
                 fly ? constrain(newTop, minTop, maxTop) :
                   constrain(helpers.smoothChange(this.boardTop, newTop), minTop, maxTop)
     if (newTop === this.boardTop && newLeft === this.boardLeft)

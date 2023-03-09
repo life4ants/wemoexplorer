@@ -28,9 +28,7 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>Back to Health and Energy</li>
-                <li>Can Build Campsite on top of firepit</li>
-                <li>Sound will play when you win or die</li>
+                <li>Preview feature for custom worlds</li>
               </ul>
             </div>
           </div>
@@ -91,8 +89,8 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.2.2",
-      publicationDate: "Oct 15, 2021"
+      version: "1.2.3",
+      publicationDate: "Mar 9, 2023"
     }
   },
   props: [

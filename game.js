@@ -10,7 +10,7 @@ var game = new Vue({
       </div> 
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
         :player="currentPlayer" :edit="edit"></welcome-menu>
-      <edit-bar v-else-if="mode === 'edit'" :exit="exit"></edit-bar>
+      <edit-bar v-else-if="mode === 'edit'" :exit="exit" :preview="previewGame"></edit-bar>
       <div v-else-if="mode === 'loading'"></div>
       <div v-else-if="mode === 'play'" class="sidebar">
         <div class="sidebar-content">
@@ -67,7 +67,8 @@ var game = new Vue({
     autoCenter: false,
     infoShown: false,
     level: 1,
-    currentPlayer: {}
+    currentPlayer: {},
+    preview: false
   },
   mounted(){
     if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "8pmDec122017"){
@@ -183,18 +184,21 @@ var game = new Vue({
     },
 
     exit() {
-      if (this.mode === "play" && !board.gameOver)
-        this.saveGame()
-      else if (board.gameOver){
-        let index = this.currentPlayer.games.findIndex((e) => e.name === board.name)
-        if (index !== -1){
-          let gameId = this.currentPlayer.games[index].id
-          localStorage.removeItem("wemoGame"+gameId)
-          this.currentPlayer.games.splice(index,1)
-          let p = JSON.parse(localStorage.wemoPlayers)
-          p[this.currentPlayer.index] = this.currentPlayer
-          localStorage.setItem("wemoPlayers", JSON.stringify(p))
+      if (this.mode === "play"){
+        this.preview = false
+        if (board.gameOver){
+          let index = this.currentPlayer.games.findIndex((e) => e.name === board.name)
+          if (index !== -1){
+            let gameId = this.currentPlayer.games[index].id
+            localStorage.removeItem("wemoGame"+gameId)
+            this.currentPlayer.games.splice(index,1)
+            let p = JSON.parse(localStorage.wemoPlayers)
+            p[this.currentPlayer.index] = this.currentPlayer
+            localStorage.setItem("wemoPlayers", JSON.stringify(p))
+          }
         }
+        else
+          this.saveGame()
       }
       this.mode = "welcome"
       $("#boardWrapper").removeClass("full-screen")
@@ -238,6 +242,9 @@ var game = new Vue({
           b.name = index
           b.level = board.level || 10
           b.type = "custom"
+          break
+        case "preview":
+          b = board
       }
       man = new Man(player.character, b.startX, b.startY)
       backpack = new Backpack("backpack", b.backpack)
@@ -323,6 +330,16 @@ var game = new Vue({
           noLoop()
         }
       }
+    },
+
+    previewGame(){
+      if(board.name){
+        this.preview = true
+        this.exit()
+        this.startGame("preview", this.currentPlayer)
+      }
+      else
+        popup.setAlert("Please load a game to preview!")
     },
 
     toggleBuildMode(){

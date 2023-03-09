@@ -11,8 +11,12 @@ const editBar = {
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
             <span @click="load">Load</span>
+            <span @click='preview'>Preview</span>
           </div>
         </div>
+      </div>
+      <div class="board-name">
+      {{boardName}}
       </div>
       <div class="editbar-top">
         <button @click= 'undo'>Undo</button>
@@ -146,11 +150,12 @@ const editBar = {
       ],
       selected: "water",
       set: 1, 
-      tool: "brush"
+      tool: "brush",
+      boardName: "Board not saved"
     }
   },
   props: [
-    'exit'
+    'exit', 'preview'
   ],
   mounted(){
     editor.tool = "brush"
@@ -186,9 +191,11 @@ const editBar = {
 
     newBoard(){
       popup.setInput("Enter size for new World", "newBoard","getSize")
+      this.boardName = "Board not saved"
     },
 
     saveBoard(){
+      popup.setCallback((n)=> this.boardName = n)
       board.save()
     },
 
@@ -212,6 +219,7 @@ const editBar = {
       for (let i = 0; i < gameBoards.length; i++){
         items.push({id: i, name: "Level "+(i+1), type: "default"})
       }
+      popup.setCallback((n)=> this.boardName = n)
       popup.setMenu(items, "Select a world to load:", "load")
     },
 

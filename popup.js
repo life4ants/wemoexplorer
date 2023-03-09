@@ -179,7 +179,8 @@ var popup = new Vue({
       selected: null,
       showOptions: [],
       selectId: null,
-      inputValue: null
+      inputValue: null,
+      callback: null // only used for sending the name of the board back to editbar vue object
     }
   },
   methods: {
@@ -375,6 +376,7 @@ var popup = new Vue({
         case "saveBoard":
           board.name = this.inputValue
           localStorage.setItem("board"+this.inputValue, JSON.stringify(board))
+          this.callback("Board Name: "+board.name)
           this.setAlert("The game was saved"); break
         case "pickBombs":
           if (msg = actions.build(this.selected, {x: active.x, y: active.y}, this.inputValue))
@@ -386,11 +388,16 @@ var popup = new Vue({
           else
             board = new Board(JSON.parse(JSON.stringify(gameBoards[this.selected.id])))
           world.resize(board.cols, board.rows)
+          this.callback("Board Name: "+board.name)
           this.close(); break
         case "newBoard":
           editor.newWorld(this.inputValue.cols,this.inputValue.rows, "random")
           this.close()
       }
+    },
+
+    setCallback(c){
+      this.callback = c
     },
 
     yesnoAction(bool){

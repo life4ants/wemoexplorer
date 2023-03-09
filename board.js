@@ -81,7 +81,7 @@ class Board extends WemoObject {
       editor.showMouse()
       rectMode(CORNER)
     }
-    else {
+    else if (!game.preview){
       // show cells surround the man if needed:
       let n = 1
       for (let i = -1; i <= 1; i++){
@@ -206,14 +206,18 @@ class Board extends WemoObject {
   }
 
   showCell(x,y, cell, revealed){
+    if (!cell.revealed && game.mode === "play" && !game.preview){
+      // in this case, print clouds and be done. 
+      image(tiles["clouds"], x*25, y*25+topbarHeight)
+      return
+    }
     let offset = game.mode === "edit" ? 0 : topbarHeight
-    let t = tiles[cell.tile] || tiles["random"]
-    let img = game.mode === "edit" || revealed ? t : tiles["clouds"]
+    let img = tiles[cell.tile] || tiles["random"]
     // print the tile:
     image(img, x*25, y*25+offset)
     
     // print the type:
-    if (["rock", "clay"].includes(cell.type) && (cell.revealed || game.mode === "edit")){
+    if (["rock", "clay"].includes(cell.type)){
       image(tiles[cell.type+cell.quantity], x*25, y*25+offset)
     }
     else if (cell.type.substr(-4,4) === "pile"){
@@ -222,9 +226,9 @@ class Board extends WemoObject {
       if (cell.quantity > 1)
         this.drawBadge(x*25+4, y*25+topbarHeight+8, cell.quantity, "#000")
     }
-    else if (seeThru.includes(cell.type) && (cell.revealed || game.mode === "edit"))
+    else if (seeThru.includes(cell.type))
       image(tiles[cell.type], x*25, y*25+offset)
-    else if (cell.type === "construction" && (cell.revealed || game.mode === "edit")){
+    else if (cell.type === "construction"){
       image(tiles.construction[cell.construction.type], x*25, y*25+offset)
       for (let i = 0; i < cell.construction.needed.length; i++) {
         let item = cell.construction.needed[i]
@@ -234,12 +238,12 @@ class Board extends WemoObject {
       }
     }
     //print dead rabbits and arrows:
-    if (cell.rabbits && cell.revealed)
+    if (cell.rabbits)
       image(tiles["rabbitDead"], x*25, y*25+offset)
-    if (cell.arrows && cell.revealed)
+    if (cell.arrows)
       image(tiles["arrow"], x*25, y*25+offset)
       
-    if (cell.revealed === 1)
+    if (cell.revealed === 1 && !game.preview)
       image(tiles.cloudsHalf, x*25, y*25+offset)
   }
 
