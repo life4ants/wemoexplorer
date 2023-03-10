@@ -101,7 +101,7 @@ const options = {
 }
 
 function preload(){
-  console.log("preload", Date.now()-world.frameTime)
+  console.timeLog("load", "preload function started")
   document.getElementById("p5_loading").innerHTML = "Loading Images ..."
   tiles = {
     apple: loadImage("images/apple.png"),
@@ -291,6 +291,7 @@ function preload(){
     water: loadImage("images/water.png"),
     z: loadImage("images/z's.png")
   }
+  console.timeLog("load", "images finished")
 
   sounds.files = {
     chop: new Audio("sounds/chop.mp3"),
@@ -311,6 +312,7 @@ function preload(){
   tiles.bones = tiles.bone
   tiles.clays = tiles.clay
   tiles.rock = tiles.rock1
+  console.timeLog("load", "sounds finished") 
 }
 
 function setup(){
@@ -321,11 +323,10 @@ function setup(){
   noLoop()
   game.mode = "welcome"
   frameRate(world.frameRate)
-  console.log("loaded in", Date.now()-world.frameTime)
+  console.timeEnd("load")
 }
 
 function draw(){
-  world.frameTime = Date.now()
   background('green')
   if (game.started){
     board.display()

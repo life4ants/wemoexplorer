@@ -17,7 +17,6 @@ class WemoObject {
 }
 
 let world = {
-  frameTime: startTime,
   topOffset: 0,
   leftOffset: 0,
   noKeys: false,
@@ -30,5 +29,3 @@ let world = {
       max(rows*25+offset, window.innerHeight))
   }
 }
-
-console.log(Date.now() - world.frameTime)

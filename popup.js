@@ -26,6 +26,11 @@ var popup = new Vue({
               <input type="text" v-model="inputValue" id="inputOne">
             </div>
 
+            <div v-else-if="'download' === type" class="modal-header">
+              <h6><a :href="title" id="link" :download="actionTitle">
+              Click here to download the board</a></h6>
+            </div>
+
             <div v-else class="modal-header">
               <h6>{{title}}</h6>
             </div>
@@ -136,7 +141,7 @@ var popup = new Vue({
               <button type="button" class="button-primary" id="etr" @click="cook">Cook</button>
             </div>
 
-            <div v-else-if="['alert', 'info'].includes(type)" class="modal-footer">
+            <div v-else-if="['alert', 'info', 'download'].includes(type)" class="modal-footer">
               <button type="button" id="etr" @click="close">Ok</button>
             </div>
 
@@ -455,6 +460,16 @@ var popup = new Vue({
       this.title = content
       this.type = "alert"
       this.size = content.length > 25 ? "popup-center" : "popup-tiny"
+      world.noKeys = true
+      noLoop()
+    },
+
+    download(url, name){
+      this.show = true
+      this.title = url
+      this.actionTitle = name
+      this.type = "download"
+      this.size = "popup-center"
       world.noKeys = true
       noLoop()
     },

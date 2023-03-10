@@ -12,6 +12,7 @@ const editBar = {
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
             <span @click="load">Load</span>
             <span @click='preview'>Preview</span>
+            <span @click="download">Download</span>
           </div>
         </div>
       </div>
@@ -221,6 +222,12 @@ const editBar = {
       }
       popup.setCallback((n)=> this.boardName = n)
       popup.setMenu(items, "Select a world to load:", "load")
+    },
+
+    download(){
+      let downloadUrl = URL.createObjectURL(new Blob(
+        [JSON.stringify(board)], {type:'text/plain'}));
+      popup.download(downloadUrl, board.name + ".txt")
     },
 
     grassAndTreeFill(){
