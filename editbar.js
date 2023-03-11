@@ -13,6 +13,7 @@ const editBar = {
             <span @click="load">Load</span>
             <span @click='preview'>Preview</span>
             <span @click="download">Download</span>
+            <span @click="upload">Upload</span>
           </div>
         </div>
       </div>
@@ -196,7 +197,7 @@ const editBar = {
     },
 
     saveBoard(){
-      popup.setCallback((n)=> this.boardName = n)
+      popup.callback = (n)=> this.boardName = n
       board.save()
     },
 
@@ -220,7 +221,7 @@ const editBar = {
       for (let i = 0; i < gameBoards.length; i++){
         items.push({id: i, name: "Level "+(i+1), type: "default"})
       }
-      popup.setCallback((n)=> this.boardName = n)
+      popup.callback = (n)=> this.boardName = n
       popup.setMenu(items, "Select a world to load:", "load")
     },
 
@@ -228,6 +229,11 @@ const editBar = {
       let downloadUrl = URL.createObjectURL(new Blob(
         [JSON.stringify(board)], {type:'text/plain'}));
       popup.download(downloadUrl, board.name + ".txt")
+    },
+
+    upload(){
+      popup.callback = (n)=> this.boardName = n
+      popup.setInput("Upload file", "fileUpload", "fileUpload")
     },
 
     grassAndTreeFill(){

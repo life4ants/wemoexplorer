@@ -26,6 +26,12 @@ var popup = new Vue({
               <input type="text" v-model="inputValue" id="inputOne">
             </div>
 
+            <div v-else-if="'fileUpload' === type" class="modal-header">
+              <h6>{{title}}</h6>
+              <input type="file" @change="readFilePath" id="inputOne">
+              <p>{{uploadData.msg}}</p>
+            </div>
+
             <div v-else-if="'download' === type" class="modal-header">
               <h6><a :href="title" id="link" :download="actionTitle">
               Click here to download the board</a></h6>
@@ -58,7 +64,7 @@ var popup = new Vue({
               </div>
             </div>
 
-            <div v-if="type === 'cook'" class="modal-body">
+            <div v-else-if="type === 'cook'" class="modal-body">
               <p>In order to cook anything, you must have a campsite and a clay pot.</p>
               <div class="build-preview">
                 <img :src="selected.src" height="50" width="50">
@@ -131,21 +137,11 @@ var popup = new Vue({
             </div>
 
 <!-- *** Footer: *** -->
-            <div v-if="'build' === type" class="modal-footer">
-              <button type="button" id="esc" @click="close">Cancel</button>
-              <button type="button" class="button-primary" id="etr" @click="build">Build</button>
-            </div>
-
-            <div v-else-if="'cook' === type" class="modal-footer">
-              <button type="button" id="esc" @click="close">Cancel</button>
-              <button type="button" class="button-primary" id="etr" @click="cook">Cook</button>
-            </div>
-
-            <div v-else-if="['alert', 'info', 'download'].includes(type)" class="modal-footer">
+            <div v-if="['alert', 'info', 'download'].includes(type)" class="modal-footer">
               <button type="button" id="etr" @click="close">Ok</button>
             </div>
 
-            <div v-else-if="'dumpMenu' === type" class="modal-footer">
+            <div v-else-if="['dumpMenu', 'build', 'cook'].includes(type)" class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
               <button type="button" class="button-primary" id="etr" @click="action">{{actionTitle}}</button>
             </div>
@@ -155,12 +151,8 @@ var popup = new Vue({
               <button type="button" class="button-primary" id="etr" @click="() => yesnoAction(true)">Yes</button>
             </div>
 
-            <div v-else-if="'pickBombs' === type" class="modal-footer">
-              <button type="button" id="esc" @click="close">Cancel</button>
-              <button type="button" class="button-primary" id="etr" @click="action">Ok</button>
-            </div>
-
-            <div v-else-if="['input', 'load', 'getSize'].includes(type)" class="modal-footer">
+            <div v-else-if="['input', 'load', 'getSize', 'pickBombs', 'fileUpload'].includes(type)" 
+                  class="modal-footer">
               <button type="button" id="esc" @click="close">Cancel</button>
               <button type="button" class="button-primary" id="etr" @click="action">Ok</button>
             </div>
@@ -185,10 +177,78 @@ var popup = new Vue({
       showOptions: [],
       selectId: null,
       inputValue: null,
-      callback: null // only used for sending the name of the board back to editbar vue object
+      uploadData: {}, 
+      callback: null // for sending the name of the board back to editbar vue object
     }
   },
   methods: {
+    readFilePath(){
+      this.uploadData = {
+        text: "",
+        done: false,
+        msg: "Loading..."
+      }
+      document.getElementById("inputOne").files[0].text().then(
+        (e)=>{this.uploadData = {
+          text: e,
+          done: true,
+          msg: "Uploaded successfully."
+        } }).catch(
+        ()=> this.uploadData.msg = "Upload failed. :(")
+    },
+
+    action(){
+      let msg
+      switch(this.actionTitle){
+        case "Build":
+          this.build(); break
+        case "Cook":
+          this.cook(); break
+        case "Dump":
+          if (msg = actions.dump(this.selected.name)) {this.setAlert(msg)}
+          else {this.close()}; break
+        case "Drop":
+          this.drop(this.selected); break
+        case "fileUpload":
+          let b = {}
+          try {b = JSON.parse(this.uploadData.text)}
+          catch(e){
+            console.error(e)
+            this.setAlert("Failed to parse file text.")
+          }
+          if (b){
+            board = new Board(b)
+            world.resize(board.cols, board.rows)
+            this.callback("Board Name: "+board.name)
+            this.setAlert("World loaded. Please save before exiting.")
+          }
+          else
+            this.setAlert("Failed to create board."); break
+        case "Grab":
+          this.grab(this.selected, this.selectId); break
+        case "saveBoard":
+          board.name = this.inputValue
+          localStorage.setItem("board"+this.inputValue, JSON.stringify(board))
+          this.callback("Board Name: "+board.name)
+          this.setAlert("The world was saved"); break
+        case "pickBombs":
+          if (msg = actions.build(this.selected, {x: active.x, y: active.y}, this.inputValue))
+            this.setAlert(msg)
+          else {this.close()}; break
+        case "load":
+          if (this.selected.type === "custom")
+            board = new Board(JSON.parse(localStorage["board"+this.selected.name]))
+          else
+            board = new Board(JSON.parse(JSON.stringify(gameBoards[this.selected.id])))
+          world.resize(board.cols, board.rows)
+          this.callback("Board Name: "+board.name)
+          this.close(); break
+        case "newBoard":
+          editor.newWorld(this.inputValue.cols,this.inputValue.rows, "random")
+          this.close()
+      }
+    },
+
     select(id){
       this.selectId = id
       this.selected = this.showOptions[id]
@@ -203,21 +263,6 @@ var popup = new Vue({
       let id = this.selectId+dir
       id = id >= this.showOptions.length ? 0 : id < 0 ? this.showOptions.length-1 : id
       this.select(id)
-    },
-
-    buildMenu(){
-      if (active === man){
-        this.showOptions = JSON.parse(JSON.stringify(options.build.filter(e => e.active)))
-        this.title = "Build Menu"
-        this.type = "build"
-        this.size = "popup-center"
-        this.selected = this.showOptions[0]
-        this.selectId = 0
-        this.show = true
-        setTimeout(() => $(".build-menu").scrollTop(0), 0)
-        world.noKeys = true
-        noLoop()
-      }
     },
 
     build(){
@@ -249,14 +294,15 @@ var popup = new Vue({
       }
     },
 
-    cookMenu(){
+    buildMenu(){
       if (active === man){
-        this.showOptions = JSON.parse(JSON.stringify(options.cook.filter(e => e.active)))
-        this.title = "Cook Book"
-        this.type = "cook"
-        this.size = "popup-center"
+        this.showOptions = JSON.parse(JSON.stringify(options.build.filter(e => e.active)))
         this.selected = this.showOptions[0]
         this.selectId = 0
+        this.actionTitle = "Build"
+        this.title = "Build Menu"
+        this.type = "build"
+        this.size = "popup-center"
         this.show = true
         setTimeout(() => $(".build-menu").scrollTop(0), 0)
         world.noKeys = true
@@ -270,6 +316,32 @@ var popup = new Vue({
         this.setAlert(msg)
       else
         this.close()
+    },
+
+    cookMenu(){
+      if (active === man){
+        this.showOptions = JSON.parse(JSON.stringify(options.cook.filter(e => e.active)))
+        this.title = "Cook Book"
+        this.type = "cook"
+        this.actionTitle = "Cook"
+        this.size = "popup-center"
+        this.selected = this.showOptions[0]
+        this.selectId = 0
+        this.show = true
+        setTimeout(() => $(".build-menu").scrollTop(0), 0)
+        world.noKeys = true
+        noLoop()
+      }
+    },
+
+    download(url, name){
+      this.show = true
+      this.title = url
+      this.actionTitle = name
+      this.type = "download"
+      this.size = "popup-center"
+      world.noKeys = true
+      noLoop()
     },
 
     dumpMenu(){
@@ -367,55 +439,6 @@ var popup = new Vue({
       noLoop()
     },
 
-    action(){
-      let msg
-      switch(this.actionTitle){
-        case "Dump":
-          if (msg = actions.dump(this.selected.name)) {this.setAlert(msg)}
-          else {this.close()}
-          break
-        case "Drop":
-          this.drop(this.selected); break
-        case "Grab":
-          this.grab(this.selected, this.selectId); break
-        case "saveBoard":
-          board.name = this.inputValue
-          localStorage.setItem("board"+this.inputValue, JSON.stringify(board))
-          this.callback("Board Name: "+board.name)
-          this.setAlert("The game was saved"); break
-        case "pickBombs":
-          if (msg = actions.build(this.selected, {x: active.x, y: active.y}, this.inputValue))
-            this.setAlert(msg)
-          else {this.close()}; break
-        case "load":
-          if (this.selected.type === "custom")
-            board = new Board(JSON.parse(localStorage["board"+this.selected.name]))
-          else
-            board = new Board(JSON.parse(JSON.stringify(gameBoards[this.selected.id])))
-          world.resize(board.cols, board.rows)
-          this.callback("Board Name: "+board.name)
-          this.close(); break
-        case "newBoard":
-          editor.newWorld(this.inputValue.cols,this.inputValue.rows, "random")
-          this.close()
-      }
-    },
-
-    setCallback(c){
-      this.callback = c
-    },
-
-    yesnoAction(bool){
-      if (this.actionTitle === "saveBoard"){
-        if(bool){
-          localStorage.setItem("board"+board.name, JSON.stringify(board))
-          this.setAlert("The game was saved")
-        }
-        else
-          this.setInput("Enter a new name for this world:", "saveBoard", "input")
-      }
-    },
-
     setInput(title, actionTitle, type){
       this.title = title
       this.actionTitle = actionTitle
@@ -427,6 +450,13 @@ var popup = new Vue({
           {cols: Math.floor((window.innerWidth-37)/25), 
           rows: Math.floor((window.innerHeight-55)/25)}
         setTimeout(() => $("#inputOne").focus(), 0)
+      }
+      else if (type === "fileUpload"){
+        this.uploadData = {
+          text: "",
+          done: false,
+          outputMessage: ""
+        }
       }
       world.noKeys = true
       noLoop()
@@ -459,17 +489,7 @@ var popup = new Vue({
       this.show = true
       this.title = content
       this.type = "alert"
-      this.size = content.length > 25 ? "popup-center" : "popup-tiny"
-      world.noKeys = true
-      noLoop()
-    },
-
-    download(url, name){
-      this.show = true
-      this.title = url
-      this.actionTitle = name
-      this.type = "download"
-      this.size = "popup-center"
+      this.size = content.length > 27 ? "popup-center" : "popup-tiny"
       world.noKeys = true
       noLoop()
     },
@@ -479,6 +499,17 @@ var popup = new Vue({
       this.type = "outOfFocus"
       this.size = "popup-tiny"
       noLoop()
+    },
+
+    yesnoAction(bool){
+      if (this.actionTitle === "saveBoard"){
+        if(bool){
+          localStorage.setItem("board"+board.name, JSON.stringify(board))
+          this.setAlert("The game was saved")
+        }
+        else
+          this.setInput("Enter a new name for this world:", "saveBoard", "input")
+      }
     }
   }
 })

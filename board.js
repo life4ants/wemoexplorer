@@ -80,8 +80,11 @@ class Board extends WemoObject {
       rectMode(CENTER)
       editor.showMouse()
       rectMode(CORNER)
+      return
     }
-    else if (!game.preview){
+      this.showObjects()
+    
+    if (!game.preview){
       // show cells surround the man if needed:
       let n = 1
       for (let i = -1; i <= 1; i++){
@@ -95,7 +98,6 @@ class Board extends WemoObject {
           n++
         }
       }
-      this.showObjects()
     }
   }
 
@@ -206,7 +208,7 @@ class Board extends WemoObject {
   }
 
   showCell(x,y, cell, revealed){
-    if (!cell.revealed && game.mode === "play" && !game.preview){
+    if (!revealed && game.mode === "play" && !game.preview){
       // in this case, print clouds and be done. 
       image(tiles["clouds"], x*25, y*25+topbarHeight)
       return
