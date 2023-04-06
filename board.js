@@ -3,6 +3,7 @@ class Board extends WemoObject {
     super()
     this.buildings = []
     this.rabbits = []
+    this.teleports = []
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       this.import(a)
       if (!this.berryBushes)
@@ -80,6 +81,13 @@ class Board extends WemoObject {
       rectMode(CENTER)
       editor.showMouse()
       rectMode(CORNER)
+      if (this.teleports){
+        stroke(255,0,0)
+        strokeWeight(2)
+        for (let e of this.teleports){
+          line((e.a.x*25)+12, (e.a.y*25)+12, (e.b.x*25)+12, (e.b.y*25)+12)
+        }
+      }
       return
     }
       this.showObjects()
@@ -188,7 +196,7 @@ class Board extends WemoObject {
       }
     }
     //Campsites:
-    if (this.buildings){//PATCH: check in case it's an old game
+    if (this.buildings){
       for (let b of this.buildings){
         image(tiles[b.type], b.x*25, b.y*25+topbarHeight)
         if (b.type === "campsite"){

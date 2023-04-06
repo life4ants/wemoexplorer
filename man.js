@@ -158,6 +158,11 @@ class Man extends WemoObject {
 
         this.revealCell(this.x, this.y, true)
         sounds.play("walk")
+        if (newCell.type === "pit" && newCell.pair){
+          this.x = newCell.pair.x
+          this.y = newCell.pair.y
+          this.revealCell(this.x, this.y, true)
+        }
       }
       //reveal rockEdge cells
       else if (["river", "rockEdge"].includes(newCell.type))

@@ -16,9 +16,38 @@ let editor = {
           board.startY = y
         }
       }
+      else if (this.type === "pit0"){
+        if (board.cells[x][y].type === "pit")
+          return
+        this.path = {x,y}
+        this.setUndo(x,y)
+        this.changeTile(x,y, "pit", "pit")
+        this.type = "pit1"
+      }
+      else if (this.type === "pit1"){
+        if (board.cells[x][y].type === "pit")
+          return
+        this.addUndo(x,y)
+        this.changeTile(x,y, "pit", "pit")
+        let id = board.teleports.length > 0 ? board.teleports[board.teleports.length-1].id+1 : 0
+        board.cells[x][y].pair = this.path
+        board.cells[x][y].id = id
+        board.cells[this.path.x][this.path.y].pair = {x,y}
+        board.cells[this.path.x][this.path.y].id = id
+        board.teleports.push({a:this.path, b:{x,y}, id:id})
+        this.type = "pit0"
+        this.path = []
+        
+      }
       else {
+        this.setUndo(x,y)
+        if (board.cells[x][y].type === "pit"){
+          this.changeTile(board.cells[x][y].pair.x, board.cells[x][y].pair.y, "random", "random")
+          let index = board.teleports.findIndex((e) => e.id === board.cells[x][y].id)
+          board.teleports.splice(index, 1)
+          this.undoList = []
+        }
         this.path = [id]
-        this.undoList = [{x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type}]
         if (this.type === "auto")
           this.changeTile(x,y, "cross", "cross")
         else
@@ -35,11 +64,11 @@ let editor = {
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
     let id = x+"_"+y
-    if (this.type === "start")
+    if (["start", "pit0", "pit1"].includes(this.type))
       return
     if (!this.path.includes(id)){
       this.path.push(id)
-      this.undoList.push({x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type})
+      this.addUndo(x,y)
       if (this.type === "auto")
         this.changeTile(x,y, "cross", "cross")
       else
@@ -102,6 +131,19 @@ let editor = {
       this.changeTile(e.x, e.y, e.tile, e.type)
     }
     this.undoList = []
+  },
+
+  setUndo(x,y){
+    this.undoList = [{x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type}]
+  },
+
+  addUndo(x,y){
+    this.undoList.push([{x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type}])
+  },
+
+  cancelPit(){
+    this.undo()
+    this.path = []
   },
 
   newWorld(cols, rows, fillType){

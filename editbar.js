@@ -92,7 +92,8 @@ const editBar = {
         { id: "beachEdge1", src: "images/beachEdge1.png", type: "beachEdge"},
         { id: "beachEdge2", src: "images/beachEdge2.png", type: "beachEdge"},
         { id: "beachEdge3", src: "images/beachEdge3.png", type: "beachEdge"},
-        { id: "beachEdge4", src: "images/beachEdge4.png", type: "beachEdge"}
+        { id: "beachEdge4", src: "images/beachEdge4.png", type: "beachEdge"},
+        { id: "pit", src: "images/pit.png", type: "pit0"}
       ],
       tiles2: [
         { id: "beach", src: "images/beachX.png", type: "auto"},
@@ -166,9 +167,11 @@ const editBar = {
   },
   methods: {
     setCurrent(id, type){
+      if (editor.type === "pit1")
+        editor.cancelPit()
       editor.tile = this.selected = id
       editor.type = type
-      if (["auto", "start"].includes(type))
+      if (["auto", "start", "pit1", "pit0"].includes(type))
         editor.tool = this.tool = "brush"
     },
 
@@ -186,7 +189,7 @@ const editBar = {
     },
 
     changeTool(id){
-      if (id === "floodFill" && ["auto", "start"].includes(editor.type))
+      if (id === "floodFill" && ["auto", "start", "pit0", "pit1"].includes(editor.type))
         return
       editor.tool = this.tool = id
     },
