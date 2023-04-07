@@ -245,6 +245,9 @@ var popup = new Vue({
           this.close(); break
         case "newBoard":
           editor.newWorld(this.inputValue.cols,this.inputValue.rows, "random")
+          this.close(); break
+        case "resize":
+          editor.resizeWorld(this.inputValue.cols,this.inputValue.rows)
           this.close()
       }
     },
@@ -296,7 +299,7 @@ var popup = new Vue({
 
     buildMenu(){
       if (active === man){
-        this.showOptions = JSON.parse(JSON.stringify(options.build.filter(e => e.active)))
+        this.showOptions = options.build.filter(e => e.level <= board.level)
         this.selected = this.showOptions[0]
         this.selectId = 0
         this.actionTitle = "Build"

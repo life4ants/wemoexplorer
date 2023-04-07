@@ -4,10 +4,9 @@ class Board extends WemoObject {
     this.buildings = []
     this.rabbits = []
     this.teleports = []
+    this.berryBushes = []
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       this.import(a)
-      if (!this.berryBushes)
-        this.berryBushes = []
       this.initializeObjects()
     }
     else if (arguments.length === 3){// creating a new game on editor
@@ -22,8 +21,10 @@ class Board extends WemoObject {
       }
       this.cells = output
       this.import({
-        berryTrees: [], berryBushes: [], fires: [], startX: 8, startY: 8, progress: false, version: 3, wemoMins: 120, type: "custom", level: 10
+        berryTrees: [], berryBushes: [], fires: [], progress: false, version: 3, wemoMins: 120, type: "custom", level: 10
       })
+      this.startX = this.cols > 8 ? 8 : this.cols-1
+      this.startY = this.rows > 8 ? 8 : this.rows-1
     }
   }
 
@@ -318,11 +319,7 @@ class Board extends WemoObject {
       if (this.cells[x][y].revealed === 1)
         this.revealCount --
     }
-    if (this.revealCount === 40){
-      popup.setAlert("Only 40 more squares to reaveal!\nBombs are now available on the build menu to clear the rest of the world")
-      options.build[options.build.findIndex((e) => e.name === "bomb")].active = true
-    }
-    else if (this.revealCount === 0){
+    if (this.revealCount === 0){
       if (this.type === "default" && this.level+1 > game.currentPlayer.unlockedLevel){
         game.currentPlayer.unlockedLevel = this.level+1
         let p = JSON.parse(localStorage.wemoPlayers)

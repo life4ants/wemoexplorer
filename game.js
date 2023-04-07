@@ -272,7 +272,6 @@ var game = new Vue({
         board.fill()
         board.addRabbits()
       }
-      options.reset()
       $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
       $("#boardWrapper").addClass("full-screen")
       this.currentPlayer = player

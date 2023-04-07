@@ -8,6 +8,7 @@ const editBar = {
           <div class="menu-content">
             <span @click="saveBoard" title="save the current board">Save</span>
             <span @click="newBoard" title="generate new board">New</span>
+            <span @click="resizeBoard" title="resize the board">Resize</span>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
             <span @click="load">Load</span>
@@ -197,6 +198,10 @@ const editBar = {
     newBoard(){
       popup.setInput("Enter size for new World", "newBoard","getSize")
       this.boardName = "Board not saved"
+    },
+
+    resizeBoard(){
+      popup.setInput("Enter new size for the World", "resize","getSize")
     },
 
     saveBoard(){

@@ -152,6 +152,35 @@ let editor = {
     this.undoList = []
   },
 
+  resizeWorld(cols, rows){
+    if (cols > board.cols){
+      for (let i = board.cols; i < cols; i++){
+        board.cells.push(new Array(board.rows).fill({tile: "random", type: "random"}))
+      }
+    }
+    else if (cols < board.cols){
+      board.cells.splice(cols, board.cols-cols)
+    }
+    board.cols = cols
+    if (rows > board.rows){
+      for (let i = 0; i < board.cells.length; i++) {
+        for (let j = board.rows; j < rows; j++ ){
+          board.cells[i].push({tile: "random", type: "random"})
+        }
+      }
+    }
+    else if (rows < board.rows){
+      for (let i = 0; i < board.cells.length; i++) {
+        board.cells[i].splice(rows, board.rows-rows)
+      }
+    }
+    board.rows = rows
+    world.resize(cols, rows)
+    this.undoList = []
+    board.startX = board.startX < cols ? board.startX : cols-1
+    board.startY = board.startY < rows ? board.startY : rows-1
+  },
+
   treeFill(){
     for (let i=0; i<board.cols; i++){
       for (let j =0; j<board.rows; j++){

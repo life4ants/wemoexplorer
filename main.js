@@ -8,72 +8,59 @@ const fordable = ["river5","river6","river7","river8","river9","river10","river1
 const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus", "berryBush"]
 const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
 const options = {
-  reset(){
-    for (var i = this.build.length - 1; i >= 0; i--) {
-      switch (this.build[i].name) {
-        case "bomb":
-          this.build[i].active = board.revealCount <= 100
-          break
-        case "claypot":
-        case "bow":
-        case "arrows":
-          this.build[i].active = board.buildings.length > 0
-      }
-    }
-  },
   build: [
-    {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", active: true,
+    {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", level: 1,
         time: 15, energy: 200,
         resources: "none",
         dist: "A bonfire to spend the night next to",
         inst: "Go to the spot where you want to build a firepit, then click build." },
-    {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", active: true,
+    {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", level: 2,
         time: 0, energy: 150,
         resources: "3 rocks",
         dist: "For crossing rivers",
         inst: "Click build to select a location."},
-    {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", active: true,
+    {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", level: 1,
         time: 15, energy: 100,
         resources: "1 stick, 1 long grass, 1 rock",
         dist: "A primitive ax for chopping trees and other things",
         inst: "Gather the needed resources in your backpack, then click build."},
-    {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel", active: true,
+    {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel", level: 3,
         time: 20, energy: 120,
         resources: "1 stick, 1 long grass, 1 bone",
-        dist: "A primitive shovel for digging clay and ore",
+        dist: "A primitive shovel for digging clay",
         inst: "Gather the needed resources in your backpack, then click build."},
-    {name: "bow", src: "images/bow.png", title: "Bow", active: false,
+    {name: "bow", src: "images/bow.png", title: "Bow", level: 4,
         time: 45, energy: 80,
         resources: "1 stick, 2 long grass",
         dist: "For hunting",
         inst: "Gather the needed resources in your backpack, then click build."},
-    {name: "arrows", src: "images/arrow.png", title: "Arrows", active: false,
+    {name: "arrows", src: "images/arrow.png", title: "Arrows", level: 4,
         time: 25, energy: 200,
         resources: "2 sticks, 4 long grass, 2 rocks",
         dist: "Flint head arrows for hunting",
         inst: "Makes 5 arrows. Gather the needed resources in your backpack, then click build. Must have an Ax with you."},
-    {name: "basket", src: "images/basket.png", title: "Basket", active: true,
+    {name: "basket", src: "images/basket.png", title: "Basket", level: 1,
         time: 30, energy: 50,
         resources: "6 long grass",
         dist: "For gathering berries and veggies in",
         inst: "Gather 6 long grass in your backpack, then click build."},
-    {name: "claypot", src: "images/claypot.png", title: "Clay Pot", active: false,
+    {name: "claypot", src: "images/claypot.png", title: "Clay Pot", level: 4,
         time: 60, energy: 150,
         resources: "2 clay",
         dist: "For cooking food and carrying water",
         inst: "Gather the clay in your backpack, go to a campsite, feed the fire enough to last on hour, then click build."},
-    {name: "raft", src: "images/raft0.png", title: "Raft", active: true,
+    {name: "raft", src: "images/raft0.png", title: "Raft", level: 2,
         time: 0, energy: 400,
         resources: "8 logs, 8 long grass",
         dist: "For exploring water",
         inst: "Click build to select a location."},
-    {name: "campsite", src: "images/campsite.png", title: "Campsite", active: true,
+    {name: "campsite", src: "images/campsite.png", title: "Campsite", level: 4,
         time: 0, energy: 500,
         resources: "5 logs, 10 sticks, 5 clay, 10 long grass",
         dist: "A place to store tools, cook meals, and more!",
         inst: "Click build to select a location."},
-    {name: "bomb", src: "images/bomb1.png", title: "Bomb", active: false,
-        time: 5, energy: 300,
+    {name: "bomb", src: "images/bomb1.png", title: "Bomb", level: 2,
+        time: 5, energy: 400,
         resources: "none",
         dist: "For clearing away clouds",
         inst: "Click build, then select how many bombs you want added to your backpack."}
