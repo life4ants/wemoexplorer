@@ -9,7 +9,7 @@ var game = new Vue({
         <div class="downButton" @click="() => moveAction(3)"></div>
       </div> 
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
-        :player="currentPlayer" :edit="edit"></welcome-menu>
+        :player="currentPlayer" :edit="edit" :updateMessage="updateMessage"></welcome-menu>
       <edit-bar v-else-if="mode === 'edit'" :exit="exit" :preview="previewGame"></edit-bar>
       <div v-else-if="mode === 'loading'"></div>
       <div v-else-if="mode === 'play'" class="sidebar">
@@ -68,10 +68,11 @@ var game = new Vue({
     infoShown: false,
     level: 1,
     currentPlayer: {},
-    preview: false
+    preview: false,
+    updateMessage: false
   },
   mounted(){
-    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "8pmDec122017"){
+    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "April2023"){
       let s = Object.keys(localStorage)
       for (let i = 0; i < s.length; i++){
         if (s[i].substr(0,8) === "wemoGame"){
@@ -84,7 +85,8 @@ var game = new Vue({
         newPlayers.push({name: players[i].name, unlockedLevel: 1, games: [], character: 0})
       }
       localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
-      localStorage.setItem("wemoUpToDate", "8pmDec122017")
+      localStorage.setItem("wemoUpToDate", "April2023")
+      this.updateMessage = true
     }
   },
   computed: {

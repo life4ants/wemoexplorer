@@ -45,7 +45,8 @@ let welcome = {
               <div v-for="item in worlds" class="button-tiles-content">
                 <h6 class="center-header four columns">World {{item.level}}</h6>
                 <div class="four columns">
-                  <button @click="() => pickGame('default', item.level)">Play</button>
+                  <button v-if="item.level <= currentPlayer.unlockedLevel" @click="() => pickGame('default', item.level)">Play</button>
+                  <span v-else >Locked</span>
                 </div>
                 <div class="four columns">
                   <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
@@ -72,7 +73,7 @@ let welcome = {
             </div>
             <div class="links">
               <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete custom worlds'}}</a>
-              <a @click="() => edit(currentPlayer)">create/edit custom worlds</a>
+              <a v-if="currentPlayer.unlockedLevel > 1" @click="() => edit(currentPlayer)">create/edit custom worlds</a>
             </div>
           </div>
         </div>
@@ -94,7 +95,7 @@ let welcome = {
     }
   },
   props: [
-    'startGame', 'edit', 'player'
+    'startGame', 'edit', 'player', 'updateMessage'
   ],
   mounted(){
     setTimeout(() => $("#grow").addClass("large"), 0)
@@ -106,7 +107,10 @@ let welcome = {
   },
   computed: {
     message(){
-      return this.players.length > 0 ? "Click on your name or make a new player:" : "Please enter your name to get started:"
+      return this.players.length > 0 ? 
+        this.updateMessage ? "All your game progress has been deleted but the players are still here:"
+          : "Click on your name or make a new player:" 
+        : "Please enter your name to get started:"
     },
     title(){
       return this.players.length > 0 ? "Welcome Back!" : "Hi There! Welcome to Wemo!"

@@ -530,12 +530,12 @@ body {
 }
 
 
-/* ------------ extra: ------------
 
 .disabled {
   cursor: not-allowed;
   opacity: .65;
 }
+/* ------------ extra: ------------
 
 .infobox {
   margin-left: 10px;
