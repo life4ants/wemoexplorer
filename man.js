@@ -134,10 +134,7 @@ class Man extends WemoObject {
   move(x, y) {
     if (this.isSleeping)
       return
-    //check for edge case
-    if (this.x + x >= 0 && this.x + x < board.cols &&
-      this.y + y >= 0 && this.y + y < board.rows){
-      
+    if (helpers.withinBounds(this.x+x, this.y+y)){
       this.standCount = 0
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
@@ -220,7 +217,7 @@ class Man extends WemoObject {
       case 6: x--;      break;
       case 7: x--; y--;
     }
-    if ((x >= 0 && x < board.cols && y >= 0 && y < board.rows) &&
+    if (helpers.withinBounds(x,y) &&
           (!["water", "river", "rockEdge", "firepit"].includes(board.cells[x][y].type))){
       this.x = x
       this.y = y

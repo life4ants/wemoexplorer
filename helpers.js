@@ -1,4 +1,11 @@
 let helpers = {
+  ringList: [
+    [{x:0,y:-1},{x:1,y:0},{x:0,y:1},{x:-1,y:0}],
+    [{x:-1,y:-1},{x:1,y:-1},{x:1,y:1},{x:1,y:-1}],
+    [{x:-2,y:1},{x:-2,y:0},{x:-2,y:-1},{x:-1,y:-2},{x:0,y:-2},{x:1,y:-2},
+      {x:2,y:-1},{x:2,y:0},{x:2,y:1},{x:1,y:2},{x:0,y:2},{x:-1,y:2}]
+    ],
+
   isNextToType(x, y, type){ //accepts a string or array as type
     for (let i = -1; i <= 1; i++){
       for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){

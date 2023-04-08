@@ -12,7 +12,7 @@ class Projectile {
     this.acc = createVector(-dx*0.11, -dy*0.11)
     this.phase = "fly"
     this.frame = 0
-    this.ring = {x: 2, y:1, n: 0, cells: []}
+    this.ring = []
     this.type = type
     this.dir = dir
   }
@@ -30,8 +30,12 @@ class Projectile {
         ellipse(this.pos.x+10, this.pos.y+10, 10,10)
       }
       else {// phase is "explode"
-        for (let c of this.ring.cells)
-          this.drawExplosion(c.x, c.y)
+        for (var i = this.ring.length - 1; i >= 0; i--) {
+          this.drawExplosion(this.ring[i].x, this.ring[i].y, this.ring[i].frame)
+          this.ring[i].frame++
+          if (this.ring[i].frame > 14)
+            this.ring.splice(i, 1)
+        }
       }
     }
     else if (this.type === "arrow"){
@@ -40,9 +44,9 @@ class Projectile {
     }
   }
 
-  drawExplosion(x,y){
-    let sx = (this.frame%4)*32
-    let sy = Math.floor(this.frame/4)*32
+  drawExplosion(x,y,frame){
+    let sx = (frame%4)*32
+    let sy = Math.floor(frame/4)*32
     image(tiles.explosion, x*25-3, y*25+topbarHeight-3, 32, 32, sx, sy, 32, 32)// offset by -3 to line up 32x32 explosion
   }
 
@@ -57,12 +61,10 @@ class Projectile {
       }
     }
     else if (this.phase === "explode"){
-      if (this.frame === 0)
-        this.blowRing(8)
-      else if (this.frame === 7)
-        this.blowRing(24)
+      if ([4,8,12].includes(this.frame))
+        this.blowRing((this.frame/4)-1)
       this.frame++
-      return this.frame > 14
+      return this.ring.length === 0
     }
   }
 
@@ -73,7 +75,7 @@ class Projectile {
       board.revealCell(x,y,true)
       this.pos = {x,y} 
       this.phase = "explode"
-      this.ring.cells = [{x,y}]
+      this.ring.push({x,y, frame: 0})
       return false
     }
     this.move()
@@ -101,37 +103,16 @@ class Projectile {
     return false 
   }
 
-  blowRing(stop){
-    while (this.ring.n < stop){
-      let x = this.pos.x+this.ring.x-2
-      let y = this.pos.y+this.ring.y-2
-      if (x >= 0 && x < board.cols && y >= 0 && y < board.rows){
+  blowRing(r){
+    for (let i = 0; i < helpers.ringList[r].length; i++){
+      let x = this.pos.x+helpers.ringList[r][i].x
+      let y = this.pos.y+helpers.ringList[r][i].y
+      if (helpers.withinBounds(x,y)){
         if (!board.cells[x][y].revealed){
           board.revealCell(x, y, true)
-          this.ring.cells.push({x,y})
+          this.ring.push({x,y, frame: 0})
         }
       }
-      this.advanceRing()
-      this.ring.n++
     }
-  }
-
-  advanceRing(){
-    if (this.ring.y==4 && this.ring.x>0)
-      this.ring.x--
-    else if (this.ring.x==1 && this.ring.y>0)
-      this.ring.y--
-    else if (this.ring.y==0 && this.ring.x<4)
-      this.ring.x++
-    else if (this.ring.x==4 && this.ring.y<4)
-      this.ring.y++
-    else if (this.ring.x==0 && this.ring.y>0)
-      this.ring.y--
-    else if (this.ring.y==1 && this.ring.x<3)
-      this.ring.x++
-    else if (this.ring.x==3 && this.ring.y<3)
-      this.ring.y++
-    else if (this.ring.y==3 && this.ring.x>1)
-      this.ring.x--
   }
 }
