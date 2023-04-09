@@ -28,8 +28,8 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>Higher levels are locked until lower levels completed</li>
-                <li>Custom worlds are locked first two levels are completed</li>
+                <li>Levels are locked until all the previous levels are completed</li>
+                <li>Custom worlds are locked until the first two levels are completed</li>
                 <li>Items on the build menu unlock based on level</li>
                 <li>Something new! May be considered an Easter egg!</li>
               </ul>
