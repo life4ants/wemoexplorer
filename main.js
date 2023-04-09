@@ -302,7 +302,7 @@ function preload(){
 
   //load the worlds:
   for (let i = 0; i<4; i++){
-    $.getJSON(`wemoexplorer/worlds/${i+1}.json`, function(data){
+    $.getJSON(`worlds/${i+1}.json`, function(data){
       gameBoards.push(data)
     })
   }
