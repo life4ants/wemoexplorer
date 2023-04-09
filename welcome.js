@@ -28,7 +28,10 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>Upload custom worlds</li>
+                <li>Higher levels are locked until lower levels completed</li>
+                <li>Custom worlds are locked first two levels are completed</li>
+                <li>Items on the build menu unlock based on level</li>
+                <li>Something new! May be considered an Easter egg!</li>
               </ul>
             </div>
           </div>
@@ -64,16 +67,17 @@ let welcome = {
               <div v-for="item in customWorlds" class="button-tiles-content">
                 <h6 class="center-header four columns">{{item.name}}</h6>
                 <div class="four columns">
-                  <button @click="() => pickGame('custom', item.name)">Play</button>
+                  <button v-if="currentPlayer.unlockedLevel > 2" @click="() => pickGame('custom', item.name)">Play</button>
+                  <span v-else>Locked</span>
                 </div>
                 <div class="four columns">
                   <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
                 </div>
               </div>
             </div>
-            <div class="links">
+            <div v-if="currentPlayer.unlockedLevel > 2" class="links">
               <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete custom worlds'}}</a>
-              <a v-if="currentPlayer.unlockedLevel > 1" @click="() => edit(currentPlayer)">create/edit custom worlds</a>
+              <a @click="() => edit(currentPlayer)">create/edit custom worlds</a>
             </div>
           </div>
         </div>
@@ -90,8 +94,8 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.2.5",
-      publicationDate: "Mar 11, 2023"
+      version: "1.3",
+      publicationDate: "April 9, 2023"
     }
   },
   props: [

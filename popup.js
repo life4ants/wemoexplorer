@@ -338,6 +338,7 @@ var popup = new Vue({
     },
 
     download(url, name){
+      $(window).scrollTop(0).scrollLeft(0)
       this.show = true
       this.title = url
       this.actionTitle = name
@@ -426,6 +427,7 @@ var popup = new Vue({
     },
 
     setMenu(items, title, actionTitle){
+      $(window).scrollTop(0).scrollLeft(0)
       this.showOptions = JSON.parse(JSON.stringify(items))
       this.title = title
       this.size = "popup-tiny"
@@ -443,6 +445,7 @@ var popup = new Vue({
     },
 
     setInput(title, actionTitle, type){
+      $(window).scrollTop(0).scrollLeft(0)
       this.title = title
       this.actionTitle = actionTitle
       this.size = type === "getSize" ? "popup-center" : "popup-tiny"

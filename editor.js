@@ -1,5 +1,6 @@
 let editor = {
   path: [],
+  cell1: {},
   tile: "water",
   type: "water",
   tool: "brush",
@@ -19,7 +20,7 @@ let editor = {
       else if (this.type === "pit0"){
         if (board.cells[x][y].type === "pit")
           return
-        this.path = {x,y}
+        this.cell1 = {x,y}
         this.setUndo(x,y)
         this.changeTile(x,y, "pit", "pit")
         this.type = "pit1"
@@ -30,13 +31,13 @@ let editor = {
         this.addUndo(x,y)
         this.changeTile(x,y, "pit", "pit")
         let id = board.teleports.length > 0 ? board.teleports[board.teleports.length-1].id+1 : 0
-        board.cells[x][y].pair = this.path
+        board.cells[x][y].pair = this.cell1
         board.cells[x][y].id = id
-        board.cells[this.path.x][this.path.y].pair = {x,y}
-        board.cells[this.path.x][this.path.y].id = id
-        board.teleports.push({a:this.path, b:{x,y}, id:id})
+        board.cells[this.cell1.x][this.cell1.y].pair = {x,y}
+        board.cells[this.cell1.x][this.cell1.y].id = id
+        board.teleports.push({a:this.cell1, b:{x,y}, id:id})
         this.type = "pit0"
-        this.path = []
+        this.cell1 = {}
         
       }
       else {
@@ -79,6 +80,8 @@ let editor = {
   mouseReleased(){
     if (this.type === "auto")
       this.parsePath(this.tile)
+    else
+      this.path = []
   },
 
   showMouse(){
@@ -127,7 +130,7 @@ let editor = {
   },
 
   undo(){
-    for (e of this.undoList){
+    for (let e of this.undoList){
       this.changeTile(e.x, e.y, e.tile, e.type)
     }
     this.undoList = []
@@ -138,12 +141,12 @@ let editor = {
   },
 
   addUndo(x,y){
-    this.undoList.push([{x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type}])
+    this.undoList.push({x, y, tile: board.cells[x][y].tile, type: board.cells[x][y].type})
   },
 
   cancelPit(){
     this.undo()
-    this.path = []
+    this.cell1 = {}
   },
 
   newWorld(cols, rows, fillType){
@@ -185,15 +188,22 @@ let editor = {
     for (let i=0; i<board.cols; i++){
       for (let j =0; j<board.rows; j++){
         let r = random(22)
-        let type = r < 2 ? "tree" : r < 4 ? "treeThin" : r < 6 ? "bush4" :
-        r < 8 ? "bush1" : r < 8.5 ? "berryTree" : r < 15 ? "longGrass" : "grass"
+        let tile = r < 2 ? "tree" : r < 4 ? "treeThin" : r < 6 ? "bush4" :
+        r < 8 ? "bush1" : r < 8.5 ? "berryBush" : r < 15 ? "longGrass" : "grass"
         if (board.cells[i][j].type === "random"){
-          let tile = type === "longGrass" ? "longGrass"+floor(random(3)+1) : type
-          board.cells[i][j] = {tile, type}
+          this.addUndo(i, j)
+          if (tile === "longGrass")
+            board.cells[i][j] = {tile: "longGrass"+floor(random(3)+1), type: "longGrass"}
+          else if (tile === "berryBush")
+            board.cells[i][j] = {tile: "grass", type: "berryBush"}
+          else {
+            let type = tile === "bush4" ? "tree" :
+              tile === "bush1" ? "treeThin" : tile
+            board.cells[i][j] = {tile, type}
+          }
         }
       }
     }
-    this.undoList = []
   },
 
   parsePath(type){

@@ -217,7 +217,7 @@ class Board extends WemoObject {
   }
 
   showCell(x,y, cell, revealed){
-    if (!revealed && game.mode === "play" && !game.preview){
+    if (!revealed && game.mode !== "edit" && !game.preview){
       // in this case, print clouds and be done. 
       image(tiles["clouds"], x*25, y*25+topbarHeight)
       return

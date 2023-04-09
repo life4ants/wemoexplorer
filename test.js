@@ -4,8 +4,10 @@ let test = {
       return board.cells[active.x][active.y]
     if (id === "man")
       return board.cells[man.x][man.y]
-    if (id === "mouse")
-      return board.cells[floor(mouseX/25)][floor((mouseY-topbarHeight)/25)]
+    if (id === "mouse"){
+      let offset = game.mode === "edit" ? 0 : topbarHeight
+      return board.cells[floor(mouseX/25)][floor((mouseY-offset)/25)]
+    }
     else
       return board.cells[id][y]
   },

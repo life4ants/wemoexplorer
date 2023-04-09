@@ -6,12 +6,12 @@ const editBar = {
         <div class="menu">
           <span>Menu</span>
           <div class="menu-content">
-            <span @click="saveBoard" title="save the current board">Save</span>
             <span @click="newBoard" title="generate new board">New</span>
+            <span @click="load">Load</span>
             <span @click="resizeBoard" title="resize the board">Resize</span>
+            <span @click="saveBoard" title="save the current board">Save</span>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
-            <span @click="load">Load</span>
             <span @click='preview'>Preview</span>
             <span @click="download">Download</span>
             <span @click="upload">Upload</span>
@@ -78,11 +78,11 @@ const editBar = {
         { id: "bone", src: "images/bone.png", type: "bone"},
         { id: "palm", src: "images/palm.png", type: "palm"},
         { id: "cactus", src: "images/cactus.png", type: "cactus"},
-        { id: "bush1", src: "images/bush1.png", type: "bush1"},
-        { id: "bush2", src: "images/bush2.png", type: "bush2"},
+        { id: "bush1", src: "images/bush1.png", type: "treeThin"},
+        { id: "bush2", src: "images/bush2.png", type: "tree"},
         { id: "bush3", src: "images/bush3.png", type: "bush3"},
-        { id: "bush4", src: "images/bush4.png", type: "bush4"},
-        { id: "bush5", src: "images/bush5.png", type: "bush5"},
+        { id: "bush4", src: "images/bush4.png", type: "tree"},
+        { id: "bush5", src: "images/bush5.png", type: "treeThin"},
         { id: "grass2", src: "images/grass2.png", type: "grass2"},
         { id: "dock1", src: "images/dock1.png", type: "dock"},
         { id: "dock2", src: "images/dock2.png", type: "dock"},

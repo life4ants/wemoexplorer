@@ -1,3 +1,4 @@
+let gameBoards = []
 const topbarHeight = 55
 // let keyDelay = 0
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
@@ -14,7 +15,7 @@ const options = {
         resources: "none",
         dist: "A bonfire to spend the night next to",
         inst: "Go to the spot where you want to build a firepit, then click build." },
-    {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", level: 2,
+    {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", level: 3,
         time: 0, energy: 150,
         resources: "3 rocks",
         dist: "For crossing rivers",
@@ -54,7 +55,7 @@ const options = {
         resources: "8 logs, 8 long grass",
         dist: "For exploring water",
         inst: "Click build to select a location."},
-    {name: "campsite", src: "images/campsite.png", title: "Campsite", level: 4,
+    {name: "campsite", src: "images/campsite.png", title: "Campsite", level: 3,
         time: 0, energy: 500,
         resources: "5 logs, 10 sticks, 5 clay, 10 long grass",
         dist: "A place to store tools, cook meals, and more!",
@@ -88,7 +89,7 @@ const options = {
 }
 
 function preload(){
-  console.timeLog("load", "preload function started")
+  console.timeLog("load", "preload started")
   document.getElementById("p5_loading").innerHTML = "Loading Images ..."
   tiles = {
     apple: loadImage("images/apple.png"),
@@ -278,7 +279,6 @@ function preload(){
     water: loadImage("images/water.png"),
     z: loadImage("images/z's.png")
   }
-  console.timeLog("load", "images finished")
 
   sounds.files = {
     chop: new Audio("sounds/chop.mp3"),
@@ -299,10 +299,18 @@ function preload(){
   tiles.bones = tiles.bone
   tiles.clays = tiles.clay
   tiles.rock = tiles.rock1
-  console.timeLog("load", "sounds finished") 
+
+  //load the worlds:
+  for (let i = 0; i<4; i++){
+    $.getJSON(`/worlds/${i+1}.json`, function(data){
+      gameBoards.push(data)
+    })
+  }
+  console.timeLog("load", "preload finished")
 }
 
 function setup(){
+  console.timeLog("load", "setup started")
   let cvs = createCanvas(window.innerWidth, window.innerHeight)
   cvs.parent("board")
   $("#board").css("top", world.topOffset).css("left", world.leftOffset)
