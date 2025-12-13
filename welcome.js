@@ -28,12 +28,11 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>Levels are locked until all the previous levels are completed</li>
-                <li>Custom worlds are locked until the first two levels are completed</li>
-                <li>Items on the build menu unlock based on level</li>
-                <li>Something new! May be considered an Easter egg!</li>
+                <li>view counts on main page</li>
+                <li>game time on default worlds</li>
               </ul>
             </div>
+            <div class="tiny">Views since Dec 13, 2025: {{viewCount}}</div>
           </div>
           <div v-else class="modal-body">
             <div class="links">
@@ -45,14 +44,18 @@ let welcome = {
             <h6>Pick the world you want to play in:</h6>
             <h6 class="left-header">Default Worlds:</h6>
             <div class="button-tiles">
-              <div v-for="item in worlds" class="button-tiles-content">
-                <h6 class="center-header four columns">World {{item.level}}</h6>
-                <div class="four columns">
+              <div v-for="item in worlds" class="button-tiles-content flex">
+                <h6 class="button-tiles-flexbox">World {{item.level}}</h6>
+                <div class="button-tiles-flexbox">
                   <button v-if="item.level <= currentPlayer.unlockedLevel" @click="() => pickGame('default', item.level)">Play</button>
                   <span v-else >Locked</span>
                 </div>
-                <div class="four columns">
+                <div class="button-tiles-flexbox">
                   <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+                  <div v-else style="width: 80px"></div>
+                </div>
+                <div class="button-tiles-flexbox">
+                  <span>Global playtime: {{item.playtime}} minutes</span>
                 </div>
               </div>
             </div>
@@ -64,14 +67,14 @@ let welcome = {
               </div>
             </div>
             <div v-else class="button-tiles">
-              <div v-for="item in customWorlds" class="button-tiles-content">
-                <h6 class="center-header four columns">{{item.name}}</h6>
-                <div class="four columns">
-                  <button v-if="currentPlayer.unlockedLevel > 2" @click="() => pickGame('custom', item.name)">Play</button>
-                  <span v-else>Locked</span>
+              <div v-for="item in customWorlds" class="button-tiles-content flex">
+                <h6 class="center-header three columns">{{item.name}}</h6>
+                <div class="button-tiles-flexbox">
+                  <button @click="() => pickGame('custom', item.name)">Play</button>
                 </div>
-                <div class="four columns">
+                <div class="class="button-tiles-flexbox"">
                   <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+                  <div v-else style="width: 80px"></div>
                 </div>
               </div>
             </div>
@@ -94,12 +97,13 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.3",
-      publicationDate: "April 9, 2023"
+      version: "1.4.0",
+      publicationDate: "Dec 13, 2025",
+      pageViews: "loading"
     }
   },
   props: [
-    'startGame', 'edit', 'player', 'updateMessage'
+    'startGame', 'edit', 'player', 'updateMessage', 'viewCount'
   ],
   mounted(){
     setTimeout(() => $("#grow").addClass("large"), 0)
@@ -126,7 +130,9 @@ let welcome = {
         this.players.push({name: this.name, unlockedLevel: 1, games: [], character: 0})
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
-      }
+        if (this.players.length === 1)
+          this.pickPlayer(0)
+        }
     },
 
     pickPlayer(id){
@@ -178,7 +184,13 @@ let welcome = {
       //make the default worlds:
       let defaultWorlds = []
       for (let i = 0; i < gameBoards.length; i++){
-        defaultWorlds.push({level: i+1, savedGame: false})
+        fetch(`https://api.counterapi.dev/v2/andys-games/world${i+1}`)
+          .then(response => response.json())
+          .then(result => {
+            this.worlds[i].playtime = result.data.up_count
+          })
+          .catch(error => console.error('Error:', error));
+        defaultWorlds.push({level: i+1, savedGame: false, playtime: "~"})
       }
       //get custom worlds:
       let saved = Object.keys(localStorage)

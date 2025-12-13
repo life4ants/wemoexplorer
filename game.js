@@ -9,7 +9,9 @@ var game = new Vue({
         <div class="downButton" @click="() => moveAction(3)"></div>
       </div> 
       <welcome-menu v-if="mode === 'welcome'" :startGame="startGame"
-        :player="currentPlayer" :edit="edit" :updateMessage="updateMessage"></welcome-menu>
+        :player="currentPlayer" :edit="edit" :updateMessage="updateMessage"
+        :viewCount="viewCount"
+        ></welcome-menu>
       <edit-bar v-else-if="mode === 'edit'" :exit="exit" :preview="previewGame"></edit-bar>
       <div v-else-if="mode === 'loading'"></div>
       <div v-else-if="mode === 'play'" class="sidebar">
@@ -62,6 +64,7 @@ var game = new Vue({
       {code: "S", active: false, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
     ],
     mode: "loading",
+    viewCount: 0,
     started: false,
     paused: false,
     autoCenter: false,
@@ -234,7 +237,7 @@ var game = new Vue({
       let b
       switch(type){
         case "default":
-          b = JSON.parse(JSON.stringify(gameBoards[index-1]))
+          b = gameBoards[index-1]
           break
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])

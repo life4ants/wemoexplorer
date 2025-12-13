@@ -16,6 +16,11 @@
       game.saveGame()
       console.log("game saved")
     }
+    if (frameCount%720 === 360 && board.type === "default"){
+      console.log(`frames: ${frameCount} (secounds: ${frameCount/12})`)
+      fetch(`https://api.counterapi.dev/v2/andys-games/world${board.level}/up`)
+          .catch(error => console.error('Error:', error));
+    }
   },
 
   increment(){
