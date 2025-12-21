@@ -320,13 +320,14 @@ function setup(){
   frameRate(world.frameRate)
   console.timeLog("load", "setup finished")
   console.timeEnd("load")
-  fetch(' https://api.counterapi.dev/v2/andys-games/wemo/up')
-    .then(response => response.json())
-    .then(result => {
-      //console.log(result) //DEVELOPMENT uses downcounts
-      game.viewCount = result.data.up_count
-    })
-    .catch(error => console.error('Error:', error));
+  if (!Vue.config.devtools){
+    fetch(' https://api.counterapi.dev/v2/andys-games/wemo/up')
+      .then(response => response.json())
+      .then(result => {
+        game.viewCount = result.data.up_count
+      })
+      .catch(error => console.error('Error:', error));
+  }
 }
 
 function draw(){

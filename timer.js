@@ -16,10 +16,18 @@
       game.saveGame()
       console.log("game saved")
     }
-    if (frameCount%720 === 360 && board.type === "default"){
-      console.log(`frames: ${frameCount} (secounds: ${frameCount/12})`)
-      fetch(`https://api.counterapi.dev/v2/andys-games/world${board.level}/up`)
-          .catch(error => console.error('Error:', error));
+    if (frameCount%720 === 360){
+      if (board.type === "default" && !Vue.config.devtools){
+        fetch(`https://api.counterapi.dev/v2/andys-games/world${board.level}/up`)
+            .catch(error => console.error('Error:', error));
+      }
+      else if (board.type === "custom"){
+        board.playtime++
+        g = JSON.parse(localStorage["board"+board.name])
+        g.playtime = board.playtime
+        localStorage.setItem("board"+board.name, JSON.stringify(g))
+        console.log("playtime: "+board.playtime)
+      }
     }
   },
 

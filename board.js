@@ -21,7 +21,7 @@ class Board extends WemoObject {
       }
       this.cells = output
       this.import({
-        berryTrees: [], berryBushes: [], fires: [], progress: false, version: 3, wemoMins: 120, type: "custom", level: 10
+        berryTrees: [], berryBushes: [], fires: [], progress: false, version: 4, wemoMins: 120, type: "custom", level: 10, playtime: 0
       })
       this.startX = this.cols > 8 ? 8 : this.cols-1
       this.startY = this.rows > 8 ? 8 : this.rows-1
@@ -94,7 +94,7 @@ class Board extends WemoObject {
       this.showObjects()
     
     if (!game.preview){
-      // show cells surround the man if needed:
+      // show rounded clouds around the man if unrevealed:
       let n = 1
       for (let i = -1; i <= 1; i++){
         for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){

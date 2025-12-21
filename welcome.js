@@ -44,14 +44,14 @@ let welcome = {
             <h6>Pick the world you want to play in:</h6>
             <h6 class="left-header">Default Worlds:</h6>
             <div class="button-tiles">
-              <div v-for="item in worlds" class="button-tiles-content flex">
+              <div v-for="(item, id) in worlds" class="button-tiles-content flex">
                 <h6 class="button-tiles-flexbox">World {{item.level}}</h6>
                 <div class="button-tiles-flexbox">
-                  <button v-if="item.level <= currentPlayer.unlockedLevel" @click="() => pickGame('default', item.level)">Play</button>
+                  <button v-if="item.level <= currentPlayer.unlockedLevel" @click="() => pickGame('default', item.level, id)">Play</button>
                   <span v-else >Locked</span>
                 </div>
                 <div class="button-tiles-flexbox">
-                  <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+                  <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId, id)">Resume</button>
                   <div v-else style="width: 80px"></div>
                 </div>
                 <div class="button-tiles-flexbox">
@@ -67,14 +67,17 @@ let welcome = {
               </div>
             </div>
             <div v-else class="button-tiles">
-              <div v-for="item in customWorlds" class="button-tiles-content flex">
-                <h6 class="center-header three columns">{{item.name}}</h6>
+              <div v-for="(item, id) in customWorlds" class="button-tiles-content flex">
+                <h6 class="button-tiles-flexbox">{{item.name}}</h6>
                 <div class="button-tiles-flexbox">
-                  <button @click="() => pickGame('custom', item.name)">Play</button>
+                  <button @click="() => pickGame('custom', item.name, id)">Play</button>
                 </div>
-                <div class="class="button-tiles-flexbox"">
-                  <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId)">Resume</button>
+                <div class="button-tiles-flexbox">
+                  <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId, id)">Resume</button>
                   <div v-else style="width: 80px"></div>
+                </div>
+                <div class="button-tiles-flexbox">
+                  <span>Global playtime: {{item.playtime}} minutes</span>
                 </div>
               </div>
             </div>
@@ -196,8 +199,14 @@ let welcome = {
       let saved = Object.keys(localStorage)
       let customWorlds = []
       for (let i = 0; i < saved.length; i++){
-        if (saved[i].substr(0, 5) === "board")
-          customWorlds.push({name: saved[i].substring(5, saved[i].length), savedGame: false})
+        if (saved[i].substr(0, 5) === "board"){
+          let playtime = JSON.parse(localStorage[saved[i]]).playtime || 0
+          customWorlds.push({
+            name: saved[i].substring(5, saved[i].length), 
+            savedGame: false,
+            playtime: playtime
+          })
+        }
       }
       //match:
       let savedGames = this.currentPlayer.games
@@ -223,13 +232,21 @@ let welcome = {
       this.worlds = defaultWorlds
     },
 
-    pickGame(type, id){
+    pickGame(type, name, id){
       if (this.selected !== this.players[this.currentPlayer.index].character){
         this.players[this.currentPlayer.index].character = this.selected
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
       }
       this.currentPlayer.character = this.selected
-      this.startGame(type, this.currentPlayer, id)
+      if (type === "default" && this.worlds[id].savedGame ||
+          type === "custom" && this.customWorlds[id].savedGame){
+        if (confirm("This will delete your process and restart the level!")){
+          this.startGame(type, this.currentPlayer, name)
+        }
+      }
+      else {
+        this.startGame(type, this.currentPlayer, name)
+      }
     },
 
     selectCharacter(id){

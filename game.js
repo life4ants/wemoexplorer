@@ -247,6 +247,8 @@ var game = new Vue({
           b.name = index
           b.level = board.level || 10
           b.type = "custom"
+          if (b.version <4)
+            b.playtime = 0 //Backwards compatible
           break
         case "preview":
           b = board
