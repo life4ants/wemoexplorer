@@ -28,8 +28,8 @@ let welcome = {
               <h5>Version {{version}}</h5>
               <h6>Published {{publicationDate}}</h6>
               <ul>
-                <li>view counts on main page</li>
-                <li>game time on default worlds</li>
+                <li>show game time on worlds</li>
+                <li>no night on level one</li>
               </ul>
             </div>
             <div class="tiny">Views since Dec 13, 2025: {{viewCount}}</div>
@@ -100,8 +100,8 @@ let welcome = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.4.0",
-      publicationDate: "Dec 13, 2025",
+      version: "1.4.1",
+      publicationDate: "Jan 7, 2026",
       pageViews: "loading"
     }
   },
