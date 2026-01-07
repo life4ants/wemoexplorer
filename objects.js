@@ -21,6 +21,7 @@ let world = {
   leftOffset: 0,
   noKeys: false,
   frameRate: 12,
+  noNight: false,
 
   resize(cols, rows){
     let offset = game.mode === "play" ? topbarHeight : 0

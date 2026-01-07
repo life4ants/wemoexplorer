@@ -82,13 +82,13 @@ let messageCreater = {
         this.pos = {w: textWidth(msg)+15, h: 55, x, y}
         this.msg = msg
       },
-      isShown: function() {return board.wemoMins%1440 >= 1260 && board.wemoMins%1440 <= 1300}
+      isShown: function() {return !world.noNight && board.wemoMins%1440 >= 1260 && board.wemoMins%1440 <= 1300}
     }
     return new Message(inst)
   }
 }
 
-let msgs = {
+let msgs = { //object that holds all messages and updates them in draw()
   following: {msg: 'Testing', frames: 0, size: 20},
   color: bootstrapColors.danger,
   fontColor: bootstrapColors.light,

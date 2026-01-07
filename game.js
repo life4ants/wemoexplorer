@@ -237,7 +237,7 @@ var game = new Vue({
       let b
       switch(type){
         case "default":
-          b = gameBoards[index-1]
+          b = JSON.parse(JSON.stringify(gameBoards[index-1]))
           break
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
@@ -273,6 +273,7 @@ var game = new Vue({
       topbar.energy = man.energy
       world.noKeys = false
       timer.setTime(board.wemoMins)
+      world.noNight = board.level < 2
       if (!board.progress){
         board.fill()
         board.addRabbits()

@@ -43,6 +43,11 @@
 
   setTimeOfDay(){
     this.mins = board.wemoMins%1440
+    if (world.noNight){
+      this.dark = false
+      this.timeOfDay = "day"
+      return
+    }
     this.dark = (this.mins >= 1360 || this.mins < 80)
     this.timeOfDay = this.mins >= 60 && this.mins <= 119 ? "dawn" :
                   this.mins >= 1320 && this.mins <= 1379 ? "dusk" :
@@ -113,14 +118,18 @@
     if (tree.berries.length >= 5)
       return
     let p = Math.floor(Math.random()*5)
+    let c = 1
     for (let i=0; i<tree.berries.length; i++){
       if (p === tree.berries[i].id){
         p = Math.floor(Math.random()*5)
+        c++
         i = -1
       }
     }
     let x = p === 3 ? 3 : p === 1 ? 9 : p === 0 ? 2 : 18
     let y = p === 2 ? 3 : p === 1 ? 0 : p === 0 ? 3 : 14
+    if (c>5)
+      console.log("tries to add apple: "+c)
     tree.berries.push({id: p, x, y})
   },
 
@@ -129,12 +138,16 @@
       return
     let a = [[16,8],[3,13],[7,14],[15,15],[21,15],[4,20],[7,20],[16,20],[22,22]]
     let p = Math.floor(Math.random()*9)
+    let c = 1
     for (let i=0; i<bush.berries.length; i++){
       if (p === bush.berries[i].id){
         p = Math.floor(Math.random()*9)
+        c++
         i = -1
       }
     }
+    if (c>9)
+      console.log("tries to add berry: "+c)
     bush.berries.push({id: p, x: a[p][0], y: a[p][1]})
   }
 }
