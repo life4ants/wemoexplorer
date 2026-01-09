@@ -6,7 +6,7 @@ const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile"
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
-const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus", "berryBush"]
+const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus", "berryBush", "star"]
 const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
 const options = {
   build: [
@@ -263,6 +263,7 @@ function preload(){
     sandpit: loadImage("images/sandpit.png"),
     sleeping: loadImage("images/sleeping.png"),
     //snake: loadImage("images/snake.png"),
+    star: loadImage("images/star.png"),
     steppingStones: loadImage("images/steppingStones.png"),
     stick: loadImage("images/stick.png"),
     sticks: loadImage("images/sticks.png"),

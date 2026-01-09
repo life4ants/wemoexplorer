@@ -5,7 +5,7 @@ class Man extends WemoObject {
     this.y = y
     this.oldX = 0
     this.oldY = 0
-    this.index = 0
+    this.index = 0 //direction facing: 0 - right, 1 - left, 2 - up, 3 - down
     this.energy = 5000
     this.health = 5000
     this.stepCount = 0
@@ -24,9 +24,6 @@ class Man extends WemoObject {
   }
 
   update(){
-    // if (keyIsPressed && !this.isAnimated && !this.isSleeping && frameCount - keyDelay > 4){
-    //   keyHandler()
-    // }
     let cell = board.cells[this.x][this.y]
     if (game.mode === "build"){
       strokeWeight(2)
@@ -52,18 +49,6 @@ class Man extends WemoObject {
       return
     }
     this.standCount++
-    if ([5,10].includes(this.standCount/world.frameRate)){
-      for (let i=-1; i<=1; i++){
-        for (let j = -1; j <= 1; j++){
-          let a = this.x+i
-          let b = this.y+j
-
-          if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
-            this.revealCell(a,b,false)
-          }
-        }
-      }
-    }
     this.canSleep = (timer.dark && !this.inDark || 
         this.isNextToFire && board.fires[this.fireId].value > 0 ||
         cell.type === "campsite")
@@ -87,6 +72,22 @@ class Man extends WemoObject {
     let index = this.vomit ? 8 : this.isSleeping ? 9 : this.index+offset
     let dx = this.x*25
     let dy = this.y*25+topbarHeight
+
+    if (board.revealCount > 0){
+      // trangle revealed in direction of travel:
+      // for (let i= -2; i<3; i++){
+      //   for (let j= -2; j<3; j++){
+      //     if (this.index === 2 && i >= j && i+j <=0 ||
+      //       this.index === 0 && i >= j && i+j >=0 ||
+      //       this.index === 1 && j >= i && i+j <=0 ||
+      //       this.index === 3 && j >= i && i+j >=0){
+      //       if (helpers.withinBounds(this.x+i, this.y+j)){
+      //         board.showCell(this.x+i, this.y+j, board.cells[this.x+i][this.y+j], 2)
+      //       }
+      //     }
+      //   }
+      // }
+    }
 
     if (board.cells[this.x][this.y].type === "campsite"){
       let id = board.cells[this.x][this.y].id
@@ -153,19 +154,29 @@ class Man extends WemoObject {
         this.health -= 1
         this.vomit = false
 
-        this.revealCell(this.x, this.y, true)
+        // this.revealCell(this.x, this.y, true)
+        // for (let i = -1; i <= 1; i++){
+        //  for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
+        //     if (helpers.withinBounds(this.x+x, this.y+y)){
+        //       this.revealCell(this.x+i,this.y+j,false)
+        //     }
+        //   }
+        // }
         sounds.play("walk")
         if (newCell.type === "pit" && newCell.pair){
           this.x = newCell.pair.x
           this.y = newCell.pair.y
-          this.revealCell(this.x, this.y, true)
+         // this.revealCell(this.x, this.y, true)
         }
       }
       //reveal rockEdge cells
-      else if (["river", "rockEdge"].includes(newCell.type))
-        this.revealCell(this.x+x, this.y+y, true)
+      // else if (["river", "rockEdge"].includes(newCell.type))
+      //   this.revealCell(this.x+x, this.y+y, true)
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
+      if (newCell.type === "star"){
+        board.claimStar(newCell)
+      }
     }
   }
 
@@ -226,7 +237,7 @@ class Man extends WemoObject {
       this.ridingId = ""
       active.index = [0,1].includes(active.index) ? 4 : 5
       active = man
-      this.revealCell(x,y,true)
+      //this.revealCell(x,y,true)
       this.fireCheck()
       return true
     }
@@ -257,13 +268,8 @@ class Man extends WemoObject {
   }
 
   revealCell(x,y,fully){
-    if (fully && !board.cells[x][y].revealed){
-      this.energy--
+    if (!board.cells[x][y].revealed){
       board.revealCell(x,y,fully)
-    }
-    else if (board.cells[x][y].revealed < 2){
-      this.energy -= 0.5
-      board.revealCell(x,y,false)
     }
   }
 
