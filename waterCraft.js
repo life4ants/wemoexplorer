@@ -26,37 +26,24 @@ class WaterCraft extends WemoObject{
   }
 
   move(x, y) {
-    if (this.x + x >= 0 && this.x + x < board.cols &&
-      this.y + y >= 0 && this.y + y < board.rows) {
-      if (["water", "river", "steppingStones"].includes(board.cells[this.x+x][this.y+y].type) ||
-          ["grassBeach", "beach"].includes(board.cells[this.x+x][this.y+y].type) &&
-           ["water", "river"].includes(board.cells[this.x][this.y].type)
+    if (helpers.withinBounds(this.x+x, this.y+y)) {
+      let cell = board.cells[this.x][this.y]
+      let newCell = board.cells[this.x+x][this.y+y]
+      
+      if (["water", "river", "steppingStones", "star"].includes(newCell.type) ||
+          ["grassBeach", "beach"].includes(newCell.type) &&
+           ["water", "river"].includes(cell.type)
         ) {
 
+        this.landed = ["grassBeach", "beach"].includes(newCell.type)
         this.x += x
         this.y += y
-        this.landed = ["grassBeach", "beach"].includes(board.cells[this.x][this.y].type)
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
         this.stepCount++
         man.energy -= 2
-
-        if (this.type === "canoe"){
-          for (let i=-1; i<=1; i++){
-            for (let j = -1; j <= 1; j++){
-              let a = this.x+i
-              let b = this.y+j
-
-              if (a >= 0 && a < board.cols && b >= 0 && b < board.rows){
-                man.revealCell(a,b,true)
-              }
-            }
-          }
-        }
-        else
-          man.revealCell(this.x, this.y,true)
+        if (newCell.type === "star")
+          board.claimStar(newCell)
       }
-      else
-        man.revealCell(this.x+x, this.y+y,true)
     }
   }
 

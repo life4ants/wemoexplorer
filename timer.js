@@ -128,8 +128,6 @@
     }
     let x = p === 3 ? 3 : p === 1 ? 9 : p === 0 ? 2 : 18
     let y = p === 2 ? 3 : p === 1 ? 0 : p === 0 ? 3 : 14
-    if (c>5)
-      console.log("tries to add apple: "+c)
     tree.berries.push({id: p, x, y})
   },
 
@@ -146,8 +144,6 @@
         i = -1
       }
     }
-    if (c>9)
-      console.log("tries to add berry: "+c)
     bush.berries.push({id: p, x: a[p][0], y: a[p][1]})
   }
 }

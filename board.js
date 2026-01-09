@@ -5,6 +5,7 @@ class Board extends WemoObject {
     this.rabbits = []
     this.teleports = []
     this.berryBushes = []
+    this.stars = []
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       this.import(a)
       this.initializeObjects()
@@ -12,35 +13,46 @@ class Board extends WemoObject {
     else if (arguments.length === 3){// creating a new game on editor
       this.cols = a
       this.rows = b
-      let output = []
+      this.cells = []
       for (let x = 0; x<this.cols; x++){
-        output.push([])
+        this.cells.push([])
         for (let y = 0; y<this.rows; y++){
-          output[x].push({tile: fillType, type: fillType})
+          this.cells[x].push({tile: fillType, type: fillType})
         }
       }
-      this.cells = output
       this.import({
-        berryTrees: [], berryBushes: [], fires: [], progress: false, version: 4, wemoMins: 120, type: "custom", level: 10, playtime: 0
+        berryTrees: [], fires: [], progress: false, version: 4, wemoMins: 120, type: "custom", level: 10, playtime: 0
       })
       this.startX = this.cols > 8 ? 8 : this.cols-1
       this.startY = this.rows > 8 ? 8 : this.rows-1
     }
   }
 
-  save(){
-    let revealCount = 0
+  save(){ // saving a game on the builder. Called from editbar.saveBoard
     let trees = []
     let bushes = []
+    for (let i in this.stars){
+      this.stars[i].cells = []
+    }
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
-        if (j === this.startY && [i,i+1,i-1].includes(this.startX))
-          cell.revealed = 2
-        else {
-          cell.revealed = 0
-          revealCount++
+        let id = 0
+        let mindist = this.rows+this.cols
+        for (let a in this.stars){
+          let star = this.stars[a]
+          let d = dist(i,j,star.x, star.y)
+          if (d < mindist){
+            mindist = d
+            id = a
+          }
         }
+        try {
+          this.stars[id].cells.push({x:i,y:j})
+        } catch (e){
+          console.error(id, e)
+        }
+        
         if (cell.type === "berryTree"){
           cell.id = trees.length
           trees.push({x: i, y: j, berries: []})
@@ -51,7 +63,7 @@ class Board extends WemoObject {
         }
       }
     }
-    this.revealCount = revealCount
+    this.revealCount = this.cols*this.rows
     this.berryTrees = trees
     this.berryBushes = bushes
     if (this.name){
@@ -93,18 +105,19 @@ class Board extends WemoObject {
     }
       this.showObjects()
     
-    if (!game.preview){
-      // show rounded clouds around the man if unrevealed:
+    if (!game.preview && this.revealCount > 0){
+      // show rounded clouds around the man (or raft) if unrevealed:
       let n = 1
       for (let i = -1; i <= 1; i++){
-        for (let j = i !== 0 ? 0 : -1; j<=1; j+=2){
-          let a = man.x+i
-          let b = man.y+j
+        for (let j = -1; j<=1; j++){
+          let a = active.x+i
+          let b = active.y+j
           if (a >= 0 && a < this.cols && b >= 0 && b < this.rows && !this.cells[a][b].revealed){
             this.showCell(a, b, this.cells[a][b], true)
-            image(tiles["clouds"+n], a*25, b*25+topbarHeight)
+            if (i !== 0 && j !== 0)
+              image(tiles["clouds"+n], a*25, b*25+topbarHeight)
           }
-          n++
+          n = i !== 0 && j !== 0? n+1 : n
         }
       }
     }
@@ -254,7 +267,7 @@ class Board extends WemoObject {
     if (cell.arrows)
       image(tiles["arrow"], x*25, y*25+offset)
       
-    if (cell.revealed === 1 && !game.preview)
+    if (revealed === 1 && !game.preview)
       image(tiles.cloudsHalf, x*25, y*25+offset)
   }
 
@@ -309,6 +322,16 @@ class Board extends WemoObject {
     }
   }
 
+  claimStar(cell){
+    let starid = board.stars.findIndex((e)=> e.id === cell.id)
+    let tcells = board.stars[starid].cells
+    for (let i in tcells){
+      let c = board.cells[tcells[i].x][tcells[i].y]
+      if (!c.revealed)
+        this.revealCell(tcells[i].x, tcells[i].y, c, 2)
+    }
+  }
+
   revealCell(x,y,fully){
     if (fully){
       this.cells[x][y].revealed = 2
@@ -316,7 +339,7 @@ class Board extends WemoObject {
     }
     else {
       this.cells[x][y].revealed++
-      if (this.cells[x][y].revealed === 1)
+      if (this.cells[x][y].revealed === 2)
         this.revealCount --
     }
     if (this.revealCount === 0){
@@ -338,23 +361,23 @@ class Board extends WemoObject {
     if (cell.type === "campsite"){
       popup.grabMenu("info", cell.id)
     }
-    // else if(game.isMobile){
-    //   let mx = map(winMouseX, world.leftOffset, window.innerWidth, 0, 100)
-    //   let my = map(winMouseY, topbarHeight, window.innerHeight, 0, 100)
+    else if(game.isMobile){
+      let mx = map(winMouseX, world.leftOffset, window.innerWidth, 0, 100)
+      let my = map(winMouseY, topbarHeight, window.innerHeight, 0, 100)
 
-    //   if (mx > my){
-    //     if (mx < 100-my) //up
-    //       active.move(0, -1)
-    //     else
-    //       active.move(1, 0) //right
-    //   }
-    //   else {
-    //     if (mx < 100-my)
-    //       active.move(-1, 0) //left
-    //     else
-    //       active.move(0, 1) //down
-    //   }
-    // }
+      if (mx > my){
+        if (mx < 100-my) //up
+          active.move(0, -1)
+        else
+          active.move(1, 0) //right
+      }
+      else {
+        if (mx < 100-my)
+          active.move(-1, 0) //left
+        else
+          active.move(0, 1) //down
+      }
+    }
     if (mouseButton === RIGHT)
       console.log(x,y,cell)
   }

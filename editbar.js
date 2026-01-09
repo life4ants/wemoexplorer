@@ -94,7 +94,8 @@ const editBar = {
         { id: "beachEdge2", src: "images/beachEdge2.png", type: "beachEdge"},
         { id: "beachEdge3", src: "images/beachEdge3.png", type: "beachEdge"},
         { id: "beachEdge4", src: "images/beachEdge4.png", type: "beachEdge"},
-        { id: "pit", src: "images/pit.png", type: "pit0"}
+        { id: "pit", src: "images/pit.png", type: "pit0"},
+        { id: "star", src: "images/star.png", type: "star"}
       ],
       tiles2: [
         { id: "beach", src: "images/beachX.png", type: "auto"},
