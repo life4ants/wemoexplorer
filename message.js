@@ -68,7 +68,7 @@ let messageCreater = {
         this.pos = {w: 500, h: 46, x, y}
         this.msg = msg
       },
-      isShown: function() {return game.infoShown}
+      isShown: function() {return msgs.infoShown}
     }
     return new Message(inst)
   },
@@ -93,6 +93,7 @@ let msgs = { //object that holds all messages and updates them in draw()
   color: bootstrapColors.danger,
   fontColor: bootstrapColors.light,
   messages: [messageCreater.info(), messageCreater.night()],
+  infoShown: false,
 
   display(){
     if (this.following.frames > 0){
