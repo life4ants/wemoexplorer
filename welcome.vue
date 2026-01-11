@@ -235,7 +235,6 @@ module.exports = {
     },
 
     pickGame(type, name, id){
-      console.log(type, name, id)
       if (this.selected !== this.players[this.currentPlayer.index].character){
         this.players[this.currentPlayer.index].character = this.selected
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))

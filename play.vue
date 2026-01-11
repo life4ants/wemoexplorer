@@ -8,14 +8,14 @@
 	  </div> 
 	  <div class="sidebar">
 	    <div class="sidebar-content">
-	      <i class="fa fa-sign-out fa-flip-horizontal fa-2x" aria-hidden="true" @click="exit" title="Exit Game"></i>
-	      <i :class="{fa: true, 'fa-2x': true, 'fa-play': paused, 'fa-pause': !paused}"
+	      <i class="fa fa-sign-out fa-flip-horizontal fa-3x" aria-hidden="true" @click="exit" title="Exit Game"></i>
+	      <i :class="{fa: true, 'fa-3x': true, 'fa-play': paused, 'fa-pause': !paused}"
 	                    aria-hidden="true" @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
-	      <img src="images/centerScreen.png" title="Center Screen (X)" height="30" width="30"
+	      <img src="images/centerScreen.png" title="Center Screen (X)" height="40" width="40"
 	              :class="{icon: true, selected: autoCenter}" @click="() => action('X')">
 	      <img v-for="icon in icons" v-show="icon.active" :key="icon.id" :src="icon.src" :title="icon.title"
-	              height="30" width="30" :class="{icon: true, selected: icon.selected}" @click="() => action(icon.code)">
-	      <i class="fa fa-info-circle fa-2x" aria-hidden="true" @click="showInfo" title="Show Info"></i>
+	              height="40" width="40" class="icon" @click="() => action(icon.code)">
+	      <i class="fa fa-info-circle fa-3x" aria-hidden="true" @click="showInfo" title="Show Info"></i>
 	    </div>
 	  </div>
 	</div>
@@ -29,17 +29,17 @@ module.exports = {
 	data(){
 		return {
 			icons: [
-	      {code: "B", active: false, selected: false, id: "build", src: "images/build.png", title: "Build (B)"},
-	      {code: "D", active: false, selected: false, id: "dump", src: "images/dump.png", title: "Dump (D)"},
-	      {code: "G", active: false, selected: false, id: "grab", src: "images/grab.png", title: "Grab/Gather (G)"},
-	      {code: "F", active: false, selected: false, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
-	      {code: "E", active: false, selected: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
-	      {code: "J", active: false, selected: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
-	      {code: "C", active: false, selected: false, id: "chop", src: "images/chop.png", title: "Chop down Tree (C)"},
-	      {code: "G", active: false, selected: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
-	      {code: "F", active: false, selected: false, id: "fling", src: "images/fling.png", title: "Fling (F)"},
-	      {code: "S", active: false, selected: false, id: "sleep", src: "images/sleepIcon.png", title: "Go to Sleep (S)"},
-	      {code: "S", active: false, selected: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
+	      {code: "B", active: false, id: "build", src: "images/build.png", title: "Build (B)"},
+	      {code: "D", active: false, id: "dump", src: "images/dump.png", title: "Dump (D)"},
+	      {code: "G", active: false, id: "grab", src: "images/grab.png", title: "Grab/Gather (G)"},
+	      {code: "F", active: false, id: "feedFire", src: "images/feedFire.png", title: "Feed Fire (F)"},
+	      {code: "E", active: false, id: "eat", src: "images/eat.png", title: "Eat (E)"},
+	      {code: "J", active: false, id: "jump", src: "images/jump.png", title: "Jump in or out of Canoe (J)"},
+	      {code: "C", active: false, id: "chop", src: "images/chop.png", title: "Chop down Tree (C)"},
+	      {code: "G", active: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
+	      {code: "F", active: false, id: "fling", src: "images/fling.png", title: "Fling (F)"},
+	      {code: "S", active: false, id: "sleep", src: "images/sleepIcon.png", title: "Go to Sleep (S)"},
+	      {code: "S", active: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
 	    ],
 		}
 	},
@@ -89,7 +89,8 @@ module.exports = {
         this.icons[5].active = (man.isRiding && (active.landed || active.isBeside("dock") ||
               "river" === board.cells[active.x][active.y].type)) ||  (!man.isRiding && vehicles.canMount(man.x, man.y))
         //chop:
-        this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type)
+        this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type) && 
+        			toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx") !== -1
         //pick:
         this.icons[7].active = (toolbelt.getContainer("basket") && ("berryTree" === cell.type &&
               board.berryTrees[cell.id].berries.length > 0) || "veggies" === cell.type)
@@ -104,3 +105,12 @@ module.exports = {
 	}
 }
 </script>
+
+<style>
+.selected {
+  height: 36px;
+  width: 36px;
+  border: solid 2px red;
+  margin: 4px 0;
+}
+</style>

@@ -38,12 +38,13 @@ body {
   z-index: 1;
 }
 
+
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   height: 100%;
-  width: 35px;
+  width: 50px;
   background-color: #e0ffe0;
   border: solid #B7CBBA;
   border-width: 0 2px 0 0;
@@ -372,7 +373,10 @@ body {
 
 .icon {
   margin: 4px 0;
+  width: 30;
+  height: 30;
 }
+
 
 .selected {
   height: 25px;

@@ -453,8 +453,8 @@ var popup = new Vue({
       this.show = true
       if (["input", "getSize"].includes(type)){
         this.inputValue = this.type === "input" ? "" : 
-          {cols: Math.floor((window.innerWidth-37)/25), 
-          rows: Math.floor((window.innerHeight-55)/25)}
+          {cols: Math.floor((window.innerWidth)/25), 
+          rows: Math.floor((window.innerHeight)/25)}
         setTimeout(() => $("#inputOne").focus(), 0)
       }
       else if (type === "fileUpload"){

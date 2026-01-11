@@ -10,7 +10,7 @@ var game = new Vue({
         :viewCount="viewCount">
       </welcome-menu>
       <edit-bar v-else-if="mode === 'edit'" :exit="exit" :preview="previewGame"></edit-bar>
-      <play-box v-else-if="mode === 'play'" 
+      <play-box v-else-if="mode === 'play'" ref="playbox"
         :exit="exit"
         :action="action"
         :paused="paused"
@@ -143,6 +143,7 @@ var game = new Vue({
       switch(type){
         case "default":
           b = JSON.parse(JSON.stringify(gameBoards[index-1]))
+          console.log("starting game "+index)
           break
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
@@ -173,7 +174,7 @@ var game = new Vue({
       delete b.vehicles
       active = man.ridingId ? vehicles[man.ridingId] : man
       board = new Board(b)
-      world.leftOffset = 37
+      world.leftOffset = 52
       topbar.health = man.health
       topbar.energy = man.energy
       world.noKeys = false
@@ -257,7 +258,7 @@ var game = new Vue({
     toggleBuildMode(){
       if (this.mode === "build"){
         this.mode = "play"
-        world.leftOffset = 37
+        world.leftOffset = 52
       }
       else if (this.mode === "play"){
         this.mode = "build"
