@@ -6,11 +6,11 @@ const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile"
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
-const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "snake", "cactus", "berryBush", "star"]
+const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "cactus", "berryBush", "star", "mushroom"]
 const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
 const options = {
   build: [
-    {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", level: 1,
+    {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", level: 0,
         time: 15, energy: 200,
         resources: "none",
         dist: "A bonfire to spend the night next to",
@@ -20,7 +20,7 @@ const options = {
         resources: "3 rocks",
         dist: "For crossing rivers",
         inst: "Click build to select a location."},
-    {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", level: 1,
+    {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", level: 0,
         time: 15, energy: 100,
         resources: "1 stick, 1 long grass, 1 rock",
         dist: "A primitive ax for chopping trees and other things",
@@ -40,7 +40,7 @@ const options = {
         resources: "2 sticks, 4 long grass, 2 rocks",
         dist: "Flint head arrows for hunting",
         inst: "Makes 5 arrows. Gather the needed resources in your backpack, then click build. Must have an Ax with you."},
-    {name: "basket", src: "images/basket.png", title: "Basket", level: 1,
+    {name: "basket", src: "images/basket.png", title: "Basket", level: 0,
         time: 30, energy: 50,
         resources: "6 long grass",
         dist: "For gathering berries and veggies in",
@@ -89,7 +89,7 @@ const options = {
 }
 
 function preload(){
-  console.timeLog("load", "preload started")
+  //console.timeLog("load", "preload started")
   document.getElementById("p5_loading").innerHTML = "Loading Images ..."
   tiles = {
     apple: loadImage("images/apple.png"),
@@ -99,6 +99,7 @@ function preload(){
     backpack: loadImage("images/carrying.png"),
     basket: loadImage("images/basket.png"),
     basketBerries: loadImage("images/basketBerries.png"),
+    blank: loadImage("images/blank.png"),
     beach1: loadImage("images/beach1.png"),
     beach2: loadImage("images/beach2.png"),
     beach3: loadImage("images/beach3.png"),
@@ -128,8 +129,10 @@ function preload(){
     bush3: loadImage("images/bush3.png"),
     bush4: loadImage("images/bush4.png"),
     bush5: loadImage("images/bush5.png"),
+    build: loadImage("images/build.png"),
     grass2: loadImage("images/grass2.png"),
     cactus: loadImage("images/cactus.png"),
+    chop: loadImage("images/chop.png"),
     campsite: loadImage("images/campsite.png"),
     clouds: loadImage("images/clouds.png"),
     clouds1: loadImage("images/clouds1.png"),
@@ -138,15 +141,6 @@ function preload(){
     clouds4: loadImage("images/clouds4.png"),
     cloudsHalf: loadImage("images/cloudsHalf.png"),
     cross: loadImage("images/cross.png"),
-    day: loadImage("images/sun.png"),
-    dawn: loadImage("images/dawn.png"),
-    dock1: loadImage("images/dock1.png"),
-    dock2: loadImage("images/dock2.png"),
-    dock3: loadImage("images/dock3.png"),
-    dock4: loadImage("images/dock4.png"),
-    dock5: loadImage("images/dock5.png"),
-    dock6: loadImage("images/dock6.png"),
-    dusk: loadImage("images/dusk.png"),
     canoe: [ loadImage("images/canoe0.png"),
              loadImage("images/canoe1.png")
            ],
@@ -162,7 +156,18 @@ function preload(){
       raft: loadImage("images/raftHB.png"),
       campsite: loadImage("images/campsiteHB.png")
     },
+    day: loadImage("images/sun.png"),
+    dawn: loadImage("images/dawn.png"),
+    dock1: loadImage("images/dock1.png"),
+    dock2: loadImage("images/dock2.png"),
+    dock3: loadImage("images/dock3.png"),
+    dock4: loadImage("images/dock4.png"),
+    dock5: loadImage("images/dock5.png"),
+    dock6: loadImage("images/dock6.png"),
+    dusk: loadImage("images/dusk.png"),
+    dump: loadImage("images/dump.png"),
     explosion: loadImage("images/explosion.png"),
+    eat: loadImage("images/eat.png"),
     fire: [
       loadImage("images/fire1.png"),
       loadImage("images/fire2.png"),
@@ -172,7 +177,9 @@ function preload(){
     firepit: loadImage("images/firepit.png"),
     firepitOutlined: loadImage("images/firepitOutlined.png"),
     floodFill: loadImage("images/floodFill.png"),
+    feedFire: loadImage("images/feedFire.png"),
     grass: loadImage("images/grass.png"),
+    grab: loadImage("images/grab.png"),
     log: loadImage("images/log.png"),
     logs: loadImage("images/logs.png"),
     longGrass: loadImage("images/longGrass.png"),
@@ -192,6 +199,7 @@ function preload(){
     grassBeach11: loadImage("images/grassBeach11.png"),
     grassBeach12: loadImage("images/grassBeach12.png"),
     grassBeachX: loadImage("images/grassBeachX.png"),
+    mushroom: loadImage("images/mushroom.png"),
     night: loadImage("images/moon.png"),
     palm: loadImage("images/palm.png"),
     pit: loadImage("images/pit.png"),
@@ -210,13 +218,6 @@ function preload(){
     rabbitDead: loadImage("images/rabbitDead.png"),
     rabbitStew: loadImage("images/veggyStew.png"),
     random: loadImage("images/random.png"),
-    randomBerries: loadImage("images/randomBerries.png"),
-    randomGrass: loadImage("images/randomGrass.png"),
-    randomLog: loadImage("images/randomLog.png"),
-    randomPit: loadImage("images/randomPit.png"),
-    randomRock: loadImage("images/randomRock.png"),
-    randomStick: loadImage("images/randomStick.png"),
-    randomTree: loadImage("images/randomTree.png"),
     river1: loadImage("images/grassRiver1.png"),
     river2: loadImage("images/grassRiver2.png"),
     river3: loadImage("images/grassRiver3.png"),
@@ -302,16 +303,16 @@ function preload(){
   tiles.rock = tiles.rock1
 
   //load the worlds:
-  for (let i = 0; i<4; i++){
-    $.getJSON(`worlds/${i+1}.json`, function(data){
+  for (let i = 0; i<5; i++){
+    $.getJSON(`worlds/${i}.json`, function(data){
       gameBoards.push(data)
     })
   }
-  console.timeLog("load", "preload finished")
+  //console.timeLog("load", "preload finished")
 }
 
 function setup(){
-  console.timeLog("load", "setup started")
+  //console.timeLog("load", "setup started")
   let cvs = createCanvas(window.innerWidth, window.innerHeight)
   cvs.parent("board")
   $("#board").css("top", world.topOffset).css("left", world.leftOffset)
@@ -319,8 +320,8 @@ function setup(){
   noLoop()
   game.mode = "welcome"
   frameRate(world.frameRate)
-  console.timeLog("load", "setup finished")
-  console.timeEnd("load")
+  // console.timeLog("load", "setup finished")
+  // console.timeEnd("load")
   if (!Vue.config.devtools){
     fetch(' https://api.counterapi.dev/v2/andys-games/wemo/up')
       .then(response => response.json())
@@ -348,6 +349,8 @@ function playLoop(){
   // move board:
   viewport.update(false)
   //display:
+  if (tutorial.active)
+    tutorial.display()
   vehicles.display()
   man.update()
   board.showNight()

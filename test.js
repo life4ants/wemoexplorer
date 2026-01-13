@@ -1,5 +1,7 @@
 let test = {
-  looker(id,y){
+  clickInfo: false,
+  
+  lookup(id,y){
     if (id === "active")
       return board.cells[active.x][active.y]
     if (id === "man")
@@ -55,5 +57,15 @@ let test = {
     if (["stoneAx", "boneShovel", "bow"].includes(item))
       return toolbelt.addItem("tool", item)
     return false
+  },
+
+  equip(){
+    this.add("stoneAx")
+    this.add("bow")
+    this.add("claypot")
+  },
+
+  worldCheck(){
+    return board.cells.length === board.cols && board.cells[0].length === board.rows
   }
 }

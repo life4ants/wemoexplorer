@@ -1,10 +1,14 @@
 <template>
 	<div>
 		<div v-if="isMobile">
-	    <div class="rightButton" @click="() => moveAction(0)"></div>
-	    <div class="leftButton" @click="() => moveAction(1)"></div>
-	    <div class="upButton" @click="() => moveAction(2)"></div>
-	    <div class="downButton" @click="() => moveAction(3)"></div>
+	    <div class="rightButton" @pointerdown="disableCanvas" 
+        @click="() => moveAction(39)"></div>
+	    <div class="leftButton" @pointerdown="disableCanvas" 
+        @click="() => moveAction(37)"></div>
+	    <div class="upButton" @pointerdown="disableCanvas" 
+        @click="() => moveAction(38)"></div>
+	    <div class="downButton" @pointerdown="disableCanvas" 
+        @click="() => moveAction(40)"></div>
 	  </div> 
 	  <div class="sidebar">
 	    <div class="sidebar-content">
@@ -24,7 +28,7 @@
 <script>
 module.exports = {
 	props: [
-		'exit', 'paused', 'pauseGame', 'action', 'autoCenter'
+		'isMobile', 'exit', 'paused', 'pauseGame', 'autoCenter'
 	],
 	data(){
 		return {
@@ -43,23 +47,22 @@ module.exports = {
 	    ],
 		}
 	},
-  computed: {
-    isMobile(){
-      return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1)
-    }
-  },
   methods: {
+    disableCanvas(){
+      window._UIevent = true
+    },
+
   	showInfo(){
   		msgs.infoShown = !msgs.infoShown
   	},
-  	moveAction(dir){//responds to mobile buttons for moving
+
+    action(key){
+      keyHandler(0, key)
+    },
+
+  	moveAction(keyCode){//responds to mobile buttons for moving
       if (!world.noKeys && !this.paused && !man.isAnimated){
-        switch(dir){
-          case 0: active.move(1,0);  break;
-          case 1: active.move(-1,0); break;
-          case 2: active.move(0,-1); break;
-          case 3: active.move(0, 1); break;
-        }
+        keyHandler(keyCode)
       }
     },
   	checkActions(){
@@ -83,8 +86,9 @@ module.exports = {
               (man.isNextToFire || cell.type === "campsite")
         //eat:
         let basket = toolbelt.getContainer("basket")
-        this.icons[4].active = (("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0)) ||
-              (basket && basket.includesItems(["berries", "veggies"]).length > 0 )
+        this.icons[4].active = ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0) ||
+            ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0) ||
+            "veggies" === cell.type || (basket && basket.includesItems(["berries", "veggies"]).length > 0 )
         //jump:
         this.icons[5].active = (man.isRiding && (active.landed || active.isBeside("dock") ||
               "river" === board.cells[active.x][active.y].type)) ||  (!man.isRiding && vehicles.canMount(man.x, man.y))
@@ -107,7 +111,7 @@ module.exports = {
 </script>
 
 <style>
-.selected {
+.sidebar.selected {
   height: 36px;
   width: 36px;
   border: solid 2px red;

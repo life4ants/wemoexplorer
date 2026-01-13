@@ -12,7 +12,7 @@ var game = new Vue({
       <edit-bar v-else-if="mode === 'edit'" :exit="exit" :preview="previewGame"></edit-bar>
       <play-box v-else-if="mode === 'play'" ref="playbox"
         :exit="exit"
-        :action="action"
+        :isMobile="isMobile"
         :paused="paused"
         :pauseGame="pauseGame"
         :autoCenter="autoCenter">
@@ -59,35 +59,12 @@ var game = new Vue({
       this.updateMessage = true
     }
   },
+  computed:{
+    isMobile(){
+      return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1)
+    }
+  },
   methods: {
-    action(key){
-      if (man.isSleeping){
-        if (key === "S")
-          man.goToSleep()
-      }
-      else {
-        switch(key){
-          case "B": popup.buildMenu();    break;
-          case "C": actions.chop();       break;
-          case "D":
-            if (board.cells[active.x][active.y].type === "campsite"){ popup.dropMenu() }
-            else { popup.dumpMenu() }
-            break
-          case "E": actions.eat();        break;
-          case "F": actions.fling();      break;
-          case "G":
-            if (board.cells[active.x][active.y].type === "campsite"){ popup.grabMenu("grab") }
-            else { actions.grab() }
-            break
-          case "J": man.dismount();       break;
-          case "K": popup.cookMenu();     break;
-          case "S": man.goToSleep();      break;
-          case "T": actions.throw();      break;
-          case "X": this.autoCenter = !this.autoCenter; break;
-        }
-      }
-    },
-
     checkActive(){
       if (this.$refs.playbox)
         this.$refs.playbox.checkActions()
@@ -107,7 +84,7 @@ var game = new Vue({
             localStorage.setItem("wemoPlayers", JSON.stringify(p))
           }
         }
-        else
+        else if (board.level > 0)
           this.saveGame()
       }
       this.mode = "welcome"
@@ -142,7 +119,7 @@ var game = new Vue({
       let b
       switch(type){
         case "default":
-          b = JSON.parse(JSON.stringify(gameBoards[index-1]))
+          b = JSON.parse(JSON.stringify(gameBoards[index]))
           console.log("starting game "+index)
           break
         case "resume":
@@ -179,9 +156,13 @@ var game = new Vue({
       topbar.energy = man.energy
       world.noKeys = false
       timer.setTime(board.wemoMins)
+      if (board.level === 0){
+        tutorial.start()
+      }
+      else
+        tutorial.active = false
       world.noNight = board.level < 2
-      if (!board.progress){
-        board.fill()
+      if (!board.progress && board.level > 1){
         board.addRabbits()
       }
       $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
@@ -265,6 +246,17 @@ var game = new Vue({
         world.leftOffset = 152
       }
       viewport.update(true)
+    },
+
+    finishLevel(){
+      this.currentPlayer.unlockedLevel = board.level+1
+      let p = JSON.parse(localStorage.wemoPlayers)
+      p[game.currentPlayer.index] = game.currentPlayer
+      localStorage.setItem("wemoPlayers", JSON.stringify(p)) 
+      if (board.level > 0){
+        sounds.play("win")
+        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)
+      }
     }
   }
 })

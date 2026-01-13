@@ -42,7 +42,7 @@ class WaterCraft extends WemoObject{
         this.stepCount++
         man.energy -= 2
         if (newCell.type === "star")
-          board.claimStar(newCell)
+          board.claimStar(this.x, this.y, newCell)
       }
     }
   }

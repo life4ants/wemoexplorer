@@ -3,15 +3,20 @@ let topbar = {
   health: 0,
 
   display(){
-    let backpackPos = viewport.width > 1200 ? viewport.left+530 : viewport.width > 1000 ? viewport.left+340 : viewport.left+240
-    let widthFactor = viewport.width > 1200 ? 10 : viewport.width > 1000 ? 16 : 24
+    let widthFactor = viewport.width > 1200 ? 8 : viewport.width > 1000 ? 12 : viewport.width > 600 ? 18 : 28
+    let backpackPos = viewport.left+(3000/widthFactor)+25
     this.showSelf()
     this.energy = helpers.smoothChange(this.energy, man.energy)
     this.health = helpers.smoothChange(this.health, man.health)
     this.showEnergyBar("Energy: ", Math.round(this.energy), 3, widthFactor)
     this.showEnergyBar("Health: ", Math.round(this.health), 30, widthFactor)
     this.showBackpack(backpackPos, viewport.top+3)
-    this.showWorldName(backpackPos+150)
+    if (tutorial.questIsShown){
+      tutorial.displayQuest(backpackPos+150)
+    }
+    else{
+      this.showWorldName(backpackPos+150)
+    }
     this.showTimer()
   },
 
@@ -52,27 +57,28 @@ let topbar = {
     fill(255)
     stroke(80)
     strokeWeight(3)
-    rect(viewport.left+10, top, Math.floor(5000/widthFactor)+3, 20)
-    let color = value > 3333 ? "green" :
-                 value > 1666 ? "#e90" : "red"
-    if (frameCount%10 < 5 && value < 1000)
+    rect(viewport.left+10, top, Math.floor(3000/widthFactor)+3, 20)
+    let color = value > 2000 ? "green" :
+                 value > 1000 ? "#e90" : "red"
+    if (frameCount%10 < 5 && value < 500)
       fill(255)
     else
       fill(color)
     noStroke()
     rect(viewport.left+12, top+2, Math.floor(value/widthFactor), 17)
     let f, x
-    if (value/widthFactor > 100){
+    if (value/widthFactor > 80){
       f = 255, x = Math.floor(value/(widthFactor*2))
       textAlign(CENTER,TOP)
+      textSize(14)
     }
     else {
-      f = 0, x = Math.floor(value/widthFactor)+2
-      textAlign(LEFT,TOP)
+      f = 0, x = Math.floor(3000/widthFactor)-2
+      textAlign(RIGHT,TOP)
+      textSize(12)
     }
     fill(f)
-    textSize(14)
-    text(title+value, viewport.left+12+x, top+2)
+    text(title+value, viewport.left+12+x, top+3)
   },
 
   showBackpack(left, top){
@@ -125,9 +131,10 @@ let topbar = {
   },
 
   showWorldName(left){
+    let s = viewport.width > 780 ? 20 : 15
     fill(0)
-    textSize(20)
+    textSize(s)
     textAlign(LEFT,TOP)
-    text("World: "+board.name, left, viewport.top+20)
+    text("World:\n"+board.name, left, viewport.top+s/2)
   }
 }

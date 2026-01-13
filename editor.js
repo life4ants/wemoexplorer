@@ -9,6 +9,8 @@ let editor = {
   mousePressed(){
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
+    if (x < 0 || x > board.cols || y < 0 || y > board.rows)
+      return
     let id = x+"_"+y
     if (this.tool === "brush"){
       if (this.type === "start"){

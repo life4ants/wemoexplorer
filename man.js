@@ -5,9 +5,9 @@ class Man extends WemoObject {
     this.y = y
     this.oldX = 0
     this.oldY = 0
-    this.index = 0 //direction facing: 0 - right, 1 - left, 2 - up, 3 - down
-    this.energy = 5000
-    this.health = 5000
+    this.index = 3 //direction facing: 0 - right, 1 - left, 2 - up, 3 - down
+    this.energy = 3000
+    this.health = 3000
     this.stepCount = 0
     this.standCount = 0
     this.img = [tiles.players[characterId], tiles.playersAnimated[characterId]]
@@ -38,7 +38,7 @@ class Man extends WemoObject {
     if (this.inDark){
       msgs.following.msg = "You're too far from a fire!"
       msgs.following.frames = 1
-      this.health -= Math.floor((this.health+1000)/499)
+      this.health -= Math.floor((this.health+500)/200)
     }
     if (this.isRiding){
       let sx = (active.index%3)*25
@@ -61,7 +61,7 @@ class Man extends WemoObject {
       this.health -=25
     }
     if (this.isSleeping){
-       this.health = this.health < 4997 ? this.health+2 : 5000
+       this.health = min(this.health+2, 3000)
        this.energy = frameCount%5 === 0 && this.energy < 5000 ? this.energy+1 : this.energy
     }
     this.display()
@@ -135,7 +135,7 @@ class Man extends WemoObject {
   move(x, y) {
     if (this.isSleeping)
       return
-    if (helpers.withinBounds(this.x+x, this.y+y)){
+    if (helpers.canWalk(this.x+x, this.y+y)){
       this.standCount = 0
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
@@ -175,7 +175,7 @@ class Man extends WemoObject {
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
       if (newCell.type === "star"){
-        board.claimStar(newCell)
+        board.claimStar(this.x, this.y, newCell)
       }
     }
   }

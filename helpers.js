@@ -71,6 +71,13 @@ let helpers = {
     return x >= 0 && x < board.cols && y >= 0 && y < board.rows
   },
 
+  canWalk(x,y){
+    if (tutorial.active){
+      return x >= 0 && x < tutorial.xbound && y >= 0 && y < tutorial.ybound
+    }
+    return x >= 0 && x < board.cols && y >= 0 && y < board.rows
+  },
+
   randomPicker(type){//string or array
     let count = 0
     while (count < 100){

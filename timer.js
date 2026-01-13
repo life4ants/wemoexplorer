@@ -8,13 +8,12 @@
       this.updateFires()
     if (frameCount % 75 === 0)
       this.growBerries()
-    if (frameCount % 180 === 0 && man.health < 5000)
+    if (frameCount % 180 === 0 && man.health < 3000)
       man.health++
     if (frameCount%317 === 0)
       this.growVeggies()
-    if (frameCount%437 === 0){
+    if (frameCount%437 === 0 && board.level > 0){
       game.saveGame()
-      console.log("game saved")
     }
     if (frameCount%720 === 360){
       if (board.type === "default" && !Vue.config.devtools){

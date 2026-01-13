@@ -469,7 +469,6 @@ var popup = new Vue({
     },
 
     gameOver(){
-      console.log("gameOver")
       board.gameOver = true
       this.show = true
       this.title = "Game Over!!"

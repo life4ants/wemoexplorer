@@ -28,9 +28,11 @@ class Board extends WemoObject {
     }
   }
 
-  save(){ // saving a game on the builder. Called from editbar.saveBoard
+  // saving a game on the builder. Called from editbar.saveBoard
+  save(){ 
     let trees = []
     let bushes = []
+    this.revealCount = this.cols*this.rows
     for (let i in this.stars){
       this.stars[i].cells = []
     }
@@ -53,6 +55,11 @@ class Board extends WemoObject {
           console.error(id, e)
         }
         
+        if (this.name === "tut" && i<10 && j<10){
+          cell.revealed = 2
+          this.revealCount--
+        }
+
         if (cell.type === "berryTree"){
           cell.id = trees.length
           trees.push({x: i, y: j, berries: []})
@@ -63,7 +70,6 @@ class Board extends WemoObject {
         }
       }
     }
-    this.revealCount = this.cols*this.rows
     this.berryTrees = trees
     this.berryBushes = bushes
     if (this.name){
@@ -119,14 +125,6 @@ class Board extends WemoObject {
           }
           n = i !== 0 && j !== 0? n+1 : n
         }
-      }
-    }
-  }
-
-  fill(){
-    for (let i = 0; i < this.cols; i++){
-      for (let j = 0; j< this.rows; j++){
-        this.pickCell(i,j)
       }
     }
   }
@@ -236,9 +234,8 @@ class Board extends WemoObject {
       return
     }
     let offset = game.mode === "edit" ? 0 : topbarHeight
-    let img = tiles[cell.tile] || tiles["random"]
     // print the tile:
-    image(img, x*25, y*25+offset)
+    image(tiles[cell.tile] || tiles["random"], x*25, y*25+offset)
     
     // print the type:
     if (["rock", "clay"].includes(cell.type)){
@@ -250,8 +247,9 @@ class Board extends WemoObject {
       if (cell.quantity > 1)
         this.drawBadge(x*25+4, y*25+topbarHeight+8, cell.quantity, "#000")
     }
-    else if (seeThru.includes(cell.type))
-      image(tiles[cell.type], x*25, y*25+offset)
+    else if (seeThru.includes(cell.type)){
+      image(tiles[cell.type] || tiles["random"], x*25, y*25+offset)
+    }
     else if (cell.type === "construction"){
       image(tiles.construction[cell.construction.type], x*25, y*25+offset)
       for (let i = 0; i < cell.construction.needed.length; i++) {
@@ -271,64 +269,45 @@ class Board extends WemoObject {
       image(tiles.cloudsHalf, x*25, y*25+offset)
   }
 
-  pickCell(x,y){
-    let cell = this.cells[x][y]
-    if (cell.type.substr(0,6) === "random"){
-      let roll = Math.random()
-      if (cell.type === "randomGrass" && roll < .8){
-        let a = Math.floor(Math.random()*3)+1
-        cell.type = "longGrass"
-        cell.tile = "longGrass"+a
-      }
-      else if (cell.type === "randomBerries" && roll < .7){
-        cell.type = "berryTree"
-        cell.tile = "berryTree"
-        cell.id = this.berryTrees.length
-        this.berryTrees.push({x, y, berries: []})
-      }
-      else if (["randomLog", "randomStick"].includes(cell.type)){
-        if (roll < .5)
-          cell.type = cell.type === "randomLog" ? "log" : "stick"
-        else
-          cell.type = cell.tile.replace(/\d+$/, "")
-      }
-      else if (cell.type === "randomRock"){
-        let a = Math.floor(Math.random()*4)+1
-        if (Math.random() < .5){
-          cell.type = "rock"
-          cell.quantity = a
-        }
-        else
-          cell.type = cell.tile.replace(/\d+$/, "")
-      }
-      else if (cell.type === "randomTree"){
-        if (roll > .6){
-          cell.type = "treeThin"
-          cell.tile = "treeThin"
-        }
-        else if (roll > .1){
-          cell.type = "tree"
-          cell.tile = "tree"
-        }
-        else {
-          cell.type = "grass"
-          cell.tile = "grass"
-        }
-      }
-      else {
-        cell.type = "grass"
-        cell.tile = "grass"
-      }
-    }
-  }
-
-  claimStar(cell){
+  claimStar(x, y, cell){
     let starid = board.stars.findIndex((e)=> e.id === cell.id)
     let tcells = board.stars[starid].cells
     for (let i in tcells){
       let c = board.cells[tcells[i].x][tcells[i].y]
       if (!c.revealed)
         this.revealCell(tcells[i].x, tcells[i].y, c, 2)
+    }
+    delete cell.id
+    board.stars.splice(starid, 1)
+    let r = random(9)
+    if (cell.tile === "grass"){
+      if (r<4){
+        cell.tile = "veggies4"; cell.type = "veggies"
+      }
+      else if (r<6)
+        cell.type = "stick"
+      else if (r<7)
+        cell.type = "log"
+      else
+        cell.type = "mushroom"
+    }
+    else if (cell.tile === "sand"){
+      if (r<2){
+        cell.tile = "palm"; cell.type = "palm"
+      }
+      else if (r<6)
+        cell.type = "cactus"
+      else if (r<8){
+        cell.type = "rock"; cell.quantity = 3;
+      }
+      else
+        cell.type = "stick"
+    }
+    else
+      cell.type = cell.tile.replace(/\d+$/, "")
+    board.cells[x][y] = cell
+    if (board.revealCount <= 0 && board.level > 0){
+      game.finishLevel()
     }
   }
 
@@ -342,19 +321,11 @@ class Board extends WemoObject {
       if (this.cells[x][y].revealed === 2)
         this.revealCount --
     }
-    if (this.revealCount === 0){
-      if (this.type === "default" && this.level+1 > game.currentPlayer.unlockedLevel){
-        game.currentPlayer.unlockedLevel = this.level+1
-        let p = JSON.parse(localStorage.wemoPlayers)
-        p[game.currentPlayer.index] = game.currentPlayer
-        localStorage.setItem("wemoPlayers", JSON.stringify(p)) 
-      }
-      sounds.play("win")
-      setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)
-    }
   }
 
   clicker(){
+    if (man.isAnimated)
+      return
     let y = Math.floor((mouseY-topbarHeight)/25)
     let x = Math.floor(mouseX/25)
     let cell = this.cells[x][y]
@@ -362,24 +333,24 @@ class Board extends WemoObject {
       popup.grabMenu("info", cell.id)
     }
     else if(game.isMobile){
-      let mx = map(winMouseX, world.leftOffset, window.innerWidth, 0, 100)
-      let my = map(winMouseY, topbarHeight, window.innerHeight, 0, 100)
-
-      if (mx > my){
-        if (mx < 100-my) //up
-          active.move(0, -1)
+      
+      let mx = mouseX - active.x*25+12
+      let my = mouseY-topbarHeight - active.y*25+12
+      let keyCode
+      if (mx >= my){
+        if (mx+my <= 0) //up
+          keyCode = 38
         else
-          active.move(1, 0) //right
+          keyCode = 39 //right
       }
       else {
-        if (mx < 100-my)
-          active.move(-1, 0) //left
+        if (mx+my <= 0)
+          keyCode = 37 //left
         else
-          active.move(0, 1) //down
+          keyCode = 40 //down
       }
-    }
-    if (mouseButton === RIGHT)
-      console.log(x,y,cell)
+      keyHandler(keyCode)
+    } 
   }
 
   showNight(){

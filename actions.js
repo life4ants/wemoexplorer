@@ -57,6 +57,8 @@ let actions = {
           cell.type = "firepit"
           cell.id = id
           man.fireCheck()
+          if (tutorial.active && tutorial.step === 7)
+            tutorial.step++
         }}
       }
       else
@@ -117,6 +119,8 @@ let actions = {
               backpack.removeItem(type, 1)
             }
             popup.setAlert(msg)
+            if (tutorial.active && tutorial.step === 8)
+              tutorial.step++
           }}
         }
         else
@@ -246,6 +250,8 @@ let actions = {
           cell.tile = "stump"
           cell.quantity = 5
           man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
+          if (tutorial.active && tutorial.step === 9)
+            tutorial.step++
         }}
       }
     }
@@ -339,7 +345,7 @@ let actions = {
     }
     if (kind === "") return
 
-    if (man.energy > 5000){
+    if (man.energy > 3000){
       man.energy -= Math.floor((Math.random()*5+1)*100)
       man.health -= Math.floor((Math.random()*5+1)*10)
       msgs.following.msg = "You ate too much!!!"
@@ -357,9 +363,12 @@ let actions = {
       case "rabbitStew": e = 200, h = 500;  break;
       default: e = 0, h = 0;
     }
-    man.health = min(man.health+h, 5000)
-    man.energy = min(man.energy+e, 5025)
-    if (man.energy > 5000)
+    man.health = min(man.health+h, 3000)
+    man.energy = min(man.energy+e, 3010)
+    if (tutorial.active && tutorial.step === 3){
+      tutorial.step++
+    }
+    if (man.energy > 3000)
       popup.setAlert("You are full. Stop eating!")
   },
 
@@ -413,6 +422,11 @@ let actions = {
         else
           board.fires[man.fireId].value = fireValue
         backpack.removeItem(items[0].type, 1)
+        if (tutorial.active && tutorial.step === 11){
+          tutorial.step++
+          if (game.currentPlayer.unlockedLevel === 0)
+            game.finishLevel()
+        }
       }
     }
   },

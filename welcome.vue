@@ -43,7 +43,7 @@
         <h6 class="left-header">Default Worlds:</h6>
         <div class="button-tiles">
           <div v-for="(item, id) in worlds" class="button-tiles-content flex">
-            <h6 class="button-tiles-flexbox">World {{item.level}}</h6>
+            <h6 class="button-tiles-flexbox">{{item.name}}</h6>
             <div class="button-tiles-flexbox">
               <button v-if="item.level <= currentPlayer.unlockedLevel" @click="() => pickGame('default', item.level, id)">Play</button>
               <span v-else >Locked</span>
@@ -132,7 +132,7 @@ module.exports = {
   methods: {
     newPlayer(){
       if (this.name.length > 0){
-        this.players.push({name: this.name, unlockedLevel: 1, games: [], character: 0})
+        this.players.push({name: this.name, unlockedLevel: 0, games: [], character: 0})
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
         if (this.players.length === 1)
@@ -189,13 +189,13 @@ module.exports = {
       //make the default worlds:
       let defaultWorlds = []
       for (let i = 0; i < gameBoards.length; i++){
-        fetch(`https://api.counterapi.dev/v2/andys-games/world${i+1}`)
+        fetch(`https://api.counterapi.dev/v2/andys-games/world${i}`)
           .then(response => response.json())
           .then(result => {
             this.worlds[i].playtime = result.data.up_count
           })
           .catch(error => console.error('Error:', error));
-        defaultWorlds.push({level: i+1, savedGame: false, playtime: "~"})
+        defaultWorlds.push({name: gameBoards[i].name, level: i, savedGame: false, playtime: "~"})
       }
       //get custom worlds:
       let saved = Object.keys(localStorage)
@@ -214,8 +214,8 @@ module.exports = {
       let savedGames = this.currentPlayer.games
       for (let i = 0; i < savedGames.length; i++){
         if (savedGames[i].type === "default"){
-          defaultWorlds[savedGames[i].level-1].savedGame = true
-          defaultWorlds[savedGames[i].level-1].gameId = savedGames[i].id
+          defaultWorlds[savedGames[i].level].savedGame = true
+          defaultWorlds[savedGames[i].level].gameId = savedGames[i].id
         }
         else {
           let index = customWorlds.findIndex((e) => e.name === savedGames[i].name)
