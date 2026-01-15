@@ -237,19 +237,32 @@ class Board extends WemoObject {
     // print the tile:
     image(tiles[cell.tile] || tiles["random"], x*25, y*25+offset)
     
-    // print the type:
+    // rock or clay:
     if (["rock", "clay"].includes(cell.type)){
       image(tiles[cell.type+cell.quantity], x*25, y*25+offset)
     }
+    // piles:
     else if (cell.type.substr(-4,4) === "pile"){
-      let tile = cell.quantity > 1 ? cell.type.substr(0, cell.type.length-4)+"s" : cell.type.substr(0, cell.type.length-4)
-      image(tiles[tile], x*25, y*25+offset)
-      if (cell.quantity > 1)
+      if (cell.quantity > 1){
+        let tile = cell.type === "longGrasspile" ? "longGrass" : cell.type.substr(0, cell.type.length-4)+"s"
+        image(tiles[tile], x*25, y*25+offset)
         this.drawBadge(x*25+4, y*25+topbarHeight+8, cell.quantity, "#000")
+      }
+      else { 
+        image(tiles[cell.type.substr(0, cell.type.length-4)], x*25, y*25+offset)
+      }
     }
+    // roots:
+    else if ("root" === cell.type){
+      cell.growtime++
+      if (cell.growtime > 480)
+        timer.sprout(cell)
+    }
+    // see thru:
     else if (seeThru.includes(cell.type)){
       image(tiles[cell.type] || tiles["random"], x*25, y*25+offset)
     }
+    // construction sites:
     else if (cell.type === "construction"){
       image(tiles.construction[cell.construction.type], x*25, y*25+offset)
       for (let i = 0; i < cell.construction.needed.length; i++) {

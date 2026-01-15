@@ -5,16 +5,17 @@ class Backpack {
     if (this.type === "backpack"){
       this.maxWeight = 250
       this.items = {
-        log: {weight: 80, quantity: 0},
-        stick: {weight: 45, quantity: 0},
-        rock: {weight: 40, quantity: 0},
-        longGrass: {weight: 15, quantity: 0},
+        arrow: {weight: 10, quantity: 0},
+        bomb: {weight: 50, quantity: 0},
         bone: {weight: 20, quantity: 0},
         clay: {weight: 60, quantity: 0},
-        bomb: {weight: 50, quantity: 0},
+        log: {weight: 80, quantity: 0},
+        longGrass: {weight: 15, quantity: 0},
+        mushroom: {weight: 20, quantity: 0},
         rabbitLive: {weight: 50, quantity: 0},
         rabbitDead: {weight: 50, quantity: 0},
-        arrow: {weight: 10, quantity: 0}
+        rock: {weight: 40, quantity: 0},
+        stick: {weight: 45, quantity: 0},
       }
     }
     else if (this.type === "basket"){
@@ -40,9 +41,12 @@ class Backpack {
   }
 
   getAllItems(){
-    let ar = this.type === "backpack" ? ["stick", "log", "rock", "longGrass", "bone", "clay", "arrow", "bomb", "rabbitLive", "rabbitDead"] :
-            this.type === "basket" ? ["berries", "veggies"] :
-            this.type === "claypot" ? ["water", "rabbitStew"] : []
+    let ar = this.type === "backpack" ? [
+        "arrow", "bomb", "bone", "clay",
+        "log", "longGrass", "mushroom", "rock",
+        "rabbitDead", "rabbitLive", "stick" ] :
+      this.type === "basket" ? ["berries", "veggies"] :
+      this.type === "claypot" ? ["water", "rabbitStew"] : []
     return this.includesItems(ar)
   }
 

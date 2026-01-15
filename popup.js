@@ -358,6 +358,16 @@ var popup = new Vue({
           this.setAlert(msg)
         return
       }
+      let cell = board.cells[active.x][active.y]
+      if (cell.type.substr(-4,4) === "pile"){
+        let type = cell.type.substr(0, cell.type.length-4)
+        if (backpack.includesItem(type)){
+          let msg = actions.dump(type)
+          if (msg)
+            this.setAlert(msg)
+          return
+        }
+      }
       let output = options.resources.filter(i => items.find((e) => e.type === i.name))
       this.setMenu(output, "What would you like to Dump?", "Dump")
     },

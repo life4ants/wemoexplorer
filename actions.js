@@ -48,6 +48,8 @@ let actions = {
     let cell = board.cells[pos.x][pos.y]
     // build firepit:
     if (item.name === "firepit"){
+      if (!cell.revealed)
+        return "Sorry, you can't build a firepit in the clouds!"
       if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
         man.isAnimated = true
         man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
@@ -258,33 +260,10 @@ let actions = {
   },
 
   dump(type){
-    const _dumpable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle"]
+    const _dumpable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle", "root"]
     let cell = board.cells[active.x][active.y]
-    // long Grass:
-    if (type === "longGrass"){
-      backpack.removeItem("longGrass", 1)
-      return false
-    }
-    // log, stick, bone or clay:
-    else if (["log", "stick", "bone", "clay", "arrow"].includes(type)){
-      if (cell.type === type+"pile")
-        cell.quantity++
-      else if (cell.type === type){
-        if (type === "clay")
-          return "Sorry, you can't start a clay pile on a hill of clay."
-        cell.type = type+"pile"
-        cell.quantity = 2
-      }
-      else if (_dumpable.includes(cell.type) || ( ["log", "stick"].includes(type) && cell.type === "stump")){
-        cell.type = type+"pile"
-        cell.quantity = 1
-      }
-      else
-        return "Sorry, you can't dump a "+type+" on a "+cell.type+" square!"
-      backpack.removeItem(type, 1)
-    }
     // rock:
-    else if (type === "rock"){
+    if (type === "rock"){
       if (cell.type === "rockpile")
         cell.quantity++
       else if (cell.type === "rock"){
@@ -304,72 +283,92 @@ let actions = {
       cell.rabbits = cell.rabbits +1 || 1
       backpack.removeItem("rabbitDead", 1)
     }
+    // everything else:
+    else if (["arrow", "bone", "clay", "log", "longGrass", "mushroom", "stick"].includes(type)){
+      if (cell.type === type+"pile")
+        cell.quantity++
+      else if (cell.type === type){
+        if (type === "clay")
+          return "Sorry, you can't start a clay pile on a hill of clay."
+        if (type === "longGrass")
+          return "Grab the long grass from this square before starting a long grass pile."
+        cell.type = type+"pile"
+        cell.quantity = 2
+      }
+      else if (_dumpable.includes(cell.type) || ( ["log", "stick"].includes(type) && cell.type === "stump")){
+        cell.type = type+"pile"
+        cell.quantity = 1
+      }
+      else
+        return "Sorry, you can't dump a "+type+" on a "+cell.type+" square!"
+      backpack.removeItem(type, 1)
+    }
     return false
   },
 
   eat(){
+    let kind = this.findFood()
+    if (kind){
+      if (man.energy > 3000){
+        man.energy -= Math.floor((Math.random()*5+1)*100)
+        man.health -= Math.floor((Math.random()*5+1)*10)
+        msgs.following.msg = "You ate too much!!!"
+        msgs.following.frames = 30
+        man.vomit = true
+        sounds.play("vomit")
+        return
+      }
+      sounds.play("eat")
+      let e,h
+      switch (kind){
+        case "berries": e = 20, h = 2;       break;
+        case "apples": e = 35, h = 3;        break;
+        case "veggies": e = 40, h = 5;       break;
+        case "mushrooms": e = 20, h = 1000;  break;
+        case "rabbitStew": e = 300, h = 800;  break;
+        default: e = 0, h = 0;
+      }
+      man.health = min(man.health+h, 3000)
+      man.energy = min(man.energy+e, 3005)
+      if (tutorial.active && tutorial.step === 3){
+        tutorial.step++
+      }
+      if (man.energy > 3000)
+        popup.setAlert("You are full. Stop eating!")
+    }
+  },
+
+  findFood(){
     let cell = board.cells[man.x][man.y]
     let tree = board.berryTrees[cell.id]
     let bush = board.berryBushes[cell.id]
-    let kind = ""
     if (cell.type === "berryTree" && tree.berries.length > 0){
       let p = Math.floor(Math.random()*tree.berries.length)
       tree.berries.splice(p, 1)
-      kind = "apples"
+      return "apples"
     }
-    else if (cell.type === "berryBush" && bush.berries.length > 0){
+    if (cell.type === "berryBush" && bush.berries.length > 0){
       let p = Math.floor(Math.random()*bush.berries.length)
       bush.berries.splice(p, 1)
-      kind = "berries"
+      return "berries"
     }
-    else if (cell.type === "veggies"){
-      let quantity = Number(cell.tile.substr(7,1))
-      cell.tile = quantity > 1 ? "veggies"+(quantity-1) : "grass"
-      cell.type = quantity > 1 ? cell.type : "grass"
-      kind = "veggies"
+    if(backpack.removeItem("mushroom", 1)){
+      return "mushrooms"
     }
-    else {
-      let basket = toolbelt.getContainer("basket")
-      let claypot = toolbelt.getContainer("claypot")
-      if (basket){
-        let items = basket.includesItems(["berries", "veggies", "apples"])
-        if (items.length > 0){
-          basket.removeItem(items[0].type, 1)
-          kind = items[0].type
-        }
-      }
-      if (claypot && claypot.includesItem("rabbitStew")){
-        claypot.removeItem("rabbitStew", 1)
-        kind = "rabbitStew"
+    let basket = toolbelt.getContainer("basket")
+    if (basket){
+      let items = basket.includesItems(["berries", "veggies", "apples"]) // no apples yet
+      if (items.length > 0){
+        basket.removeItem(items[0].type, 1)
+        return items[0].type
       }
     }
-    if (kind === "") return
-
-    if (man.energy > 3000){
-      man.energy -= Math.floor((Math.random()*5+1)*100)
-      man.health -= Math.floor((Math.random()*5+1)*10)
-      msgs.following.msg = "You ate too much!!!"
-      msgs.following.frames = 30
-      man.vomit = true
-      sounds.play("vomit")
-      return
+    let claypot = toolbelt.getContainer("claypot")
+    if (claypot && claypot.includesItem("rabbitStew")){
+      claypot.removeItem("rabbitStew", 1)
+      return "rabbitStew"
     }
-    sounds.play("eat")
-    let e,h
-    switch (kind){
-      case "berries": e = 20, h = 2;       break;
-      case "apples": e = 35, h = 3;        break;
-      case "veggies": e = 40, h = 5;       break;
-      case "rabbitStew": e = 200, h = 500;  break;
-      default: e = 0, h = 0;
-    }
-    man.health = min(man.health+h, 3000)
-    man.energy = min(man.energy+e, 3010)
-    if (tutorial.active && tutorial.step === 3){
-      tutorial.step++
-    }
-    if (man.energy > 3000)
-      popup.setAlert("You are full. Stop eating!")
+    return false
   },
 
   fling(){
@@ -469,6 +468,15 @@ let actions = {
       else
         return
     }
+    //pick mushrooms:
+    else if ("mushroom" === cell.type){
+      if (backpack.addItem("mushroom")){
+        cell.type = "root"
+        cell.growtime = floor(random(180))
+      }
+      else
+        return
+    }
     //gather a rock:
     else if ("rock" === cell.type){
       if (backpack.addItem("rock")){
@@ -485,8 +493,14 @@ let actions = {
     else if ("longGrass" === cell.type){
       if (backpack.addItem("longGrass")){
         let quantity = Number(cell.tile.substr(9,1))
-        cell.tile = quantity > 1 ? "longGrass"+(quantity-1) : "grass"
-        cell.type = quantity > 1 ? cell.type : "grass"
+        if (quantity === 1){
+          cell.type = "root"
+          cell.tile = "grass"
+          cell.growtime = floor(random(180))
+        }
+        else{
+          cell.tile = "longGrass"+(quantity-1)
+        }
       }
       else
         return
@@ -508,8 +522,14 @@ let actions = {
       if (basket){
         if (basket.addItem("veggies")){ 
           let quantity = Number(cell.tile.substr(7,1))
-          cell.tile = quantity > 1 ? "veggies"+(quantity-1) : "grass"
-          cell.type = quantity > 1 ? cell.type : "grass"
+          if (quantity === 1){
+            cell.type = "root"
+            cell.tile = "grass"
+            cell.growtime = floor(random(180))
+          }
+          else {
+            cell.tile = "veggies"+(quantity-1)
+          }
         }
         else
           return

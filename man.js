@@ -150,8 +150,9 @@ class Man extends WemoObject {
         this.x += x
         this.y += y
         this.stepCount++
-        this.energy -= this.walkingCost()
-        this.health -= 1
+        let c = this.walkingCost()
+        this.energy -= c
+        this.health -= c/5
         this.vomit = false
 
         // this.revealCell(this.x, this.y, true)

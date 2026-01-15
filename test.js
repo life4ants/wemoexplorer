@@ -1,5 +1,5 @@
 let test = {
-  clickInfo: false,
+  clickInfo: "cell",
   
   lookup(id,y){
     if (id === "active")

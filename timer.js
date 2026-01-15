@@ -144,6 +144,23 @@
       }
     }
     bush.berries.push({id: p, x: a[p][0], y: a[p][1]})
+  },
+
+  sprout(cell){ //grow random stuff where somthing was before
+    let r = random(10)
+    if (r < 6){
+      cell.type = "longGrass"
+      cell.tile = "longGrass1"
+    }
+    else if (r < 9){
+      cell.type = "veggies"
+      cell.tile = "veggies1"
+    }
+    else {
+      cell.type = "mushroom"
+      cell.tile = "grass"
+    }
+    delete cell.growtime
   }
 }
 

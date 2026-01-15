@@ -161,7 +161,7 @@ var game = new Vue({
       }
       else
         tutorial.active = false
-      world.noNight = board.level < 2
+      world.noNight = board.level < 1
       if (!board.progress && board.level > 1){
         board.addRabbits()
       }
