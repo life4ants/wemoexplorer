@@ -357,7 +357,7 @@ let actions = {
     }
     let basket = toolbelt.getContainer("basket")
     if (basket){
-      let items = basket.includesItems(["berries", "veggies", "apples"]) // no apples yet
+      let items = basket.includesItems(["berries", "veggies", "apples"])
       if (items.length > 0){
         basket.removeItem(items[0].type, 1)
         return items[0].type
@@ -508,8 +508,18 @@ let actions = {
     //pick berries:
     else if ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0){
       let basket = toolbelt.getContainer("basket")
-      if (basket && basket.addItem("berries")){
+      if (basket && basket.addItem("apples")){
         let tree = board.berryTrees[cell.id]
+        let p = Math.floor(Math.random()*tree.berries.length)
+        tree.berries.splice(p, 1)
+      }
+      else
+        return
+    }
+    else if ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0){
+      let basket = toolbelt.getContainer("basket")
+      if (basket && basket.addItem("berries")){
+        let tree = board.berryBushes[cell.id]
         let p = Math.floor(Math.random()*tree.berries.length)
         tree.berries.splice(p, 1)
       }

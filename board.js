@@ -49,22 +49,14 @@ class Board extends WemoObject {
             id = a
           }
         }
-        try {
-          this.stars[id].cells.push({x:i,y:j})
-        } catch (e){
-          console.error(id, e)
-        }
+      
+        this.stars[id].cells.push({x:i,y:j})
         
-        if (this.name === "tut" && i<10 && j<10){
-          cell.revealed = 2
-          this.revealCount--
-        }
-
         if (cell.type === "berryTree"){
           cell.id = trees.length
           trees.push({x: i, y: j, berries: []})
         }
-        if (cell.type === "berryBush"){
+        else if (cell.type === "berryBush"){
           cell.id = bushes.length
           bushes.push({x: i, y: j, berries: []})
         }
@@ -109,7 +101,7 @@ class Board extends WemoObject {
       }
       return
     }
-      this.showObjects()
+    this.showObjects()
     
     if (!game.preview && this.revealCount > 0){
       // show rounded clouds around the man (or raft) if unrevealed:
@@ -145,7 +137,18 @@ class Board extends WemoObject {
     }
   }
 
- addRabbits(){
+  startGrowingThings(){
+    for (let i = 0; i < this.cols; i++){
+      for (let j = 0; j<this.rows; j++){
+        let cell = this.cells[i][j]
+        if (["berryBush", "berryTree", "veggies"].includes(cell.type)){
+          cell.growtime = floor(random(180))
+        }
+      }
+    }
+  }
+
+  addRabbits(){
     let types = helpers.countTypes(board)
     let total = this.rows*this.cols
     let land = total - (types.water || 0 ) - (types.river || 0)
@@ -157,36 +160,6 @@ class Board extends WemoObject {
   }
 
   showObjects(){
-    //apple Trees:
-    for (let i=0; i<this.berryTrees.length; i++){
-      let tree = this.berryTrees[i]
-      if (viewport.onScreen(tree.x, tree.y) && this.cells[tree.x][tree.y].revealed){
-        for (let j = 0; j< tree.berries.length; j++){
-          image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
-        }
-      }
-    }
-    if (this.berryBushes){
-      for (let i=0; i<this.berryBushes.length; i++){
-        let tree = this.berryBushes[i]
-        if (viewport.onScreen(tree.x, tree.y) && this.cells[tree.x][tree.y].revealed){
-          noStroke()
-          fill(128,0,128)
-          ellipseMode(CENTER)
-          for (let j = 0; j< tree.berries.length; j++){
-            ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 4, 4)
-          }
-        }
-      }
-    }
-    // Fires:
-    for (let i=0; i<this.fires.length; i++){
-      let tile = this.fires[i].value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] :
-        man.fireId === i ? tiles.firepitOutlined : tiles.firepit
-      image(tile, this.fires[i].x*25, this.fires[i].y*25+topbarHeight)
-      if (this.fires[i].value > 0)
-        this.drawProgressBar(this.fires[i].x, this.fires[i].y, this.fires[i].value, 0)
-    }
     //Rabbits:
     for (let r of this.rabbits){
       r.update()
@@ -234,7 +207,6 @@ class Board extends WemoObject {
       return
     }
     let offset = game.mode === "edit" ? 0 : topbarHeight
-    // print the tile:
     image(tiles[cell.tile] || tiles["random"], x*25, y*25+offset)
     
     // rock or clay:
@@ -252,12 +224,6 @@ class Board extends WemoObject {
         image(tiles[cell.type.substr(0, cell.type.length-4)], x*25, y*25+offset)
       }
     }
-    // roots:
-    else if ("root" === cell.type){
-      cell.growtime++
-      if (cell.growtime > 480)
-        timer.sprout(cell)
-    }
     // see thru:
     else if (seeThru.includes(cell.type)){
       image(tiles[cell.type] || tiles["random"], x*25, y*25+offset)
@@ -272,14 +238,59 @@ class Board extends WemoObject {
         this.drawBadge(x*25+a*14+4, y*25+offset+(b*14)+4, item.quantity, item.color)
       }
     }
+    //updates:
+    if ("root" === cell.type){
+      cell.growtime++
+      if (cell.growtime > world.growtime*1.5)
+        timer.sprout(cell)
+    }
+    else if ("berryBush" === cell.type){
+      let tree = this.berryBushes[cell.id]
+      noStroke()
+      fill(128,0,128)
+      ellipseMode(CENTER)
+      for (let j = 0; j< tree.berries.length; j++){
+        ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 4, 4)
+      }
+      cell.growtime++
+      if (cell.growtime > world.growtime){
+        timer.addBerry(tree)
+        cell.growtime = 0
+      }
+
+    }
+    else if ("berryTree" === cell.type){
+      let tree = this.berryTrees[cell.id]
+      for (let j = 0; j< tree.berries.length; j++){
+        image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
+      }
+      cell.growtime++
+      if (cell.growtime > world.growtime){
+        timer.addApple(tree)
+        cell.growtime = 0
+      }
+    }
+    else if ("firepit" === cell.type){
+      let fire = this.fires[cell.id]
+      let tile = fire.value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] :
+        man.fireId === cell.id ? tiles.firepitOutlined : tiles.firepit
+      image(tile, fire.x*25, fire.y*25+topbarHeight)
+      if (fire.value > 0)
+        this.drawProgressBar(fire.x, fire.y, fire.value, 0)
+    }
+    else if ("veggies" === cell.type){
+      cell.growtime++
+      if (cell.growtime > world.growtime){
+        let q = Number(cell.tile.substr(7,1))
+        cell.tile = q < 4 ? "veggies"+(q+1): cell.tile 
+        cell.growtime = 0
+      }
+    }
     //print dead rabbits and arrows:
     if (cell.rabbits)
       image(tiles["rabbitDead"], x*25, y*25+offset)
     if (cell.arrows)
       image(tiles["arrow"], x*25, y*25+offset)
-      
-    if (revealed === 1 && !game.preview)
-      image(tiles.cloudsHalf, x*25, y*25+offset)
   }
 
   claimStar(x, y, cell){

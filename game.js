@@ -162,8 +162,10 @@ var game = new Vue({
       else
         tutorial.active = false
       world.noNight = board.level < 1
-      if (!board.progress && board.level > 1){
-        board.addRabbits()
+      if (!board.progress){
+        board.startGrowingThings()
+        if (board.level > 1)
+          board.addRabbits()
       }
       $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
       $("#boardWrapper").addClass("full-screen")
@@ -249,10 +251,13 @@ var game = new Vue({
     },
 
     finishLevel(){
-      this.currentPlayer.unlockedLevel = board.level+1
-      let p = JSON.parse(localStorage.wemoPlayers)
-      p[game.currentPlayer.index] = game.currentPlayer
-      localStorage.setItem("wemoPlayers", JSON.stringify(p)) 
+      let level = this.currentPlayer.unlockedLevel
+      if (level <= board.level){
+        this.currentPlayer.unlockedLevel = board.level+1
+        let p = JSON.parse(localStorage.wemoPlayers)
+        p[game.currentPlayer.index] = game.currentPlayer
+        localStorage.setItem("wemoPlayers", JSON.stringify(p)) 
+      }
       if (board.level > 0){
         sounds.play("win")
         setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)

@@ -25,7 +25,7 @@ class Rabbit {
       if (frameCount % (rate+1) === 0)
         this.move(manDist)
       let cell = board.cells[this.x][this.y]
-      if (cell.revealed === 2)
+      if (cell.revealed || manDist < 2)
         this.display()
       if (cell.type === "veggies" && board.wemoMins-this.ateLast > 45){
         this.ateLast = board.wemoMins

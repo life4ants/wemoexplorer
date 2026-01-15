@@ -113,7 +113,7 @@ let topbar = {
         let items = toolbelt.containers[i].getAllItems()
         for (let i = 0; i < items.length; i++){
           image(tiles[items[i].type], left+82+(i*13), top+25)
-          let col = items[i].type === "veggies" ? "#0B2D0C" : "#3A0E12"
+          let col = items[i].type === "veggies" ? "#0B2D0C" : items[i].type === "berries" ? "#3A0E12" : "#751E02"
           board.drawBadge(left+82+(i*24), top+25, items[i].quantity, col)
         }
       }

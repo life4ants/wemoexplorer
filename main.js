@@ -3,7 +3,7 @@ const topbarHeight = 55
 // let keyDelay = 0
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile"]
-const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite"]
+const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
 const seeThru = ["log", "randomLog", "bone", "steppingStones", "randomRock", "randomStick", "stick", "cactus", "berryBush", "star", "mushroom"]
@@ -95,6 +95,7 @@ function preload(){
   document.getElementById("p5_loading").innerHTML = "Loading Images ..."
   tiles = {
     apple: loadImage("images/apple.png"),
+    apples: loadImage("images/apples.png"),
     arrow: loadImage("images/arrow.png"),
     arrow1: loadImage("images/arrow2.png"),
     arrowInFlight: loadImage("images/arrows.png"),
@@ -299,6 +300,8 @@ function preload(){
   }
 
   sounds.files.sleep.loop = true
+  sounds.files.sleep.volume = 0.5
+  sounds.files.win.volume = 0.5
   tiles.construction.steppingStones = tiles.steppingStones
   tiles.arrows = tiles.arrow
   tiles.bones = tiles.bone

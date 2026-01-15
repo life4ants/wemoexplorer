@@ -4,6 +4,7 @@ class Backpack {
     this.type = type
     if (this.type === "backpack"){
       this.maxWeight = 250
+      this.maxNum = 4
       this.items = {
         arrow: {weight: 10, quantity: 0},
         bomb: {weight: 50, quantity: 0},
@@ -20,12 +21,15 @@ class Backpack {
     }
     else if (this.type === "basket"){
       this.maxWeight = 50
+      this.maxNum = 2
       this.items = {
         berries: {weight: 1, quantity: 0},
+        apples: {weight: 2, quantity: 0},
         veggies: {weight: 2, quantity: 0}
       }
     }
     else if (this.type === "claypot"){
+      this.maxNum = 1
       this.maxWeight = 64
       this.items = {
         water: {weight: 16, quantity: 0},
@@ -40,14 +44,14 @@ class Backpack {
     }
   }
 
-  getAllItems(){
+  getAllItems(list){
     let ar = this.type === "backpack" ? [
         "arrow", "bomb", "bone", "clay",
         "log", "longGrass", "mushroom", "rock",
         "rabbitDead", "rabbitLive", "stick" ] :
-      this.type === "basket" ? ["berries", "veggies"] :
+      this.type === "basket" ? ["berries", "apples", "veggies"] :
       this.type === "claypot" ? ["water", "rabbitStew"] : []
-    return this.includesItems(ar)
+    return this.includesItems(ar, list)
   }
 
   getQuantity(){ //counting total items in a basket or claypot
@@ -72,6 +76,11 @@ class Backpack {
   }
 
   addItem(e, num = 1){
+    let list = this.getAllItems(true)
+    if (!list.includes(e) && list.length === this.maxNum){
+      popup.setAlert(`Sorry you can only have ${this.maxNum} types of items in your ${this.type}!`)
+      return false
+    }
     if (this.items[e] && this.itemFits(e,num)){
       this.items[e].quantity+=num
       this.weight+=this.items[e].weight*num
@@ -99,11 +108,14 @@ class Backpack {
     return false
   }
 
-  includesItems(ar){ // returns an object for each item that has quantity more than 0, in order asked for
+  includesItems(ar, list){ // returns an object for each item that has quantity more than 0, in order asked for
     let output = []
     for (let i=0; i < ar.length; i++) {
       if (this.items[ar[i]] && this.items[ar[i]].quantity > 0)
-        output.push({type: ar[i], quantity: this.items[ar[i]].quantity})
+        if (list)
+          output.push(ar[i])
+        else
+          output.push({type: ar[i], quantity: this.items[ar[i]].quantity})
     }
     return output
   }
