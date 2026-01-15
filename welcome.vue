@@ -27,16 +27,16 @@
           <h5>Version {{version}}</h5>
           <h6>Published {{publicationDate}}</h6>
           <ul>
-            <li>bug fixes (but maybe made more)</li>
-            <li>grab, dump and eat mushrooms</li>
+            <li>pick berries and apples</li>
+            <li>limit backback to 4 and basket to 2</li>
           </ul>
         </div>
         <div class="whatsNew">
-          <h5>Version 1.5.1</h5>
-          <h6>Published Jan 13, 2026</h6>
+          <h5>Version 1.5.2</h5>
+          <h6>Published Jan 14, 2026</h6>
           <ul>
-            <li>start in tutorial</li>
-            <li>new object: mushrooms</li>
+            <li>bug fixes (but maybe made more)</li>
+            <li>grab, dump and eat mushrooms</li>
           </ul>
         </div>
         <div class="tiny">Views since Dec 13, 2025: {{viewCount}}</div>
@@ -111,8 +111,8 @@ module.exports = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.5.2",
-      publicationDate: "Jan 14, 2026",
+      version: "1.5.3",
+      publicationDate: "Jan 15, 2026",
       pageViews: "loading"
     }
   },
