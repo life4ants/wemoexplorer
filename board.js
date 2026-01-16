@@ -137,17 +137,6 @@ class Board extends WemoObject {
     }
   }
 
-  startGrowingThings(){
-    for (let i = 0; i < this.cols; i++){
-      for (let j = 0; j<this.rows; j++){
-        let cell = this.cells[i][j]
-        if (["berryBush", "berryTree", "veggies"].includes(cell.type)){
-          cell.growtime = floor(random(180))
-        }
-      }
-    }
-  }
-
   addRabbits(){
     let types = helpers.countTypes(board)
     let total = this.rows*this.cols
@@ -241,7 +230,7 @@ class Board extends WemoObject {
     //updates:
     if ("root" === cell.type){
       cell.growtime++
-      if (cell.growtime > world.growtime*1.5)
+      if (cell.growtime > world.growtime)
         timer.sprout(cell)
     }
     else if ("berryBush" === cell.type){
@@ -252,22 +241,11 @@ class Board extends WemoObject {
       for (let j = 0; j< tree.berries.length; j++){
         ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 4, 4)
       }
-      cell.growtime++
-      if (cell.growtime > world.growtime){
-        timer.addBerry(tree)
-        cell.growtime = 0
-      }
-
     }
     else if ("berryTree" === cell.type){
       let tree = this.berryTrees[cell.id]
       for (let j = 0; j< tree.berries.length; j++){
         image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
-      }
-      cell.growtime++
-      if (cell.growtime > world.growtime){
-        timer.addApple(tree)
-        cell.growtime = 0
       }
     }
     else if ("firepit" === cell.type){
@@ -277,14 +255,6 @@ class Board extends WemoObject {
       image(tile, fire.x*25, fire.y*25+topbarHeight)
       if (fire.value > 0)
         this.drawProgressBar(fire.x, fire.y, fire.value, 0)
-    }
-    else if ("veggies" === cell.type){
-      cell.growtime++
-      if (cell.growtime > world.growtime){
-        let q = Number(cell.tile.substr(7,1))
-        cell.tile = q < 4 ? "veggies"+(q+1): cell.tile 
-        cell.growtime = 0
-      }
     }
     //print dead rabbits and arrows:
     if (cell.rabbits)

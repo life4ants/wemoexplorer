@@ -22,7 +22,7 @@ let world = {
   noKeys: false,
   frameRate: 12,
   noNight: false,
-  growtime: 420,
+  growtime: 360,
 
   resize(cols, rows){
     let offset = game.mode === "play" ? topbarHeight : 0

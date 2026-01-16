@@ -15,10 +15,16 @@
 	      <i class="fa fa-sign-out fa-flip-horizontal fa-3x" aria-hidden="true" @click="exit" title="Exit Game"></i>
 	      <i :class="{fa: true, 'fa-3x': true, 'fa-play': paused, 'fa-pause': !paused}"
 	                    aria-hidden="true" @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
-	      <img src="images/centerScreen.png" title="Center Screen (X)" height="40" width="40"
-	              :class="{icon: true, selected: autoCenter}" @click="() => action('X')">
-	      <img v-for="icon in icons" v-show="icon.active" :key="icon.id" :src="icon.src" :title="icon.title"
-	              height="40" width="40" class="icon" @click="() => action(icon.code)">
+	      <div class="icon">
+          <span class="icontext">Center Screen (X)</span>
+          <img src="images/centerScreen.png" height="40" width="40"
+  	              :class="{icon: true, selected: autoCenter}" @click="() => action('X')">
+        </div>
+	      <div v-for="icon in icons" v-show="icon.active" class="icon">
+          <span class="icontext">{{icon.title}}</span>
+          <img  :key="icon.id" :src="icon.src"
+  	              height="40" width="40"  @click="() => action(icon.code)">
+        </div>
 	      <i class="fa fa-info-circle fa-3x" aria-hidden="true" @click="showInfo" title="Show Info"></i>
 	    </div>
 	  </div>
@@ -116,5 +122,31 @@ module.exports = {
   width: 36px;
   border: solid 2px red;
   margin: 4px 0;
+}
+
+.icon {
+  position: relative;
+  display: inline-block;
+}
+
+.icon .icontext {
+  visibility: hidden;
+  width: 100px;
+  font-size: 12px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  bottom: 105%;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.icon:hover .icontext {
+  visibility: visible;
+  opacity: 1;
 }
 </style>

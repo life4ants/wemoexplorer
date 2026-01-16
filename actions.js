@@ -309,33 +309,41 @@ let actions = {
   eat(){
     let kind = this.findFood()
     if (kind){
-      if (man.energy > 3000){
-        man.energy -= Math.floor((Math.random()*5+1)*100)
-        man.health -= Math.floor((Math.random()*5+1)*10)
-        msgs.following.msg = "You ate too much!!!"
-        msgs.following.frames = 30
-        man.vomit = true
-        sounds.play("vomit")
-        return
+      if (kind === "mushrooms"){
+        popup.setInput("Do you want to eat a mushroom from your packback?", "eat", "yesno")
       }
-      sounds.play("eat")
-      let e,h
-      switch (kind){
-        case "berries": e = 20, h = 2;       break;
-        case "apples": e = 35, h = 3;        break;
-        case "veggies": e = 40, h = 5;       break;
-        case "mushrooms": e = 20, h = 1000;  break;
-        case "rabbitStew": e = 300, h = 800;  break;
-        default: e = 0, h = 0;
-      }
-      man.health = min(man.health+h, 3000)
-      man.energy = min(man.energy+e, 3005)
-      if (tutorial.active && tutorial.step === 3){
-        tutorial.step++
-      }
-      if (man.energy > 3000)
-        popup.setAlert("You are full. Stop eating!")
+      else
+        this.eatAction(kind)
     }
+  },
+
+  eatAction(kind){
+    if (man.energy > 3000){
+      man.energy -= Math.floor((Math.random()*5+1)*100)
+      man.health -= Math.floor((Math.random()*5+1)*10)
+      msgs.following.msg = "You ate too much!!!"
+      msgs.following.frames = 30
+      man.vomit = true
+      sounds.play("vomit")
+      return
+    }
+    sounds.play("eat")
+    let e,h
+    switch (kind){
+      case "berries": e = 20, h = 2;       break;
+      case "apples": e = 35, h = 3;        break;
+      case "veggies": e = 40, h = 5;       break;
+      case "mushrooms": e = 20, h = 1000;  break;
+      case "rabbitStew": e = 300, h = 800;  break;
+      default: e = 0, h = 0;
+    }
+    man.health = min(man.health+h, 3000)
+    man.energy = min(man.energy+e, 3005)
+    if (tutorial.active && tutorial.step === 3){
+      tutorial.step++
+    }
+    if (man.energy > 3000)
+      popup.setAlert("You are full. Stop eating!")
   },
 
   findFood(){
@@ -352,7 +360,7 @@ let actions = {
       bush.berries.splice(p, 1)
       return "berries"
     }
-    if(backpack.removeItem("mushroom", 1)){
+    if(backpack.includesItem("mushroom")){
       return "mushrooms"
     }
     let basket = toolbelt.getContainer("basket")

@@ -6,6 +6,8 @@
       this.increment()
     if (frameCount%20 === 0)
       this.updateFires()
+    if (frameCount % 75 === 0)
+      this.growBerries()
     if (frameCount%317 === 0)
       this.growVeggies()
     if (frameCount%437 === 0 && board.level > 0){
@@ -97,6 +99,18 @@
     }
   },
 
+  growBerries(){
+    let trees = board.berryTrees
+    let bushes = board.berryBushes || []
+    let x = Math.round(frameCount%300/75)
+    for (let i=x; i<trees.length; i+=4){
+      this.addApple(trees[i])
+    }
+    for (let i=x; i<bushes.length; i+=4){
+      this.addBerry(bushes[i])
+    }
+  },
+
   addApple(tree){
     if (tree.berries.length >= 5)
       return
@@ -139,7 +153,6 @@
     else if (r < 9){
       cell.type = "veggies"
       cell.tile = "veggies1"
-      return
     }
     else {
       cell.type = "mushroom"

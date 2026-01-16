@@ -102,7 +102,7 @@ class Backpack {
     return false
   }
 
-  includesItem(s){ // returns the quantity of asked for item, or false if doesn't exsist
+  includesItem(s){ // returns the quantity of asked for item, or false if doesn't exist
     if (this.items[s])
       return this.items[s].quantity
     return false

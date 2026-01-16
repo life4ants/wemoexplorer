@@ -525,6 +525,14 @@ var popup = new Vue({
         else
           this.setInput("Enter a new name for this world:", "saveBoard", "input")
       }
+      else if (this.actionTitle === "eat"){
+        if (bool && backpack.removeItem("mushroom", 1)){
+          actions.eatAction("mushrooms")
+          this.close()
+        }
+        else
+          this.close()
+      }
     }
   }
 })
