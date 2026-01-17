@@ -162,10 +162,8 @@ var game = new Vue({
       else
         tutorial.active = false
       world.noNight = board.level < 1
-      if (!board.progress){
-        board.startGrowingThings()
-        if (board.level > 1)
-          board.addRabbits()
+      if (!board.progress && board.level > 1){
+        board.addAnimals()
       }
       $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
       $("#boardWrapper").addClass("full-screen")

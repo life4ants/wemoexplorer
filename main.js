@@ -267,7 +267,7 @@ function preload(){
     sand: loadImage("images/sand.png"),
     sandpit: loadImage("images/sandpit.png"),
     sleeping: loadImage("images/sleeping.png"),
-    //snake: loadImage("images/snake.png"),
+    snake: loadImage("images/snake.png"),
     star: loadImage("images/star.png"),
     steppingStones: loadImage("images/steppingStones.png"),
     stick: loadImage("images/stick.png"),

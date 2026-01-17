@@ -61,7 +61,7 @@ class Man extends WemoObject {
       this.health -=25
     }
     if (this.isSleeping){
-       this.health = min(this.health+2, 3000)
+       this.health = min(this.health+1, 3000)
        this.energy = frameCount%10 === 0 && this.energy < 3000 ? this.energy+1 : this.energy
     }
     this.display()

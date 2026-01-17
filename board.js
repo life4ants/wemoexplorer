@@ -6,6 +6,7 @@ class Board extends WemoObject {
     this.teleports = []
     this.berryBushes = []
     this.stars = []
+    this.snakes = []
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       this.import(a)
       this.initializeObjects()
@@ -131,20 +132,26 @@ class Board extends WemoObject {
         }
       }
     }
-    for (let i = 0; i < this.rabbits.length; i++){
+    for (let i = 0; i < this.rabbits.length; i++){ //TODO fix this
       let rabbit = new Rabbit({x: this.rabbits[i].x, y: this.rabbits[i].y})
       this.rabbits[i] = rabbit
     }
+    for (let i = 0; i < this.snakes.length; i++){ //TODO fix this
+      let snake = new Snake({x: this.snakes[i].x, y: this.snakes[i].y})
+      this.snakes[i] = snake
+    }
   }
 
-  addRabbits(){
-    let types = helpers.countTypes(board)
-    let total = this.rows*this.cols
-    let land = total - (types.water || 0 ) - (types.river || 0)
-    for (let i = 0; i < land/600; i++){
-      let pos = helpers.randomPicker(["grass", "longGrass", "sand", "veggies"])
-      if (pos)
-        this.rabbits.push(new Rabbit(pos))
+  addAnimals(){
+    let list = helpers.getCellsByType(board)
+    let rabbitSpots = [ ...(list.grass ?? []), ...(list.longGrass ?? []), ...(list.veggies ?? [])]
+    let snakeSpots = [... (list.sand ?? []), ...(list.beach ?? [])]
+    for (let i = 0; i < rabbitSpots.length; i+=100){
+      this.rabbits.push(new Rabbit(random(rabbitSpots)))
+    }
+
+    for (let i = 0; i<snakeSpots.length; i+=100){
+      this.snakes.push(new Snake(random(snakeSpots)))
     }
   }
 
@@ -159,6 +166,11 @@ class Board extends WemoObject {
         this.bombs[i].display()
         if (this.bombs[i].update())
           this.bombs.splice(i, 1)
+      }
+    }
+    if (this.snakes){
+      for (let s of this.snakes){
+        s.update()
       }
     }
     //Arrows:

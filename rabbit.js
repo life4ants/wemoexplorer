@@ -1,6 +1,5 @@
 class Rabbit {
   constructor(pos){
-    this.img = tiles.rabbit
     this.x = pos.x
     this.y = pos.y
     this.dir = 0
@@ -11,7 +10,7 @@ class Rabbit {
   display(){
     if (this.alive){
       let sx = (this.dir%4)*25
-      image(this.img, this.x*25, this.y*25+topbarHeight, 25, 25, sx, 0, 25, 25)
+      image(tiles.rabbit, this.x*25, this.y*25+topbarHeight, 25, 25, sx, 0, 25, 25)
     }
     else {
       image(tiles.rabbitDead, this.x*25, this.y*25+topbarHeight, 25, 25)
@@ -20,7 +19,7 @@ class Rabbit {
 
   update(){
     if (this.alive){
-      let manDist = dist(man.x,man.y, this.x, this.y)
+      let manDist = dist(active.x,active.y, this.x, this.y)
       let rate = min(round(manDist), 9)
       if (frameCount % (rate+1) === 0)
         this.move(manDist)
