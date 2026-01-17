@@ -250,33 +250,35 @@ class Board extends WemoObject {
       }
     }
     //updates:
-    if ("root" === cell.type){
+    if (["play", "build"].includes(game.mode)){
+      if ("berryBush" === cell.type){
+        let tree = this.berryBushes[cell.id]
+        noStroke()
+        fill(128,0,128)
+        ellipseMode(CENTER)
+        for (let j = 0; j< tree.berries.length; j++){
+          ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 4, 4)
+        }
+      }
+      else if ("berryTree" === cell.type){
+        let tree = this.berryTrees[cell.id]
+        for (let j = 0; j< tree.berries.length; j++){
+          image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
+        }
+      }
+      else if ("firepit" === cell.type){
+        let fire = this.fires[cell.id]
+        let tile = fire.value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] :
+          man.fireId === cell.id ? tiles.firepitOutlined : tiles.firepit
+        image(tile, fire.x*25, fire.y*25+topbarHeight)
+        if (fire.value > 0)
+          this.drawProgressBar(fire.x, fire.y, fire.value, 0)
+      }
+    }
+    if ("root" === cell.type && game.mode === "play"){
       cell.growtime++
       if (cell.growtime > world.growtime)
         timer.sprout(cell)
-    }
-    else if ("berryBush" === cell.type){
-      let tree = this.berryBushes[cell.id]
-      noStroke()
-      fill(128,0,128)
-      ellipseMode(CENTER)
-      for (let j = 0; j< tree.berries.length; j++){
-        ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 4, 4)
-      }
-    }
-    else if ("berryTree" === cell.type){
-      let tree = this.berryTrees[cell.id]
-      for (let j = 0; j< tree.berries.length; j++){
-        image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
-      }
-    }
-    else if ("firepit" === cell.type){
-      let fire = this.fires[cell.id]
-      let tile = fire.value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] :
-        man.fireId === cell.id ? tiles.firepitOutlined : tiles.firepit
-      image(tile, fire.x*25, fire.y*25+topbarHeight)
-      if (fire.value > 0)
-        this.drawProgressBar(fire.x, fire.y, fire.value, 0)
     }
     //print dead rabbits and arrows:
     if (cell.rabbits)

@@ -169,7 +169,7 @@ const editBar = {
         editor.cancelPit()
       editor.tile = this.selected = id
       editor.type = type
-      if (["auto", "start", "pit1", "pit0"].includes(type))
+      if (["auto", "start", "pit1", "pit0", "star"].includes(type))
         editor.tool = this.tool = "brush"
     },
 
@@ -187,7 +187,7 @@ const editBar = {
     },
 
     changeTool(id){
-      if (id === "floodFill" && ["auto", "start", "pit0", "pit1"].includes(editor.type))
+      if (id === "floodFill" && ["auto", "start", "pit0", "pit1", "star"].includes(editor.type))
         return
       editor.tool = this.tool = id
     },
