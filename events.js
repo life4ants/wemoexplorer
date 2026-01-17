@@ -54,9 +54,9 @@ function mousePressed(){
     window._UIevent = false
     return
   }
-  if (game.mode === "edit")
+  if (game.mode === "edit" && winMouseX > world.leftOffset && !popup.show)
     editor.mousePressed()
-  else if (game.mode === "welcome" || popup.show || world.noKeys ||
+  if (game.mode === "welcome" || popup.show || world.noKeys ||
       mouseX < 0 || mouseX > board.cols*25 ||
       mouseY < topbarHeight || mouseY > board.rows*25+topbarHeight)
     return
