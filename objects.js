@@ -13,7 +13,6 @@ class WemoObject {
         output[items[i]] = this[items[i]]
     }
     if (this.snakes){
-      console.log("saving snakes")
       output.snakes = []
       for (let k in this.snakes){
         output.snakes.push(this.snakes[k].save())

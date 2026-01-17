@@ -23,12 +23,12 @@ class Snake {
     	this.pos.add(this.dir)
     	this.moveCount--
 	    this.cellPos = {x: floor(this.pos.x/25), y:floor(this.pos.y/25)}
-	    if(test.clickInfo){
-	    	stroke("red")
-		    strokeWeight(3)
-		    noFill()
-		    rect(this.cellPos.x*25,this.cellPos.y*25+topbarHeight,25,25)
-	    }
+	    // if(test.clickInfo){
+	    // 	stroke("red")
+		  //   strokeWeight(3)
+		  //   noFill()
+		  //   rect(this.cellPos.x*25,this.cellPos.y*25+topbarHeight,25,25)
+	    // }
 	  	if (this.moveCount <= 0){
 	  		this.isMoving = false
 	  		this.restTime = 10
