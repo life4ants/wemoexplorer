@@ -69,7 +69,7 @@ let builder = {
       case "raft":
         return (cell.type === "beach" && helpers.isNextToType(x, y, "water")) || cell.type === "river"
       case "campsite":
-        return buildable.includes(cell.type) && !cell.byPit
+        return buildable.includes(cell.type)
       default:
         return false
     }

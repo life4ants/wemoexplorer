@@ -5,6 +5,11 @@ class Rabbit {
     this.dir = 0
     this.ateLast = board.wemoMins
     this.alive = true
+    this.type = "rabbit"
+  }
+
+  export(){
+    return {type: this.type, pos: {x: this.x, y: this.y}}
   }
 
   display(){

@@ -3,27 +3,37 @@ class Board extends WemoObject {
     super()
     this.buildings = []
     this.rabbits = []
+    this.snakes = []
     this.teleports = []
+    this.berryTrees = [] 
     this.berryBushes = []
     this.stars = []
-    this.snakes = []
+    this.fires = [] 
+    this.cells = []
+    this.progress = false 
+    this.version = 4
+    this.wemoMins = 120
+    
+
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
-      this.import(a)
+      for (let key in a){
+        this[key] = a[key]
+      }
       this.initializeObjects()
     }
     else if (arguments.length === 3){// creating a new game on editor
       this.cols = a
       this.rows = b
-      this.cells = []
+      this.type = "custom"
+      this.level = 10
+      this.playtime = 0;
+
       for (let x = 0; x<this.cols; x++){
         this.cells.push([])
         for (let y = 0; y<this.rows; y++){
           this.cells[x].push({tile: fillType, type: fillType})
         }
       }
-      this.import({
-        berryTrees: [], fires: [], progress: false, version: 4, wemoMins: 120, type: "custom", level: 10, playtime: 0
-      })
       this.startX = this.cols > 8 ? 8 : this.cols-1
       this.startY = this.rows > 8 ? 8 : this.rows-1
     }

@@ -120,7 +120,6 @@ var game = new Vue({
       switch(type){
         case "default":
           b = JSON.parse(JSON.stringify(gameBoards[index]))
-          console.log("starting game "+index)
           break
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
@@ -172,6 +171,7 @@ var game = new Vue({
       this.started = true
       this.autoCenter = false
       this.infoShown = false
+      msgs.following.frames = 0
       world.resize(board.cols, board.rows)
       viewport.update(true)
       frameRate(world.frameRate)

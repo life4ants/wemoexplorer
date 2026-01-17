@@ -15,7 +15,7 @@ class WemoObject {
     if (this.snakes){
       output.snakes = []
       for (let k in this.snakes){
-        output.snakes.push(this.snakes[k].save())
+        output.snakes.push(this.snakes[k].export())
       }
     }
     return output

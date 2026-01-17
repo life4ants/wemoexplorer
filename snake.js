@@ -7,10 +7,11 @@ class Snake {
     this.isMoving = false
     this.moveCount = 0
     this.restTime = 0
+    this.type = "snake"
   }
 
-  save(){
-  	return this.cellPos//TODO: need more info,
+  export(){
+  	return {type: this.type, pos: this.cellPos}
   }
 
   update(){
@@ -41,8 +42,8 @@ class Snake {
 	  }
 	  if (this.cellPos.x === active.x && this.cellPos.y === active.y && this.bitecooldown <= 0){
 	  	msgs.following.msg = "You got bit by a snake!"
-      msgs.following.frames = 48
-      man.health -=500
+      msgs.following.frames = 24
+      man.health -=1000
 	  	this.bitecooldown = 48
 	  }
 	  this.bitecooldown--
@@ -76,16 +77,9 @@ class Snake {
   		}
   	}
   	let dir = list.length ? random(list) : {i:0,j:0}
-  	if (!list.length){
-  		console.log(toMan.x, toMan.y)
-  	}
   	this.dir.set(dir.i,dir.j)
   	
   	this.isMoving = true
   	this.moveCount = 25
-  }
-
-  export(){
-  	return {pos: this.pos, dir: {x: this.dir.x, y: this.dir.y}}
   }
 }

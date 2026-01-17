@@ -360,12 +360,9 @@ let actions = {
       bush.berries.splice(p, 1)
       return "berries"
     }
-    if(backpack.includesItem("mushroom")){
-      return "mushrooms"
-    }
     let basket = toolbelt.getContainer("basket")
     if (basket){
-      let items = basket.includesItems(["berries", "veggies", "apples"])
+      let items = basket.includesItems(["berries", "apples", "veggies"])
       if (items.length > 0){
         basket.removeItem(items[0].type, 1)
         return items[0].type
@@ -375,6 +372,9 @@ let actions = {
     if (claypot && claypot.includesItem("rabbitStew")){
       claypot.removeItem("rabbitStew", 1)
       return "rabbitStew"
+    }
+    if(backpack.includesItem("mushroom")){
+      return "mushrooms"
     }
     return false
   },
