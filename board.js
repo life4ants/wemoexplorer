@@ -143,11 +143,11 @@ class Board extends WemoObject {
       }
     }
     for (let i = 0; i < this.rabbits.length; i++){ //TODO fix this
-      let rabbit = new Rabbit({x: this.rabbits[i].x, y: this.rabbits[i].y})
+      let rabbit = new Rabbit(this.rabbits[i].pos)
       this.rabbits[i] = rabbit
     }
     for (let i = 0; i < this.snakes.length; i++){ //TODO fix this
-      let snake = new Snake({x: this.snakes[i].x, y: this.snakes[i].y})
+      let snake = new Snake(this.snakes[i].pos)
       this.snakes[i] = snake
     }
   }

@@ -1,6 +1,6 @@
 class Snake {
 	constructor(cellPos){
-    this.cellPos = cellPos
+    this.cellPos = cellPos // object with x and y
     this.pos = createVector(cellPos.x*25+12.5,cellPos.y*25+12.5) // pixel positions to center of snake
     this.dir = createVector(1,0)
     this.bitecooldown = 0
