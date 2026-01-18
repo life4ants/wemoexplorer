@@ -202,6 +202,10 @@ const editBar = {
     },
 
     saveBoard(){
+      if (board.stars.length < 1){
+        popup.setAlert("You can't save a world without any stars!")
+        return
+      }
       popup.callback = (n)=> this.boardName = n
       board.save()
     },

@@ -61,7 +61,7 @@ let editor = {
     }
     else if (this.tool === "floodFill"){
       let cell = board.cells[x][y]
-      this.undoList = this.floodFill(x, y, cell.tile, cell.type, this.tile, this.type)
+      this.floodFill(x, y, cell.tile, cell.type, this.tile, this.type)
     }
   },
 
@@ -136,6 +136,7 @@ let editor = {
   floodFill(x,y, tile1, type1, tile2, type2){
     if (type1 === type2)
       return
+    this.addUndo(x,y)
     this.changeTile(x,y,tile2, type2)
     let list = [{x,y}]
     for (let i = 0; i<list.length; i++){
@@ -153,6 +154,7 @@ let editor = {
     for (let i = x-1; i <= x+1; i++){
       for (let j = i === x ? y-1 : y; j <= y+1; j+=2){
         if (i >= 0 && i < board.cols && j >= 0 && j < board.rows && board.cells[i][j].type === type1){
+          this.addUndo(i,j)
           this.changeTile(i,j,tile2, type2)
           list.push({x:i,y:j})
         }
