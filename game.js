@@ -27,7 +27,7 @@ var game = new Vue({
     'welcome-menu': httpVueLoader('welcome.vue'),
     'edit-bar': editBar,
     'play-box': httpVueLoader('play.vue'),
-    'build-sidebar': httpVueLoader('build.vue')
+    'build-sidebar': httpVueLoader('buildSidebar.vue')
   },
   data: {
     

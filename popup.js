@@ -4,7 +4,35 @@ var popup = new Vue({
     <div>
       <div class="modal" v-show="show" :id="size">
         <div class="modal-dialog">
-          <div class="modal-content" >
+
+          <build-menu v-if="['build', 'cook', 'load', 'dumpMenu', 'info'].includes(type)" 
+            :type="type"
+            :title="title"
+            :selected="selected"
+            :showOptions="showOptions"
+            :select="select"
+            :action="action"
+            :actionTitle="actionTitle"
+            :close="close"
+          ></build-menu>
+          <info-menu v-else-if="['alert', 'download', 'gameOver'].includes(type)" 
+            :type="type"
+            :title="title"
+            :action="action"
+            :actionTitle="actionTitle"
+            :close="close"
+            :exit="exit"
+          ></info-menu>
+          <select-menu v-else-if="['input', 'getSize', 'pickBombs', 'fileUpload'].includes(type)" 
+            :type="type"
+            :title="title"
+            :inputValue="inputValue"
+            :action="action"
+            :close="close"
+            :callback="callback"
+            :setAlert="setAlert"
+          ></select-menu>
+          <div v-else class="modal-content" >
 
   <!-- **** Footer as everything: ***** -->
             <div v-if="'gamePaused' === type" class="modal-footer">
@@ -17,155 +45,27 @@ var popup = new Vue({
             </div>
 
   <!-- **** Header: ************** -->
-            <div v-else-if="['build', 'cook'].includes(type)" class="modal-header">
-              <h4>{{title}}</h4>
-            </div>
-
-            <div v-else-if="'input' === type" class="modal-header">
-              <h6>{{title}}</h6>
-              <input type="text" v-model="inputValue" id="inputOne">
-            </div>
-
-            <div v-else-if="'fileUpload' === type" class="modal-header">
-              <h6>{{title}}</h6>
-              <input type="file" @change="readFilePath" id="inputOne">
-              <p>{{uploadData.msg}}</p>
-            </div>
-
-            <div v-else-if="'download' === type" class="modal-header">
-              <h6><a :href="title" id="link" :download="actionTitle">
-              Click here to download the board</a></h6>
-            </div>
-
             <div v-else class="modal-header">
               <h6>{{title}}</h6>
             </div>
 
-  <!-- *** Body: **** -->
-            <div v-if="type === 'build'" class="modal-body horizonal">
-              <div class="build-preview">
-                <img :src="selected.src" height="50" width="50">
-                <h5>{{selected.title}}</h5>
-                <p>{{selected.dist}}</p>
-                <p><b>Time it takes to build:</b> {{selected.time}} Wemo Minutes</p>
-                <p><b>Energy Needed:</b> {{selected.energy}}</p>
-                <p><b>Resources Needed:</b> {{selected.resources}}</p>
-                <p><b>Instructions:</b> {{selected.inst}}</p>
-              </div>
-              <div class="build-menu">
-                <div class="build-option-container">
-                  <div v-for="(item, k) in showOptions" :id="item.name" :key="item.name" @click="() => select(k)"
-                            :class="{'build-option-selected': selected.name === item.name, 'build-option': true}">
-                    <img :src="item.src" height="35" width="35" >
-                    <h6>{{item.title}}</h6>
-                    <p>{{item.dist}}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="type === 'cook'" class="modal-body">
-              <p>In order to cook anything, you must have a campsite and a clay pot.</p>
-              <div class="build-preview">
-                <img :src="selected.src" height="50" width="50">
-                <h5>{{selected.title}}</h5>
-                <p>{{selected.dist}}</p>
-                <p>Makes {{selected.servings}} servings</p>
-                <p><b>Time it takes to cook:</b> {{selected.time}} Wemo Minutes</p>
-                <p><b>Each Serving gives you:</b> {{selected.benefits}}</p>
-                <p><b>Ingredients Needed:</b> {{selected.resources}}</p>
-                <p><b>Instructions:</b> {{selected.inst}}</p>
-              </div>
-              <div class="build-menu">
-                <div class="build-option-container">
-                  <div v-for="(item, k) in showOptions" :id="item.name" :key="item.name" @click="() => select(k)"
-                            :class="{'build-option-selected': selected.name === item.name, 'build-option': true}">
-                    <img :src="item.src" height="35" width="35" >
-                    <h6>{{item.title}}</h6>
-                    <p>{{item.dist}}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="type === 'load'" class="modal-body">
-              <div class="build-menu">
-                <div class="build-option-container">
-                  <div v-for="(item, k) in showOptions" :id="item.name" :key="item.name" @click="() => select(k)"
-                            :class="{'build-option-selected': selected.name === item.name, 'build-option': true}">
-                    <h6>{{item.name}}</h6>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="type === 'gameOver'" class="modal-body">
-              <p>Your energy and/or health reached 0, and you died.</p>
-            </div>
-
-            <div v-else-if="'dumpMenu' === type" class="modal-body">
-              <p>Use arrow keys or click:</p>
-              <div class="flex">
-                <div v-for="(item, k) in showOptions" :key="item.id" style="position: relative">
-                  <img :src="item.src" height="35" width="35" @click="() => select(k)"
-                    :class="selectId === k ? 'red-border' : 'no-border'">
-                  <div v-if="item.num" class="img-badge">{{item.num}}</div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="'info' === type" class="modal-body">
-              <div class="flex">
-                <div v-for="item in showOptions" :key="item.id" style="position: relative">
-                  <img :src="item.src" height="35" width="35" class="no-border">
-                  <div v-if="item.num" class="img-badge">{{item.num}}</div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="'pickBombs' === type" class="modal-body">
-              <label style="display: inline">Enter number:</label>
-              <input type="number" min="1" max="5" id="inputOne" v-model="inputValue">
-            </div>
-
-             <div v-else-if="'getSize' === type" class="modal-body">
-              <label style="display: inline">Number of columns (width):</label>
-              <input type="number" v-model="inputValue.cols" min="20" max="250" id="inputOne">
-              <br>
-              <label style="display: inline">Number of rows (height):</label>
-              <input type="number" v-model="inputValue.rows" min="20" max="250" id="inputTwo">
-            </div>
-
 <!-- *** Footer: *** -->
-            <div v-if="['alert', 'info', 'download'].includes(type)" class="modal-footer">
-              <button type="button" id="etr" @click="close">Ok</button>
-            </div>
-
-            <div v-else-if="['dumpMenu', 'build', 'cook'].includes(type)" class="modal-footer">
-              <button type="button" id="esc" @click="close">Cancel</button>
-              <button type="button" class="button-primary" id="etr" @click="action">{{actionTitle}}</button>
-            </div>
-
-            <div v-else-if="'yesno' === type" class="modal-footer">
+            <div v-if="'yesno' === type" class="modal-footer">
               <button type="button" id="esc" @click="() => yesnoAction(false)">No</button>
               <button type="button" class="button-primary" id="etr" @click="() => yesnoAction(true)">Yes</button>
             </div>
 
-            <div v-else-if="['input', 'load', 'getSize', 'pickBombs', 'fileUpload'].includes(type)" 
-                  class="modal-footer">
-              <button type="button" id="esc" @click="close">Cancel</button>
-              <button type="button" class="button-primary" id="etr" @click="action">Ok</button>
-            </div>
-
-            <div v-else-if="'gameOver' === type" class="modal-footer">
-              <button type="button" id="etr" @click="exit">Ok</button>
-            </div>
           </div>
         </div>
       </div>
       <div :class="{'modal-backdrop': show && type !== 'gamePaused'}"></div>
     </div>
     `,
+  components: {
+    'build-menu': httpVueLoader('buildMenu.vue'),
+    'info-menu': httpVueLoader('infoMenu.vue'),
+    'select-menu': httpVueLoader('selectMenu.vue')
+  },
   data(){
     return {
       show: false,
@@ -176,27 +76,12 @@ var popup = new Vue({
       selected: null,
       showOptions: [],
       selectId: null,
-      inputValue: null,
-      uploadData: {}, 
+      inputValue: {},
       callback: null // for sending the name of the board back to editbar vue object
     }
   },
   methods: {
-    readFilePath(){
-      this.uploadData = {
-        text: "",
-        done: false,
-        msg: "Loading..."
-      }
-      document.getElementById("inputOne").files[0].text().then(
-        (e)=>{this.uploadData = {
-          text: e,
-          done: true,
-          msg: "Uploaded successfully."
-        } }).catch(
-        ()=> this.uploadData.msg = "Upload failed. :(")
-    },
-
+    
     action(){
       let msg
       switch(this.actionTitle){
@@ -209,30 +94,15 @@ var popup = new Vue({
           else {this.close()}; break
         case "Drop":
           this.drop(this.selected); break
-        case "fileUpload":
-          let b = {}
-          try {b = JSON.parse(this.uploadData.text)}
-          catch(e){
-            console.error(e)
-            this.setAlert("Failed to parse file text.")
-          }
-          if (b){
-            board = new Board(b)
-            world.resize(board.cols, board.rows)
-            this.callback("Board Name: "+board.name)
-            this.setAlert("World loaded. Please save before exiting.")
-          }
-          else
-            this.setAlert("Failed to create board."); break
         case "Grab":
           this.grab(this.selected, this.selectId); break
         case "saveBoard":
-          board.name = this.inputValue
-          localStorage.setItem("board"+this.inputValue, JSON.stringify(board))
+          board.name = this.inputValue.text
+          localStorage.setItem("board"+this.inputValue.text, JSON.stringify(board))
           this.callback("Board Name: "+board.name)
           this.setAlert("The world was saved"); break
         case "pickBombs":
-          if (msg = actions.build(this.selected, {x: active.x, y: active.y}, this.inputValue))
+          if (msg = actions.build(this.selected, {x: active.x, y: active.y}, Number(this.inputValue.number)))
             this.setAlert(msg)
           else {this.close()}; break
         case "load":
@@ -283,7 +153,7 @@ var popup = new Vue({
       else if (this.selected.name === "bomb"){
         this.type = this.actionTitle = "pickBombs"
         this.title = "How many bombs do you want to get?"
-        this.inputValue = 1
+        this.inputValue.number = 1
         setTimeout( () => $("#inputOne").focus(),0)
       }
       else {
@@ -461,18 +331,11 @@ var popup = new Vue({
       this.size = type === "getSize" ? "popup-center" : "popup-tiny"
       this.type = type
       this.show = true
-      if (["input", "getSize"].includes(type)){
-        this.inputValue = this.type === "input" ? "" : 
+      if (["input", "getSize", "pickBombs"].includes(type)){
+        this.inputValue = this.type === "input" ? {text: ""} : 
           {cols: Math.floor((window.innerWidth)/25), 
           rows: Math.floor((window.innerHeight)/25)}
         setTimeout(() => $("#inputOne").focus(), 0)
-      }
-      else if (type === "fileUpload"){
-        this.uploadData = {
-          text: "",
-          done: false,
-          outputMessage: ""
-        }
       }
       world.noKeys = true
       noLoop()
