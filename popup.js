@@ -267,8 +267,10 @@ var popup = new Vue({
     grabMenu(type, cellId){
       let id = type === "info" ? cellId : board.cells[active.x][active.y].id
       let items = board.buildings[id].items
-      if (items.length === 0)
+      if (items.length === 0){
+        this.setAlert("This campsite does not have any items in it.")
         return
+      }
       let output = []
       for (let i = 0; i < items.length; i++){
         let type = items[i].type || items[i]

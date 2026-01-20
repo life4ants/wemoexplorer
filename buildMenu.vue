@@ -64,8 +64,8 @@
       </div>
     </div>
 <!-- Footer -->
-		<div v-if="type === 'info'">
-			<button type="button" id="esc" @click="close">Ok</button>
+		<div v-if="type === 'info'" class="modal-footer">
+			<button type="button" id="etr" @click="close">Ok</button>
 		</div>
     <div v-else class="modal-footer">
       <button type="button" id="esc" @click="close">Cancel</button>

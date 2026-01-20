@@ -9,6 +9,7 @@
     <div v-if="type === 'manual'" class="modal-body" style="background-color: #ffc;">
     	<h6>Movement</h6>
     	<p>Movement is acomplished using the arrow keys. On moblie, tap the translucent buttons on the sides of the screen, or tap on the board.</p>
+    	<p>You can click on a campsite to see what items are in it, or on a construction site to see what is needed to complete.</p>
     	<h6>Top Bar</h6>
     	<p>At the top of the screen there is info relating to your player. The green bars show your health and energy levels. Your backback shows what items you have to carry around. Beside the backpack are your tools and containers. You may equip 2 tools and one container at a time. Any more that you have must be stored in campsites.</p>
     	<p>Next is where your quests will appear. Then in the top right we have the clock. This shows what time of the day it is. When night comes you must light a fire and stay by it all night. A popup will warn you when night is close.</p>

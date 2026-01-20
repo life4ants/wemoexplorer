@@ -340,7 +340,14 @@ class Board extends WemoObject {
     if (cell.type === "campsite"){
       popup.grabMenu("info", cell.id)
     }
-    else if(game.isMobile){
+    else if (cell.construction){
+      let output = []
+      for (let e of cell.construction.needed){
+        output.push({src: "images/"+e.type+".png", num: e.quantity})
+      }
+      popup.setMenu(output, "Items needed to complete:", "info")
+    }
+    else if (game.isMobile){
       
       let mx = mouseX - active.x*25+12
       let my = mouseY-topbarHeight - active.y*25+12
