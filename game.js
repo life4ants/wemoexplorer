@@ -57,7 +57,7 @@ var game = new Vue({
       let players = JSON.parse(localStorage.wemoPlayers || "[]")
       let newPlayers = []
       for (let i=0; i<players.length; i++){
-        newPlayers.push({name: players[i].name, unlockedLevel: 1, games: [], character: 0})
+        newPlayers.push({name: players[i].name, unlockedLevel: 0, games: [], character: 0})
       }
       localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
       localStorage.setItem("wemoUpToDate", "01192026")
