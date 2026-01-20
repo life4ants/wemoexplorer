@@ -63,7 +63,7 @@
                 <div v-else style="width: 80px"></div>
               </div>
               <div class="button-tiles-flexbox">
-                <span>Global playtime: {{item.playtime}} minutes</span>
+                <span>Times finished: {{item.completes}}</span>
               </div>
             </div>
           </div>
@@ -85,7 +85,7 @@
                 <div v-else style="width: 80px"></div>
               </div>
               <div class="button-tiles-flexbox">
-                <span>Times finished: {{item.completes}} minutes</span>
+                <span>Playtime: {{item.playtime}} minutes</span>
               </div>
             </div>
           </div>
