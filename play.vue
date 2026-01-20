@@ -12,9 +12,9 @@
 	  </div> 
 	  <div class="sidebar">
 	    <div class="sidebar-content">
-	      <i class="fa fa-sign-out fa-flip-horizontal fa-3x" aria-hidden="true" @click="exit" title="Exit Game"></i>
+	      <i class="fa fa-sign-out fa-flip-horizontal fa-3x" @click="exit" title="Exit Game"></i>
 	      <i :class="{fa: true, 'fa-3x': true, 'fa-play': paused, 'fa-pause': !paused}"
-	                    aria-hidden="true" @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
+	                     @click="pauseGame" :title="paused ? 'Resume Game (Space)' : 'Pause Game (Space)'"></i>
 	      <div class="icon">
           <span class="icontext">Center Screen (X)</span>
           <img src="images/centerScreen.png" height="40" width="40"
@@ -25,7 +25,10 @@
           <img  :key="icon.id" :src="icon.src"
   	              height="40" width="40"  @click="() => action(icon.code)">
         </div>
-	      <i class="fa fa-info-circle fa-3x" aria-hidden="true" @click="showInfo" title="Show Info"></i>
+        <div class="bottom">
+  	      <i class="fa fa-question-circle fa-3x" @click="showQuest" title="Show Quest"></i>
+          <i class="fa fa-info-circle fa-3x" @click="showInfo" title="Show Info"></i>
+        </div>
 	    </div>
 	  </div>
 	</div>
@@ -59,8 +62,12 @@ module.exports = {
     },
 
   	showInfo(){
-  		msgs.infoShown = !msgs.infoShown
+  		popup.setInfo("manual")
   	},
+
+    showQuest(){
+      popup.setInfo("tutorial")
+    },
 
     action(key){
       keyHandler(0, key)
@@ -72,7 +79,7 @@ module.exports = {
       }
     },
   	checkActions(){
-  		if (man.isSleeping || this.paused || man.isAnimated){
+  		if (man.isSleeping || this.paused || man.isAnimated || popup.show){
         for (let i = 0; i<this.icons.length; i++){
           this.icons[i].active = false
         }
@@ -94,7 +101,7 @@ module.exports = {
         let basket = toolbelt.getContainer("basket")
         this.icons[4].active = ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0) ||
             ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0) ||
-            "veggies" === cell.type || (basket && basket.includesItems(["berries", "veggies"]).length > 0 )
+             (basket && basket.includesItems(["berries", "veggies", "apples"]).length > 0 )
         //jump:
         this.icons[5].active = (man.isRiding && (active.landed || active.isBeside("dock") ||
               "river" === board.cells[active.x][active.y].type)) ||  (!man.isRiding && vehicles.canMount(man.x, man.y))
@@ -102,8 +109,10 @@ module.exports = {
         this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type) && 
         			toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx") !== -1
         //pick:
-        this.icons[7].active = (toolbelt.getContainer("basket") && ("berryTree" === cell.type &&
-              board.berryTrees[cell.id].berries.length > 0) || "veggies" === cell.type)
+        this.icons[7].active = toolbelt.getContainer("basket") && (
+          ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0) || 
+          ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0)
+          || "veggies" === cell.type)
         //fling:
         this.icons[8].active = !!helpers.nearbyType(active.x, active.y, "construction")
         //sleep:
@@ -148,5 +157,10 @@ module.exports = {
 .icon:hover .icontext {
   visibility: visible;
   opacity: 1;
+}
+
+.bottom {
+  position: absolute;
+  bottom: 0;
 }
 </style>

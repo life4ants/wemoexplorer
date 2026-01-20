@@ -324,8 +324,8 @@ class Board extends WemoObject {
     else
       cell.type = cell.tile.replace(/\d+$/, "")
     board.cells[x][y] = cell
-    if (board.revealCount <= 0 && board.level > 0){
-      game.finishLevel()
+    if (board.revealCount <= 0){
+      tutorial.checkAction("stars")
     }
   }
 

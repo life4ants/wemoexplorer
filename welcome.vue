@@ -1,88 +1,90 @@
 <template>
-  <div class="modal-dialog" id="popup-lg" style="z-index: 10">
-    <div class="modal-content" id="grow">
-      <div class="modal-header">
-        <h1>Wemo Explorer</h1>
-      </div>
-      <div v-if="stage === 1" class="modal-body">
-        <h5>{{title}}</h5>
-        <p>{{message}}</p>
-        <div v-if="deleteMode" class="button-tiles">
-          <div v-for="(player, id) in players" class="button-tiles-content">
-            {{player.name}}
-            <a @click="() => deletePlayer(id)">delete</a>
-          </div>
+  <div class="modal" id="popup-lg">
+    <div class="modal-dialog" >
+      <div class="modal-content" id="grow">
+        <div class="modal-header">
+          <h1>Wemo Explorer</h1>
         </div>
-        <div v-else class="button-tiles">
-          <div v-for="(player, id) in players" @click="() => pickPlayer(id)" class="button-tiles-content clickable">
-            {{player.name}}
-          </div>
-        </div>
-        <div v-if="players.length > 0" class="links">
-          <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete players'}}</a>
-        </div>
-        <input type="text" v-model="name" placeholder="enter name">
-        <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
-        <div class="whatsNew">
-          <h5>Version {{version}}</h5>
-          <h6>Published {{publicationDate}}</h6>
-          <ul>
-            <li>New Danger: Snakes</li>
-            <li>update Floodfill on editor</li>
-          </ul>
-        </div>
-        <div class="tiny">Views since Dec 13, 2025: {{viewCount}}</div>
-      </div>
-      <div v-else class="modal-body">
-        <div class="links">
-          <a @click="signout">not {{currentPlayer.name}}? sign out</a>
-        </div>
-        <h6>{{currentPlayer.name}}, pick your player:</h6>
-        <img v-for="(pic, i) in characters" :src="pic" :key="i" @click="() => selectCharacter(i)"
-              :class="selected === i ? 'red-border' : 'no-border'" height="32" width="32">
-        <h6>Pick the world you want to play in:</h6>
-        <h6 class="left-header">Default Worlds:</h6>
-        <div class="button-tiles">
-          <div v-for="(item, id) in worlds" class="button-tiles-content flex">
-            <h6 class="button-tiles-flexbox">{{item.name}}</h6>
-            <div class="button-tiles-flexbox">
-              <button v-if="item.level <= currentPlayer.unlockedLevel" @click="() => pickGame('default', item.level, id)">Play</button>
-              <span v-else >Locked</span>
-            </div>
-            <div class="button-tiles-flexbox">
-              <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId, id)">Resume</button>
-              <div v-else style="width: 80px"></div>
-            </div>
-            <div class="button-tiles-flexbox">
-              <span>Global playtime: {{item.playtime}} minutes</span>
+        <div v-if="stage === 1" class="modal-body">
+          <h5>{{title}}</h5>
+          <p>{{message}}</p>
+          <div v-if="deleteMode" class="button-tiles">
+            <div v-for="(player, id) in players" class="button-tiles-content">
+              {{player.name}}
+              <a @click="() => deletePlayer(id)">delete</a>
             </div>
           </div>
-        </div>
-        <h6 class="left-header">Custom Worlds:</h6>
-        <div v-if="deleteMode" class="button-tiles">
-          <div v-for="(item, id) in customWorlds" class="button-tiles-content">
-            {{item.name}}
-            <a @click="() => deleteGame(item.name, id)">delete</a>
-          </div>
-        </div>
-        <div v-else class="button-tiles">
-          <div v-for="(item, id) in customWorlds" class="button-tiles-content flex">
-            <h6 class="button-tiles-flexbox">{{item.name}}</h6>
-            <div class="button-tiles-flexbox">
-              <button @click="() => pickGame('custom', item.name, id)">Play</button>
-            </div>
-            <div class="button-tiles-flexbox">
-              <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId, id)">Resume</button>
-              <div v-else style="width: 80px"></div>
-            </div>
-            <div class="button-tiles-flexbox">
-              <span>Global playtime: {{item.playtime}} minutes</span>
+          <div v-else class="button-tiles">
+            <div v-for="(player, id) in players" @click="() => pickPlayer(id)" class="button-tiles-content clickable">
+              {{player.name}}
             </div>
           </div>
+          <div v-if="players.length > 0" class="links">
+            <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete players'}}</a>
+          </div>
+          <input type="text" v-model="name" placeholder="enter name">
+          <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
+          <div class="whatsNew">
+            <h5>Version {{version}}</h5>
+            <h6>Published {{publicationDate}}</h6>
+            <ul>
+              <li>New Danger: Snakes</li>
+              <li>update Floodfill on editor</li>
+            </ul>
+          </div>
+          <div class="tiny">Views since Dec 13, 2025: {{viewCount}}</div>
         </div>
-        <div v-if="currentPlayer.unlockedLevel > 2" class="links">
-          <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete custom worlds'}}</a>
-          <a @click="() => edit(currentPlayer)">create/edit custom worlds</a>
+        <div v-else class="modal-body">
+          <div class="links">
+            <a @click="signout">not {{currentPlayer.name}}? sign out</a>
+          </div>
+          <h6>{{currentPlayer.name}}, pick your player:</h6>
+          <img v-for="(pic, i) in characters" :src="pic" :key="i" @click="() => selectCharacter(i)"
+                :class="selected === i ? 'red-border' : 'no-border'" height="32" width="32">
+          <h6>Pick the world you want to play in:</h6>
+          <h6 class="left-header">Default Worlds:</h6>
+          <div class="button-tiles">
+            <div v-for="(item, id) in worlds" class="button-tiles-content flex">
+              <h6 class="button-tiles-flexbox">{{item.name}}</h6>
+              <div class="button-tiles-flexbox">
+                <button v-if="item.level <= currentPlayer.unlockedLevel" @click="() => pickGame('default', item.level, id)">Play</button>
+                <span v-else >Locked</span>
+              </div>
+              <div class="button-tiles-flexbox">
+                <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId, id)">Resume</button>
+                <div v-else style="width: 80px"></div>
+              </div>
+              <div class="button-tiles-flexbox">
+                <span>Global playtime: {{item.playtime}} minutes</span>
+              </div>
+            </div>
+          </div>
+          <h6 class="left-header">Custom Worlds:</h6>
+          <div v-if="deleteMode" class="button-tiles">
+            <div v-for="(item, id) in customWorlds" class="button-tiles-content">
+              {{item.name}}
+              <a @click="() => deleteGame(item.name, id)">delete</a>
+            </div>
+          </div>
+          <div v-else class="button-tiles">
+            <div v-for="(item, id) in customWorlds" class="button-tiles-content flex">
+              <h6 class="button-tiles-flexbox">{{item.name}}</h6>
+              <div class="button-tiles-flexbox">
+                <button @click="() => pickGame('custom', item.name, id)">Play</button>
+              </div>
+              <div class="button-tiles-flexbox">
+                <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId, id)">Resume</button>
+                <div v-else style="width: 80px"></div>
+              </div>
+              <div class="button-tiles-flexbox">
+                <span>Global playtime: {{item.playtime}} minutes</span>
+              </div>
+            </div>
+          </div>
+          <div v-if="currentPlayer.unlockedLevel > 2" class="links">
+            <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete custom worlds'}}</a>
+            <a @click="() => edit(currentPlayer)">create/edit custom worlds</a>
+          </div>
         </div>
       </div>
     </div>

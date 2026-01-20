@@ -76,6 +76,6 @@
 <script>
 	module.exports = {
 		props: ['type','title', 'selected', 'showOptions', 
-						'select', 'action', 'actionTitle','close']
+						'select', 'selectId', 'action', 'actionTitle','close']
 	}
 </script>

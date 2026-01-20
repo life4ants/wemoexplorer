@@ -11,18 +11,26 @@ var popup = new Vue({
             :selected="selected"
             :showOptions="showOptions"
             :select="select"
+            :selectId="selectId"
             :action="action"
             :actionTitle="actionTitle"
             :close="close"
           ></build-menu>
-          <info-menu v-else-if="['alert', 'download', 'gameOver'].includes(type)" 
+
+          <alert-menu v-else-if="['alert', 'download', 'gameOver'].includes(type)" 
             :type="type"
             :title="title"
             :action="action"
             :actionTitle="actionTitle"
             :close="close"
             :exit="exit"
+          ></alert-menu>
+
+          <info-menu v-else-if="['manual', 'tutorial', 'welcome'].includes(type)" 
+            :type="type"
+            :close="close"
           ></info-menu>
+
           <select-menu v-else-if="['input', 'getSize', 'pickBombs', 'fileUpload'].includes(type)" 
             :type="type"
             :title="title"
@@ -62,6 +70,7 @@ var popup = new Vue({
     </div>
     `,
   components: {
+    'alert-menu': httpVueLoader('alertMenu.vue'),
     'build-menu': httpVueLoader('buildMenu.vue'),
     'info-menu': httpVueLoader('infoMenu.vue'),
     'select-menu': httpVueLoader('selectMenu.vue')
@@ -81,7 +90,6 @@ var popup = new Vue({
     }
   },
   methods: {
-    
     action(){
       let msg
       switch(this.actionTitle){
@@ -337,6 +345,15 @@ var popup = new Vue({
           rows: Math.floor((window.innerHeight)/25)}
         setTimeout(() => $("#inputOne").focus(), 0)
       }
+      world.noKeys = true
+      noLoop()
+    },
+
+    setInfo(type){
+      $(window).scrollTop(0).scrollLeft(0)
+      this.size = type === "manual" ? "popup-lg" : "popup-center"
+      this.type = type
+      this.show = true
       world.noKeys = true
       noLoop()
     },

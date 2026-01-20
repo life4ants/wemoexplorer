@@ -59,8 +59,7 @@ let actions = {
           cell.type = "firepit"
           cell.id = id
           man.fireCheck()
-          if (tutorial.active && tutorial.step === 7)
-            tutorial.step++
+          tutorial.checkAction("firepit")
         }}
       }
       else
@@ -75,6 +74,7 @@ let actions = {
           man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
             toolbelt.addItem("container", new Backpack("basket"))
             backpack.removeItem("longGrass", 6)
+            tutorial.checkAction("basket")
             popup.setAlert("Congratulations! You can now gather berries. Look for the Basket icon on the top bar.")
           }}
         }
@@ -121,8 +121,7 @@ let actions = {
               backpack.removeItem(type, 1)
             }
             popup.setAlert(msg)
-            if (tutorial.active && tutorial.step === 8)
-              tutorial.step++
+            tutorial.checkAction(item.name)
           }}
         }
         else
@@ -252,8 +251,7 @@ let actions = {
           cell.tile = "stump"
           cell.quantity = 5
           man.energy = toolbelt.tools[t] === "stoneAx" ? man.energy-300 : man.energy-150
-          if (tutorial.active && tutorial.step === 9)
-            tutorial.step++
+          tutorial.checkAction("chop")
         }}
       }
     }
@@ -339,9 +337,7 @@ let actions = {
     }
     man.health = min(man.health+h, 3000)
     man.energy = min(man.energy+e, 3005)
-    if (tutorial.active && tutorial.step === 3){
-      tutorial.step++
-    }
+    tutorial.checkAction("eat")
     if (man.energy > 3000)
       popup.setAlert("You are full. Stop eating!")
   },
@@ -394,9 +390,11 @@ let actions = {
               if (item.type === "raft"){
                 vehicles.addRaft(o.x, o.y)
                 cell.type = cell.tile.replace(/\d+$/, "")
+                tutorial.checkAction("raft")
               }
               else if (item.type === "steppingStones"){
                 cell.type = "steppingStones"
+                tutorial.checkAction("steppingStones")
               }
               else if (item.type === "campsite"){
                 let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
@@ -408,6 +406,7 @@ let actions = {
                     board.cells[i][j].id = id
                   }
                 }
+                tutorial.checkAction("campsite")
               }
               delete cell.construction
             }
@@ -429,11 +428,7 @@ let actions = {
         else
           board.fires[man.fireId].value = fireValue
         backpack.removeItem(items[0].type, 1)
-        if (tutorial.active && tutorial.step === 11){
-          tutorial.step++
-          if (game.currentPlayer.unlockedLevel === 0)
-            game.finishLevel()
-        }
+        tutorial.checkAction("fire")
       }
     }
   },
@@ -520,6 +515,7 @@ let actions = {
         let tree = board.berryTrees[cell.id]
         let p = Math.floor(Math.random()*tree.berries.length)
         tree.berries.splice(p, 1)
+        tutorial.checkAction("apples")
       }
       else
         return
@@ -530,6 +526,7 @@ let actions = {
         let tree = board.berryBushes[cell.id]
         let p = Math.floor(Math.random()*tree.berries.length)
         tree.berries.splice(p, 1)
+        tutorial.checkAction("berries")
       }
       else
         return
@@ -548,6 +545,7 @@ let actions = {
           else {
             cell.tile = "veggies"+(quantity-1)
           }
+          tutorial.checkAction("veggies")
         }
         else
           return

@@ -9,18 +9,23 @@ var game = new Vue({
         :updateMessage="updateMessage"
         :viewCount="viewCount">
       </welcome-menu>
-      <edit-bar v-else-if="mode === 'edit'" :exit="exit" :preview="previewGame"></edit-bar>
-      <play-box v-else-if="mode === 'play'" ref="playbox"
+
+      <edit-bar v-if="mode === 'edit'" 
+        :exit="exit" 
+        :preview="previewGame">
+      </edit-bar>
+      
+      <play-box v-if="mode === 'play'" ref="playbox"
         :exit="exit"
         :isMobile="isMobile"
         :paused="paused"
         :pauseGame="pauseGame"
         :autoCenter="autoCenter">
       </play-box>
-      <build-sidebar v-else-if="mode === 'build'"
+      
+      <build-sidebar v-if="mode === 'build'"
         :toggleBuildMode="toggleBuildMode">
       </build-sidebar>
-      <div v-else></div>
     </div>
     `,
   components: {
@@ -42,7 +47,7 @@ var game = new Vue({
     updateMessage: false
   },
   mounted(){
-    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "April2023"){
+    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "01192026"){
       let s = Object.keys(localStorage)
       for (let i = 0; i < s.length; i++){
         if (s[i].substr(0,8) === "wemoGame"){
@@ -55,7 +60,7 @@ var game = new Vue({
         newPlayers.push({name: players[i].name, unlockedLevel: 1, games: [], character: 0})
       }
       localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
-      localStorage.setItem("wemoUpToDate", "April2023")
+      localStorage.setItem("wemoUpToDate", "01192026")
       this.updateMessage = true
     }
   },
@@ -155,11 +160,6 @@ var game = new Vue({
       topbar.energy = man.energy
       world.noKeys = false
       timer.setTime(board.wemoMins)
-      if (board.level === 0){
-        tutorial.start()
-      }
-      else
-        tutorial.active = false
       world.noNight = board.level < 1
       if (!board.progress && board.level > 1){
         board.addAnimals()
@@ -176,6 +176,12 @@ var game = new Vue({
       viewport.update(true)
       frameRate(world.frameRate)
       loop()
+      if (board.level < 4){
+        tutorial.start()
+        popup.setInfo("welcome")
+      }
+      else
+        tutorial.active = false
     },
 
     saveGame(){
@@ -249,6 +255,7 @@ var game = new Vue({
     },
 
     finishLevel(){
+      tutorial.active = false
       let level = this.currentPlayer.unlockedLevel
       if (level <= board.level){
         this.currentPlayer.unlockedLevel = board.level+1
@@ -256,9 +263,9 @@ var game = new Vue({
         p[game.currentPlayer.index] = game.currentPlayer
         localStorage.setItem("wemoPlayers", JSON.stringify(p)) 
       }
+      sounds.play("win")
       if (board.level > 0){
-        sounds.play("win")
-        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou revealed the whole world in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)
+        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou finished the level in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)
       }
     }
   }

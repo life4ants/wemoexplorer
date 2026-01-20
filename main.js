@@ -2,7 +2,7 @@ let gameBoards = []
 const topbarHeight = 55
 // let keyDelay = 0
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
-const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile"]
+const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit", "root"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
@@ -300,7 +300,7 @@ function preload(){
   }
 
   sounds.files.sleep.loop = true
-  sounds.files.sleep.volume = 0.5
+  sounds.files.sleep.volume = 0.3
   sounds.files.win.volume = 0.5
   tiles.construction.steppingStones = tiles.steppingStones
   tiles.arrows = tiles.arrow
@@ -355,8 +355,6 @@ function playLoop(){
   // move board:
   viewport.update(false)
   //display:
-  if (tutorial.active)
-    tutorial.display()
   vehicles.display()
   man.update()
   board.showNight()

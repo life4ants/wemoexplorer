@@ -48,7 +48,7 @@ let helpers = {
   },
 
   canWalk(x,y){
-    if (tutorial.active){
+    if (tutorial.active && board.level === 0){
       return x >= 0 && x < tutorial.xbound && y >= 0 && y < tutorial.ybound
     }
     return x >= 0 && x < board.cols && y >= 0 && y < board.rows

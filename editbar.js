@@ -228,7 +228,7 @@ const editBar = {
           items.push({name: saved[i].substring(5, saved[i].length), type: "custom"})
       }
       for (let i = 0; i < gameBoards.length; i++){
-        items.push({id: i, name: "Level "+(i+1), type: "default"})
+        items.push({id: i, name: gameBoards[i].name, type: "default"})
       }
       popup.callback = (n)=> this.boardName = n
       popup.setMenu(items, "Select a world to load:", "load")

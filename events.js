@@ -45,7 +45,7 @@ function keyHandler(keyCode, key){
     case "T": actions.throw();      break;
     case "X": game.autoCenter = !game.autoCenter; break;
   }
-  if (tutorial.active)
+  if (tutorial.active && board.level === 0)
     tutorial.keyHandler(keyCode)
 }
 
