@@ -60,15 +60,6 @@ function mousePressed(){
       mouseX < 0 || mouseX > board.cols*25 ||
       mouseY < topbarHeight || mouseY > board.rows*25+topbarHeight)
     return
-  // let dir = mouseX < 0 ? "sidebar" : 
-  //   mouseX > board.cols*25 ? "too far right" : 
-  //   mouseY < topbarHeight ? "topbar" : 
-  //   mouseY > board.rows*25+topbarHeight ? "too far down" : 
-  //   false 
-  // if (dir){
-  //   console.log(dir)
-  //   return
-  // }
   switch(game.mode){
     case "play":
       board.clicker()

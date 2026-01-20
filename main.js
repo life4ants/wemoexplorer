@@ -1,6 +1,5 @@
 let gameBoards = []
 const topbarHeight = 55
-// let keyDelay = 0
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]
@@ -370,18 +369,3 @@ $("#board").contextmenu(function(e) {
     e.stopPropagation();
 });
 
-// window.onblur = function(){
-//   console.log("blur")
-//   if (game.mode === "play")
-//     popup.outOfFocus()
-// }
-
-// window.onfocus = function(){
-//   console.log("focus")
-//   if (popup.type === "outOfFocus"){
-//     if (game.paused)
-//       popup.type = "gamePaused"
-//     else
-//       popup.close()
-//   }
-// }

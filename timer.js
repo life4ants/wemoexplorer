@@ -23,7 +23,6 @@
         g = JSON.parse(localStorage["board"+board.name])
         g.playtime = board.playtime
         localStorage.setItem("board"+board.name, JSON.stringify(g))
-        console.log("playtime: "+board.playtime)
       }
     }
   },

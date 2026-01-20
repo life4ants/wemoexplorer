@@ -142,11 +142,11 @@ class Board extends WemoObject {
         }
       }
     }
-    for (let i = 0; i < this.rabbits.length; i++){ //TODO fix this
+    for (let i = 0; i < this.rabbits.length; i++){ 
       let rabbit = new Rabbit(this.rabbits[i].pos)
       this.rabbits[i] = rabbit
     }
-    for (let i = 0; i < this.snakes.length; i++){ //TODO fix this
+    for (let i = 0; i < this.snakes.length; i++){ 
       let snake = new Snake(this.snakes[i].pos)
       this.snakes[i] = snake
     }
@@ -292,8 +292,10 @@ class Board extends WemoObject {
     let tcells = board.stars[starid].cells
     for (let i in tcells){
       let c = board.cells[tcells[i].x][tcells[i].y]
-      if (!c.revealed)
-        this.revealCell(tcells[i].x, tcells[i].y, c, 2)
+      if (!c.revealed){
+        c.revealed = true
+        this.revealCount--
+      }
     }
     delete cell.id
     board.stars.splice(starid, 1)
@@ -326,18 +328,6 @@ class Board extends WemoObject {
     board.cells[x][y] = cell
     if (board.revealCount <= 0){
       tutorial.checkAction("stars")
-    }
-  }
-
-  revealCell(x,y,fully){
-    if (fully){
-      this.cells[x][y].revealed = 2
-      this.revealCount--
-    }
-    else {
-      this.cells[x][y].revealed++
-      if (this.cells[x][y].revealed === 2)
-        this.revealCount --
     }
   }
 

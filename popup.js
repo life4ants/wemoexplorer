@@ -47,10 +47,6 @@ var popup = new Vue({
               <h6>Game Paused</h6>
               <p class="center-grey">press space bar to resume</p>
             </div>
-            <div v-else-if="'outOfFocus' === type" class="modal-footer">
-              <h6>Out of focus</h6>
-              <p class="center-grey">click anywhere to close this</p>
-            </div>
 
   <!-- **** Header: ************** -->
             <div v-else class="modal-header">
@@ -386,13 +382,6 @@ var popup = new Vue({
       this.type = "alert"
       this.size = content.length > 27 ? "popup-center" : "popup-tiny"
       world.noKeys = true
-      noLoop()
-    },
-
-    outOfFocus(){
-      this.show = true
-      this.type = "outOfFocus"
-      this.size = "popup-tiny"
       noLoop()
     },
 

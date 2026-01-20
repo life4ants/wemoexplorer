@@ -73,22 +73,6 @@ let messageCreater = {
     return new Message(inst)
   },
 
-  // test(){
-  //   let inst = {
-  //     type: "square", fontSize: 18, color: [255,255,255,180],
-  //     data: false,
-  //     update: function(){
-  //       if (this.data)
-  //         return
-  //       this.pos = {w: 300, h: 100, x: 200, y: 75}
-  //       this.msg = "Welcome to Wemo Explorer!"
-  //       this.data = true
-  //     },
-  //     isShown: function() {return msgs.testShown}
-  //   }
-  //   return new Message(inst)
-  // },
-
   night(){
     let inst = {
       type: "square-center", fontSize: 45, color: [255,255,255,180],

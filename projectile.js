@@ -72,7 +72,8 @@ class Projectile {
     if (!helpers.withinBounds(x,y) || this.vel.mag() < 0.1)
         return true
     if (!board.cells[x][y].revealed){
-      board.revealCell(x,y,true)
+      board.cells[x][y].revealed = true
+      board.revealCount--
       this.pos = {x,y} 
       this.phase = "explode"
       this.ring.push({x,y, frame: 0})
@@ -109,7 +110,8 @@ class Projectile {
       let y = this.pos.y+helpers.ringList[r][i].y
       if (helpers.withinBounds(x,y)){
         if (!board.cells[x][y].revealed){
-          board.revealCell(x, y, true)
+          board.cells[x][y].revealed = true
+          board.revealCount--
           this.ring.push({x,y, frame: 0})
         }
       }

@@ -55,7 +55,6 @@ let builder = {
 
   clicker(){
     if (this.color === "green"){
-      board.cells[this.x][this.y].revealed = 2
       actions.addConstructionSite(this.item, board.cells[this.x][this.y])
       game.toggleBuildMode()
     }
