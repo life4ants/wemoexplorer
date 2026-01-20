@@ -28,6 +28,14 @@
             <h5>Version {{version}}</h5>
             <h6>Published {{publicationDate}}</h6>
             <ul>
+              <li>New Tutorial and Quest system</li>
+              <li>Track level completes</li>
+            </ul>
+          </div>
+          <div class="whatsNew">
+            <h5>Version 1.5.5</h5>
+            <h6>Published Jan 17, 2026</h6>
+            <ul>
               <li>New Danger: Snakes</li>
               <li>update Floodfill on editor</li>
             </ul>
@@ -77,7 +85,7 @@
                 <div v-else style="width: 80px"></div>
               </div>
               <div class="button-tiles-flexbox">
-                <span>Global playtime: {{item.playtime}} minutes</span>
+                <span>Times finished: {{item.completes}} minutes</span>
               </div>
             </div>
           </div>
@@ -105,8 +113,8 @@ module.exports = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.5.5",
-      publicationDate: "Jan 17, 2026",
+      version: "1.6.0",
+      publicationDate: "Jan 19, 2026",
       pageViews: "loading"
     }
   },
@@ -196,9 +204,10 @@ module.exports = {
           .then(response => response.json())
           .then(result => {
             this.worlds[i].playtime = result.data.up_count
+            this.worlds[i].completes = result.data.down_count
           })
           .catch(error => console.error('Error:', error));
-        defaultWorlds.push({name: gameBoards[i].name, level: i, savedGame: false, playtime: "~"})
+        defaultWorlds.push({name: gameBoards[i].name, level: i, savedGame: false, playtime: "~", completes: "~"})
       }
       //get custom worlds:
       let saved = Object.keys(localStorage)

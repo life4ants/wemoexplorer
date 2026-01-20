@@ -264,6 +264,8 @@ var game = new Vue({
         localStorage.setItem("wemoPlayers", JSON.stringify(p)) 
       }
       sounds.play("win")
+      fetch(`https://api.counterapi.dev/v2/andys-games/world${board.level}/down`)
+        .catch(error => console.error('Error:', error));
       if (board.level > 0){
         setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou finished the level in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)
       }
