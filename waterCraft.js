@@ -30,8 +30,8 @@ class WaterCraft extends WemoObject{
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
       
-      if (["water", "river", "steppingStones", "star"].includes(newCell.type) ||
-          ["grassBeach", "beach"].includes(newCell.type) &&
+      if (["water", "river", "steppingStones"].includes(newCell.type) ||
+          ["grassBeach", "beach", "star"].includes(newCell.type) &&
            ["water", "river"].includes(cell.type)
         ) {
 

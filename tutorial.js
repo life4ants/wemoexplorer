@@ -5,7 +5,6 @@ let tutorial = {
 	ybound: 9,
 	level: 0,
 	req: {up: true, down: true, right: true, left: true, count: 4},
-	questIsShown: false,
 	questData: [
 	[
 			{
@@ -156,7 +155,6 @@ let tutorial = {
 				this.checkAction("night")
 		}
 		this.revealCount = board.revealCount
-		this.questIsShown = true
 		if (this.level === 0){
 			this.req = {up: true, down: true, right: true, left: true, count: 4}
 			this.xbound = 9

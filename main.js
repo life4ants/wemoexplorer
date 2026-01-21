@@ -300,7 +300,8 @@ function preload(){
 
   sounds.files.sleep.loop = true
   sounds.files.sleep.volume = 0.3
-  sounds.files.win.volume = 0.5
+  sounds.files.win.volume = 0.4
+  sounds.files.eat.volume = 0.6
   tiles.construction.steppingStones = tiles.steppingStones
   tiles.arrows = tiles.arrow
   tiles.bones = tiles.bone

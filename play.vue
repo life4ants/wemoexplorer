@@ -66,7 +66,10 @@ module.exports = {
   	},
 
     showQuest(){
-      popup.setInfo("tutorial")
+      if (tutorial.active)
+        popup.setInfo("tutorial")
+      else
+        popup.setAlert("No quests are availible for this world!")
     },
 
     action(key){

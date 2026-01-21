@@ -11,7 +11,7 @@ let topbar = {
     this.showEnergyBar("Energy: ", Math.round(this.energy), 3, widthFactor)
     this.showEnergyBar("Health: ", Math.round(this.health), 30, widthFactor)
     this.showBackpack(backpackPos, viewport.top+3)
-    if (tutorial.questIsShown){
+    if (tutorial.active){
       tutorial.displayQuest(backpackPos+150)
     }
     else{
