@@ -401,7 +401,8 @@ let actions = {
         else
           board.fires[man.fireId].value = fireValue
         backpack.removeItem(items[0].type, 1)
-        tutorial.checkAction("fire")
+        if (fireValue > 122)
+          tutorial.checkAction("fire")
       }
     }
   },

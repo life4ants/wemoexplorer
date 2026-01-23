@@ -58,9 +58,13 @@ let tutorial = {
 				text: "Now you have a log pile or stick pile, depending on which kind of tree you chopped. Grab a log."
 			},
 			{
+				title: "Grab long grass",
+				text: "Grab some long grass to start the fire with."
+			},
+			{
 				title: "Feed the fire",
-				text: "Stand next to the firepit and press F to start a fire.",
-				mobileText: "Stand next to the firepit and press the Feed Fire button to start a fire.",
+				text: "Stand next to the firepit and press F to start a fire. Press again to add the log to the fire.",
+				mobileText: "Stand next to the firepit and press the Feed Fire button to start a fire. Press again to add the log to the fire.",
 			},
 			{
 				title: "All Done!",
@@ -194,6 +198,7 @@ let tutorial = {
 		case 5: if (backpack.weight > 210){this.next()} return
 		case 6: if (backpack.weight === 0){this.next()} return
 		case 10: if (backpack.includesItem("log")){this.next()} return
+		case 11: if (backpack.includesItem("longGrass")){this.next()} return
 		}
 	},
 
@@ -214,7 +219,7 @@ let tutorial = {
 			else if (this.level === 1) {this.complete(1)}
 		  return
 		case "fire": 
-			if (this.level === 0 && this.step === 11){
+			if (this.level === 0 && this.step === 12){
 	      this.next()
 	      game.finishLevel()
 	    }
