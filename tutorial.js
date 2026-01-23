@@ -178,8 +178,8 @@ let tutorial = {
 				this.req.right = false; this.req.count--
 			}
 			if (this.req.count <= 0){
-				this.xbound = 15
-				this.ybound = 15
+				this.xbound = 12
+				this.ybound = 12
 				this.next()
 			}
 			break

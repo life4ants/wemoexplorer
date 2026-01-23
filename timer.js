@@ -2,10 +2,10 @@
   startTime: null,
 
   update(){
-    if (frameCount%(world.frameRate/4) === 0)
+    if (frameCount%(world.frameRate/4) === 0){
       this.increment()
-    if (frameCount%20 === 0)
       this.updateFires()
+    }
     if (frameCount % 75 === 0)
       this.growBerries()
     if (frameCount%317 === 0)
@@ -64,27 +64,14 @@
     this.setTimeOfDay()
   },
 
-  updateFires(){
-    let x = Math.round(frameCount%40/20)//gives either 0 or 1
-    for (let i=x; i<board.fires.length; i+=2){
+  updateFires(){ // runs every wemo minute
+    for (let i=0; i<board.fires.length; i++){
       if (board.fires[i].value > 0)
-        board.fires[i].value--
+        board.fires[i].value-- 
     }
-    if (x === 0){
-      for (let i=x; i<board.buildings.length; i++){
-        if (board.buildings[i].type === "campsite" && board.buildings[i].fireValue > 0){
-          board.buildings[i].fireValue--
-          if (board.buildings[i].isCooking){//REFACTOR this into a building object
-            board.buildings[i].cookTime--
-            if (board.buildings[i].cookTime === 0){
-              board.buildings[i].isCooking = false
-              if (typeof board.buildings[i].action === "function")
-                board.buildings[i].action()
-            }
-          }
-        }
-      }
-    }
+    for (let i=0; i<board.buildings.length; i++){
+      board.buildings[i].update()
+    }   
   },
 
   growVeggies(){

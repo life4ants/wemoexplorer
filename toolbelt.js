@@ -1,17 +1,23 @@
 class Toolbelt {
-  constructor(items){
+  constructor(obj){
     this.tools = []
     this.containers = []
     this.maxTools = 2
     this.maxContainers = 1
-    if (items){
-      for (let item of items){
-        if (item.type === "tool")
-          this.tools.push(item.name)
-        else if (item.type === "container")
-          this.containers.push(new Backpack(item.name, item.items))
+    if (obj){
+      this.tools = obj.tools
+      for (let c of obj.containers){
+        this.containers.push(new Backpack(c))
       }
     }
+  }
+
+  export(){
+    let output = []
+    for (let c of this.containers){
+      output.push(c.export())
+    }
+    return {tools: this.tools, containers: output}
   }
 
   getAllItems(){

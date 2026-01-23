@@ -1,5 +1,9 @@
 let test = {
-  clickInfo: false,
+  clickInfo: "cell",
+  counts: {
+    blocks: {},
+    points: 0
+  },
   
   lookup(id,y){
     if (id === "active")
@@ -17,6 +21,7 @@ let test = {
   skip(hours){
     board.wemoMins += (hours*60)
     timer.resume()
+    man.inDark = timer.dark
   },
 
   build(){
@@ -32,18 +37,12 @@ let test = {
         cell.type = "steppingStones"
       }
       else if (item.type === "campsite"){
-        let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
         let id = board.buildings.length
-        board.buildings.push(site)
+        board.buildings.push(new Campsite({x: o.x, y: o.y}))
         for (let i = o.x; i <= o.x+1; i++){
           for (let j = o.y; j <= o.y+1; j++){
             board.cells[i][j].type = "campsite"
             board.cells[i][j].id = id
-          }
-        }
-        for (var k = options.build.length - 1; k >= 0; k--) {
-          if (["bow", "arrows", "claypot"].includes(options.build[k].name)){
-            options.build[k].active = true
           }
         }
       }
@@ -67,5 +66,53 @@ let test = {
 
   worldCheck(){
     return board.cells.length === board.cols && board.cells[0].length === board.rows
-  }
+  },
+
+  testBackpack(){
+    let pack = new Backpack({type: "backpack"})
+    let basket = new Backpack({type: "basket"})
+    let pot = new Backpack({type: "claypot"})
+    pack.addItem("bone", 1)
+    pack.addItem("arrow", 1)
+    pack.addItem("longGrass", 1)
+    pack.addItem("rock", 1)
+    basket.addItem("berries", 20)
+    pot.addItem("water", 4)
+    return [new Backpack(pack.export()), new Backpack(basket.export()), new Backpack(pot.export())]
+  },
+
+  testToolBelt(){
+    let basket = new Backpack({type: "basket"})
+    basket.addItem("berries", 20)
+    basket.addItem("veggies", 15)
+    let belt =  new Toolbelt()
+    belt.addItem("tool", "stoneAx")
+    belt.addItem("tool", "boneShovel")
+    belt.addItem("container", basket)
+    return new Toolbelt(belt.export())
+  },
+
+  testCampsite(){
+    let camp = new Campsite({x:34, y:45})
+    let basket = new Backpack({type: "basket"})
+    basket.addItem("berries", 20)
+    basket.addItem("veggies", 15)
+    camp.addItem("container", basket)
+    camp.addItem("tool", "stoneAx")
+    camp.addItem("container", new Backpack({type: "claypot"}))
+    return new Campsite(camp.export())
+  },
+
+  testDark(alpha){
+    this.counts = {blocks: {}, points: 0}
+    for (let i = viewport.left+128; i < viewport.right; i+=256) {
+      for (let j = viewport.top+128; j< viewport.bottom; j+=256){
+        board.darkOutBlock(i, j, 256, alpha)
+      }
+    }
+    return this.counts
+  },
+
+  
+
 }

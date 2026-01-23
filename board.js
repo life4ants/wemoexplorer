@@ -134,13 +134,8 @@ class Board extends WemoObject {
 
   initializeObjects(){
     for (let i = 0; i < this.buildings.length; i++){
-      for (let j = 0; j < this.buildings[i].items.length; j++){
-        let item = this.buildings[i].items[j]
-        if (typeof item === "object"){
-          let container = new Backpack(item.type, item.items)
-          this.buildings[i].items[j] = container
-        }
-      }
+      let b = new Campsite(this.buildings[i])
+      this.buildings[i] = b
     }
     for (let i = 0; i < this.rabbits.length; i++){ 
       let rabbit = new Rabbit(this.rabbits[i].pos)
@@ -194,8 +189,8 @@ class Board extends WemoObject {
     //Campsites:
     if (this.buildings){
       for (let b of this.buildings){
-        image(tiles[b.type], b.x*25, b.y*25+topbarHeight)
-        if (b.type === "campsite"){
+        image(tiles["campsite"], b.x*25, b.y*25+topbarHeight)
+        
           if (b.isCooking){
             image(tiles.claypot_water, b.x*25+12, (b.y+1)*25+topbarHeight, 10,10)
             this.drawBadge(b.x*25+4, b.y*25+6+topbarHeight, "C", bootstrapColors.info)
@@ -205,8 +200,8 @@ class Board extends WemoObject {
             image(tile, b.x*25+5, (b.y+1)*25+topbarHeight+5, 25, 15, 0, 0, 25, 15)
             this.drawProgressBar(b.x, b.y+1, b.fireValue, 5)
           }
-          this.drawBadge(b.x*25+42, b.y*25+6+topbarHeight, b.items.length, "#000")
-        }
+          this.drawBadge(b.x*25+42, b.y*25+6+topbarHeight, b.getItems().length, "#000")
+        
       }
     }
   }
@@ -227,7 +222,9 @@ class Board extends WemoObject {
     // piles:
     else if (cell.type.substr(-4,4) === "pile"){
       if (cell.quantity > 1){
-        let tile = cell.type === "longGrasspile" ? "longGrass" : cell.type.substr(0, cell.type.length-4)+"s"
+        let tile = cell.type === "longGrasspile" ? "longGrass" : 
+          cell.type === "rabbitDeadpile" ? "rabbitDead" :
+          cell.type.substr(0, cell.type.length-4)+"s"
         image(tiles[tile], x*25, y*25+offset)
         this.drawBadge(x*25+4, y*25+topbarHeight+8, cell.quantity, "#000")
       }
@@ -392,74 +389,86 @@ class Board extends WemoObject {
         alpha = Math.round(255-pow((time+1)*.266, 2))
         break
     }
-
-    man.inDark = timer.dark
-
-    fill(0,0,0,alpha)
-    noStroke()
-    beginShape()
-    vertex(0,0)
-    vertex(width,0)
-    vertex(width,height)
-    vertex(0,height)
-    let fires = board.fires
-    for (let f of fires){
-      if (f.value > 0)
-        this.cutFireCircle(f.x, f.y, f.value)
-    }
-    for (let b of this.buildings){
-      if (b.fireValue > 0)
-        this.cutFireCircle(b.x, b.y+1, b.fireValue)
-    }
-    endShape(CLOSE)
-    for (let f of fires){
-      if (f.value > 0)
-        this.drawFireCircle(f.x,f.y,f.value,alpha)
-    }
-    for (let b of this.buildings){
-      if (b.fireValue > 0)
-        this.drawFireCircle(b.x,b.y+1,b.fireValue,alpha)
-    }
-    if (man.inDark && man.isSleeping)
-      image(tiles.z, man.x*25, man.y*25+topbarHeight)
-  }
-
-  cutFireCircle(bx,by,value){
-    let size = (value/4)+3.1
-    let x = bx*25+12.5
-    let y = by*25+12.5+topbarHeight
-    let r = size*25/2
-    let arm = r*0.54666
-    if (timer.dark && man.inDark){
-      let d = dist(active.x*25+12.5, active.y*25+topbarHeight+12.5, x, y)
-      man.inDark = d > r-10
-    }
-    beginContour()
-    vertex(x,y-r)
-    bezierVertex(x-arm,y-r,x-r,y-arm,x-r,y)
-    bezierVertex(x-r,y+arm,x-arm,y+r,x,y+r)
-    bezierVertex(x+arm,y+r,x+r,y+arm,x+r,y)
-    bezierVertex(x+r,y-arm,x+arm,y-r,x,y-r)
-    endContour()
-  }
-
-  drawFireCircle(x,y,value,alpha){
-    let size = (value/4)+3.1
-    ellipseMode(CENTER)
-    if (alpha < 20){
-      fill(0,0,0,Math.floor(alpha/2))
-      noStroke()
-      ellipse(x*25+12.5,y*25+12.5+topbarHeight,size*25,size*25)
-    }
-    else {
-      noFill()
-      strokeWeight(2)
-      for (let i = size*25-1; i > 1; i-=3){
-        let d = alpha < 40 ? alpha-20 : (alpha-40)/(size*25)*i+20
-        stroke(0,0,0,d)
-        ellipse(x*25+12.5,y*25+12.5+topbarHeight,i,i)
+    man.inDark = man.darkCheck()
+    for (let i = viewport.left+128; i < viewport.right; i+=256) {
+      for (let j = viewport.top+128; j< viewport.bottom; j+=256){
+        this.darkOutBlock(i, j, 256, alpha)
       }
     }
+  }
+
+  darkOutBlock(x,y, size, alpha){ //all in pixels
+    let f = this.checkFireDist(x,y,size)
+    if (f.show){
+      if (f.close){
+        fill(0,0,0, min(100,alpha))
+        noStroke()
+        rect(x-(size/2),y-(size/2)+topbarHeight,size,size)
+      }
+      else {
+        for (let i = x-size/4; i<=x+size/4; i+=size/2){
+          for (let j = y-size/4; j<=y+size/4; j+=size/2){
+            if (size <= 4){
+              this.dimOutBlock(i, j, 2, alpha)
+            }
+            else
+              this.darkOutBlock(i, j, size/2, alpha)
+          }
+        }
+      }
+    }
+    else {
+      fill(0,0,0,alpha)
+      noStroke()
+      rect(x-(size/2),y-(size/2)+topbarHeight,size,size)
+    }
+  }
+
+  dimOutBlock(x,y, size, alpha){ // size <= 2
+    let fire = {}
+    strokeWeight(1)
+    for (let i = x-size/2; i<x+size/2; i++){
+      for (let j = y-size/2; j<y+size/2; j++){
+        let f = this.checkFireDist(i,j,size)
+        if (f.show){
+          stroke(0,0,0,min(100,alpha))
+        }
+        else {
+          stroke(0,0,0, alpha)
+        }
+        point(i, j+topbarHeight)
+      }
+    }
+  }
+
+  checkFireDist(x,y,size){
+    let show = false
+    let close = false
+    for (let f of this.fires){
+      if (f.value > 0){
+        let fd = dist(x,y,f.x*25+12.5,f.y*25+12.5)
+        let offset = (f.value/4)+50
+        if (fd-offset < size*0.75) {
+          show = true
+          if (offset-fd > size*0.75){
+            close = true
+          }
+        }
+      }
+    }
+    for (let camp of this.buildings){
+      if (camp.fireValue > 0){
+        let fd = dist(x,y,camp.x*25+25,camp.y*25+25)
+        let offset = (camp.fireValue/4)+50
+        if (fd-offset < size*0.75) {
+          show = true
+          if (offset-fd > size*0.75){
+            close = true
+          }
+        }
+      }
+    }
+    return {show, close}
   }
 
   drawBadge(x,y,num,color){
@@ -475,7 +484,8 @@ class Board extends WemoObject {
     text(num,x,y)
   }
 
-  drawProgressBar(i,j,value, Xoffset){
+  drawProgressBar(i,j,fireValue, Xoffset){
+    let value = map(fireValue, 0, 240, 0, 20)
     fill(255)
     stroke(80)
     strokeWeight(1)

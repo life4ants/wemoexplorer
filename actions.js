@@ -50,7 +50,7 @@ let actions = {
     if (item.name === "firepit"){
       if (!cell.revealed)
         return "Sorry, you can't build a firepit in the clouds!"
-      if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle"].includes(cell.type)){
+      if (["grass", "sand", "stump", "beach", "beachEdge", "grassBeach", "rockMiddle", "root"].includes(cell.type)){
         man.isAnimated = true
         man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
           let fires = board.fires
@@ -72,7 +72,7 @@ let actions = {
         if (toolbelt.containers.length < toolbelt.maxContainers){
           man.isAnimated = true
           man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
-            toolbelt.addItem("container", new Backpack("basket"))
+            toolbelt.addItem("container", new Backpack({type:"basket"}))
             backpack.removeItem("longGrass", 6)
             tutorial.checkAction("basket")
             popup.setAlert("Congratulations! You can now gather berries. Look for the Basket icon on the top bar.")
@@ -89,17 +89,11 @@ let actions = {
     else if (item.name === "claypot"){
       let num = backpack.includesItem("clay")
       if (num >= 2){
-        if (cell.type === "campsite" && board.buildings[cell.id].fireValue >= 5){
-          backpack.removeItem("clay", 2)
-          board.buildings[cell.id].isCooking = true
-          board.buildings[cell.id].cookTime = 5 //4-5 periods of 13.33 wemo mins
-          board.buildings[cell.id].action = function (){
-            board.buildings[cell.id].items.push(new Backpack("claypot"))
-            popup.setAlert("Your Clay Pot is now available to grab from your campsite")
-          }
+        if (cell.type === "campsite"){
+          return board.buildings[cell.id].cook(item)
         }
         else
-          return "Opps! Your fire isn't big enough or you aren't in a campsite."
+          return "You have to be in a campsite to cook a claypot."
       }
       else {
         return "Oops! You need "+(2-num)+" more Clay!"
@@ -210,28 +204,7 @@ let actions = {
 
   cook(item){
     if (board.cells[man.x][man.y].type === "campsite"){
-      let camp = board.buildings[board.cells[man.x][man.y].id]
-      if (camp.fireValue >= floor(item.time/13.333)){
-        if (item.name === "rabbitStew"){
-          let w = camp.items.findIndex((e) => e.type === "claypot" && e.items.water.quantity === 4)
-          let v = camp.items.findIndex((e) => e.type === "basket" && e.items.veggies.quantity >= 8)
-          if (w === -1 || v === -1 || backpack.includesItem("rabbitDead") < 1)
-            return "Opps! looks like you don't have the needed ingredients. Make sure you dropped the claypot and basket in your campsite."
-          else {
-            camp.items[v].removeItem("veggies", 8)
-            camp.isCooking = true
-            camp.cookTime = 3
-            camp.action = function(){
-              camp.items[w].items.water.quantity = 0
-              camp.items[w].items.rabbitStew.quantity = 8
-              backpack.removeItem("rabbitDead", 1)
-              popup.setAlert("Your stew is done!")
-            }
-          }
-        }
-      }
-      else
-        return "Your fire isn't big enough!"
+      return board.buildings[board.cells[man.x][man.y].id].cook(item)
     }
     else
       return "Opps! You have to be in a campsite to cook"
@@ -276,13 +249,8 @@ let actions = {
         return "Sorry, you can't dump rock on a "+cell.type+" square!"
       backpack.removeItem("rock", 1)
     }
-    // rabbit:
-    else if (type === "rabbitDead"){
-      cell.rabbits = cell.rabbits +1 || 1
-      backpack.removeItem("rabbitDead", 1)
-    }
     // everything else:
-    else if (["arrow", "bone", "clay", "log", "longGrass", "mushroom", "stick"].includes(type)){
+    else if (["arrow", "bone", "clay", "log", "longGrass", "mushroom", "stick", "rabbitDead"].includes(type)){
       if (cell.type === type+"pile")
         cell.quantity++
       else if (cell.type === type){
@@ -300,6 +268,10 @@ let actions = {
       else
         return "Sorry, you can't dump a "+type+" on a "+cell.type+" square!"
       backpack.removeItem(type, 1)
+    }
+    else if (type === "rabbitLive"){
+      board.rabbits.push(new Rabbit({x: man.x, y: man.y}))
+      backpack.removeItem("rabbitLive", 1)
     }
     return false
   },
@@ -397,9 +369,8 @@ let actions = {
                 tutorial.checkAction("steppingStones")
               }
               else if (item.type === "campsite"){
-                let site = {type: "campsite", x: o.x, y: o.y, items: [], fireValue: 0}
                 let id = board.buildings.length
-                board.buildings.push(site)
+                board.buildings.push(new Campsite({x: o.x, y: o.y}))
                 for (let i = o.x; i <= o.x+1; i++){
                   for (let j = o.y; j <= o.y+1; j++){
                     board.cells[i][j].type = "campsite"
@@ -417,12 +388,14 @@ let actions = {
     }
     let cell = board.cells[man.x][man.y]
     if (man.isNextToFire || cell.type === "campsite"){
-      let items = backpack.includesItems(["log", "stick", "longGrass", "rabbitLive"])
+      let fireValue = cell.type === "campsite" ? board.buildings[cell.id].fireValue : board.fires[man.fireId].value
+      let list = fireValue === 0 ? ["longGrass"] : ["log", "stick", "rabbitLive", "longGrass"]
+      let items = backpack.includesItems(list)
       if (items.length > 0){
-        let fireValue = cell.type === "campsite" ? board.buildings[cell.id].fireValue : board.fires[man.fireId].value
-        fireValue = items[0].type === "log" ? Math.min(fireValue+13, 20) :
-                      items[0].type === "stick" ? Math.min(fireValue+6, 20) : 
-                        items[0].type === "longGrass" ? Math.min(fireValue+2, 20) : Math.min(fireValue+8,20)
+        fireValue = items[0].type === "log" ? Math.min(fireValue+122, 240) :
+            items[0].type === "stick" ? Math.min(fireValue+70, 240) : 
+            items[0].type === "longGrass" && fireValue === 0 ? 20 : 
+            items[0].type === "rabbitLive" ? Math.min(fireValue+50, 240) : Math.min(fireValue+10,240)
         if (cell.type === "campsite")
           board.buildings[cell.id].fireValue = fireValue
         else
@@ -434,6 +407,15 @@ let actions = {
   },
 
   grab(){
+    //grab live rabbit
+    for (let i = board.rabbits.length - 1; i >= 0; i--) {
+      let r = board.rabbits[i]
+      if (r.x === man.x && r.y === man.y){
+        if (backpack.addItem("rabbitLive"))
+          board.rabbits.splice(i, 1)
+        return
+      }
+    }
     let cell = board.cells[man.x][man.y]
     //grab dead rabbit:
     if (cell.rabbits){

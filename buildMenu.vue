@@ -11,7 +11,7 @@
 		<div v-if="'dumpMenu' === type" class="modal-body">
       <p>Use arrow keys or click:</p>
       <div class="flex">
-        <div v-for="(item, k) in showOptions" :key="item.id" style="position: relative">
+        <div v-for="(item, k) in showOptions" :key="k" style="position: relative">
           <img :src="item.src" height="35" width="35" @click="() => select(k)"
             :class="selectId === k ? 'red-border' : 'no-border'">
           <div v-if="item.num" class="img-badge">{{item.num}}</div>

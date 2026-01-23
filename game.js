@@ -141,7 +141,7 @@ var game = new Vue({
           b = board
       }
       man = new Man(player.character, b.startX, b.startY)
-      backpack = new Backpack("backpack", b.backpack)
+      backpack = new Backpack(b.backpack ?? {type:"backpack"})
       delete b.backpack
       toolbelt = new Toolbelt(b.toolbelt)
       delete b.toolbelt
@@ -206,8 +206,8 @@ var game = new Vue({
       board.progress = true
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
         Object.assign({man: man.export(), vehicles: vehicles.save(),
-                        backpack: backpack.items,
-                        toolbelt: toolbelt.getAllItems(),
+                        backpack: backpack.export(),
+                        toolbelt: toolbelt.export(),
                       }, board.export())
       ))
     },

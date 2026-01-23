@@ -143,7 +143,8 @@ module.exports = {
   methods: {
     newPlayer(){
       if (this.name.length > 0){
-        this.players.push({name: this.name, unlockedLevel: 0, games: [], character: 0})
+        let level = typeof test === "undefined" ? 0 : 4
+        this.players.push({name: this.name, unlockedLevel: level, games: [], character: 0})
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
         if (this.players.length === 1)
@@ -169,8 +170,7 @@ module.exports = {
         }
         this.players.splice(id, 1)
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
-        if (this.players.length === 0)
-          this.deleteMode = false
+        this.deleteMode = false
       }
     },
 

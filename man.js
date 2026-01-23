@@ -168,6 +168,24 @@ class Man extends WemoObject {
     this.fireId = null
   }
 
+  darkCheck(){
+    for (let f of board.fires){
+      let d = dist(this.x, this.y, f.x, f.y) // tile distance
+      let l = f.value > 0 ? (f.value/4)+45 : 0// pixels
+      if ((d*25) < l){
+        return false
+      }
+    }
+    for (let c of board.buildings){
+      let d = dist(this.x, this.y, c.x, c.y)
+      let l = c.fireValue > 0 ? (c.fireValue/4)+45 : 0
+      if ((d*25) < l){
+        return false
+      }
+    }
+    return timer.dark
+  }
+
   dismount(){
     if (this.isRiding && (active.landed || active.isBeside("dock") || board.cells[active.x][active.y].type === "river")){
       let dirs = active.index === 0 ? [4,0,2,3,1,5,7,6] :

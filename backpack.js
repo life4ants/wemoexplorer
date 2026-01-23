@@ -1,7 +1,7 @@
 class Backpack {
-  constructor(type,items){
+  constructor(obj){
     this.weight = 0
-    this.type = type
+    this.type = obj.type
     if (this.type === "backpack"){
       this.maxWeight = 250
       this.maxNum = 4
@@ -36,12 +36,21 @@ class Backpack {
         rabbitStew: {weight: 8, quantity: 0}
       }
     }
-    if (items){
-      for (let key in items) {
-        this.items[key].quantity = items[key].quantity
-        this.weight += this.items[key].weight*items[key].quantity
+    if (obj.items){
+      for (let key in obj.items) {
+        this.items[key].quantity = obj.items[key]
+        this.weight += this.items[key].weight*obj.items[key]
       }
     }
+  }
+
+  export(){
+    let output = {}
+    for (let key in this.items) {
+      if (this.items[key].quantity > 0)
+        output[key] = this.items[key].quantity
+    }
+    return {type: this.type, items: output}
   }
 
   getAllItems(list){

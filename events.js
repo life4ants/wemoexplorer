@@ -69,7 +69,7 @@ function mousePressed(){
       break
   }
   
-  if (test && game.mode === "play" && test.clickInfo){
+  if (typeof test !== 'undefined' && game.mode === "play" && test.clickInfo){
     let y = Math.floor((mouseY-topbarHeight)/25)
     let x = Math.floor(mouseX/25)
     let cell = board.cells[x][y] || {}

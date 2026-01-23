@@ -9,7 +9,7 @@ class WemoObject {
     let output = {}
     let items = Object.keys(this)
     for (let i = 0; i < items.length; i++){
-      if (typeof this[items[i]] !== "function" && !["img", "bombs", "snakes", "rabbits"].includes(items[i]))
+      if (typeof this[items[i]] !== "function" && !["img", "bombs", "snakes", "rabbits", "buildings"].includes(items[i]))
         output[items[i]] = this[items[i]]
     }
     if (this.rabbits){
@@ -22,6 +22,12 @@ class WemoObject {
       output.snakes = []
       for (let k in this.snakes){
         output.snakes.push(this.snakes[k].export())
+      }
+    }
+    if (this.buildings){
+      output.buildings = []
+      for (let k in this.buildings){
+        output.buildings.push(this.buildings[k].export())
       }
     }
     return output

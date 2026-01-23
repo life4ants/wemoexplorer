@@ -256,17 +256,17 @@ var popup = new Vue({
     drop(item){
       let camp = board.buildings[board.cells[active.x][active.y].id]
       if (item.type === "container"){
-        camp.items.push(toolbelt.containers.splice(item.id, 1)[0])
+        camp.addItem("container", toolbelt.containers.splice(item.id, 1)[0])
       }
       else if (item.type === "tool"){
-        camp.items.push(toolbelt.tools.splice(item.id, 1)[0])
+        camp.addItem("tool", toolbelt.tools.splice(item.id, 1)[0])
       }
       this.close()
     },
 
     grabMenu(type, cellId){
       let id = type === "info" ? cellId : board.cells[active.x][active.y].id
-      let items = board.buildings[id].items
+      let items = board.buildings[id].getItems()
       if (items.length === 0){
         this.setAlert("This campsite does not have any items in it.")
         return
@@ -293,10 +293,10 @@ var popup = new Vue({
     },
 
     grab(x, selID){
-      let items = board.buildings[board.cells[active.x][active.y].id].items
+      let camp = board.buildings[board.cells[active.x][active.y].id]
       if (x.type === "tool"){
         if (toolbelt.tools.length < toolbelt.maxTools){
-          toolbelt.tools.push(items.splice(selID, 1)[0])
+          toolbelt.tools.push(camp.takeItem("tool", selID))
           this.close()
         }
         else
@@ -304,7 +304,7 @@ var popup = new Vue({
       }
       else if (x.type === "container"){
         if (toolbelt.containers.length < toolbelt.maxContainers){
-          toolbelt.containers.push(items.splice(selID, 1)[0])
+          toolbelt.containers.push(camp.takeItem("container", selID))
           this.close()
         }
         else
