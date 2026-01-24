@@ -28,17 +28,20 @@
             <h5>Version {{version}}</h5>
             <h6>Published {{publicationDate}}</h6>
             <ul>
-              <li>Must start fire with long grass</li>
-              <li>Mulitple fires show correctly</li>
-              <li>Probably lots of new bugs. Please test.</li>
+              <li>More info on How to Play page</li>
+              <li>Background music</li>
+              <li>Cook button</li>
+              <li>Should work on mobile</li>
+              <li>Can grab and dump rabbits, but not burn them.</li>
             </ul>
           </div>
           <div class="whatsNew">
-            <h5>Version 1.6.0</h5>
-            <h6>Published Jan 19, 2026</h6>
+            <h5>Version 1.7.0</h5>
+            <h6>Published Jan 23, 2026</h6>
             <ul>
-              <li>New Tutorial and Quest system</li>
-              <li>Track level completes</li>
+              <li>Must start fire with long grass</li>
+              <li>Mulitple fires show correctly</li>
+              <li>Probably lots of new bugs. Please test.</li>
             </ul>
           </div>
           <div class="tiny">Views since Dec 13, 2025: {{viewCount}}</div>
@@ -114,8 +117,8 @@ module.exports = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.7.0",
-      publicationDate: "Jan 23, 2026",
+      version: "1.7.1",
+      publicationDate: "Jan 24, 2026",
       pageViews: "loading"
     }
   },
