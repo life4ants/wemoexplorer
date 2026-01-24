@@ -444,15 +444,11 @@ let actions = {
           delete cell.quantity
         }
       }
-      else
-        return
     }
     //gather a log, bone or stick:
     else if (["log", "bone", "stick", "arrow"].includes(cell.type)){
       if (backpack.addItem(cell.type))
         cell.type = cell.tile.replace(/\d+$/, "")
-      else
-        return
     }
     //pick mushrooms:
     else if ("mushroom" === cell.type){
@@ -460,8 +456,6 @@ let actions = {
         cell.type = "root"
         cell.growtime = floor(random(180))
       }
-      else
-        return
     }
     //gather a rock:
     else if ("rock" === cell.type){
@@ -472,8 +466,6 @@ let actions = {
           delete cell.quantity
         }
       }
-      else
-        return
     }
     //gather grass:
     else if ("longGrass" === cell.type){
@@ -488,8 +480,6 @@ let actions = {
           cell.tile = "longGrass"+(quantity-1)
         }
       }
-      else
-        return
     }
     //pick berries:
     else if ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0){
@@ -500,8 +490,6 @@ let actions = {
         tree.berries.splice(p, 1)
         tutorial.checkAction("apples")
       }
-      else
-        return
     }
     else if ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0){
       let basket = toolbelt.getContainer("basket")
@@ -511,8 +499,6 @@ let actions = {
         tree.berries.splice(p, 1)
         tutorial.checkAction("berries")
       }
-      else
-        return
     }
     //gather veggies:
     else if ("veggies" === cell.type){
@@ -530,12 +516,9 @@ let actions = {
           }
           tutorial.checkAction("veggies")
         }
-        else
-          return
       }
       else {
         popup.setAlert("You can't gather veggies without a basket!")
-        return
       }
     }
     //dig clay:
@@ -553,10 +536,7 @@ let actions = {
         }
         man.energy = toolbelt.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
         sounds.play("dig")
-        return
       }
-      else
-        return
     }
     //gather water:
     else if (helpers.isNextToType(active.x,active.y, "river")){
@@ -564,11 +544,8 @@ let actions = {
       if (pot){
         pot.addItem("water")
         sounds.play("water")
-        return
       }
     }
-    else
-      return
   },
 
   throw(){

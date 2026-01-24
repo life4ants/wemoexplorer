@@ -53,7 +53,8 @@
       <p><span><img src="images/wakeUp.png"></span>
       Click this or press S to wake up.</p>
       <br>
-      <p>Press K to open the cooking Menu</p>
+      <p><span><img src="images/cook.png"></span>
+      Click this or press K to open the cooking Menu</p>
       <p>Press T to shoot an arrow</p>
       <h6>Food</h6>
       <p><span><img src="images/berryBush.png"></span>
