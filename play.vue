@@ -10,7 +10,7 @@
 	    <div class="downButton" @pointerdown="disableCanvas" 
         @click="() => moveAction(40)"></div>
 	  </div> 
-	  <div class="sidebar">
+	  <div class="sidebar unselctable">
 	    <div class="sidebar-content">
 	      <i class="fa fa-sign-out fa-flip-horizontal fa-3x" @click="exit" title="Exit Game"></i>
 	      <i :class="{fa: true, 'fa-3x': true, 'fa-play': paused, 'fa-pause': !paused}"

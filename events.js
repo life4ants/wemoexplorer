@@ -99,6 +99,6 @@ function windowResized(){
     viewport.update(true)
 }
 
-function touchStarted(){
-  // declared to fix mobile issues
+function touchStarted(e){
+  window._UIevent = true
 }

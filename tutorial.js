@@ -10,7 +10,7 @@ let tutorial = {
 			{
 				title: "Learn to Walk", 
 				text: "Use the arrow keys to move around. Walk all four directions to continue.",
-				mobileText: "This game works best with a keyboard, but can be played on touchscreen. Tap the buttons on the edge of the screen to move, or tap anywhere on the board. Walk all four directions to continue."
+				mobileText: "This game works best with a keyboard, but can be played on touchscreen. Tap the buttons on the edge of the screen to move. Walk all four directions to continue."
 			},
 			{
 				title: "Find a star",
