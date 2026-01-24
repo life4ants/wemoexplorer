@@ -390,8 +390,8 @@ class Board extends WemoObject {
         break
     }
     man.inDark = man.darkCheck()
-    for (let i = viewport.left+128; i < viewport.right; i+=256) {
-      for (let j = viewport.top+128; j< viewport.bottom; j+=256){
+    for (let i = viewport.left+128; i < viewport.right+128; i+=256) {
+      for (let j = viewport.top+128; j< viewport.bottom+128; j+=256){
         this.darkOutBlock(i, j, 256, alpha)
       }
     }

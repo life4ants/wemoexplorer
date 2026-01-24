@@ -389,13 +389,12 @@ let actions = {
     let cell = board.cells[man.x][man.y]
     if (man.isNextToFire || cell.type === "campsite"){
       let fireValue = cell.type === "campsite" ? board.buildings[cell.id].fireValue : board.fires[man.fireId].value
-      let list = fireValue === 0 ? ["longGrass"] : ["log", "stick", "rabbitLive", "longGrass"]
+      let list = fireValue === 0 ? ["longGrass"] : ["log", "stick", "longGrass"]
       let items = backpack.includesItems(list)
       if (items.length > 0){
         fireValue = items[0].type === "log" ? Math.min(fireValue+122, 240) :
             items[0].type === "stick" ? Math.min(fireValue+70, 240) : 
-            items[0].type === "longGrass" && fireValue === 0 ? 20 : 
-            items[0].type === "rabbitLive" ? Math.min(fireValue+50, 240) : Math.min(fireValue+10,240)
+            items[0].type === "longGrass" && fireValue === 0 ? 20 : Math.min(fireValue+10,240)
         if (cell.type === "campsite")
           board.buildings[cell.id].fireValue = fireValue
         else
