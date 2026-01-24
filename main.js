@@ -285,23 +285,8 @@ function preload(){
     z: loadImage("images/z's.png")
   }
 
-  sounds.files = {
-    chop: new Audio("sounds/chop.mp3"),
-    dig: new Audio("sounds/dig.mp3"),
-    eat: new Audio("sounds/eat.mp3"),
-    lose: new Audio("sounds/lose.mp3"),
-    sleep: new Audio("sounds/sleeping.mp3"),
-    vomit: new Audio("sounds/vomit.mp3"),
-    water: new Audio("sounds/water.wav"),
-    walk1: new Audio("sounds/walk1.mp3"),
-    walk2: new Audio("sounds/walk2.mp3"),
-    win: new Audio("sounds/win.mp3")
-  }
-
-  sounds.files.sleep.loop = true
-  sounds.files.sleep.volume = 0.3
-  sounds.files.win.volume = 0.4
-  sounds.files.eat.volume = 0.4
+  document.getElementById("p5_loading").innerHTML = "Loading Sounds ..."
+  sounds.initialize()
   tiles.construction.steppingStones = tiles.steppingStones
   tiles.arrows = tiles.arrow
   tiles.bones = tiles.bone

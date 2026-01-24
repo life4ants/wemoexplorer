@@ -2,6 +2,28 @@ let sounds = {
   odd: true,
   files: {},
 
+  initialize(){
+    this.files = {
+    chop: new Audio("sounds/chop.mp3"),
+    dig: new Audio("sounds/dig.mp3"),
+    eat: new Audio("sounds/eat.mp3"),
+    lose: new Audio("sounds/lose.mp3"),
+    music: new Audio("sounds/music3.mp3"),
+    sleep: new Audio("sounds/sleeping.mp3"),
+    vomit: new Audio("sounds/vomit.mp3"),
+    water: new Audio("sounds/water.wav"),
+    walk1: new Audio("sounds/walk1.mp3"),
+    walk2: new Audio("sounds/walk2.mp3"),
+    win: new Audio("sounds/win.mp3")
+  }
+
+    this.files.sleep.loop = true
+    this.files.music.loop = true
+    this.files.sleep.volume = 0.3
+    this.files.win.volume = 0.4
+    this.files.eat.volume = 0.4
+  },
+
   play(file){ 
     if ("walk" === file){
       let num1 = this.odd ? 1 : 2
@@ -12,6 +34,10 @@ let sounds = {
       }
       this.files[file+num2].play()
       this.odd = !this.odd
+    }
+    else if (['win', 'lose'].includes(file)){
+      this.files.music.pause()
+      this.files[file].play()
     }
     else {
       if (this.files[file].currentTime != 0)

@@ -18,7 +18,7 @@
 	      <div class="icon">
           <span class="icontext">Center Screen (X)</span>
           <img src="images/centerScreen.png" height="40" width="40"
-  	              :class="{icon: true, selected: autoCenter}" @click="() => action('X')">
+  	              :class="{icon: true, 'x-selected': autoCenter}" @click="() => action('X')">
         </div>
 	      <div v-for="icon in icons" v-show="icon.active" class="icon">
           <span class="icontext">{{icon.title}}</span>
@@ -26,6 +26,20 @@
   	              height="40" width="40"  @click="() => action(icon.code)">
         </div>
         <div class="bottom">
+          <div class="musicIcon" v-if="musicOn" style="left: 4px">
+            <div class="absolute" @click="setMusic" >
+              <i class="fa fa-music fa-lg"></i>
+            </div>
+            <input class="vertical-slider" type="range" 
+                id="volumeSlider" v-model.number="volume"
+                min="0" max="0.6" step="0.01">
+          </div>
+          <div class="musicIcon" v-else style="right: 4px">
+            <span class="fa-stack fa-lg" @click="setMusic">
+              <i class="fa fa-music fa-stack-1x"></i>
+              <i class="fa fa-ban fa-stack-2x"></i>
+            </span>
+          </div>
   	      <i class="fa fa-question-circle fa-3x" @click="showQuest" title="Show Quest"></i>
           <i class="fa fa-info-circle fa-3x" @click="showInfo" title="Show Info"></i>
         </div>
@@ -52,13 +66,37 @@ module.exports = {
 	      {code: "G", active: false, id: "pick", src: "images/pick.png", title: "Gather Berries (G)"},
 	      {code: "F", active: false, id: "fling", src: "images/fling.png", title: "Fling (F)"},
 	      {code: "S", active: false, id: "sleep", src: "images/sleepIcon.png", title: "Go to Sleep (S)"},
-	      {code: "S", active: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"}
+        {code: "S", active: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"},
+	      {code: "K", active: false, id: "cook", src: "images/cook.png", title: "Cook (K)"}
 	    ],
+      musicOn: false,
+      volume: 0.4
 		}
 	},
+  destroyed(){
+    sounds.files.music.pause()
+    sounds.files.music.currentTime = 0
+
+  },
+  watch:{
+    volume(){
+      sounds.files.music.volume = this.volume
+    }
+  },
   methods: {
     disableCanvas(){
       window._UIevent = true
+    },
+
+    setMusic(){
+      if (this.musicOn){
+        sounds.files.music.pause()
+        this.musicOn = false
+      }
+      else {
+        sounds.files.music.play()
+        this.musicOn = true
+      }
     },
 
   	showInfo(){
@@ -122,6 +160,8 @@ module.exports = {
         this.icons[9].active = (man.canSleep && !man.isSleeping && !man.isRiding)
         //wake up:
         this.icons[10].active = man.isSleeping
+        // Cook:
+        this.icons[11].active = board.buildings.length > 0
       }
   	}
 	}
@@ -129,11 +169,22 @@ module.exports = {
 </script>
 
 <style>
-.sidebar.selected {
+.x-selected {
   height: 36px;
   width: 36px;
   border: solid 2px red;
   margin: 4px 0;
+}
+
+.musicIcon {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  font-size: 1.26em;
+}
+
+.absolute {
+  position: absolute;
 }
 
 .icon {
@@ -166,4 +217,47 @@ module.exports = {
   position: absolute;
   bottom: 0;
 }
+
+.vertical-slider {
+  position: absolute;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 60px;          /* becomes height after rotation */
+  height: 10px;
+  transform: rotate(-90deg);
+}
+
+/* Track */
+.vertical-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  background: #222;
+  border-radius: 6px;
+}
+
+.vertical-slider::-moz-range-track {
+  height: 6px;
+  background: #222;
+  border-radius: 6px;
+}
+
+/* Thumb */
+.vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #00d;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -6px;
+}
+
+.vertical-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #444;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
 </style>

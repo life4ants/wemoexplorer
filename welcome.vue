@@ -190,6 +190,7 @@ module.exports = {
         this.customWorlds.splice(customWorldIndex, 1)
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
       }
+      this.deleteMode = false
     },
 
     signout(){
