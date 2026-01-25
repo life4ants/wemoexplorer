@@ -62,7 +62,7 @@ let messageCreater = {
       type: "square-center", fontSize: 18, color: [255,255,255,180],
       update: function(){
         let msg = "man dist: "+man.stepCount+" | cells left to explore: "+board.revealCount+
-          " | walking cost: "+(Math.round(man.walkingCost()*100)/100)+" | stand count: "+man.standCount
+          " | walking cost: "+(Math.round(man.walkingCost()*100)/100)
         let x = viewport.left+floor(viewport.width/2)
         let y = viewport.bottom-50
         this.pos = {w: 500, h: 46, x, y}

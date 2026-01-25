@@ -219,7 +219,7 @@ let actions = {
       }
       else {
         man.isAnimated = true
-        man.animation = {frame: 0, type: "chopping", end: world.frameRate*15/3, action: () => {
+        man.animation = {frame: 0, type: "chopping", end: world.frameRate*5, action: () => {
           cell.type = cell.type === "treeThin" ? "stickpile" : "logpile"
           cell.tile = "stump"
           cell.quantity = 5
@@ -293,8 +293,9 @@ let actions = {
       man.health -= Math.floor((Math.random()*5+1)*10)
       msgs.following.msg = "You ate too much!!!"
       msgs.following.frames = 30
-      man.vomit = true
       sounds.play("vomit")
+      man.isAnimated = true
+        man.animation = {frame: 0, type: "vomit", end: 30}
       return
     }
     sounds.play("eat")

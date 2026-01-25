@@ -157,7 +157,7 @@ module.exports = {
         //fling:
         this.icons[8].active = !!helpers.nearbyType(active.x, active.y, "construction")
         //sleep:
-        this.icons[9].active = (man.canSleep && !man.isSleeping && !man.isRiding)
+        this.icons[9].active = (man.canSleep && !man.isSleeping)
         //wake up:
         this.icons[10].active = man.isSleeping
         // Cook:

@@ -1,26 +1,37 @@
-class Man extends WemoObject {
+class Man {
   constructor(characterId, x, y){
-    super()
     this.x = x
     this.y = y
-    this.oldX = 0
-    this.oldY = 0
+    this.characterId = characterId
     this.index = 3 //direction facing: 0 - right, 1 - left, 2 - up, 3 - down
     this.energy = 3000
     this.health = 3000
     this.stepCount = 0
-    this.standCount = 0
-    this.img = [tiles.players[characterId], tiles.playersAnimated[characterId]]
     this.isRiding = false
     this.ridingId = ""
     this.isNextToFire = false
     this.fireId = null
-    this.vomit = false
-    this.inDark = false
     this.isSleeping = false
     this.canSleep = false
     this.isAnimated = false
     this.animation = {frame: 0, type: "", end: 0, action: null}
+  }
+
+  import(obj) {
+    for (let key in obj){
+      this[key] = obj[key]
+    }
+  }
+
+  export(){
+    let list = [
+    "x", "y", "characterId", "energy", "health", "stepCount", "isRiding", 
+    "ridingId", "isNextToFire", "fireId", "isSleeping", "canSleep"]
+    let output = {}
+    for (let key of list){
+      output[key] = this[key]
+    }
+    return output
   }
 
   update(){
@@ -34,29 +45,25 @@ class Man extends WemoObject {
       this.drawImage(this.img[0], this.index, this.x*25, this.y*25+topbarHeight, 25, 25)
       return
     }
-
-    if (this.inDark){
-      msgs.following.msg = "You're too far from a fire!"
-      msgs.following.frames = 1
-      if (!this.isAnimated)
-        this.health -= Math.floor((this.health+500)/200)
+    if (timer.dark){
+     this.darkCheck()
     }
     if (this.isRiding){
       let sx = (active.index%3)*25
       let sy = Math.floor(active.index/3)*25
       let h = active.type === "canoe" && [0,1].includes(active.index) ? 19 :
               active.type === "canoe" ? 21 : 25
-      image(this.img[0], active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
+      let img = tiles.players[this.characterId]
+      image(img, active.x*25, active.y*25+topbarHeight, 25, h, sx, sy, 25, h)
       return
     }
-    this.standCount++
-    this.canSleep = (timer.dark && !this.inDark || 
-        this.isNextToFire && board.fires[this.fireId].value > 0 ||
+
+    this.canSleep = !this.isRiding && (this.isNextToFire && board.fires[this.fireId].value > 0 ||
         cell.type === "campsite")
     if (this.isSleeping && !this.canSleep)
       this.goToSleep()
 
-    if (board.cells[this.x][this.y].type === "firepit" && board.fires[this.fireId].value > 0){
+    if (cell.type === "firepit" && board.fires[cell.id].value > 0){
       msgs.following.msg = "Get off the fire! You're burning!"
       msgs.following.frames = 1
       this.health -=25
@@ -70,7 +77,7 @@ class Man extends WemoObject {
 
   display() {
     let offset = backpack.weight > 0 ? 4 : 0
-    let index = this.vomit ? 8 : this.isSleeping ? 9 : this.index+offset
+    let index = this.isSleeping ? 9 : this.index+offset
     let dx = this.x*25
     let dy = this.y*25+topbarHeight
 
@@ -78,43 +85,34 @@ class Man extends WemoObject {
       let id = board.cells[this.x][this.y].id
       dx = (board.buildings[id].x+1)*25
       dy = board.buildings[id].y*25+topbarHeight+18
-      index = this.vomit ? 8 : 10
+      index = 10
       if (this.isSleeping){
         image(tiles.z, dx, dy)
         return
       }
     }
     if (this.isAnimated){
-      if (["shrinking", "growing"].includes(this.animation.type)){
-        let length = this.animation.type === "growing" ? 30-Math.round(this.energy/200) : 5
-        let size = this.animation.type === "growing" ?  map(this.animation.frame, 0, length, 10, 25) :
-              map(this.animation.frame, 0, length, 25, 10)
-        let pos = map(this.animation.frame, 0, length, 0, 25)
-        let x = (this.x-this.oldX)*pos
-        let y = (this.y-this.oldY)*pos
-        imageMode(CENTER)
-        this.drawImage(this.img[0], this.index+offset, this.oldX*25+12.5+x, this.oldY*25+topbarHeight+12.5+y, size, size)
-        imageMode(CORNER)
-        if (this.animation.frame >= length)
-          this.isAnimated = false
+      if ("vomit" === this.animation.type){
+        this.drawImage(8, dx, dy, 25, 25)
       }
       else if (["building", "chopping"].includes(this.animation.type)){
         let id = floor(map(frameCount%(world.frameRate/3), 0, world.frameRate/3, 0, 3))
         let sx = (id%3)*35
         let sy = floor(id/3)*25
-        image(this.img[1], dx, dy, 35, 25, sx, sy, 35, 25)
-        if (this.animation.type === "chopping" && frameCount%6 === 0)
+        let img = tiles.playersAnimated[this.characterId]
+        image(img, dx, dy, 35, 25, sx, sy, 35, 25)
+        if (this.animation.type === "chopping" && this.animation.frame % 6 === 1)
           sounds.play("chop")
-        if (this.animation.frame >= this.animation.end){
-          this.isAnimated = false
-          if (typeof this.animation.action === "function")
-            this.animation.action()
-        }
       }
       this.animation.frame++
-      return
+      if (this.animation.frame >= this.animation.end){
+        this.isAnimated = false
+        if (typeof this.animation.action === "function")
+          this.animation.action()
+      }
     }
-    this.drawImage(this.img[0], index, dx, dy, 25, 25)
+    else
+      this.drawImage(index, dx, dy, 25, 25)
   }
 
   move(x, y) {
@@ -173,17 +171,21 @@ class Man extends WemoObject {
       let d = dist(this.x, this.y, f.x, f.y) // tile distance
       let l = f.value > 0 ? (f.value/4)+45 : 0// pixels
       if ((d*25) < l){
-        return false
+        return // not in the dark
       }
     }
     for (let c of board.buildings){
       let d = dist(this.x, this.y, c.x, c.y)
       let l = c.fireValue > 0 ? (c.fireValue/4)+45 : 0
       if ((d*25) < l){
-        return false
+        return
       }
     }
-    return timer.dark
+
+    msgs.following.msg = "You're too far from a fire!"
+    msgs.following.frames = 1
+    if (!this.isAnimated)
+      this.health -= Math.floor((this.health+500)/200)
   }
 
   dismount(){
@@ -204,6 +206,8 @@ class Man extends WemoObject {
         this.isRiding = true
         this.ridingId = watercraft
         vehicles[watercraft].index = vehicles[watercraft].index === 4 ? 0 : 3
+        this.isNextToFire = false
+        this.fireId = null
       }
     }
   }
@@ -241,22 +245,21 @@ class Man extends WemoObject {
       this.isSleeping = false
       sounds.files['sleep'].pause()
     }
-    else if (this.canSleep && sleepable.includes(board.cells[this.x][this.y].type) && !this.isRiding){
+    else if (this.canSleep && sleepable.includes(board.cells[this.x][this.y].type)){
       this.isSleeping = true
       sounds.files['sleep'].play()
     }
     else {
-      let message = this.isRiding ? "Sorry, no sleeping on your raft!" :
-                      !this.canSleep ? "You can only sleep near a fire or in a campsite." :
+      let message = !this.canSleep ? "You can only sleep near a fire or in a campsite." :
                         "You can't sleep on a "+board.cells[this.x][this.y].type+"!"
       popup.setAlert(message)
     }
   }
 
-  drawImage(img, index, x, y, w, h){
+  drawImage(index, x, y, w, h){
     let sx = (index%3)*25
     let sy = Math.floor(index/3)*25
-    image(img, x, y, w, h, sx, sy, 25, 25)
+    image(tiles.players[this.characterId], x, y, w, h, sx, sy, 25, 25)
   }
 
   walkingCost(){

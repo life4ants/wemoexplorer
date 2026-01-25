@@ -21,7 +21,6 @@ let test = {
   skip(hours){
     board.wemoMins += (hours*60)
     timer.resume()
-    man.inDark = timer.dark
   },
 
   build(){
