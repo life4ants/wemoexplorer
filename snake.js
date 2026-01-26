@@ -11,7 +11,7 @@ class Snake {
   }
 
   export(){
-  	return {type: this.type, pos: this.cellPos}
+  	return this.cellPos
   }
 
   update(){

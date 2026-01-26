@@ -9,7 +9,7 @@ class Rabbit {
   }
 
   export(){
-    return {type: this.type, pos: {x: this.x, y: this.y}}
+    return {x: this.x, y: this.y}
   }
 
   display(){

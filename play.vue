@@ -145,7 +145,7 @@ module.exports = {
              (basket && basket.includesItems(["berries", "veggies", "apples"]).length > 0 )
         //jump:
         this.icons[5].active = (man.isRiding && (active.landed || active.isBeside("dock") ||
-              "river" === board.cells[active.x][active.y].type)) ||  (!man.isRiding && vehicles.canMount(man.x, man.y))
+              "river" === board.cells[active.x][active.y].type)) ||  (!man.isRiding && man.canMount() !== null)
         //chop:
         this.icons[6].active = ["tree", "treeShore", "treeThin"].includes(cell.type) && 
         			toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx") !== -1

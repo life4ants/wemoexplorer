@@ -6,7 +6,6 @@ let builder = {
   item: {},
 
   loop(){
-    vehicles.display()
     man.update()
     topbar.display()
     if (this.getPos()){

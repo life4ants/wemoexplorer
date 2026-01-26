@@ -1,18 +1,19 @@
-class WaterCraft extends WemoObject{
-  constructor(img, x, y, type){
-    super()
-    this.x = x
-    this.y = y
-    this.type = type
-    this.img = img
-    this.index = 4
-    this.landed = false
-    this.stepCount = 0
+class WaterCraft {
+  constructor(obj){
+    this.x = obj.x
+    this.y = obj.y
+    this.type = obj.type
+    this.index = 3
+    this.landed = obj.landed
+  }
+
+  export(){
+    return {x: this.x, y: this.y, type: this.type, landed: this.landed}
   }
 
   display() {
     let x, y, id
-    if ([0,1,4].includes(this.index)){
+    if ([0,1].includes(this.index)){
       x = this.type === "canoe" ? (this.x-1)*25 : this.x*25-5
       y = this.type === "canoe" ? this.y*25+topbarHeight : this.y*25+topbarHeight+3
       id = 0
@@ -22,7 +23,7 @@ class WaterCraft extends WemoObject{
       y = this.type === "canoe" ? (this.y-1)*25+topbarHeight : this.y*25+topbarHeight-5
       id = 1
     }
-    image(this.img[id], x, y)
+    image(tiles[this.type][id], x, y)
   }
 
   move(x, y) {
@@ -39,7 +40,6 @@ class WaterCraft extends WemoObject{
         this.x += x
         this.y += y
         this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
-        this.stepCount++
         man.energy -= 2
         if (newCell.type === "star")
           board.claimStar(this.x, this.y, newCell)

@@ -29,7 +29,7 @@ let test = {
       let cell = board.cells[o.x][o.y]
       let item = cell.construction
       if (item.type === "raft"){
-        vehicles.addRaft(o.x, o.y)
+        board.vehicles.push(new WaterCraft({x:o.x, y:o.y, landed: true, type: "raft"}))
         cell.type = cell.tile.replace(/\d+$/, "")
       }
       else if (item.type === "steppingStones"){

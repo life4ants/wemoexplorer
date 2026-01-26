@@ -1,9 +1,9 @@
-class Board extends WemoObject {
+class Board {
   constructor(a,b,fillType){
-    super()
     this.buildings = []
     this.rabbits = []
     this.snakes = []
+    this.vehicles = []
     this.teleports = []
     this.berryTrees = [] 
     this.berryBushes = []
@@ -26,7 +26,7 @@ class Board extends WemoObject {
       this.rows = b
       this.type = "custom"
       this.level = 10
-      this.playtime = 0;
+      this.playtime = 0
 
       for (let x = 0; x<this.cols; x++){
         this.cells.push([])
@@ -37,6 +37,28 @@ class Board extends WemoObject {
       this.startX = this.cols > 8 ? 8 : this.cols-1
       this.startY = this.rows > 8 ? 8 : this.rows-1
     }
+  }
+
+  export(){
+    let output = {rabbits: [], snakes: [], buildings: []}
+    let list = [
+      "teleports", "berryTrees", "berryBushes", "stars", "fires", "cells", "progress",
+      "version", "wemoMins", "type", "level", "name", "revealCount", "startX", "startY",
+      "cols", "rows", "vehicles"
+    ]
+    for (let i of list){
+      output[i] = this[i]
+    }
+    for (let r of this.rabbits){
+      output.rabbits.push(r.export())
+    }
+    for (let s of this.snakes){
+      output.snakes.push(s.export())
+    }
+    for (let b of this.buildings){
+      output.buildings.push(b.export())
+    }
+    return output
   }
 
   // saving a game on the builder. Called from editbar.saveBoard
@@ -133,16 +155,20 @@ class Board extends WemoObject {
   }
 
   initializeObjects(){
+     for (let i = 0; i < this.vehicles.length; i++){
+      let raft = new WaterCraft(this.vehicles[i])
+      this.vehicles[i] = raft
+    }
     for (let i = 0; i < this.buildings.length; i++){
-      let b = new Campsite(this.buildings[i])
-      this.buildings[i] = b
+      let camp = new Campsite(this.buildings[i])
+      this.buildings[i] = camp
     }
     for (let i = 0; i < this.rabbits.length; i++){ 
-      let rabbit = new Rabbit(this.rabbits[i].pos)
+      let rabbit = new Rabbit(this.rabbits[i])
       this.rabbits[i] = rabbit
     }
     for (let i = 0; i < this.snakes.length; i++){ 
-      let snake = new Snake(this.snakes[i].pos)
+      let snake = new Snake(this.snakes[i])
       this.snakes[i] = snake
     }
   }
@@ -164,6 +190,9 @@ class Board extends WemoObject {
     //Rabbits:
     for (let r of this.rabbits){
       r.update()
+    }
+    for (let v of this.vehicles){
+      v.display()
     }
     //Bombs:
     if (this.bombs){

@@ -19,9 +19,8 @@
             .catch(error => console.error('Error:', error));
       }
       else if (board.type === "custom"){
-        board.playtime++
         g = JSON.parse(localStorage["board"+board.name])
-        g.playtime = board.playtime
+        g.playtime++ 
         localStorage.setItem("board"+board.name, JSON.stringify(g))
       }
     }

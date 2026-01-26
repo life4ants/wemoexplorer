@@ -361,7 +361,7 @@ let actions = {
             item.needed.splice(i, 1)
             if (item.needed.length === 0){
               if (item.type === "raft"){
-                vehicles.addRaft(o.x, o.y)
+                board.vehicles.push(new WaterCraft({x:o.x, y:o.y, landed: true, type: "raft"}))
                 cell.type = cell.tile.replace(/\d+$/, "")
                 tutorial.checkAction("raft")
               }

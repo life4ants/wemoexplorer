@@ -340,7 +340,6 @@ function playLoop(){
   // move board:
   viewport.update(false)
   //display:
-  vehicles.display()
   man.update()
   board.showNight()
   topbar.display()
@@ -354,4 +353,21 @@ $("#board").contextmenu(function(e) {
     e.preventDefault();
     e.stopPropagation();
 });
+
+
+let world = {
+  topOffset: 0,
+  leftOffset: 0,
+  noKeys: false,
+  frameRate: 12,
+  noNight: false,
+  growtime: 360,
+
+  resize(cols, rows){
+    let offset = game.mode === "play" ? topbarHeight : 0
+    resizeCanvas(
+      max(cols*25,window.innerWidth), 
+      max(rows*25+offset, window.innerHeight))
+  }
+}
 

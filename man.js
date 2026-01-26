@@ -8,7 +8,7 @@ class Man {
     this.health = 3000
     this.stepCount = 0
     this.isRiding = false
-    this.ridingId = ""
+    this.ridingId = null
     this.isNextToFire = false
     this.fireId = null
     this.isSleeping = false
@@ -42,7 +42,7 @@ class Man {
       noFill()
       ellipseMode(CENTER)
       ellipse(this.x*25+12.5, this.y*25+topbarHeight+12.5, 200, 200)
-      this.drawImage(this.img[0], this.index, this.x*25, this.y*25+topbarHeight, 25, 25)
+      this.drawImage(this.index, this.x*25, this.y*25+topbarHeight)
       return
     }
     if (timer.dark){
@@ -93,7 +93,7 @@ class Man {
     }
     if (this.isAnimated){
       if ("vomit" === this.animation.type){
-        this.drawImage(8, dx, dy, 25, 25)
+        this.drawImage(8, dx, dy)
       }
       else if (["building", "chopping"].includes(this.animation.type)){
         let id = floor(map(frameCount%(world.frameRate/3), 0, world.frameRate/3, 0, 3))
@@ -112,7 +112,7 @@ class Man {
       }
     }
     else
-      this.drawImage(index, dx, dy, 25, 25)
+      this.drawImage(index, dx, dy)
   }
 
   move(x, y) {
@@ -200,16 +200,24 @@ class Man {
       }
     }
     else if (!this.isRiding) {
-      let watercraft = vehicles.canMount(this.x, this.y)
-      if (watercraft) {
-        active = vehicles[watercraft]
+      let raftId = this.canMount(this.x, this.y)
+      if (raftId !== null) {
+        active = board.vehicles[raftId]
         this.isRiding = true
-        this.ridingId = watercraft
-        vehicles[watercraft].index = vehicles[watercraft].index === 4 ? 0 : 3
+        this.ridingId = raftId
+        active.index = active.index === 4 ? 0 : 3
         this.isNextToFire = false
         this.fireId = null
       }
     }
+  }
+
+  canMount(){
+    for (let i = 0; i < board.vehicles.length; i++){
+      if (helpers.isNearSquare(this.x,this.y,board.vehicles[i].x,board.vehicles[i].y))
+        return i
+    }
+    return null
   }
 
   dismountDirection(dir){
@@ -231,7 +239,6 @@ class Man {
       this.y = y
       this.index = dir === 0 ? 2 : [1,2,3].includes(dir) ? 0 : 4 === dir ? 3 : 1
       this.isRiding = false
-      this.ridingId = ""
       active.index = [0,1].includes(active.index) ? 4 : 5
       active = man
       this.fireCheck()
@@ -256,10 +263,10 @@ class Man {
     }
   }
 
-  drawImage(index, x, y, w, h){
+  drawImage(index, x, y){
     let sx = (index%3)*25
     let sy = Math.floor(index/3)*25
-    image(tiles.players[this.characterId], x, y, w, h, sx, sy, 25, 25)
+    image(tiles.players[this.characterId], x, y, 25, 25, sx, sy, 25, 25)
   }
 
   walkingCost(){

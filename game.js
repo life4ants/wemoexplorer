@@ -149,18 +149,16 @@ var game = new Vue({
         man.import(b.man)
         delete b.man
       }
-      if (man.isSleeping)
-        sounds.files['sleep'].play()
-      vehicles = new Vehicle(b.vehicles)
-      delete b.vehicles
-      active = man.ridingId ? vehicles[man.ridingId] : man
       board = new Board(b)
+      active = man.isRiding ? board.vehicles[man.ridingId] : man
       world.leftOffset = 52
       topbar.health = man.health
       topbar.energy = man.energy
       world.noKeys = false
       timer.setTime(board.wemoMins)
       world.noNight = board.level < 1
+      if (man.isSleeping)
+        sounds.files['sleep'].play()
       if (!board.progress && board.level > 1){
         board.addAnimals()
       }
@@ -205,10 +203,7 @@ var game = new Vue({
 
       board.progress = true
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
-        Object.assign({man: man.export(), vehicles: vehicles.save(),
-                        backpack: backpack.export(),
-                        toolbelt: toolbelt.export(),
-                      }, board.export())
+        Object.assign({man: man.export(), backpack: backpack.export(), toolbelt: toolbelt.export()}, board.export())
       ))
     },
 
