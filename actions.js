@@ -246,8 +246,16 @@ let actions = {
         cell.quantity = 1
       }
       else
-        return "Sorry, you can't dump rock on a "+cell.type+" square!"
+        return "Sorry, you can't dump rock on "+cell.type+"!"
       backpack.removeItem("rock", 1)
+    }
+    if (type === "boulder"){
+      if (_dumpable.includes(cell.type)){
+        cell.type = "boulder"
+        backpack.removeItem("boulder", 1)
+      }
+      else
+        return "Sorry, you can't dump a boulder on "+cell.type+"!"
     }
     // everything else:
     else if (["arrow", "bone", "clay", "log", "longGrass", "mushroom", "stick", "rabbitDead"].includes(type)){
@@ -266,7 +274,7 @@ let actions = {
         cell.quantity = 1
       }
       else
-        return "Sorry, you can't dump a "+type+" on a "+cell.type+" square!"
+        return "Sorry, you can't dump a "+type+" on "+cell.type+"!"
       backpack.removeItem(type, 1)
     }
     else if (type === "rabbitLive"){
@@ -446,7 +454,7 @@ let actions = {
       }
     }
     //gather a log, bone or stick:
-    else if (["log", "bone", "stick", "arrow"].includes(cell.type)){
+    else if (["log", "bone", "stick", "boulder"].includes(cell.type)){
       if (backpack.addItem(cell.type))
         cell.type = cell.tile.replace(/\d+$/, "")
     }

@@ -32,7 +32,7 @@
             </div>
             <input class="vertical-slider" type="range" 
                 id="volumeSlider" v-model.number="volume"
-                min="0" max="0.6" step="0.01">
+                min="0" max="0.6" step="0.01" @keydown="blockArrows">
           </div>
           <div class="musicIcon" v-else style="right: 4px">
             <span class="fa-stack fa-lg" @click="setMusic">
@@ -86,6 +86,13 @@ module.exports = {
   methods: {
     disableCanvas(){
       window._UIevent = true
+    },
+
+    blockArrows(e) {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+        console.log(e.key)
+        e.preventDefault();
+      }
     },
 
     setMusic(){

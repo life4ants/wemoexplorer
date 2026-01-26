@@ -127,8 +127,10 @@ let editor = {
       board.cells[x][y].type = type
       board.cells[x][y].quantity = 5
     }
-    else if (seeThru.includes(type))
-      board.cells[x][y].type = type
+    else if (seeThru.includes(type)){
+      let t = stackable.includes(board.cells[x][y].type) ? board.cells[x][y].tile : "grass"
+      board.cells[x][y] = {tile: t, type}
+    }
     else
       board.cells[x][y] = {tile, type}
   },

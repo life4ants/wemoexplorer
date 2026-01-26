@@ -74,6 +74,7 @@ const editBar = {
         { id: "palm", src: "images/palm.png", type: "palm"},
         { id: "cactus", src: "images/cactus.png", type: "cactus"},
         { id: "mushroom", src: "images/mushroom.png", type: "mushroom"},
+        { id: "boulder", src: "images/boulder.png", type: "boulder"},
         { id: "bush1", src: "images/bush1.png", type: "treeThin"},
         { id: "bush2", src: "images/bush2.png", type: "tree"},
         { id: "bush3", src: "images/bush3.png", type: "bush3"},
