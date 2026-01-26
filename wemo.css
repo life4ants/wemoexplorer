@@ -203,8 +203,8 @@ body {
 }
 
 .links {
-  display: flex;
-  float: right;
+  position: relative;
+  text-align: right;
 }
 .links a {
   text-decoration: underline;
@@ -229,23 +229,7 @@ body {
   margin: 5px;
 }
 
-.whatsNew {
-  margin-top: 15px;
-  background-color: #ddd;
-  border-radius: 10px;
-  padding: 5px;
-  text-align: center;
-}
 
-@media (min-width:  550px){
-  .whatsNew h5 {
-    display: inline;
-    margin-right: 20px;
-  }
-  .whatsNew h6 {
-    display: inline;
-  }
-}
            /* ---------------------------- Build Menu: -------------------------*/
 .horizonal {
   display: flex;

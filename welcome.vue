@@ -5,8 +5,8 @@
         <div class="modal-header">
           <h1>Wemo Explorer</h1>
         </div>
-        <div v-if="stage === 1" class="modal-body">
-          <h5>{{title}}</h5>
+        <div v-if="page === 'pickPlayer'" class="modal-body">
+          <h5>Welcome Back!</h5>
           <p>{{message}}</p>
           <div v-if="deleteMode" class="button-tiles">
             <div v-for="(player, id) in players" class="button-tiles-content">
@@ -18,15 +18,41 @@
             <div v-for="(player, id) in players" @click="() => pickPlayer(id)" class="button-tiles-content clickable">
               {{player.name}}
             </div>
+            <div @click="page = 'newPlayer'" class="button-tiles-content clickable">
+              <i>New Player</i>
+            </div>
           </div>
-          <div v-if="players.length > 0" class="links">
-            <a @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete players'}}</a>
+          <div class="links">
+            <a v-if="players.length > 0" @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete players'}}</a>
+            <a @click="page = 'history'">version history</a>
+            <span>Views since Dec 13, 2025: {{viewCount}}</span>
           </div>
-          <input type="text" v-model="name" placeholder="enter name">
-          <button class="button-primary" id="etr" @click="newPlayer">New Player</button>
+        </div>
+        <div v-else-if="page === 'newPlayer'" class="modal-body center">
+          <h5>What is your name?</h5>
+          <input type="text" v-model="name" placeholder="enter name" class="player-name">
+          <button class="button-primary" id="etr" @click="newPlayer">Start</button>
+          <button v-if="players.length > 0" id="esc" @click="page = 'pickPlayer'">Cancel</button>
+        </div>
+        <div v-else-if="page === 'history'" class="modal-body">
+          <div class="links">
+            <a @click="page = 'pickPlayer'">back</a>
+            </div>
           <div class="whatsNew">
-            <h5>Version {{version}}</h5>
-            <h6>Published {{publicationDate}}</h6>
+            <div class="center">
+              <h5>Version 1.7.2</h5>
+              <h6>Published Jan 25, 2026</h6>
+            </div>
+            <ul>
+              <li>New Welcome page</li>
+              <li>Muliple rafts</li>
+            </ul>
+          </div>
+          <div class="whatsNew">
+            <div class="center">
+              <h5>Version 1.7.1</h5>
+              <h6>Published Jan 24, 2026</h6>
+            </div>
             <ul>
               <li>More info on How to Play page</li>
               <li>Background music</li>
@@ -36,15 +62,16 @@
             </ul>
           </div>
           <div class="whatsNew">
-            <h5>Version 1.7.0</h5>
-            <h6>Published Jan 23, 2026</h6>
+            <div class="center">
+              <h5>Version 1.7.0</h5>
+              <h6>Published Jan 23, 2026</h6>
+            </div>
             <ul>
               <li>Must start fire with long grass</li>
               <li>Mulitple fires show correctly</li>
               <li>Probably lots of new bugs. Please test.</li>
             </ul>
           </div>
-          <div class="tiny">Views since Dec 13, 2025: {{viewCount}}</div>
         </div>
         <div v-else class="modal-body">
           <div class="links">
@@ -108,7 +135,7 @@
 module.exports = {
   data(){
     return {
-      stage: 1,
+      page: "pickPlayer",
       players: [],
       currentPlayer: {},
       characters: ["images/player10icon.png", "images/player11icon.png"],
@@ -117,8 +144,6 @@ module.exports = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      version: "1.7.1",
-      publicationDate: "Jan 24, 2026",
       pageViews: "loading"
     }
   },
@@ -129,6 +154,9 @@ module.exports = {
     setTimeout(() => $("#grow").addClass("large"), 0)
     if (localStorage.wemoPlayers)
       this.players = JSON.parse(localStorage.wemoPlayers)
+    if (this.players.length === 0){
+      this.page = "newPlayer"
+    }
     if (this.player.index !== undefined) {
       this.pickPlayer(this.player.index)
     }
@@ -139,9 +167,6 @@ module.exports = {
         this.updateMessage ? "All your game progress has been deleted but the players are still here:"
           : "Click on your name or make a new player:" 
         : "Please enter your name to get started:"
-    },
-    title(){
-      return this.players.length > 0 ? "Welcome Back!" : "Hi There! Welcome to Wemo!"
     }
   },
   methods: {
@@ -151,9 +176,8 @@ module.exports = {
         this.players.push({name: this.name, unlockedLevel: level, games: [], character: 0})
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
-        if (this.players.length === 1)
-          this.pickPlayer(0)
-        }
+        this.pickPlayer(this.players.length-1)
+      }
     },
 
     pickPlayer(id){
@@ -162,7 +186,7 @@ module.exports = {
       this.selected = p.character || 0
       this.currentPlayer = p
       this.matchWorlds()
-      this.stage = 2
+      this.page = 'pickGame'
     },
 
     deletePlayer(id){
@@ -197,7 +221,7 @@ module.exports = {
     },
 
     signout(){
-      this.stage = 1
+      this.page = "pickPlayer"
       this.currentPlayer = {}
     },
 
@@ -274,3 +298,30 @@ module.exports = {
   }
 }
 </script>
+<style>
+  .whatsNew {
+  margin-top: 15px;
+  background-color: #ddd;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+
+.center {
+  text-align: center;
+}
+@media (min-width: 350px){
+  .player-name {
+    width: 300px;
+  }
+}
+
+@media (min-width:  550px){
+  .whatsNew h5 {
+    display: inline;
+    margin-right: 20px;
+  }
+  .whatsNew h6 {
+    display: inline;
+  }
+}
+</style>

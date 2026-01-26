@@ -47,7 +47,7 @@ var game = new Vue({
     updateMessage: false
   },
   mounted(){
-    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "01232026"){
+    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "01252026"){
       let s = Object.keys(localStorage)
       for (let i = 0; i < s.length; i++){
         if (s[i].substr(0,8) === "wemoGame"){
@@ -57,10 +57,10 @@ var game = new Vue({
       let players = JSON.parse(localStorage.wemoPlayers || "[]")
       let newPlayers = []
       for (let i=0; i<players.length; i++){
-        newPlayers.push({name: players[i].name, unlockedLevel: 0, games: [], character: 0})
+        newPlayers.push({name: players[i].name, unlockedLevel: players[i].unlockedLevel, games: [], character: 0})
       }
       localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
-      localStorage.setItem("wemoUpToDate", "01232026")
+      localStorage.setItem("wemoUpToDate", "01252026")
       this.updateMessage = true
     }
   },
