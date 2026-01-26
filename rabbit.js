@@ -29,8 +29,10 @@ class Rabbit {
       if (frameCount % (rate+1) === 0)
         this.move(manDist)
       let cell = board.cells[this.x][this.y]
-      if (cell.revealed || manDist < 2)
+      if (cell.revealed)
         this.display()
+      else if (manDist < 2)
+        world.nearMan.push({x: this.x, y: this.y, obj: this})
       if (cell.type === "veggies" && board.wemoMins-this.ateLast > 45){
         this.ateLast = board.wemoMins
         let quantity = Number(cell.tile.substr(7,1))

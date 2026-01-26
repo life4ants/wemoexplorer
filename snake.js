@@ -14,12 +14,18 @@ class Snake {
   	return this.cellPos
   }
 
+  getDist(){
+  	return dist(active.x, active.y, this.cellPos.x, this.cellPos.y)
+  }
+
   update(){
 	  let cell = board.cells[this.cellPos.x][this.cellPos.y]
 	  let manDist = dist(active.x, active.y, this.cellPos.x, this.cellPos.y)
-	  if (cell.revealed || manDist < 2){
+	  if (cell.revealed){
 	  	this.display()
 	  }
+	  else if (manDist < 2)
+	  	world.nearMan.push({x: this.cellPos.x, y: this.cellPos.y, obj: this})
     if (this.isMoving){
     	this.pos.add(this.dir)
     	this.moveCount--

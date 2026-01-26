@@ -134,21 +134,32 @@ class Board {
       }
       return
     }
+    world.nearMan = []
     this.showObjects()
     
     if (!game.preview && this.revealCount > 0){
       // show rounded clouds around the man (or raft) if unrevealed:
-      let n = 1
       for (let i = -1; i <= 1; i++){
         for (let j = -1; j<=1; j++){
           let a = active.x+i
           let b = active.y+j
-          if (a >= 0 && a < this.cols && b >= 0 && b < this.rows && !this.cells[a][b].revealed){
+          if (helpers.withinBounds(a,b) && !this.cells[a][b].revealed){
             this.showCell(a, b, this.cells[a][b], true)
-            if (i !== 0 && j !== 0)
-              image(tiles["clouds"+n], a*25, b*25+topbarHeight)
           }
-          n = i !== 0 && j !== 0? n+1 : n
+        }
+      }
+      for (let c of world.nearMan){
+        c.obj.display()
+      }
+      let n = 1
+      for (let i = -1; i <= 1; i+=2){
+        for (let j = -1; j<=1; j+=2){
+          let a = active.x+i
+          let b = active.y+j
+          if (helpers.withinBounds(a,b) && !this.cells[a][b].revealed){
+            image(tiles["clouds"+n], a*25, b*25+topbarHeight)
+          }
+          n++
         }
       }
     }
@@ -192,7 +203,7 @@ class Board {
       r.update()
     }
     for (let v of this.vehicles){
-      v.display()
+      v.update()
     }
     //Bombs:
     if (this.bombs){
@@ -332,14 +343,14 @@ class Board {
       }
       else if (r<6)
         cell.type = "stick"
-      else if (r<7)
+      else if (r<8)
         cell.type = "log"
       else
         cell.type = "mushroom"
     }
     else if (cell.tile === "sand"){
       if (r<2){
-        cell.tile = "palm"; cell.type = "palm"
+        cell.type = "palm"
       }
       else if (r<6)
         cell.type = "cactus"

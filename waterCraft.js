@@ -11,6 +11,16 @@ class WaterCraft {
     return {x: this.x, y: this.y, type: this.type, landed: this.landed}
   }
 
+  update(){
+    let cell = board.cells[this.x][this.y]
+    let manDist = dist(active.x, active.y, this.x, this.y)
+    if (cell.revealed){
+      this.display()
+    }
+    else if (manDist < 2)
+      world.nearMan.push({x: this.x, y: this.y, obj: this})
+  }
+
   display() {
     let x, y, id
     if ([0,1].includes(this.index)){

@@ -127,7 +127,8 @@ class Man {
       }
        //check for forbidden cells
       if (!["water", "rockEdge", "river", "construction"].includes(newCell.type)){
-        if ("firepit" === newCell.type && board.fires[newCell.id].value > 0)
+        if ("firepit" === newCell.type && board.fires[newCell.id].value > 0 || 
+          (newCell.type === "star" && newCell.tile === "water"))
           return
         //move and set image index
         this.x += x
