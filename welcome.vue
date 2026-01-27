@@ -6,8 +6,23 @@
           <h1>Wemo Explorer</h1>
         </div>
         <div v-if="page === 'pickPlayer'" class="modal-body">
-          <h5>Welcome Back!</h5>
-          <p>{{message}}</p>
+          <div class="center whatsNew">
+            <h5>Current version: {{history[0].version}}</h5>
+            <h6>Published {{history[0].date}}</h6>
+          </div>
+          <div v-if="lastVisit < history[0].value" class="scroll-box">
+            <h5>What's new since your last visit:</h5>
+            <div v-for="entry in whatsNew" class="whatsNew">
+              <div class="center">
+                <h5>Version {{entry.version}}</h5>
+                <h6>Published {{entry.date}}</h6>
+              </div>
+              <ul>
+                <li v-for="l in entry.items">{{l}}</li>
+              </ul>
+            </div>
+          </div>
+          <p>Click on your name or make a new player:</p>
           <div v-if="deleteMode" class="button-tiles">
             <div v-for="(player, id) in players" class="button-tiles-content">
               {{player.name}}
@@ -121,36 +136,43 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
-        {version: "1.7.2",
-        date: "Jan 25, 2026",
+        {version: "1.7.3", date: "Jan 27, 2026", value: 260127,
+        items: ["New object: Boulders", "Rabbits and snakes show when they are near you"]},
+        {version: "1.7.2", date: "Jan 25, 2026", value: 260125,
         items: ["New Welcome page", "Multiple rafts"]},
-        {version: "1.7.1",
-        date: "Jan 24, 2026",
+        {version: "1.7.1", date: "Jan 24, 2026", value: 260124,
         items: ["Background music", "Cook button", "Can grab and dump rabbit, but not burn them", "Mobile movement issues"]},
-        {version: "1.7.0",
-        date: "Jan 23, 2026",
+        {version: "1.7.0", date: "Jan 23, 2026", value: 260123,
         items: ["Must start fire with long grass", "Multiple fires show correctly"]},
-        {version: "1.6.0",
-        date: "Jan 19, 2026",
+        {version: "1.6.0", date: "Jan 19, 2026", value: 260119,
         items: ["New Tutorial and Quest system", "Track level completes"]},
-        {version: "1.5.5",
-        date: "Jan 17, 2026",
-        items: ["New Danger: Snakes", "Update flood fill on editor"]},
-        {version: "1.5.4",
-        date: "Jan 16, 2026",
-        items: ["New Danger: Snakes", "Update flood fill on editor"]},
-        {version: "1.5.3",
-        date: "Jan 15, 2026",
+        {version: "1.5.5", date: "Jan 17, 2026", value: 260117,
+        items: ["Update flood fill on editor"]}, 
+        {version: "1.5.4", date: "Jan 16, 2026", value: 260116,
+        items: ["New Danger: Snakes", ]},
+        {version: "1.5.3", date: "Jan 15, 2026", value: 260115,
         items: ["Pick berries and apples", "Limit backback to 4 items and basket to 2 items"]},
-        {version: "1.5.2",
-        date: "Jan 14, 2026",
+        {version: "1.5.2", date: "Jan 14, 2026", value: 260114,
         items: ["Bug fixes", "Grab, dump and eat mushrooms"]},
-       
-      ]
+        {version: "1.5.1", date: "Jan 13, 2026", value: 260113,
+        items: ["Start in tutorial", "New object: mushrooms"]},
+        {version: "1.5.0", date: "Jan 8, 2026", value: 260108,
+        items: ["Find stars to reveal clouds"]},
+        {version: "1.4.1", date: "Jan 7, 2026", value: 260107,
+        items: ["Show game time on custom worlds", "No night on level one"]},
+        {version: "1.4.0", date: "Dec 13, 2025", value: 251213,
+        items: ["View counts on main page", "Game time on default worlds"]},
+        {version: "1.3", date: "April 9, 2023", value: 230409,
+        items: ["Levels are locked until all the previous levels are completed", 
+          "Custom worlds are locked until the first two levels are completed",
+          "Items on the build menu unlock based on level",
+          "Pits are now teleports"]},
+      ],
+      whatsNew: []
     }
   },
   props: [
-    'startGame', 'edit', 'player', 'updateMessage', 'viewCount'
+    'startGame', 'edit', 'player', 'lastVisit', 'viewCount'
   ],
   mounted(){
     setTimeout(() => $("#grow").addClass("large"), 0)
@@ -162,13 +184,16 @@ module.exports = {
     if (this.player.index !== undefined) {
       this.pickPlayer(this.player.index)
     }
+    if (this.lastVisit < this.history[0].value){
+      for (let e of this.history){
+        if (e.value > this.lastVisit)
+          this.whatsNew.push(e)
+      }
+    }
   },
   computed: {
     message(){
-      return this.players.length > 0 ? 
-        this.updateMessage ? "All your game progress has been deleted but the players are still here:"
-          : "Click on your name or make a new player:" 
-        : "Please enter your name to get started:"
+      return "" 
     }
   },
   methods: {
@@ -311,6 +336,13 @@ module.exports = {
 .center {
   text-align: center;
 }
+
+.scroll-box {
+  max-height: 350px;
+  overflow: scroll;
+  margin: 15px 0px;
+}
+
 @media (min-width: 350px){
   .player-name {
     width: 300px;
@@ -318,11 +350,11 @@ module.exports = {
 }
 
 @media (min-width:  550px){
-  .whatsNew h5 {
+  .center h5 {
     display: inline;
     margin-right: 20px;
   }
-  .whatsNew h6 {
+  .center h6 {
     display: inline;
   }
 }

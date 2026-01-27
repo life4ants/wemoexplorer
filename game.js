@@ -6,7 +6,7 @@ var game = new Vue({
         :startGame="startGame"
         :player="currentPlayer" 
         :edit="edit" 
-        :updateMessage="updateMessage"
+        :lastVisit="lastVisit"
         :viewCount="viewCount">
       </welcome-menu>
 
@@ -35,7 +35,6 @@ var game = new Vue({
     'build-sidebar': httpVueLoader('buildSidebar.vue')
   },
   data: {
-    
     mode: "loading",
     viewCount: 0,
     started: false,
@@ -44,25 +43,42 @@ var game = new Vue({
     level: 1,
     currentPlayer: {},
     preview: false,
-    updateMessage: false
+    lastVisit: null
   },
   mounted(){
-    if (!localStorage.wemoUpToDate || localStorage.wemoUpToDate !== "01252026"){
+    const dateValue = 260127 // update this with each version publication
+    let deleteProgress = false // change this to delete players saved progress
+    let resetLevel = false // change this to force people to do the tutorial again
+    this.lastVisit = Number(localStorage.wemoUpToDate ?? 1012011)
+
+    if (this.lastVisit === dateValue)
+      return
+    if (localStorage.length === 0){
+      localStorage.setItem("wemoPlayers", JSON.stringify([]))
+      localStorage.setItem("wemoUpToDate", dateValue)
+      return
+    }
+    if (this.lastVisit > 1012010){ // old date format or no record
+      deleteProgress = true; resetLevel = true
+      this.lastVisit = 260119
+    }
+    if (deleteProgress){
       let s = Object.keys(localStorage)
       for (let i = 0; i < s.length; i++){
         if (s[i].substr(0,8) === "wemoGame"){
           delete localStorage[s[i]]
         }
       }
+    }
+    if (resetLevel){
       let players = JSON.parse(localStorage.wemoPlayers || "[]")
       let newPlayers = []
       for (let i=0; i<players.length; i++){
         newPlayers.push({name: players[i].name, unlockedLevel: players[i].unlockedLevel, games: [], character: 0})
       }
       localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
-      localStorage.setItem("wemoUpToDate", "01252026")
-      this.updateMessage = true
     }
+    localStorage.setItem("wemoUpToDate", dateValue)
   },
   computed:{
     isMobile(){
