@@ -185,7 +185,7 @@ class Board {
   }
 
   addAnimals(){
-    let list = helpers.getCellsByType(board)
+    let list = helpers.getAllTypes(board)
     let rabbitSpots = [ ...(list.grass ?? []), ...(list.longGrass ?? []), ...(list.veggies ?? [])]
     let snakeSpots = [... (list.sand ?? []), ...(list.beach ?? [])]
     for (let i = 0; i < rabbitSpots.length; i+=100){

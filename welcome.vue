@@ -38,38 +38,13 @@
           <div class="links">
             <a @click="page = 'pickPlayer'">back</a>
             </div>
-          <div class="whatsNew">
+          <div v-for="entry in history" class="whatsNew">
             <div class="center">
-              <h5>Version 1.7.2</h5>
-              <h6>Published Jan 25, 2026</h6>
+              <h5>Version {{entry.version}}</h5>
+              <h6>Published {{entry.date}}</h6>
             </div>
             <ul>
-              <li>New Welcome page</li>
-              <li>Muliple rafts</li>
-            </ul>
-          </div>
-          <div class="whatsNew">
-            <div class="center">
-              <h5>Version 1.7.1</h5>
-              <h6>Published Jan 24, 2026</h6>
-            </div>
-            <ul>
-              <li>More info on How to Play page</li>
-              <li>Background music</li>
-              <li>Cook button</li>
-              <li>Should work on mobile</li>
-              <li>Can grab and dump rabbits, but not burn them.</li>
-            </ul>
-          </div>
-          <div class="whatsNew">
-            <div class="center">
-              <h5>Version 1.7.0</h5>
-              <h6>Published Jan 23, 2026</h6>
-            </div>
-            <ul>
-              <li>Must start fire with long grass</li>
-              <li>Mulitple fires show correctly</li>
-              <li>Probably lots of new bugs. Please test.</li>
+              <li v-for="l in entry.items">{{l}}</li>
             </ul>
           </div>
         </div>
@@ -144,7 +119,34 @@ module.exports = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      pageViews: "loading"
+      pageViews: "loading",
+      history: [
+        {version: "1.7.2",
+        date: "Jan 25, 2026",
+        items: ["New Welcome page", "Multiple rafts"]},
+        {version: "1.7.1",
+        date: "Jan 24, 2026",
+        items: ["Background music", "Cook button", "Can grab and dump rabbit, but not burn them", "Mobile movement issues"]},
+        {version: "1.7.0",
+        date: "Jan 23, 2026",
+        items: ["Must start fire with long grass", "Multiple fires show correctly"]},
+        {version: "1.6.0",
+        date: "Jan 19, 2026",
+        items: ["New Tutorial and Quest system", "Track level completes"]},
+        {version: "1.5.5",
+        date: "Jan 17, 2026",
+        items: ["New Danger: Snakes", "Update flood fill on editor"]},
+        {version: "1.5.4",
+        date: "Jan 16, 2026",
+        items: ["New Danger: Snakes", "Update flood fill on editor"]},
+        {version: "1.5.3",
+        date: "Jan 15, 2026",
+        items: ["Pick berries and apples", "Limit backback to 4 items and basket to 2 items"]},
+        {version: "1.5.2",
+        date: "Jan 14, 2026",
+        items: ["Bug fixes", "Grab, dump and eat mushrooms"]},
+       
+      ]
     }
   },
   props: [

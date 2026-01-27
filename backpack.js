@@ -58,7 +58,7 @@ class Backpack {
     let ar = this.type === "backpack" ? [
         "arrow", "bomb", "bone", "clay",
         "log", "longGrass", "mushroom", "rock",
-        "rabbitDead", "rabbitLive", "stick" ] :
+        "rabbitDead", "rabbitLive", "stick", "boulder" ] :
       this.type === "basket" ? ["berries", "apples", "veggies"] :
       this.type === "claypot" ? ["water", "rabbitStew"] : []
     return this.includesItems(ar, list)

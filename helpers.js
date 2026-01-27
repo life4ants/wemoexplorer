@@ -54,13 +54,25 @@ let helpers = {
     return x >= 0 && x < board.cols && y >= 0 && y < board.rows
   },
 
-  getCellsByType(b){//count num of each type of cell in the board
+  getAllTypes(b){//count num of each type of cell in a board
     let output = {}
     for (let i = 0; i <b.cells.length; i++) {
       for (let j = 0; j< b.cells[i].length; j++){
         let type = b.cells[i][j].type
         output[type] = output[type] || []
         output[type].push({x:i,y:j})
+      }
+    }
+    return output
+  },
+
+  getCellsByType(type){//get all cells of a type in the current board
+    let output = []
+    for (let i = 0; i <board.cells.length; i++) {
+      for (let j = 0; j< board.cells[i].length; j++){
+        if (board.cells[i][j].type === type){
+          output.push(Object.assign(board.cells[i][j], {x: i, y: j}))
+        }
       }
     }
     return output

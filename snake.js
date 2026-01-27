@@ -44,7 +44,7 @@ class Snake {
 	  	msgs.following.msg = "You got bit by a snake!"
       msgs.following.frames = 24
       man.health -=1000
-	  	this.bitecooldown = 48
+	  	this.bitecooldown = 96 // 8 seconds
 	  }
 	  this.bitecooldown--
   }
