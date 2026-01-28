@@ -58,11 +58,17 @@ class Campsite {
 		else if (item.name === "rabbitStew"){
 			if (this.fireValue >= item.time){
         let w = this.containers.findIndex((e) => e.type === "claypot" && e.items.water.quantity === 4)
-        let v = this.containers.findIndex((e) => e.type === "basket" && e.items.veggies.quantity >= 8)
-        if (w === -1 || v === -1 || backpack.includesItem("rabbitDead") < 1)
+        let basket = toolbelt.getContainer("basket")
+        if (!basket){
+	        let v = this.containers.findIndex((e) => e.type === "basket" && e.items.veggies.quantity >= 8)
+        	if (v !== -1){
+        		basket = this.containers[v]
+        	}
+        }
+        if (w === -1 || !basket || backpack.includesItem("rabbitDead") < 1)
           return "Opps! looks like you don't have the needed ingredients. Make sure you dropped the claypot and basket in your campsite."
         else {
-          this.containers[v].removeItem("veggies", 8)
+          basket.removeItem("veggies", 8)
           backpack.removeItem("rabbitDead", 1)
           this.isCooking = true
           this.cookTime = item.time

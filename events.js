@@ -39,6 +39,11 @@ function keyHandler(keyCode, key){
       if (board.cells[active.x][active.y].type === "campsite"){ popup.grabMenu("grab") }
       else { actions.grab() }
       break
+    case "M": 
+      if (backpack.removeItem("mushroom", 1)){
+        actions.eatAction("mushrooms")
+      }
+      break
     case "J": man.dismount();       break;
     case "K": popup.cookMenu();     break;
     case "S": man.goToSleep();      break;

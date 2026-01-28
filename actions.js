@@ -318,7 +318,8 @@ let actions = {
     }
     man.health = min(man.health+h, 3000)
     man.energy = min(man.energy+e, 3005)
-    tutorial.checkAction("eat")
+    if (board.level === 0)
+      tutorial.checkAction("eat")
     if (man.energy > 3000)
       popup.setAlert("You are full. Stop eating!")
   },
