@@ -47,7 +47,7 @@
                   this.mins >= 1320 && this.mins <= 1379 ? "dusk" :
                   this.mins >= 1380 || this.mins <= 59 ? "night" :
                       "day"
-    if (this.mins === 60)
+    if (this.mins === 120)
       tutorial.checkAction("night")
   },
 

@@ -60,7 +60,9 @@ const editBar = {
         { id: "rockMiddle", src: "images/rockEdge13.png", type: "rockMiddle"},
         { id: "random", src: "images/random.png", type: "random"},
         { id: "blank", src: "images/blank.png", type: "blank"},
+        { id: "sandpit", src: "images/sandpit.png", type: "sandpit"},
         { id: "playerIcon", src: "images/player10icon.png", type: "start"},
+        { id: "star", src: "images/star.png", type: "star"},
         { id: "treeThin", src: "images/tree-thin.png", type: "treeThin"},
         { id: "tree", src: "images/tree.png", type: "tree"},
         { id: "longGrass3", src: "images/longGrass3.png", type: "longGrass"},
@@ -68,6 +70,7 @@ const editBar = {
         { id: "berryBush", src: "images/berryBush.png", type: "berryBush"},
         { id: "veggies4", src: "images/veggies4.png", type: "veggies"},
         { id: "stick", src: "images/stick.png", type: "stick"},
+        { id: "log", src: "images/log.png", type: "log"},
         { id: "rock", src: "images/rock4.png", type: "rock"},
         { id: "clay", src: "images/clay5.png", type: "clay"},
         { id: "bone", src: "images/bone.png", type: "bone"},
@@ -92,7 +95,6 @@ const editBar = {
         { id: "beachEdge3", src: "images/beachEdge3.png", type: "beachEdge"},
         { id: "beachEdge4", src: "images/beachEdge4.png", type: "beachEdge"},
         { id: "pit", src: "images/pit.png", type: "pit0"},
-        { id: "star", src: "images/star.png", type: "star"}
       ],
       tiles2: [
         { id: "beach", src: "images/beachX.png", type: "auto"},

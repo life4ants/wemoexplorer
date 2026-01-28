@@ -80,7 +80,7 @@ class Board {
         }
         else if (cell.type === "star"){
           cell.id = stars.length
-          stars.push({x: i, y: j, cells: []})
+          stars.push({x: i, y: j, id: cell.id, cells: []})
         }
         else if (cell.type === "pit"){
           if (!cell.pair){
@@ -196,13 +196,12 @@ class Board {
   addAnimals(){
     let list = helpers.getAllTypes(board)
     let rabbitSpots = [ ...(list.grass ?? []), ...(list.longGrass ?? []), ...(list.veggies ?? [])]
-    let snakeSpots = [... (list.sand ?? []), ...(list.beach ?? [])]
     for (let i = 0; i < rabbitSpots.length; i+=100){
       this.rabbits.push(new Rabbit(random(rabbitSpots)))
     }
 
-    for (let i = 0; i<snakeSpots.length; i+=100){
-      this.snakes.push(new Snake(random(snakeSpots)))
+    for (let i = 0; i<list.sandpit.length; i++){
+      this.snakes.push(new Snake(list.sandpit[i]))
     }
   }
 
@@ -345,32 +344,7 @@ class Board {
     }
     delete cell.id
     board.stars.splice(starid, 1)
-    let r = random(9)
-    if (cell.tile === "grass"){
-      if (r<4){
-        cell.tile = "veggies4"; cell.type = "veggies"
-      }
-      else if (r<6)
-        cell.type = "stick"
-      else if (r<8)
-        cell.type = "log"
-      else
-        cell.type = "mushroom"
-    }
-    else if (cell.tile === "sand"){
-      if (r<2){
-        cell.type = "palm"
-      }
-      else if (r<6)
-        cell.type = "cactus"
-      else if (r<8){
-        cell.type = "rock"; cell.quantity = 3;
-      }
-      else
-        cell.type = "stick"
-    }
-    else
-      cell.type = cell.tile.replace(/\d+$/, "")
+    cell.type = cell.tile.replace(/\d+$/, "")
     board.cells[x][y] = cell
     if (board.revealCount <= 0){
       tutorial.checkAction("stars")
