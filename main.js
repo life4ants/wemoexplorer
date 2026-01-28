@@ -71,9 +71,8 @@ const options = {
         time: 40, benefits: "800 health, 400 energy", servings: 8,
         resources: "4 units water, 8 veggies, 1 dead rabbit",
         dist: "Nutritious Rabbit Stew",
-        inst: `Gather the water in a Clay Pot and the veggies in a Basket. Have the rabbit in your backpack. 
-          Feed the fire to last 40 minutes.
-          Put both containers in your campsite, then click cook.` }
+        inst: `Gather the water in a Clay Pot and put it in your campsite. Gather the veggies in a Basket. Have the rabbit in your backpack. 
+          Feed the fire to last 40 minutes, then click cook.` }
   ],
   resources: [ //used by popup.dumpMenu
     {name: "arrow", src: "images/arrow.png"},

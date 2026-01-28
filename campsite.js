@@ -66,7 +66,7 @@ class Campsite {
         	}
         }
         if (w === -1 || !basket || backpack.includesItem("rabbitDead") < 1)
-          return "Opps! looks like you don't have the needed ingredients. Make sure you dropped the claypot and basket in your campsite."
+          return "Opps! looks like you don't have the needed ingredients. Make sure you dropped the claypot in your campsite."
         else {
           basket.removeItem("veggies", 8)
           backpack.removeItem("rabbitDead", 1)
