@@ -42,14 +42,6 @@ let editor = {
         this.cell1 = {}
         
       }
-      else if (this.type === "star"){
-        if (board.cells[x][y].type === "star")
-          return
-        this.changeTile(x,y, "star", "star")
-        let id = board.stars.length > 0 ? board.stars[board.stars.length-1].id+1 : 0
-        board.cells[x][y].id = id
-        board.stars.push({id, x, y, cells:[]})
-      }
       else {
         this.setUndo(x,y)
         this.path = [id]
@@ -69,7 +61,7 @@ let editor = {
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
     let id = x+"_"+y
-    if (["start", "pit0", "pit1"].includes(this.type))
+    if (["start", "pit0", "pit1", "star"].includes(this.type))
       return
     if (!this.path.includes(id)){
       this.path.push(id)
@@ -101,17 +93,12 @@ let editor = {
   },
 
   changeTile(x,y, tile, type){
-    if (board.cells[x][y].type === "pit"){
-        let a = board.cells[x][y].pair.x
-        let b = board.cells[x][y].pair.y
-        board.cells[a][b] = {tile: "random", type: "random"}
-        let index = board.teleports.findIndex((e) => e.id === board.cells[x][y].id)
-        board.teleports.splice(index, 1)
-        this.undoList = []
-      }
-    else if (board.cells[x][y].type === "star"){
-      let index = board.stars.findIndex((e) => e.id === board.cells[x][y].id)
-      board.stars.splice(index, 1)
+    if (board.cells[x][y].type === "pit" && board.cells[x][y].pair){
+      let a = board.cells[x][y].pair.x
+      let b = board.cells[x][y].pair.y
+      board.cells[a][b] = {tile: "random", type: "random"}
+      let index = board.teleports.findIndex((e) => e.id === board.cells[x][y].id)
+      board.teleports.splice(index, 1)
       this.undoList = []
     }
     if (type === "rock"){

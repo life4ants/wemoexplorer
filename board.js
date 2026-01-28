@@ -65,26 +65,11 @@ class Board {
   save(){ 
     let trees = []
     let bushes = []
+    let stars = []
     this.revealCount = this.cols*this.rows
-    for (let i in this.stars){
-      this.stars[i].cells = []
-    }
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
-        let id = 0
-        let mindist = this.rows+this.cols
-        for (let a in this.stars){
-          let star = this.stars[a]
-          let d = dist(i,j,star.x, star.y)
-          if (d < mindist){
-            mindist = d
-            id = a
-          }
-        }
-      
-        this.stars[id].cells.push({x:i,y:j})
-        
         if (cell.type === "berryTree"){
           cell.id = trees.length
           trees.push({x: i, y: j, berries: []})
@@ -93,8 +78,32 @@ class Board {
           cell.id = bushes.length
           bushes.push({x: i, y: j, berries: []})
         }
+        else if (cell.type === "star"){
+          cell.id = stars.length
+          stars.push({x: i, y: j, cells: []})
+        }
+        else if (cell.type === "pit"){
+          if (!cell.pair){
+            this.cells[i][j] = {type: "random", tile: "ramdom"}
+          }
+        }
       }
     }
+    for (let i = 0; i < this.cols; i++){
+      for (let j = 0; j< this.rows; j++){
+        let cell = this.cells[i][j]
+        let id = 0
+        let mindist = this.rows+this.cols
+        for (let a in stars){
+          let d = dist(i,j,stars[a].x, stars[a].y)
+          if (d < mindist){
+            mindist = d; id = a
+          }
+        }
+        stars[id].cells.push({x:i,y:j})
+      }
+    }
+    this.stars = stars
     this.berryTrees = trees
     this.berryBushes = bushes
     if (this.name){
