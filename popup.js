@@ -99,7 +99,7 @@ var popup = new Vue({
         case "Drop":
           this.drop(this.selected); break
         case "Grab":
-          this.grab(this.selected, this.selectId); break
+          this.grab(this.selected); break
         case "saveBoard":
           if (this.inputValue.text.length < 1){
             this.setAlert("Name must not be blank!"); break
@@ -268,46 +268,39 @@ var popup = new Vue({
     },
 
     grabMenu(type, cellId){
-      let id = type === "info" ? cellId : board.cells[active.x][active.y].id
-      let items = board.buildings[id].getItems()
-      if (items.length === 0){
+      let id = type === "grab" ? board.cells[active.x][active.y].id : cellId
+      let camp = board.buildings[id]
+      if (camp.tools.length+camp.containers.length === 0){
         this.setAlert("This campsite does not have any items in it.")
         return
       }
       let output = []
-      for (let i = 0; i < items.length; i++){
-        let type = items[i].type || items[i]
-        let x
-        if (["claypot", "basket"].includes(type)){
-          x = {src: items[i].getPhoto(), num: items[i].getQuantity(), type: "container"}
-        }
-        else {
-          x = {src: "images/"+type+".png", type: "tool"}
-        }
-        output.push(x)
-        
+      for (let i in camp.tools){
+        output.push({src: "images/"+camp.tools[i]+".png", type: "tool", id: i})
       }
-      if (type === "grab" && !board.buildings[id].isCooking)
+      for (let i in camp.containers){
+        output.push({src: camp.containers[i].getPhoto(), 
+          num: camp.containers[i].getQuantity(), type: "container", id: i})
+      }
+      if (type === "grab")
         this.setMenu(output, "What would you like to grab from your campsite?", "Grab")
-      else if (type === "info")
+      else 
         this.setMenu(output, "Items in this campsite:", "info")
-      else
-        this.setAlert("Sorry, you can't grab anything from your campsite while you are cooking.")
     },
 
-    grab(x, selID){
+    grab(item){
       let camp = board.buildings[board.cells[active.x][active.y].id]
-      if (x.type === "tool"){
+      if (item.type === "tool"){
         if (toolbelt.tools.length < toolbelt.maxTools){
-          toolbelt.tools.push(camp.takeItem("tool", selID))
+          toolbelt.tools.push(camp.takeItem("tool", item.id))
           this.close()
         }
         else
           this.setAlert("Opps! You can only carry two tools at a time!")
       }
-      else if (x.type === "container"){
+      else if (item.type === "container"){
         if (toolbelt.containers.length < toolbelt.maxContainers){
-          toolbelt.containers.push(camp.takeItem("container", selID))
+          toolbelt.containers.push(camp.takeItem("container", item.id))
           this.close()
         }
         else

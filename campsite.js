@@ -52,10 +52,6 @@ class Campsite {
 		return this[type+"s"].splice(id,1)[0]
 	}
 
-	getItems(){
-		return concat(this.tools, this.containers)
-	}
-
 	cook(item){
 		if (item.name === "claypot"){
 			if (this.fireValue >= 60){
@@ -81,17 +77,17 @@ class Campsite {
         		basket = this.containers[v]
         	}
         }
-        if (w === -1 || !basket || backpack.includesItem("rabbitDead") < 1)
+        let rabbit = backpack.includesItems(["rabbitLive", "rabbitDead"])[0]
+        if (w === -1 || !basket || !rabbit)
           return "Opps! looks like you don't have the needed ingredients. Make sure you dropped the claypot in your campsite."
         else {
           basket.removeItem("veggies", 8)
-          backpack.removeItem("rabbitDead", 1)
+          backpack.removeItem(rabbit.type, 1)
           this.isCooking = true
           this.cookTime = item.time
           this.action = () => {
             this.containers[w].items.water.quantity = 0
             this.containers[w].items.rabbitStew.quantity = 8
-            backpack.removeItem("rabbitDead", 1)
             popup.setAlert("Your stew is done!")
           }
         }

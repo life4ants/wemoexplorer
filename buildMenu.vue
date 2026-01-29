@@ -20,7 +20,7 @@
     </div>
     <div v-else-if="'info' === type" class="modal-body">
       <div class="flex">
-        <div v-for="item in showOptions" :key="item.id" style="position: relative">
+        <div v-for="(item, k) in showOptions" :key="k" style="position: relative">
           <img :src="item.src" height="35" width="35" class="no-border">
           <div v-if="item.num" class="img-badge">{{item.num}}</div>
         </div>
