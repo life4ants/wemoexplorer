@@ -319,9 +319,8 @@ module.exports = {
       this.currentPlayer.character = this.selected
       if (type === "default" && this.worlds[id].savedGame ||
           type === "custom" && this.customWorlds[id].savedGame){
-        if (confirm("This will delete your process and restart the level!")){
-          this.startGame(type, this.currentPlayer, name)
-        }
+        popup.callback = () => this.startGame(type, this.currentPlayer, name)
+        popup.setInput("Delete your process and restart the level?", "callback", "yesno")
       }
       else {
         this.startGame(type, this.currentPlayer, name)
