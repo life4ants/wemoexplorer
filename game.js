@@ -195,7 +195,8 @@ var game = new Vue({
       loop()
       if (board.level < 4){
         tutorial.start()
-        popup.setInfo("welcome")
+        if (board.progress) {popup.setInfo("tutorial")}
+        else {popup.setInfo("welcome")}
       }
       else
         tutorial.active = false

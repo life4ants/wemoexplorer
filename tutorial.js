@@ -157,6 +157,8 @@ let tutorial = {
 				this.checkAction("stars")
 			if (board.wemoMins > 1500)
 				this.checkAction("night")
+			if (board.vehicles.length > 0)
+				this.checkAction("raft")
 		}
 		this.revealCount = board.revealCount
 		if (this.level === 0){
