@@ -62,7 +62,7 @@ class Board {
   }
 
   // saving a game on the builder. Called from editbar.saveBoard
-  save(){ 
+  save(newName){ 
     let trees = []
     let bushes = []
     let stars = []
@@ -89,6 +89,9 @@ class Board {
         }
       }
     }
+    if (stars.length < 2){
+      return "You can't save a world without at least 2 stars!"
+    }
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
@@ -107,16 +110,10 @@ class Board {
     this.berryTrees = trees
     this.berryBushes = bushes
     this.playtime = 0 // will reset playtime if you edit a world
+    this.type = "custom"
     this.level = 10
-
-    if (this.name && this.type === "custom"){
-      popup.actionTitle = "saveBoard"
-      popup.action()
-    }
-    else {
-      this.type = "custom"
-      popup.setInput("Enter a new name for this world:", "saveBoard", "input")
-    }
+    localStorage.setItem("board"+this.name, JSON.stringify(board))
+    return false
   }
 
   display(){

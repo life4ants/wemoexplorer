@@ -9,7 +9,8 @@ const editBar = {
             <span @click="newBoard" title="generate new board">New</span>
             <span @click="load">Load</span>
             <span @click="resizeBoard" title="resize the board">Resize</span>
-            <span @click="saveBoard" title="save the current board">Save</span>
+            <span @click="() => saveBoard(false)" title="save the current board">Save</span>
+            <span @click="() => saveBoard(true)" title="save a copy with new name">Save As</span>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
             <span @click="download">Download</span>
@@ -203,13 +204,15 @@ const editBar = {
       popup.setInput("Enter new size for the World", "resize","getSize")
     },
 
-    saveBoard(){
-      if (board.stars.length < 1){
-        popup.setAlert("You can't save a world without any stars!")
-        return
+    saveBoard(newName){
+      if (board.name && board.type === "custom" && !newName){
+        let m = board.save()
+        popup.setAlert(m || "The world was saved.")
       }
-      popup.callback = (n)=> this.boardName = n
-      board.save()
+      else {
+        popup.callback = (n)=> this.boardName = n
+        popup.setInput("Enter a new name for this world:", "saveBoard", "input")
+      }
     },
 
     undo(){

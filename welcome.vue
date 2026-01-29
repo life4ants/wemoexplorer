@@ -136,14 +136,20 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
+        {version: "1.7.5", date: "Jan 28, 2026", value: 10705,
+        items: ["Walk onto but not off boulders and water", 
+          "Save and Save As on editor, nicer popup confirm when deleting worlds and players", 
+          "Background music updates", "20 long grass to build campsite"]},
         {version: "1.7.4", date: "Jan 27, 2026", value: 10704,
-        items: ["Fix for stars and teleports", "Eat mushrooms with M", "Snakes spawn from sandpits", "Cook stew without dropping basket"]},
+        items: ["Fix for stars and teleports", "Eat mushrooms with M", 
+          "Snakes spawn from sandpits", "Cook stew without dropping basket"]},
         {version: "1.7.3", date: "Jan 27, 2026", value: 10703,
         items: ["New object: Boulders", "Rabbits and snakes show when they are near you"]},
         {version: "1.7.2", date: "Jan 25, 2026", value: 10702,
         items: ["New Welcome page", "Multiple rafts"]},
         {version: "1.7.1", date: "Jan 24, 2026", value: 1701,
-        items: ["Background music", "Cook button", "Can grab and dump rabbit, but not burn them", "Mobile movement issues"]},
+        items: ["Background music", "Cook button", 
+          "Can grab and dump rabbit, but not burn them", "Mobile movement issues"]},
         {version: "1.7.0", date: "Jan 23, 2026", value: 10700,
         items: ["Must start fire with long grass", "Multiple fires show correctly"]},
         {version: "1.6.0", date: "Jan 19, 2026", value: 10600,
@@ -219,7 +225,7 @@ module.exports = {
     },
 
     deletePlayer(id){
-      if (confirm("Are you sure you want to delete "+this.players[id].name+"?")){
+      popup.callback = () => {
         if (this.players[id].games.length > 0){
           for (let i = 0; i < this.players[id].games.length; i++){
             localStorage.removeItem("wemoGame"+this.players[id].games[i].id)
@@ -229,10 +235,11 @@ module.exports = {
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.deleteMode = false
       }
+      popup.setInput("Are you sure you want to delete "+this.players[id].name+"?", "callback", "yesno")
     },
 
     deleteGame(name, customWorldIndex){
-      if (confirm("Are you sure you want to delete "+name+"? Everyone's progress on this world will also be deleted.")){
+      popup.callback = () => {
         localStorage.removeItem("board"+name)
         for (let i = this.players.length - 1; i >= 0; i--) {
           for (let j = this.players[i].games.length - 1; j >= 0; j--) {
@@ -246,7 +253,7 @@ module.exports = {
         this.customWorlds.splice(customWorldIndex, 1)
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
       }
-      this.deleteMode = false
+      popup.setInput("Are you sure you want to delete "+name+"? Everyone's progress on this world will also be deleted.", "callback", "yesno")
     },
 
     signout(){

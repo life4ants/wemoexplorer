@@ -101,10 +101,13 @@ var popup = new Vue({
         case "Grab":
           this.grab(this.selected, this.selectId); break
         case "saveBoard":
+          if (this.inputValue.text.length < 1){
+            this.setAlert("Name must not be blank!"); break
+          }
           board.name = this.inputValue.text
-          localStorage.setItem("board"+this.inputValue.text, JSON.stringify(board))
           this.callback("Board Name: "+board.name)
-          this.setAlert("The world was saved"); break
+          let m = board.save()
+          this.setAlert(m || "The world was saved"); break
         case "pickBombs":
           if (msg = actions.build(this.selected, {x: active.x, y: active.y}, Number(this.inputValue.number)))
             this.setAlert(msg)
@@ -334,7 +337,7 @@ var popup = new Vue({
       $(window).scrollTop(0).scrollLeft(0)
       this.title = title
       this.actionTitle = actionTitle
-      this.size = type === "getSize" ? "popup-center" : "popup-tiny"
+      this.size = type === "getSize" || actionTitle === "callback" ? "popup-center" : "popup-tiny"
       this.type = type
       this.show = true
       if (["input", "getSize", "pickBombs"].includes(type)){
@@ -388,21 +391,17 @@ var popup = new Vue({
     },
 
     yesnoAction(bool){
-      if (this.actionTitle === "saveBoard"){
-        if(bool){
-          localStorage.setItem("board"+board.name, JSON.stringify(board))
-          this.setAlert("The game was saved")
-        }
-        else
-          this.setInput("Enter a new name for this world:", "saveBoard", "input")
-      }
-      else if (this.actionTitle === "eat"){
+      if (this.actionTitle === "eat"){
         if (bool && backpack.removeItem("mushroom", 1)){
           actions.eatAction("mushrooms")
-          this.close()
         }
-        else
-          this.close()
+        this.close()
+      }
+      else if (this.actionTitle === "callback"){
+        if (bool){
+          this.callback()
+        }
+        this.close()
       }
     }
   }

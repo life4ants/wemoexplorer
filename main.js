@@ -52,7 +52,7 @@ const options = {
         inst: "Makes 5 arrows. Gather the needed resources in your backpack, then click build. Must have an Ax with you."},
     {name: "campsite", src: "images/campsite.png", title: "Campsite", level: 3,
         time: 0, energy: 500,
-        resources: "5 logs, 10 sticks, 5 clay, 10 long grass",
+        resources: "5 logs, 10 sticks, 5 clay, 20 long grass",
         dist: "A place to store tools, cook meals, and more!",
         inst: "Click build to select a location."},
     {name: "claypot", src: "images/claypot.png", title: "Clay Pot", level: 3,
