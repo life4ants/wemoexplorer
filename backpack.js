@@ -16,8 +16,7 @@ class Backpack {
         longGrass: {weight: 15, quantity: 0},
         mushroom: {weight: 20, quantity: 0},
         rabbitLive: {weight: 50, quantity: 0},
-        rabbitDead: {weight: 50, quantity: 0},
-        boulder: {weight: 250, quantity: 0}
+        rabbitDead: {weight: 50, quantity: 0}
       }
     }
     else if (this.type === "basket"){

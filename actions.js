@@ -453,7 +453,7 @@ let actions = {
       }
     }
     //gather a log, bone or stick:
-    else if (["log", "bone", "stick", "boulder"].includes(cell.type)){
+    else if (["log", "bone", "stick"].includes(cell.type)){
       if (backpack.addItem(cell.type))
         cell.type = cell.tile.replace(/\d+$/, "")
     }

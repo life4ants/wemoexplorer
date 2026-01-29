@@ -2,8 +2,6 @@ class Man {
   constructor(characterId, x, y){
     this.x = x
     this.y = y
-    this.oldX = x
-    this.oldY = y
     this.characterId = characterId
     this.index = 3 //direction facing: 0 - right, 1 - left, 2 - up, 3 - down
     this.energy = 3000
@@ -28,7 +26,7 @@ class Man {
   export(){
     let list = [
     "x", "y", "characterId", "energy", "health", "stepCount", "isRiding", 
-    "ridingId", "isNextToFire", "fireId", "isSleeping", "canSleep", "oldX", "oldY"]
+    "ridingId", "isNextToFire", "fireId", "isSleeping", "canSleep"]
     let output = {}
     for (let key of list){
       output[key] = this[key]
@@ -123,11 +121,17 @@ class Man {
     if (helpers.canWalk(this.x+x, this.y+y)){
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
-      if (["rockEdge", "river", "construction"].includes(newCell.type) ||
+      if (["water", "rockEdge", "river", "construction"].includes(newCell.type) ||
         ("firepit" === newCell.type && board.fires[newCell.id].value > 0)  || 
           (newCell.type === "star" && newCell.tile === "water")){return}
-      if (["water", "boulder"].includes(cell.type)){
-        if (this.x+x !== this.oldX || this.y+y !== this.oldY)
+      if (["boulder"].includes(newCell.type)){
+        let boulderCell = board.cells[this.x+x*2][this.y+y*2]
+        if (stackable.includes(boulderCell.type)){
+          board.cells[this.x+x*2][this.y+y*2] = {type: "boulder", tile: boulderCell.tile, revealed: boulderCell.revealed}
+          newCell.type = newCell.tile.replace(/\d+$/, "")
+          this.energy -= 50
+        }
+        else
           return
       }
       if (cell.type === "campsite" && newCell.type === "campsite"){

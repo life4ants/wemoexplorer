@@ -6,7 +6,7 @@ const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", 
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit", "root"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
 const seeThru = ["log", "bone", "steppingStones", "stick", "cactus", "berryBush", "star", "mushroom", "boulder", "palm"]
-const stackable = ["water", "beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle"]
+const stackable = ["water", "beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle", "sandpit", "river", "root"]
 const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
 const options = {
   build: [
