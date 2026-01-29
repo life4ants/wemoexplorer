@@ -244,18 +244,12 @@ let actions = {
       else if (_dumpable.includes(cell.type)){
         cell.type = "rock"
         cell.quantity = 1
+        delete cell.growtime
+        delete cell.growtype
       }
       else
         return "Sorry, you can't dump rock on "+cell.type+"!"
       backpack.removeItem("rock", 1)
-    }
-    if (type === "boulder"){
-      if (_dumpable.includes(cell.type)){
-        cell.type = "boulder"
-        backpack.removeItem("boulder", 1)
-      }
-      else
-        return "Sorry, you can't dump a boulder on "+cell.type+"!"
     }
     // everything else:
     else if (["arrow", "bone", "clay", "log", "longGrass", "mushroom", "stick", "rabbitDead"].includes(type)){
@@ -272,6 +266,8 @@ let actions = {
       else if (_dumpable.includes(cell.type) || ( ["log", "stick"].includes(type) && cell.type === "stump")){
         cell.type = type+"pile"
         cell.quantity = 1
+        delete cell.growtime
+        delete cell.growtype
       }
       else
         return "Sorry, you can't dump a "+type+" on "+cell.type+"!"
@@ -326,16 +322,14 @@ let actions = {
 
   findFood(){
     let cell = board.cells[man.x][man.y]
-    let tree = board.berryTrees[cell.id]
-    let bush = board.berryBushes[cell.id]
-    if (cell.type === "berryTree" && tree.berries.length > 0){
-      let p = Math.floor(Math.random()*tree.berries.length)
-      tree.berries.splice(p, 1)
+    if (cell.type === "berryTree" && cell.apples.length > 0){
+      let p = Math.floor(Math.random()*cell.apples.length)
+      cell.apples.splice(p, 1)
       return "apples"
     }
-    if (cell.type === "berryBush" && bush.berries.length > 0){
-      let p = Math.floor(Math.random()*bush.berries.length)
-      bush.berries.splice(p, 1)
+    if (cell.type === "berryBush" && cell.berries.length > 0){
+      let p = Math.floor(Math.random()*cell.berries.length)
+      cell.berries.splice(p, 1)
       return "berries"
     }
     let basket = toolbelt.getContainer("basket")
@@ -466,7 +460,8 @@ let actions = {
     else if ("mushroom" === cell.type){
       if (backpack.addItem("mushroom")){
         cell.type = "root"
-        cell.growtime = floor(random(180))
+        cell.growtype = "mushroom"
+        cell.growtime = board.wemoMins%1440
       }
     }
     //gather a rock:
@@ -486,7 +481,8 @@ let actions = {
         if (quantity === 1){
           cell.type = "root"
           cell.tile = "grass"
-          cell.growtime = floor(random(180))
+          cell.growtype = "longGrass"
+          cell.growtime = floor(random(30))
         }
         else{
           cell.tile = "longGrass"+(quantity-1)
@@ -494,21 +490,19 @@ let actions = {
       }
     }
     //pick berries:
-    else if ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0){
+    else if ("berryTree" === cell.type && cell.apples.length > 0){
       let basket = toolbelt.getContainer("basket")
       if (basket && basket.addItem("apples")){
-        let tree = board.berryTrees[cell.id]
-        let p = Math.floor(Math.random()*tree.berries.length)
-        tree.berries.splice(p, 1)
+        let p = Math.floor(Math.random()*cell.apples.length)
+        cell.apples.splice(p, 1)
         tutorial.checkAction("apples")
       }
     }
-    else if ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0){
+    else if ("berryBush" === cell.type && cell.berries.length > 0){
       let basket = toolbelt.getContainer("basket")
       if (basket && basket.addItem("berries")){
-        let tree = board.berryBushes[cell.id]
-        let p = Math.floor(Math.random()*tree.berries.length)
-        tree.berries.splice(p, 1)
+        let p = Math.floor(Math.random()*cell.berries.length)
+        cell.berries.splice(p, 1)
         tutorial.checkAction("berries")
       }
     }
@@ -521,7 +515,8 @@ let actions = {
           if (quantity === 1){
             cell.type = "root"
             cell.tile = "grass"
-            cell.growtime = floor(random(180))
+            cell.growtype = "veggies"
+            cell.growtime = floor(random(30))
           }
           else {
             cell.tile = "veggies"+(quantity-1)

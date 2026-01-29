@@ -5,19 +5,42 @@ class Board {
     this.snakes = []
     this.vehicles = []
     this.teleports = []
-    this.berryTrees = [] 
-    this.berryBushes = []
     this.stars = []
     this.fires = [] 
     this.cells = []
     this.progress = false 
-    this.version = 4
+    this.version = 5
     this.wemoMins = 120
     
 
     if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
       for (let key in a){
         this[key] = a[key]
+      }
+      if (this.version < 5){
+        for (let i = 0; i < this.cols; i++){
+          for (let j = 0; j< this.rows; j++){
+            let cell = this.cells[i][j]
+            if (cell.type === "berryTree"){
+              cell.apples = []
+              cell.growtime = floor(random(30))
+              delete cell.id
+            }
+            else if (cell.type === "berryBush"){
+              cell.berries = []
+              cell.growtime = floor(random(30))
+              delete cell.id
+            }
+            else if (cell.type === "pit"){
+              if (!cell.pair){
+                this.cells[i][j] = {type: "gass", tile: "grass"}
+              }
+            }
+          }
+        }
+        delete this.berryTrees
+        delete this.berryBushes
+        this.version = 5
       }
       this.initializeObjects()
     }
@@ -42,7 +65,7 @@ class Board {
   export(){ // arrows, bombs, playtime not saved
     let output = {rabbits: [], snakes: [], buildings: []}
     let list = [
-      "teleports", "berryTrees", "berryBushes", "stars", "fires", "cells", "progress",
+      "teleports", "stars", "fires", "cells", "progress",
       "version", "wemoMins", "type", "level", "name", "revealCount", "startX", "startY",
       "cols", "rows", "vehicles"
     ]
@@ -62,30 +85,41 @@ class Board {
   }
 
   // saving a game on the builder. Called from editbar.saveBoard
-  save(newName){ 
-    let trees = []
-    let bushes = []
+  save(){ 
     let stars = []
     this.revealCount = this.cols*this.rows
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
-        if (cell.type === "berryTree"){
-          cell.id = trees.length
-          trees.push({x: i, y: j, berries: []})
-        }
-        else if (cell.type === "berryBush"){
-          cell.id = bushes.length
-          bushes.push({x: i, y: j, berries: []})
-        }
-        else if (cell.type === "star"){
+
+        switch (cell.type) {
+        case "berryTree":
+          cell.apples = []
+          cell.growtime = floor(random(30))
+          break
+        case "berryBush":
+          cell.berries = []
+          cell.growtime = floor(random(30))
+          break
+        case "veggies":
+        case "longGrass":
+          cell.tile = cell.type+"1"
+          cell.growtime = floor(random(30))
+          break
+        case "mushroom":
+          cell.type = "root"
+          cell.growtype = "mushroom"
+          cell.growtime = 120
+          break
+        case "star":
           cell.id = stars.length
-          stars.push({x: i, y: j, id: cell.id, cells: []})
-        }
-        else if (cell.type === "pit"){
-          if (!cell.pair){
-            this.cells[i][j] = {type: "random", tile: "ramdom"}
+          stars.push({ x: i, y: j, id: cell.id, cells: [] })
+          break
+        case "pit":
+          if (!cell.pair) {
+            this.cells[i][j] = { type: "random", tile: "ramdom" }
           }
+          break
         }
       }
     }
@@ -107,8 +141,6 @@ class Board {
       }
     }
     this.stars = stars
-    this.berryTrees = trees
-    this.berryBushes = bushes
     this.playtime = 0 // will reset playtime if you edit a world
     this.type = "custom"
     this.level = 10
@@ -245,12 +277,16 @@ class Board {
       image(tiles["clouds"], x*25, y*25+topbarHeight)
       return
     }
+    // print the tile for every type
     let offset = game.mode === "edit" ? 0 : topbarHeight
     image(tiles[cell.tile] || tiles["random"], x*25, y*25+offset)
     
     // rock or clay:
     if (["rock", "clay"].includes(cell.type)){
       image(tiles[cell.type+cell.quantity], x*25, y*25+offset)
+    }
+    if ("root" === cell.type && game.mode === "edit"){
+      image(tiles.mushroom, x*25, y*25+offset)
     }
     // piles:
     else if (cell.type.substr(-4,4) === "pile"){
@@ -279,22 +315,10 @@ class Board {
         this.drawBadge(x*25+a*14+4, y*25+offset+(b*14)+4, item.quantity, item.color)
       }
     }
-    //updates:
+    //objects:
     if (["play", "build"].includes(game.mode)){
-      if ("berryBush" === cell.type){
-        let tree = this.berryBushes[cell.id]
-        noStroke()
-        fill(128,0,128)
-        ellipseMode(CENTER)
-        for (let j = 0; j< tree.berries.length; j++){
-          ellipse(tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight, 4, 4)
-        }
-      }
-      else if ("berryTree" === cell.type){
-        let tree = this.berryTrees[cell.id]
-        for (let j = 0; j< tree.berries.length; j++){
-          image(tiles.apple, tree.x*25+tree.berries[j].x, tree.y*25+tree.berries[j].y+topbarHeight)
-        }
+      if (["berryBush", "berryTree"].includes(cell.type)){
+        plants.display(x, y, cell)
       }
       else if ("firepit" === cell.type){
         let fire = this.fires[cell.id]
@@ -303,11 +327,6 @@ class Board {
         image(tile, fire.x*25, fire.y*25+topbarHeight)
         if (fire.value > 0)
           this.drawProgressBar(fire.x, fire.y, fire.value, 0)
-      }
-      else if ("root" === cell.type){
-        cell.growtime++
-        if (cell.growtime > world.growtime)
-          timer.sprout(cell)
       }
     }
     //print dead rabbits and arrows:

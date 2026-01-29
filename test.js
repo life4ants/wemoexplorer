@@ -51,7 +51,7 @@ let test = {
 
   add(item){
     if (["claypot", "basket"].includes(item))
-      return toolbelt.addItem("container",new Backpack(item))
+      return toolbelt.addItem("container",new Backpack({type:item}))
     if (["stoneAx", "boneShovel", "bow"].includes(item))
       return toolbelt.addItem("tool", item)
     return false

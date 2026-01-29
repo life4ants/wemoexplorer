@@ -17,6 +17,7 @@ let editor = {
         if (board.cells[x][y].type !== "water"){
           board.startX = x
           board.startY = y
+          if (test){console.log(board.cells[x][y])}
         }
       }
       else if (this.type === "pit0"){
@@ -101,23 +102,17 @@ let editor = {
       board.teleports.splice(index, 1)
       this.undoList = []
     }
+    let t = stackable.includes(board.cells[x][y].type) ? board.cells[x][y].tile : "grass"
     if (type === "rock"){
-      if (board.cells[x][y].type === "rock"){
+      if (board.cells[x][y].type === "rock")
         board.cells[x][y].quantity = board.cells[x][y].quantity === 1 ? 4 : board.cells[x][y].quantity-1
-      }
-      else {
-        board.cells[x][y].type = type
-        board.cells[x][y].quantity = 4
-      }
+      else
+        board.cells[x][y] = {tile: t, type, quantity: 4}
     }
-    else if (type === "clay"){
-      board.cells[x][y].type = type
-      board.cells[x][y].quantity = 5
-    }
-    else if (seeThru.includes(type)){
-      let t = stackable.includes(board.cells[x][y].type) ? board.cells[x][y].tile : "grass"
+    else if (type === "clay")
+      board.cells[x][y] = {tile: t, type, quantity: 5}
+    else if (seeThru.includes(type))
       board.cells[x][y] = {tile: t, type}
-    }
     else
       board.cells[x][y] = {tile, type}
   },
@@ -216,9 +211,9 @@ let editor = {
         if (board.cells[i][j].type === "random"){
           this.addUndo(i, j)
           if (tile === "longGrass")
-            board.cells[i][j] = {tile: "longGrass"+floor(random(3)+1), type: "longGrass"}
+            board.cells[i][j] = {tile: "longGrass1", type: "longGrass", growtype: floor(random(30))}
           else if (tile === "berryBush")
-            board.cells[i][j] = {tile: "grass", type: "berryBush"}
+            board.cells[i][j] = {tile: "grass", type: "berryBush", berries: [], growtime: floor(random(30))}
           else {
             let type = tile === "bush4" ? "tree" :
               tile === "bush1" ? "treeThin" : tile
