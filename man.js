@@ -2,6 +2,8 @@ class Man {
   constructor(characterId, x, y){
     this.x = x
     this.y = y
+    this.oldX = x
+    this.oldY = y
     this.characterId = characterId
     this.index = 3 //direction facing: 0 - right, 1 - left, 2 - up, 3 - down
     this.energy = 3000
@@ -26,7 +28,7 @@ class Man {
   export(){
     let list = [
     "x", "y", "characterId", "energy", "health", "stepCount", "isRiding", 
-    "ridingId", "isNextToFire", "fireId", "isSleeping", "canSleep"]
+    "ridingId", "isNextToFire", "fireId", "isSleeping", "canSleep", "oldX", "oldY"]
     let output = {}
     for (let key of list){
       output[key] = this[key]
@@ -119,33 +121,34 @@ class Man {
     if (this.isSleeping)
       return
     if (helpers.canWalk(this.x+x, this.y+y)){
-      this.standCount = 0
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
+      if (["rockEdge", "river", "construction"].includes(newCell.type) ||
+        ("firepit" === newCell.type && board.fires[newCell.id].value > 0)  || 
+          (newCell.type === "star" && newCell.tile === "water")){return}
+      if (["water", "boulder"].includes(cell.type)){
+        if (this.x+x !== this.oldX || this.y+y !== this.oldY)
+          return
+      }
       if (cell.type === "campsite" && newCell.type === "campsite"){
         x *= 2; y*= 2;
       }
-       //check for forbidden cells
-      if (!["water", "rockEdge", "river", "construction"].includes(newCell.type)){
-        if ("firepit" === newCell.type && board.fires[newCell.id].value > 0 || 
-          (newCell.type === "star" && newCell.tile === "water"))
-          return
-        //move and set image index
-        this.x += x
-        this.y += y
-        this.stepCount++
-        let c = this.walkingCost()
-        this.energy -= c
-        this.health -= c/5
-        this.vomit = false
+      
+      //move and set image index
+      this.oldX = this.x
+      this.oldY = this.y
+      this.x += x
+      this.y += y
+      this.stepCount++
+      let c = this.walkingCost()
+      this.energy -= c
+      this.health -= c/5
 
-        sounds.play("walk")
-        if (newCell.type === "pit" && newCell.pair){
-          this.x = newCell.pair.x
-          this.y = newCell.pair.y
-        }
+      sounds.play("walk")
+      if (newCell.type === "pit" && newCell.pair){
+        this.x = newCell.pair.x
+        this.y = newCell.pair.y
       }
-
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
       if (newCell.type === "star"){
