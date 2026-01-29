@@ -6,9 +6,9 @@ let actions = {
         type: "campsite",
         needed: [
           {type: "log", quantity: 5, color: "#582C0F"},
-          {type: "longGrass", quantity: 10, color: "#207414"},
-          {type: "stick", quantity: 10, color: "#B66500"},
-          {type: "clay", quantity: 5, color: "#804000"}
+          {type: "longGrass", quantity: 20, color: "#207414"},
+          {type: "clay", quantity: 5, color: "#B66500"},
+          {type: "stick", quantity: 10, color: "#804000"}
         ]
       }
       cell.type = "construction"
@@ -41,7 +41,7 @@ let actions = {
       return
     man.energy -= item.energy
     popup.setAlert("A construction site has been started. To finish building your "+item.title+
-      ", gather the needed resources, go near the construction site, and press F.")
+      ", gather the needed resources, go near the construction site, and press F. You can click on the site to see what is still needed.")
   },
 
   build(item, pos, quantity){
@@ -412,6 +412,9 @@ let actions = {
         backpack.removeItem(items[0].type, 1)
         if (fireValue > 122)
           tutorial.checkAction("fire")
+      }
+      else if (fireValue === 0 && backpack.includesItems(["log", "stick"])){
+        popup.setAlert("You must start the fire with long grass!")
       }
     }
   },
