@@ -4,12 +4,8 @@
   update(){
     if (frameCount%(world.frameRate/4) === 0){
       this.increment()
-      this.updateFires()
+      this.updateObjects()
     }
-    if (frameCount % 75 === 0)
-      this.growBerries()
-    if (frameCount%317 === 0)
-      this.growVeggies()
     if (frameCount%437 === 0 && board.level > 0){
       game.saveGame()
     }
@@ -63,7 +59,7 @@
     this.setTimeOfDay()
   },
 
-  updateFires(){ // runs every wemo minute
+  updateObjects(){ // runs every wemo minute
     for (let i=0; i<board.fires.length; i++){
       if (board.fires[i].value > 0)
         board.fires[i].value-- 
@@ -71,80 +67,37 @@
     for (let i=0; i<board.buildings.length; i++){
       board.buildings[i].update()
     }   
-  },
-
-  growVeggies(){
     for (let i = 0; i<board.cols; i++){
       for(let j=0; j<board.rows; j++){
-        if (board.cells[i][j].type === "veggies"){
-          let cell = board.cells[i][j]
-          let q = Number(cell.tile.substr(7,1))
-          cell.tile = q < 4 ? "veggies"+(q+1): cell.tile 
+        let cell = board.cells[i][j]
+        switch(cell.type){
+        case "berryTree": plants.addApple(cell); break
+        case "berryBush": plants.addBerry(cell); break
+        case "root":
+          cell.growtime++
+          switch(cell.growtype){
+          case "mushroom":
+            if (cell.growtime > 1440){
+              cell.type = "mushroom"
+              delete cell.growtype
+              delete cell.growtime
+            }
+            break
+          case "veggies":
+          case "longGrass":
+            if (cell.growtime >= plants.sproutTime){
+              cell.type = cell.growtype
+              delete cell.growtype
+              cell.growtime = 0
+              cell.tile = cell.type+"1"
+            }
+          }
+          break
+        case "veggies": plants.addVeggy(cell); break
+        case "longGrass": plants.addGrass(cell); break
         }
       }
     }
-  },
-
-  growBerries(){
-    let trees = board.berryTrees
-    let bushes = board.berryBushes || []
-    let x = Math.round(frameCount%300/75)
-    for (let i=x; i<trees.length; i+=4){
-      this.addApple(trees[i])
-    }
-    for (let i=x; i<bushes.length; i+=4){
-      this.addBerry(bushes[i])
-    }
-  },
-
-  addApple(tree){
-    if (tree.berries.length >= 5)
-      return
-    let p = Math.floor(Math.random()*5)
-    let c = 1
-    for (let i=0; i<tree.berries.length; i++){
-      if (p === tree.berries[i].id){
-        p = Math.floor(Math.random()*5)
-        c++
-        i = -1
-      }
-    }
-    let x = p === 3 ? 3 : p === 1 ? 9 : p === 0 ? 2 : 18
-    let y = p === 2 ? 3 : p === 1 ? 0 : p === 0 ? 3 : 14
-    tree.berries.push({id: p, x, y})
-  },
-
-  addBerry(bush){
-    if (bush.berries.length >= 9)
-      return
-    let a = [[16,8],[3,13],[7,14],[15,15],[21,15],[4,20],[7,20],[16,20],[22,22]]
-    let p = Math.floor(Math.random()*9)
-    let c = 1
-    for (let i=0; i<bush.berries.length; i++){
-      if (p === bush.berries[i].id){
-        p = Math.floor(Math.random()*9)
-        c++
-        i = -1
-      }
-    }
-    bush.berries.push({id: p, x: a[p][0], y: a[p][1]})
-  },
-
-  sprout(cell){ //grow random stuff where somthing was before
-    let r = random(10)
-    if (r < 6){
-      cell.type = "longGrass"
-      cell.tile = "longGrass1"
-    }
-    else if (r < 9){
-      cell.type = "veggies"
-      cell.tile = "veggies1"
-    }
-    else {
-      cell.type = "mushroom"
-      cell.tile = "grass"
-    }
-    delete cell.growtime
   }
 }
 

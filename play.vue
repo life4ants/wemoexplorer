@@ -130,8 +130,8 @@ module.exports = {
               (man.isNextToFire || cell.type === "campsite")
         //eat:
         let basket = toolbelt.getContainer("basket")
-        this.icons[4].active = ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0) ||
-            ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0) ||
+        this.icons[4].active = ("berryTree" === cell.type && cell.apples.length > 0) ||
+            ("berryBush" === cell.type && cell.berries.length > 0) ||
              (basket && basket.includesItems(["berries", "veggies", "apples"]).length > 0 )
         //jump:
         this.icons[5].active = (man.isRiding && (active.landed || active.isBeside("dock") ||
@@ -141,8 +141,8 @@ module.exports = {
         			toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx") !== -1
         //pick:
         this.icons[7].active = toolbelt.getContainer("basket") && (
-          ("berryTree" === cell.type && board.berryTrees[cell.id].berries.length > 0) || 
-          ("berryBush" === cell.type && board.berryBushes[cell.id].berries.length > 0)
+          ("berryTree" === cell.type && cell.apples.length > 0) || 
+          ("berryBush" === cell.type && cell.berries.length > 0)
           || "veggies" === cell.type)
         //fling:
         this.icons[8].active = !!helpers.nearbyType(active.x, active.y, "construction")
