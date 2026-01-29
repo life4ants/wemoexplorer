@@ -12,7 +12,6 @@ const editBar = {
             <span @click="saveBoard" title="save the current board">Save</span>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
-            <span @click='preview'>Preview</span>
             <span @click="download">Download</span>
             <span @click="upload">Upload</span>
           </div>
@@ -159,7 +158,7 @@ const editBar = {
     }
   },
   props: [
-    'exit', 'preview'
+    'exit'
   ],
   mounted(){
     editor.tool = "brush"

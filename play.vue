@@ -51,7 +51,7 @@
 <script>
 module.exports = {
 	props: [
-		'isMobile', 'exit', 'paused', 'pauseGame', 'autoCenter'
+		'isMobile', 'exit', 'paused', 'pauseGame', 'autoCenter', 'musicOn', 'setMusic'
 	],
 	data(){
 		return {
@@ -69,15 +69,9 @@ module.exports = {
         {code: "S", active: false, id: "wake", src: "images/wakeUp.png", title: "Wake up (S)"},
 	      {code: "K", active: false, id: "cook", src: "images/cook.png", title: "Cook (K)"}
 	    ],
-      musicOn: false,
       volume: 0.4
 		}
 	},
-  destroyed(){
-    sounds.files.music.pause()
-    sounds.files.music.currentTime = 0
-
-  },
   watch:{
     volume(){
       sounds.files.music.volume = this.volume
@@ -92,17 +86,6 @@ module.exports = {
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
         console.log(e.key)
         e.preventDefault();
-      }
-    },
-
-    setMusic(){
-      if (this.musicOn){
-        sounds.files.music.pause()
-        this.musicOn = false
-      }
-      else {
-        sounds.files.music.play()
-        this.musicOn = true
       }
     },
 

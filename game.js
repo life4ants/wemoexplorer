@@ -10,16 +10,15 @@ var game = new Vue({
         :viewCount="viewCount">
       </welcome-menu>
 
-      <edit-bar v-if="mode === 'edit'" 
-        :exit="exit" 
-        :preview="previewGame">
-      </edit-bar>
+      <edit-bar v-if="mode === 'edit'" :exit="exit"></edit-bar>
       
       <play-box v-if="mode === 'play'" ref="playbox"
         :exit="exit"
         :isMobile="isMobile"
         :paused="paused"
         :pauseGame="pauseGame"
+        :musicOn="musicOn"
+        :setMusic="setMusic"
         :autoCenter="autoCenter">
       </play-box>
       
@@ -42,8 +41,8 @@ var game = new Vue({
     autoCenter: false,
     level: 1,
     currentPlayer: {},
-    preview: false,
-    lastVisit: null
+    lastVisit: null,
+    musicOn: false
   },
   mounted(){
     const dateValue = 10704 // update this with each version publication
@@ -91,9 +90,19 @@ var game = new Vue({
         this.$refs.playbox.checkActions()
     },
 
+    setMusic(){
+      if (this.musicOn){
+        sounds.files.music.pause()
+        this.musicOn = false
+      }
+      else {
+        sounds.files.music.play()
+        this.musicOn = true
+      }
+    },
+
     exit() {
       if (this.mode === "play"){
-        this.preview = false
         if (board.gameOver){
           let index = this.currentPlayer.games.findIndex((e) => e.name === board.name)
           if (index !== -1){
@@ -113,6 +122,9 @@ var game = new Vue({
       noLoop()
       this.started = false
       this.paused = false
+      this.musicOn = false
+      sounds.files.music.pause()
+      sounds.files.music.currentTime = 0
       sounds.files['sleep'].pause()
       popup.show = false
       world.topOffset = 0
@@ -147,14 +159,6 @@ var game = new Vue({
           break
         case "custom":
           b = JSON.parse(localStorage["board"+index])
-          b.name = index
-          b.level = board.level || 10
-          b.type = "custom"
-          if (b.version <4)
-            b.playtime = 0 //Backwards compatible
-          break
-        case "preview":
-          b = board
       }
       man = new Man(player.character, b.startX, b.startY)
       backpack = new Backpack(b.backpack ?? {type:"backpack"})
@@ -175,9 +179,8 @@ var game = new Vue({
       world.noNight = board.level < 1
       if (man.isSleeping)
         sounds.files['sleep'].play()
-      if (!board.progress && board.level > 1){
+      if (!board.progress && board.level > 1)
         board.addAnimals()
-      }
       $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
       $("#boardWrapper").addClass("full-screen")
       this.currentPlayer = player
@@ -229,7 +232,9 @@ var game = new Vue({
           timer.resume()
           this.paused = false
           if (man.isSleeping)
-            sounds.files['sleep'].play()
+            sounds.files.sleep.play()
+          if (this.musicOn)
+            sounds.files.music.play()
           popup.close()
         }
         else {
@@ -237,20 +242,11 @@ var game = new Vue({
           popup.size = "popup-tiny"
           popup.show = true
           this.paused = true
-          sounds.files['sleep'].pause()
+          sounds.files.sleep.pause()
+          sounds.files.music.pause()
           noLoop()
         }
       }
-    },
-
-    previewGame(){
-      if(board.name){
-        this.preview = true
-        this.exit()
-        this.startGame("preview", this.currentPlayer)
-      }
-      else
-        popup.setAlert("Please load a game to preview!")
     },
 
     toggleBuildMode(){

@@ -39,7 +39,7 @@ class Board {
     }
   }
 
-  export(){
+  export(){ // arrows, bombs, playtime not saved
     let output = {rabbits: [], snakes: [], buildings: []}
     let list = [
       "teleports", "berryTrees", "berryBushes", "stars", "fires", "cells", "progress",
@@ -106,10 +106,15 @@ class Board {
     this.stars = stars
     this.berryTrees = trees
     this.berryBushes = bushes
-    if (this.name){
-      popup.setInput("Do you want to save the game as "+this.name+"?", "saveBoard", "yesno")
+    this.playtime = 0 // will reset playtime if you edit a world
+    this.level = 10
+
+    if (this.name && this.type === "custom"){
+      popup.actionTitle = "saveBoard"
+      popup.action()
     }
     else {
+      this.type = "custom"
       popup.setInput("Enter a new name for this world:", "saveBoard", "input")
     }
   }
@@ -146,7 +151,7 @@ class Board {
     world.nearMan = []
     this.showObjects()
     
-    if (!game.preview && this.revealCount > 0){
+    if (this.revealCount > 0){
       // show rounded clouds around the man (or raft) if unrevealed:
       for (let i = -1; i <= 1; i++){
         for (let j = -1; j<=1; j++){
@@ -199,9 +204,9 @@ class Board {
     for (let i = 0; i < rabbitSpots.length; i+=100){
       this.rabbits.push(new Rabbit(random(rabbitSpots)))
     }
-
-    for (let i = 0; i<list.sandpit.length; i++){
-      this.snakes.push(new Snake(list.sandpit[i]))
+    let snakeSpots = list.sandpit ?? []
+    for (let i = 0; i<snakeSpots.length; i++){
+      this.snakes.push(new Snake(snakeSpots[i]))
     }
   }
 
@@ -213,17 +218,18 @@ class Board {
     for (let v of this.vehicles){
       v.update()
     }
+    for (let b of this.buildings){
+      b.display()
+    }
+    for (let s of this.snakes){
+      s.update()
+    }
     //Bombs:
     if (this.bombs){
       for (var i = this.bombs.length - 1; i >= 0; i--) {
         this.bombs[i].display()
         if (this.bombs[i].update())
           this.bombs.splice(i, 1)
-      }
-    }
-    if (this.snakes){
-      for (let s of this.snakes){
-        s.update()
       }
     }
     //Arrows:
@@ -234,28 +240,10 @@ class Board {
           this.arrows.splice(i, 1)
       }
     }
-    //Campsites:
-    if (this.buildings){
-      for (let b of this.buildings){
-        image(tiles["campsite"], b.x*25, b.y*25+topbarHeight)
-        
-          if (b.isCooking){
-            image(tiles.claypot_water, b.x*25+12, (b.y+1)*25+topbarHeight, 10,10)
-            this.drawBadge(b.x*25+4, b.y*25+6+topbarHeight, "C", bootstrapColors.info)
-          }
-          if (b.fireValue > 0){
-            let tile = tiles.fire[Math.floor((frameCount%6)/2)]
-            image(tile, b.x*25+5, (b.y+1)*25+topbarHeight+5, 25, 15, 0, 0, 25, 15)
-            this.drawProgressBar(b.x, b.y+1, b.fireValue, 5)
-          }
-          this.drawBadge(b.x*25+42, b.y*25+6+topbarHeight, b.getItems().length, "#000")
-        
-      }
-    }
   }
 
   showCell(x,y, cell, revealed){
-    if (!revealed && game.mode !== "edit" && !game.preview){
+    if (!revealed && game.mode !== "edit"){
       // in this case, print clouds and be done. 
       image(tiles["clouds"], x*25, y*25+topbarHeight)
       return
@@ -319,11 +307,11 @@ class Board {
         if (fire.value > 0)
           this.drawProgressBar(fire.x, fire.y, fire.value, 0)
       }
-    }
-    if ("root" === cell.type && game.mode === "play"){
-      cell.growtime++
-      if (cell.growtime > world.growtime)
-        timer.sprout(cell)
+      else if ("root" === cell.type){
+        cell.growtime++
+        if (cell.growtime > world.growtime)
+          timer.sprout(cell)
+      }
     }
     //print dead rabbits and arrows:
     if (cell.rabbits)

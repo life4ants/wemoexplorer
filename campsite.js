@@ -23,6 +23,22 @@ class Campsite {
 		return output
 	}
 
+	display(){
+		image(tiles["campsite"], this.x*25, this.y*25+topbarHeight)
+        
+    if (this.isCooking){
+      image(tiles.claypot_water, this.x*25+12, (this.y+1)*25+topbarHeight, 10,10)
+      board.drawBadge(this.x*25+4, this.y*25+6+topbarHeight, "C", bootstrapColors.info)
+    }
+    if (this.fireValue > 0){
+      let tile = tiles.fire[Math.floor((frameCount%6)/2)]
+      image(tile, this.x*25+5, (this.y+1)*25+topbarHeight+5, 25, 15, 0, 0, 25, 15)
+      board.drawProgressBar(this.x, this.y+1, this.fireValue, 5)
+    }
+    board.drawBadge(this.x*25+42, this.y*25+6+topbarHeight, this.tools.length+this.containers.length, "#000")
+        
+	}
+
 	addItem(type, object){
 		if (type === "tool"){
 			this.tools.push(object)
