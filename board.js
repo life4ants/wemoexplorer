@@ -323,7 +323,8 @@ class Board {
       else if ("firepit" === cell.type){
         let fire = this.fires[cell.id]
         let tile = fire.value > 0 ? tiles.fire[Math.floor((frameCount%6)/2)] :
-          man.fireId === cell.id ? tiles.firepitOutlined : tiles.firepit
+          man.fireId === cell.id && !helpers.nearbyType(active.x, active.y, "construction") ? 
+          tiles.firepitOutlined : tiles.firepit
         image(tile, fire.x*25, fire.y*25+topbarHeight)
         if (fire.value > 0)
           this.drawProgressBar(fire.x, fire.y, fire.value, 0)

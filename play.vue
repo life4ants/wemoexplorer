@@ -145,7 +145,7 @@ module.exports = {
           ("berryBush" === cell.type && cell.berries.length > 0)
           || "veggies" === cell.type)
         //fling:
-        this.icons[8].active = !!helpers.nearbyType(active.x, active.y, "construction")
+        this.icons[8].active = backpack.weight > 0 && helpers.nearbyType(active.x, active.y, "construction")
         //sleep:
         this.icons[9].active = (man.canSleep && !man.isSleeping)
         //wake up:

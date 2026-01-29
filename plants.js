@@ -1,7 +1,8 @@
 let plants = {
 	berryTime: 100,
 	appleTime: 120,
-	veggieTime: 150,
+  veggieTime: 150,
+	grassTime: 150,
 	mushroomTime: 1440,
 	sproutTime: 180,
 	applePositions: [[2,3],[9,0],[18,3],[3,14],[18,14]],
@@ -43,7 +44,7 @@ let plants = {
   },
 
   addGrass(cell){
-    let q = Number(cell.tile.substr(7,1))
+    let q = Number(cell.tile.substr(9,1))
     if (q >= 3)
     	return
     cell.growtime++

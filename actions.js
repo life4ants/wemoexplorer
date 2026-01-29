@@ -389,6 +389,7 @@ let actions = {
           break
         }
       }
+      return
     }
     let cell = board.cells[man.x][man.y]
     if (man.isNextToFire || cell.type === "campsite"){
