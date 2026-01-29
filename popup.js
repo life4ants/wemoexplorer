@@ -392,7 +392,7 @@ var popup = new Vue({
       }
       else if (this.actionTitle === "callback"){
         if (bool){
-          this.callback()
+          setTimeout(this.callback, 0)
         }
         this.close()
       }

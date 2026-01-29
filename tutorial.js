@@ -148,14 +148,17 @@ let tutorial = {
 		this.active = true
 		this.step = 0
 		this.level = board.level
-		if (board.level > 0){
+		for (let q of this.questData[this.level]){
+			q.completed = false
+		}
+		if (board.progress){
 			if (toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx") !== -1)
 				this.checkAction("stoneAx")
 			if (toolbelt.getContainer("basket"))
 				this.checkAction("basket")
 			if (board.revealCount <= 0)
 				this.checkAction("stars")
-			if (board.wemoMins > 1500)
+			if (board.wemoMins > 1560)
 				this.checkAction("night")
 			if (board.vehicles.length > 0)
 				this.checkAction("raft")
