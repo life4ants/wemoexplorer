@@ -78,7 +78,9 @@ class Rabbit {
       for (let i = 0; i < 3; i++){
         let x = pdirs[index[i]][0]
         let y = pdirs[index[i]][1]
-        if (helpers.withinBounds(this.x+x,this.y+y) && !nonWalkable.includes(board.cells[this.x+x][this.y+y].type)){
+        let cell = board.cells[this.x+x][this.y+y]
+        if (helpers.withinBounds(this.x+x,this.y+y) && !nonWalkable.includes(cell.type) && 
+              cell.type.substr(-4,4) !== "pile"){
           this.setPos(x,y)
           break
         }
