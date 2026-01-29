@@ -136,6 +136,9 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
+        {version: "1.7.6", date: "Jan 29, 2026", value: 10706,
+        items: ["Grass and Veggies regrow when fully picked", "Lots of bug fixes", 
+          "Rabbits can't walk on piles", "Push boulders instead of grabbing"]},
         {version: "1.7.5", date: "Jan 28, 2026", value: 10705,
         items: ["Walk onto but not off boulders and water", 
           "Save and Save As on editor, nicer popup confirm when deleting worlds and players", 
