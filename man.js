@@ -121,15 +121,18 @@ class Man {
     if (helpers.canWalk(this.x+x, this.y+y)){
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
-      if (["water", "rockEdge", "river", "construction"].includes(newCell.type) ||
-        ("firepit" === newCell.type && board.fires[newCell.id].value > 0)  || 
-          (newCell.type === "star" && newCell.tile === "water")){return}
+      if (["water","rockEdge","river","construction"].some(v => v === newCell.type || v === newCell.tile.replace(/\d+$/, "")) ||
+        ("firepit" === newCell.type && board.fires[newCell.id].value > 0)){return}
       if (["boulder"].includes(newCell.type)){
-        let boulderCell = board.cells[this.x+x*2][this.y+y*2]
-        if (stackable.includes(boulderCell.type)){
-          board.cells[this.x+x*2][this.y+y*2] = {type: "boulder", tile: boulderCell.tile, revealed: boulderCell.revealed}
-          newCell.type = newCell.tile.replace(/\d+$/, "")
-          this.energy -= 50
+        if (keyIsDown(SHIFT) && helpers.withinBounds(this.x+x*2, this.y+y*2)){
+          let boulderCell = board.cells[this.x+x*2][this.y+y*2]
+          if (stackable.includes(boulderCell.type)){
+            board.cells[this.x+x*2][this.y+y*2] = {type: "boulder", tile: boulderCell.tile, revealed: boulderCell.revealed}
+            newCell.type = newCell.tile.replace(/\d+$/, "")
+            this.energy -= 50
+          }
+          else
+            return
         }
         else
           return
