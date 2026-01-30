@@ -121,8 +121,9 @@ class Man {
     if (helpers.canWalk(this.x+x, this.y+y)){
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
-      if (["water","rockEdge","river","construction"].some(v => v === newCell.type || v === newCell.tile.replace(/\d+$/, "")) ||
+      if (["water","rockEdge","construction"].some(v => v === newCell.type || v === newCell.tile.replace(/\d+$/, "")) ||
         ("firepit" === newCell.type && board.fires[newCell.id].value > 0)){return}
+      if (newCell.tile.replace(/\d+$/, "") === "river" && newCell.type !== "steppingStones"){return}
       if (["boulder"].includes(newCell.type)){
         if (keyIsDown(SHIFT) && helpers.withinBounds(this.x+x*2, this.y+y*2)){
           let boulderCell = board.cells[this.x+x*2][this.y+y*2]

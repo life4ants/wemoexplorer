@@ -33,7 +33,7 @@
             <div v-for="(player, id) in players" @click="() => pickPlayer(id)" class="button-tiles-content clickable">
               {{player.name}}
             </div>
-            <div @click="page = 'newPlayer'" class="button-tiles-content clickable">
+            <div @click="addPlayer" class="button-tiles-content clickable">
               <i>New Player</i>
             </div>
           </div>
@@ -45,7 +45,7 @@
         </div>
         <div v-else-if="page === 'newPlayer'" class="modal-body center">
           <h5>What is your name?</h5>
-          <input type="text" v-model="name" placeholder="enter name" class="player-name">
+          <input type="text" v-model="name" placeholder="enter name" class="player-name" id="inputOne">
           <button class="button-primary" id="etr" @click="newPlayer">Start</button>
           <button v-if="players.length > 0" id="esc" @click="page = 'pickPlayer'">Cancel</button>
         </div>
@@ -136,6 +136,8 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
+        {version: "1.7.8", date: "Jan 29, 2026", value: 10708,
+        items: ["Push boulders holding shift"]},
         {version: "1.7.7", date: "Jan 29, 2026", value: 10707,
         items: ["New Level 1 world"]},
         {version: "1.7.6", date: "Jan 29, 2026", value: 10706,
@@ -210,6 +212,12 @@ module.exports = {
     }
   },
   methods: {
+    addPlayer(){
+      this.page = "newPlayer"
+      this.name = ""
+      setTimeout(() => $("#inputOne").focus(), 0)
+    },
+
     newPlayer(){
       if (this.name.length > 0){
         let level = typeof test === "undefined" ? 0 : 4
