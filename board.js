@@ -21,21 +21,27 @@ class Board {
         for (let i = 0; i < this.cols; i++){
           for (let j = 0; j< this.rows; j++){
             let cell = this.cells[i][j]
-            if (cell.type === "berryTree"){
+            switch (cell.type){
+            case "berryTree":
               cell.apples = []
               cell.growtime = floor(random(30))
               delete cell.id
-            }
-            else if (cell.type === "berryBush"){
+              break
+            case "berryBush":
               cell.berries = []
               cell.growtime = floor(random(30))
               delete cell.id
-            }
-            else if (cell.type === "pit"){
+              break
+            case "pit":
               if (!cell.pair){
                 this.cells[i][j] = {type: "gass", tile: "grass"}
               }
+              break
+            case "veggies":
+            case "longGrass":
+              cell.growtime = floor(random(30))
             }
+            
           }
         }
         delete this.berryTrees

@@ -77,10 +77,10 @@ let tutorial = {
 				text: "Build a stone Ax. You will need one stick, one rock, and one long grass."
 			},
 			{
-				title: "Chop down a tree",
-				text: "Chop a tree for logs."
+				title: "Build a raft",
+				text: "Build a raft along the beach. You will need logs and long grass."
 			},
-			{
+			{ 
 				title: "Explore the world",
 				text: "Find all the stars to uncover the world."
 			},
@@ -221,7 +221,6 @@ let tutorial = {
 			return
 		case "chop": 
 			if (this.level === 0 && this.step === 9) {this.next()}
-			else if (this.level === 1) {this.complete(1)}
 		  return
 		case "fire": 
 			if (this.level === 0 && this.step === 12){
@@ -241,6 +240,7 @@ let tutorial = {
 			return
 		case "raft":
 			if (this.level === 2) {this.complete(0)}
+			else if (this.level === 1) {this.complete(1)}
 			return
 		case "veggies":
 			if (this.level === 2) {this.complete(1)}

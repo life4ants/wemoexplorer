@@ -45,9 +45,9 @@ var game = new Vue({
     musicOn: false
   },
   mounted(){
-    const version = 10706 // update this with each version publication
+    const version = 10707 // update this with each version publication
     let deleteProgress = true // change this to delete players saved progress
-    let resetLevel = false // change this to force people to do the tutorial again
+    let resetLevel = true // change this to force people to do the tutorial again
     this.lastVisit = Number(localStorage.wemoUpToDate ?? 1012011)
 
     if (this.lastVisit === version)
@@ -73,7 +73,7 @@ var game = new Vue({
       let players = JSON.parse(localStorage.wemoPlayers || "[]")
       let newPlayers = []
       for (let i=0; i<players.length; i++){
-        newPlayers.push({name: players[i].name, unlockedLevel: players[i].unlockedLevel, games: [], character: 0})
+        newPlayers.push({name: players[i].name, unlockedLevel: 1, games: [], character: 0})
       }
       localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
     }

@@ -136,6 +136,8 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
+        {version: "1.7.7", date: "Jan 29, 2026", value: 10707,
+        items: ["New Level 1 world"]},
         {version: "1.7.6", date: "Jan 29, 2026", value: 10706,
         items: ["Grass and Veggies regrow when fully picked", "Lots of bug fixes", 
           "Rabbits can't walk on piles", "Push boulders instead of grabbing"]},
