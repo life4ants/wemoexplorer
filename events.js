@@ -59,22 +59,18 @@ function mousePressed(){
     window._UIevent = false
     return
   }
-  if (game.mode === "edit" && winMouseX > world.leftOffset && !popup.show)
-    editor.mousePressed()
+  let offset = ["edit", "starEdit"].includes(game.mode) ? 0 : topbarHeight
   if (game.mode === "welcome" || popup.show || world.noKeys ||
       mouseX < 0 || mouseX > board.cols*25 ||
-      mouseY < topbarHeight || mouseY > board.rows*25+topbarHeight)
-    return
+      mouseY < offset || mouseY > board.rows*25+offset){return}
   switch(game.mode){
-    case "play":
-      board.clicker()
-      break
-    case "build":
-      builder.clicker()
-      break
+    case "play": board.clicker(); break
+    case "build": builder.clicker(); break
+    case "edit": editor.mousePressed(); break
+    case "starEdit": starEditor.mousePressed(); break
   }
   
-  if (typeof test !== 'undefined' && game.mode === "play" && test.clickInfo){
+  if (test != null && game.mode === "play" && test.clickInfo){
     let y = Math.floor((mouseY-topbarHeight)/25)
     let x = Math.floor(mouseX/25)
     let cell = board.cells[x][y] || {}
@@ -90,6 +86,8 @@ function mouseDragged(){
     return
   if (game.mode === "edit" && winMouseY > world.topOffset)
     editor.mouseDragged()
+  if (game.mode === "starEdit" && winMouseY > world.topOffset)
+    starEditor.mousePressed()
 }
 
 function mouseReleased(){

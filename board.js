@@ -92,7 +92,10 @@ class Board {
 
   // saving a game on the builder. Called from editbar.saveBoard
   save(){ 
+    if (!this.name)
+      return "no name!"
     let stars = []
+    let starsGood = true
     this.revealCount = this.cols*this.rows
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
@@ -110,7 +113,7 @@ class Board {
         case "veggies":
         case "longGrass":
           cell.tile = cell.type+"1"
-          cell.growtime = floor(random(30))
+          cell.growtime = floor(random(90))
           break
         case "mushroom":
           cell.type = "root"
@@ -118,8 +121,8 @@ class Board {
           cell.growtime = 120
           break
         case "star":
-          cell.id = stars.length
-          stars.push({ x: i, y: j, id: cell.id, cells: [] })
+          if (cell.id == null){starsGood = false}
+          stars.push(cell.id)
           break
         case "pit":
           if (!cell.pair) {
@@ -132,25 +135,13 @@ class Board {
     if (stars.length < 2){
       return "You can't save a world without at least 2 stars!"
     }
-    for (let i = 0; i < this.cols; i++){
-      for (let j = 0; j< this.rows; j++){
-        let cell = this.cells[i][j]
-        let id = 0
-        let mindist = this.rows+this.cols
-        for (let a in stars){
-          let d = dist(i,j,stars[a].x, stars[a].y)
-          if (d < mindist){
-            mindist = d; id = a
-          }
-        }
-        stars[id].cells.push({x:i,y:j})
-      }
+    if (this.stars.length !== stars.length || !starsGood){
+      return "You must edit the stars before saving!"
     }
-    this.stars = stars
     this.playtime = 0 // will reset playtime if you edit a world
     this.type = "custom"
     this.level = 10
-    localStorage.setItem("board"+this.name, JSON.stringify(board))
+    localStorage.setItem("board"+this.name, JSON.stringify(this))
     return false
   }
 
@@ -186,7 +177,7 @@ class Board {
     world.nearMan = []
     this.showObjects()
     
-    if (this.revealCount > 0){
+    if (this.revealCount > 0 && game.mode === "play"){
       // show rounded clouds around the man (or raft) if unrevealed:
       for (let i = -1; i <= 1; i++){
         for (let j = -1; j<=1; j++){
@@ -278,13 +269,18 @@ class Board {
   }
 
   showCell(x,y, cell, revealed){
+    let offset = ["edit", "starEdit"].includes(game.mode) ? 0 : topbarHeight
     if (!revealed && game.mode !== "edit"){
-      // in this case, print clouds and be done. 
-      image(tiles["clouds"], x*25, y*25+topbarHeight)
-      return
+      if (game.mode === "starEdit" && (cell.type === "star" || 
+        starEditor.matrix[x][y] === starEditor.selected.id)){
+        //continue to show the cell
+      }
+      else {
+        image(tiles["clouds"], x*25, y*25+offset)
+        return
+      }
     }
     // print the tile for every type
-    let offset = game.mode === "edit" ? 0 : topbarHeight
     image(tiles[cell.tile] || tiles["random"], x*25, y*25+offset)
     
     // rock or clay:

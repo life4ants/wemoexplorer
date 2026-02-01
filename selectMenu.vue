@@ -50,18 +50,30 @@
   methods: {
     callAction(){
       if (this.type === "fileUpload"){
-        let b = {}
-        try {b = JSON.parse(this.uploadData.text)}
+        let d = {}
+        try {d = JSON.parse(this.uploadData.text)}
         catch(e){
           console.error(e)
           this.setAlert("Failed to parse file text.")
           return
         }
-        if (b.name){
-          board = new Board(b)
-          world.resize(board.cols, board.rows)
-          this.callback("Board Name: "+board.name)
-          this.setAlert("World loaded. Please save before exiting.")
+        if (d && d.cols && d.rows){
+          let w = new Board(d)
+          let dupname = false
+          for (let g of Object.keys(localStorage)){
+            if (g === "board" + w.name){
+              dupname = true
+            }
+          }
+          if (dupname || w.save()){// board.save returns true with error message, so world was not saved
+            board = w
+            world.resize(board.cols, board.rows)
+            this.callback("Board Name: "+board.name)
+            this.setAlert(`World [${w.name}] loaded. Please save before exiting. If you already have a world named [${w.name}], it will replace it. Use Save As to save with a new name.`)
+          }
+          else {// world was saved to local storage
+            this.setAlert(`World [${w.name}] was saved. You can load it to edit, or exit and play it now.`)
+          }
         }
         else
           this.setAlert("Failed to create board.");

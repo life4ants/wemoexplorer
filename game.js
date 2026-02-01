@@ -10,7 +10,8 @@ var game = new Vue({
         :viewCount="viewCount">
       </welcome-menu>
 
-      <edit-bar v-if="mode === 'edit'" :exit="exit"></edit-bar>
+      <edit-bar v-if="['edit', 'starEdit'].includes(mode)" :exit="exit" :mode="mode">
+      </edit-bar>
       
       <play-box v-if="mode === 'play'" ref="playbox"
         :exit="exit"
@@ -29,7 +30,7 @@ var game = new Vue({
     `,
   components: {
     'welcome-menu': httpVueLoader('welcome.vue'),
-    'edit-bar': editBar,
+    'edit-bar': httpVueLoader('editBar.vue'),
     'play-box': httpVueLoader('play.vue'),
     'build-sidebar': httpVueLoader('buildSidebar.vue')
   },
@@ -257,7 +258,7 @@ var game = new Vue({
       }
       else if (this.mode === "play"){
         this.mode = "build"
-        world.leftOffset = 152
+        world.leftOffset = 182
       }
       viewport.update(true)
     },

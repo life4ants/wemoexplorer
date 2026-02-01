@@ -156,13 +156,13 @@ body {
   width: 65px;
   float: left;
   border: solid 2px #ccc;
-  cursor: pointer; 
 }
 
 .layer-button{
   display: block;
   padding: 3px 5px;
   background-color: #ddd;
+  cursor: pointer; 
 }
 
 .activelayer {

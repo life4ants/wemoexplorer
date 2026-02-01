@@ -1,6 +1,14 @@
-const editBar = {
-  template: `
-    <div class="editbar">
+<template>
+  <div class="editbar">
+    <div v-if="mode === 'starEdit'" class="star-buttons">
+      <button @click= 'exitStarMode'>Done</button>
+      <button @click= 'calculateStars'>Recalculate</button>
+      <span :class = "{activelayer: starMode === 'add'}" class="layer-button"
+        @click="() => changeStarMode('add')">Add cells</span>
+      <span :class = "{activelayer: starMode === 'subtract'}" class="layer-button"
+        @click="() => changeStarMode('subtract')">Subtract Cells</span>
+    </div>
+    <div v-if="mode === 'edit'">
       <div class="menu-buttons">
         <div class="menu" @click='exit'>Exit</div>
         <div class="menu">
@@ -13,6 +21,7 @@ const editBar = {
             <span @click="() => saveBoard(true)" title="save a copy with new name">Save As</span>
             <span @click="island">Make an island</span>
             <span @click="grassAndTreeFill" title="fill board with trees and grass">Grass&Trees</span>
+            <span @click="starEdit">Edit Stars</span>
             <span @click="download">Download</span>
             <span @click="upload">Upload</span>
           </div>
@@ -24,12 +33,10 @@ const editBar = {
       <div class="editbar-top">
         <button @click= 'undo'>Undo</button>
         <div class="layer-buttons">
-          <span :class = "{activelayer: set === 1}"
-          class="layer-button"
-          @click="() => changeSet(1)">Set 1</span>
-          <span :class = "{activelayer: set === 2}"
-          class="layer-button"
-          @click="() => changeSet(2)">Set 2</span>
+          <span :class = "{activelayer: set === 1}" class="layer-button"
+            @click="() => changeSet(1)">Set 1</span>
+          <span :class = "{activelayer: set === 2}" class="layer-button"
+            @click="() => changeSet(2)">Set 2</span>
         </div>
         <div class="tilebox">
           <img v-for="pic in tools" :key="pic.id" :src="pic.src"
@@ -50,7 +57,10 @@ const editBar = {
         </div>
       </div>
     </div>
-    `,
+  </div>
+</template>
+<script>
+module.exports = {
   data(){
     return {
       tiles1: [
@@ -154,12 +164,13 @@ const editBar = {
       ],
       selected: "water",
       set: 1, 
+      starMode: "add",
       tool: "brush",
       boardName: "Board not saved"
     }
   },
   props: [
-    'exit'
+    'exit', 'mode'
   ],
   mounted(){
     editor.tool = "brush"
@@ -207,6 +218,7 @@ const editBar = {
     saveBoard(newName){
       if (board.name && board.type === "custom" && !newName){
         let m = board.save()
+        $(window).scrollTop(0).scrollLeft(0)
         popup.setAlert(m || "The world was saved.")
       }
       else {
@@ -239,6 +251,32 @@ const editBar = {
       popup.setMenu(items, "Select a world to load:", "load")
     },
 
+    starEdit(){
+      starEditor.calculateMatrix()
+      if (board.stars.length < 2){
+        popup.setAlert("There must be at least 2 stars!")
+      }
+      else {
+        $("#defaultCanvas0").css("cursor", "pointer")
+        game.mode = "starEdit"
+      }
+    },
+
+    exitStarMode(){
+      starEditor.saveStars()
+      $("#defaultCanvas0").css("cursor", "none")
+      game.mode = "edit"
+    },
+
+    changeStarMode(m){
+      this.starMode = m
+      starEditor.mode = m
+    },
+
+    calculateStars(){
+      starEditor.asignStars()
+    },
+
     download(){
       let downloadUrl = URL.createObjectURL(new Blob(
         [JSON.stringify(board)], {type:'text/plain'}));
@@ -255,4 +293,12 @@ const editBar = {
     }
   }
 }
-
+</script>
+<style>
+  .star-buttons {
+    text-align: center;
+  }
+  .star-buttons button{
+    margin: 10px 0px;
+  }
+</style>

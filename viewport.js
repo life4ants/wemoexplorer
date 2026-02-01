@@ -84,7 +84,7 @@ let viewport = {
   },
 
   screenEdges(){
-    if (game.mode === "edit"){
+    if (["edit", "starEdit"].includes(game.mode)){
       let l = window.pageXOffset
       let t = window.pageYOffset
       let r = l + window.innerWidth - world.leftOffset

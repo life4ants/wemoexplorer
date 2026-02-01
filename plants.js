@@ -2,7 +2,7 @@ let plants = {
 	berryTime: 100,
 	appleTime: 120,
   veggieTime: 150,
-	grassTime: 150,
+	grassTime: 180,
 	mushroomTime: 1440,
 	sproutTime: 180,
 	applePositions: [[2,3],[9,0],[18,3],[3,14],[18,14]],

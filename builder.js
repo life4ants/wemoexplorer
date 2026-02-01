@@ -63,7 +63,7 @@ let builder = {
     let cell = board.cells[x][y]
     switch(this.item.name){
       case "steppingStones":
-        return fordable.includes(cell.tile)
+        return cell.type === "river" && fordable.includes(cell.tile)
       case "raft":
         return (cell.type === "beach" && helpers.isNextToType(x, y, "water")) || cell.type === "river"
       case "campsite":

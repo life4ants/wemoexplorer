@@ -143,8 +143,6 @@ class Man {
       }
       
       //move and set image index
-      this.oldX = this.x
-      this.oldY = this.y
       this.x += x
       this.y += y
       this.stepCount++
@@ -194,10 +192,11 @@ class Man {
       }
     }
 
-    msgs.following.msg = "You're too far from a fire!"
-    msgs.following.frames = 1
-    if (!this.isAnimated)
+    if (!this.isAnimated){
+      msgs.following.msg = "You're too far from a fire!"
+      msgs.following.frames = 1
       this.health -= Math.floor((this.health+500)/200)
+    }
   }
 
   dismount(){

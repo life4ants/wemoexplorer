@@ -332,6 +332,12 @@ function draw(){
       playLoop()
     else if (game.mode === "build")
       builder.loop()
+    else if (game.mode === "starEdit"){
+      stroke("red")
+      strokeWeight(3)
+      noFill()
+      rect(starEditor.selected.x*25,starEditor.selected.y*25,25,25)
+    }
   }
 }
 

@@ -9,8 +9,6 @@ let editor = {
   mousePressed(){
     let x = Math.floor(mouseX/25)
     let y = Math.floor(mouseY/25)
-    if (x < 0 || x > board.cols || y < 0 || y > board.rows)
-      return
     let id = x+"_"+y
     if (this.tool === "brush"){
       if (this.type === "start"){
@@ -102,7 +100,7 @@ let editor = {
       board.teleports.splice(index, 1)
       this.undoList = []
     }
-    let t = stackable.includes(board.cells[x][y].type) ? board.cells[x][y].tile : "grass"
+    let t = stackable.includes(board.cells[x][y].tile.replace(/\d+$/, "")) ? board.cells[x][y].tile : "grass"
     if (type === "rock"){
       if (board.cells[x][y].type === "rock")
         board.cells[x][y].quantity = board.cells[x][y].quantity === 1 ? 4 : board.cells[x][y].quantity-1
@@ -425,6 +423,112 @@ let editor = {
     else {
       console.log(this.path)
       this.path = []
+    }
+  }
+}
+
+let starEditor = {
+  selected: {id: 0},
+  mode: "add",
+  matrix: [],
+
+  calculateMatrix(){ //add ids to stars, builds board.stars as empty list
+    this.matrix = Array.from({ length: board.cols }, () => [])
+
+    // add cells for each star in board.stars, delete stars that are not on the board
+    if (board.stars.length > 0){
+      for (let i = board.stars.length-1; i >= 0; i--){
+        let s = board.stars[i]
+        if (board.cells[s.x][s.y].type !== "star"){
+          board.stars.splice(i, 1)
+        }
+        else {
+          board.cells[s.x][s.y].id = s.id
+          for (let c of s.cells){
+            this.matrix[c.x][c.y] = s.id
+          }
+        }
+      }
+    }
+    // add any new stars found on the board
+    for (let i = 0; i < board.cols; i++){
+      for (let j = 0; j< board.rows; j++){
+        let cell = board.cells[i][j]
+        if (cell.type === "star"){
+          if (cell.id == null || board.stars.findIndex(e => e.id === cell.id) === -1){
+            cell.id = board.stars.length === 0 ? 0 : board.stars[board.stars.length-1].id+1
+            board.stars.push({ x: i, y: j, id: cell.id, cells: [] })
+            if (this.matrix[i][j] != null){// this cell already belongs to another star.
+              let index = board.stars.findIndex(e => e.id === this.matrix[i][j]) 
+              for (let cell of board.stars[index].cells){ // reasign all of that star's cells
+                this.asignCell(cell.x, cell.y)
+              }
+            }
+          }
+        }
+      }
+    }
+    if (board.stars.length < 2){
+      return
+    }
+    // asign cells to a star that don't have one (i.e. their star was deleted)
+    for (let i = 0; i < board.cols; i++){
+      for (let j = 0; j< board.rows; j++){
+        if (this.matrix[i][j] == null){
+          this.asignCell(i,j)
+        }
+      }
+    }
+    this.selected = {x: board.stars[0].x, y: board.stars[0].y, id: board.stars[0].id}
+  },
+
+  saveStars(){ //fills board.stars.cells list
+    for (let s of board.stars){
+      s.cells = []
+    }
+    for (let i = 0; i < board.cols; i++){
+      for (let j = 0; j< board.rows; j++){
+        let index = board.stars.findIndex(e => e.id === this.matrix[i][j])
+        if (index === -1)
+          console.error(`missing star with id ${this.matrix[i][j]}. Error at ${i},${j}.`)
+        else
+          board.stars[index].cells.push({x:i,y:j})
+      }
+    }
+  },
+
+  asignStars(){
+    for (let i = 0; i < board.cols; i++){
+      for (let j = 0; j< board.rows; j++){
+        this.asignCell(i,j)
+      }
+    }
+  },
+
+  asignCell(x,y, skip){
+    let id = 0
+    let mindist = board.rows+board.cols
+    for (let a = 0; a < board.stars.length; a++){
+      let d = dist(x,y,board.stars[a].x, board.stars[a].y)
+      if (d < mindist && a !== skip){
+        mindist = d; id = a
+      }
+    }
+    this.matrix[x][y] = board.stars[id].id
+  },
+
+  mousePressed(){
+    let x = Math.floor(mouseX/25)
+    let y = Math.floor(mouseY/25)
+    let cell = board.cells[x][y]
+    if (cell.type === "star"){
+      this.selected = {x,y, id: cell.id}
+    }
+    else if (this.mode === 'add') {
+      this.matrix[x][y] = this.selected.id
+    }
+    else if (this.mode === 'subtract'){
+      this.asignCell(x,y, this.selected.id)
     }
   }
 }

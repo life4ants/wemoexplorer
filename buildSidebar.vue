@@ -1,5 +1,5 @@
 <template>
-	<div class="sidebar" style="width: 150px">
+	<div class="sidebar" style="width: 180px">
     <div class="sidebar-content">
       <h5 style="text-decoration: underline">Build Mode</h5>
       <h6>Rules:</h6>
@@ -10,9 +10,9 @@
         <li>A red square means you can't build at that spot, a green circle inside a square means you can.</li>
         <li>Click to build!</li>
       </ul>
-      <p style="margin-left: 5px">
-        You are building: <br><b>{{buildType}}</b>
-      </p>
+      <p class="slide-right">You are building:</p>
+      <p class="center"><b>{{buildType.name}}</b></p>
+      <p class="slide-right">{{buildType.rules}}</p>
       <button style="margin-left: 20px" @click="toggleBuildMode" id="esc">Cancel</button>
     </div>
   </div>
@@ -22,29 +22,27 @@
 module.exports = {
 	data(){
 		return {
-
+      types: {
+        raft: {name:"A Raft", rules: "Must be on a beach with water next to it." },
+        steppingStones: {name: "Stepping Stones", rules: "Must be in a straight section of river"},
+        campsite: {name: "A Campsite", rules: "Must be on a cleared section of land"}
+      },
+      buildType: null
 		}
 	},
 	props: [
 		"toggleBuildMode"
 	],
 	mounted(){
-    
-  },
-  computed: {
-    buildType(){
-      if (builder.item.name){
-        switch(builder.item.name){
-          case "raft": return "A Raft"
-          case "steppingStones": return "Stepping Stones"
-          case "campsite": return "A Campsite"
-        }
-      }
-      return ""
-    }
+    this.buildType = this.types[builder.item.name]
   },
   methods: {
 
 	}
 }
 </script>
+<style>
+  .slide-right{
+    margin-left: 10px;
+  }
+</style>
