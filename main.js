@@ -1,5 +1,6 @@
 let gameBoards = []
 const topbarHeight = 55
+const version = 10709 // update this with each version publication
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]
@@ -21,7 +22,7 @@ const options = {
         dist: "A primitive ax for chopping trees and other things",
         inst: "Gather the needed resources in your backpack, then click build."},
     {name: "basket", src: "images/basket.png", title: "Basket", level: 1,
-        time: 30, energy: 50,
+        time: 20, energy: 50,
         resources: "6 long grass",
         dist: "For gathering berries and veggies in",
         inst: "Gather 6 long grass in your backpack, then click build."},
@@ -41,7 +42,7 @@ const options = {
         dist: "A primitive shovel for digging clay",
         inst: "Gather the needed resources in your backpack, then click build."},
     {name: "bow", src: "images/bow.png", title: "Bow", level: 3,
-        time: 45, energy: 80,
+        time: 30, energy: 80,
         resources: "1 stick, 2 long grass",
         dist: "For hunting",
         inst: "Gather the needed resources in your backpack, then click build."},
@@ -56,10 +57,10 @@ const options = {
         dist: "A place to store tools, cook meals, and more!",
         inst: "Click build to select a location."},
     {name: "claypot", src: "images/claypot.png", title: "Clay Pot", level: 3,
-        time: 60, energy: 150,
+        time: 120, energy: 150,
         resources: "2 clay",
         dist: "For cooking food and carrying water",
-        inst: "Gather the clay in your backpack, go to a campsite, feed the fire enough to last on hour, then click build."},
+        inst: "Gather the clay in your backpack, go to a campsite, feed the fire enough to last 2 hours, then click build."},
     {name: "bomb", src: "images/bomb1.png", title: "Bomb", level: 4,
         time: 5, energy: 400,
         resources: "none",

@@ -162,6 +162,9 @@ let tutorial = {
 				this.checkAction("night")
 			if (board.vehicles.length > 0)
 				this.checkAction("raft")
+			let basket = toolbelt.getContainer("basket")
+			if (basket && basket.includesItems(["berries", "apples"]))
+				this.checkAction("berries")
 		}
 		this.revealCount = board.revealCount
 		if (this.level === 0){

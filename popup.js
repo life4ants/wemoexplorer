@@ -102,12 +102,13 @@ var popup = new Vue({
           this.grab(this.selected); break
         case "saveBoard":
           if (this.inputValue.text.length < 1){
-            this.setAlert("Name must not be blank!"); break
+            this.setAlert("Name must not be blank!"); return
           }
+          const m = board.save()
+          if (m){ this.setAlert(m); return}
           board.name = this.inputValue.text
           this.callback("Board Name: "+board.name)
-          let m = board.save()
-          this.setAlert(m || "The world was saved"); break
+          this.setAlert("The world was saved"); break
         case "pickBombs":
           if (msg = actions.build(this.selected, {x: active.x, y: active.y}, Number(this.inputValue.number)))
             this.setAlert(msg)
@@ -121,10 +122,10 @@ var popup = new Vue({
           this.callback("Board Name: "+board.name)
           this.close(); break
         case "newBoard":
-          editor.newWorld(this.inputValue.cols,this.inputValue.rows, "random")
+          editor.newWorld(Number(this.inputValue.cols),Number(this.inputValue.rows), "random")
           this.close(); break
         case "resize":
-          editor.resizeWorld(this.inputValue.cols,this.inputValue.rows)
+          editor.resizeWorld(Number(this.inputValue.cols),Number(this.inputValue.rows))
           this.close()
       }
     },

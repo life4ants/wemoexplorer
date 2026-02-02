@@ -46,7 +46,6 @@ var game = new Vue({
     musicOn: false
   },
   mounted(){
-    const version = 10708 // update this with each version publication
     let deleteProgress = false // change this to delete players saved progress
     let resetLevel = false // change this to force people to do the tutorial again
     this.lastVisit = Number(localStorage.wemoUpToDate ?? 1012011)
@@ -60,7 +59,7 @@ var game = new Vue({
     }
     if (this.lastVisit > 260125){ // old date format or no record
       deleteProgress = true; resetLevel = true
-      this.lastVisit = 10702
+      this.lastVisit = 10706
     }
     if (deleteProgress){
       let s = Object.keys(localStorage)

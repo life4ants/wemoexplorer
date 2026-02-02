@@ -13,7 +13,7 @@ class Board {
     this.wemoMins = 120
     
 
-    if (arguments.length === 1 && typeof a === "object"){//loading a game, whether default, custom or resumed
+    if (arguments.length === 1 && typeof a === "object"){//loading a game, to play or to edit
       for (let key in a){
         this[key] = a[key]
       }
@@ -56,6 +56,8 @@ class Board {
       this.type = "custom"
       this.level = 10
       this.playtime = 0
+      this.createdAt = helpers.compactDateTime()
+      this.modifedAt = null
 
       for (let x = 0; x<this.cols; x++){
         this.cells.push([])
@@ -68,12 +70,12 @@ class Board {
     }
   }
 
-  export(){ // arrows, bombs, playtime not saved
+  export(){ // Saving the board to resume later. Arrows, bombs, playtime not saved
     let output = {rabbits: [], snakes: [], buildings: []}
     let list = [
       "teleports", "stars", "fires", "cells", "progress",
       "version", "wemoMins", "type", "level", "name", "revealCount", "startX", "startY",
-      "cols", "rows", "vehicles"
+      "cols", "rows", "vehicles", "createdAt", "modifiedAt", "gameVersion"
     ]
     for (let i of list){
       output[i] = this[i]
@@ -141,6 +143,8 @@ class Board {
     this.playtime = 0 // will reset playtime if you edit a world
     this.type = "custom"
     this.level = 10
+    this.modifedAt = helpers.compactDateTime()
+    this.gameVersion = version
     localStorage.setItem("board"+this.name, JSON.stringify(this))
     return false
   }

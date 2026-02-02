@@ -54,10 +54,10 @@ class Campsite {
 
 	cook(item){
 		if (item.name === "claypot"){
-			if (this.fireValue >= 60){
+			if (this.fireValue >= item.time){
           backpack.removeItem("clay", 2) //already checked for in actions
           this.isCooking = true
-          this.cookTime = 60 
+          this.cookTime = item.time 
           this.action = () => {
             this.containers.push(new Backpack({type:"claypot"}))
             popup.setAlert("Your Clay Pot is now available to grab from your campsite")
