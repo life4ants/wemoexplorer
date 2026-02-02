@@ -154,6 +154,8 @@ class Man {
       if (newCell.type === "pit" && newCell.pair){
         this.x = newCell.pair.x
         this.y = newCell.pair.y
+        msgs.following.msg = "You found a teleport!"
+        msgs.following.frames = 24
       }
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
