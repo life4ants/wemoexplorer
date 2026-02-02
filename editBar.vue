@@ -217,7 +217,7 @@ module.exports = {
 
     saveBoard(newName){
       if (board.name && board.type === "custom" && !newName){
-        let m = board.save()
+        let m = board.save(false)
         $(window).scrollTop(0).scrollLeft(0)
         popup.setAlert(m || "The world was saved.")
       }
@@ -244,7 +244,8 @@ module.exports = {
         if (saved[i].substr(0, 5) === "board")
           items.push({name: saved[i].substring(5, saved[i].length), type: "custom"})
       }
-      for (let i = 0; i < gameBoards.length; i++){
+      let l = min(game.currentPlayer.unlockedLevel, gameBoards.length)
+      for (let i = 0; i < l; i++){
         items.push({id: i, name: gameBoards[i].name, type: "default"})
       }
       popup.callback = (n)=> this.boardName = n
@@ -278,9 +279,8 @@ module.exports = {
     },
 
     download(){
-      let downloadUrl = URL.createObjectURL(new Blob(
-        [JSON.stringify(board)], {type:'text/plain'}));
-      popup.download(downloadUrl, board.name + ".txt")
+      if (editor.unSaved){popup.setAlert("You must save the world first!"); return}
+      popup.setInput("Download", "download", "download")
     },
 
     upload(){

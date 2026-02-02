@@ -1,11 +1,7 @@
 <template>
 	<div class="modal-content">
 <!-- Header -->
-		<div v-if="'download' === type" class="modal-header">
-      <h6><a :href="title" id="link" :download="actionTitle">
-      Click here to download the board</a></h6>
-    </div>
-		<div v-else class="modal-header">
+		<div class="modal-header">
       <h6>{{title}}</h6>
     </div>
 
@@ -24,6 +20,6 @@
 </template>
 <script>
 	module.exports = {
-		props: ['type', 'title', 'action', 'actionTitle', 'close', 'exit'],
+		props: ['type', 'title', 'close', 'exit'],
 	}
 </script>

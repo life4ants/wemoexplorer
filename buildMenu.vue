@@ -49,7 +49,7 @@
       </div>
       <div class="build-menu">
         <div class="build-option-container">
-          <div v-for="(item, k) in showOptions" :id="item.name" :key="item.name" @click="() => select(k)"
+          <div v-for="(item, k) in showOptions" :id="item.name" :key="k" @click="() => select(k)"
                     :class="{'build-option-selected': selected.name === item.name, 'build-option': true}">
             <div v-if="type === 'load'">
             	<h6>{{item.name}}</h6>

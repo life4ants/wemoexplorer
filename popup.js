@@ -17,11 +17,9 @@ var popup = new Vue({
             :close="close"
           ></build-menu>
 
-          <alert-menu v-else-if="['alert', 'download', 'gameOver'].includes(type)" 
+          <alert-menu v-else-if="['alert', 'gameOver'].includes(type)" 
             :type="type"
             :title="title"
-            :action="action"
-            :actionTitle="actionTitle"
             :close="close"
             :exit="exit"
           ></alert-menu>
@@ -31,7 +29,7 @@ var popup = new Vue({
             :close="close"
           ></info-menu>
 
-          <select-menu v-else-if="['input', 'getSize', 'pickBombs', 'fileUpload'].includes(type)" 
+          <select-menu v-else-if="['input', 'getSize', 'pickBombs', 'fileUpload', 'download'].includes(type)" 
             :type="type"
             :title="title"
             :inputValue="inputValue"
@@ -104,9 +102,8 @@ var popup = new Vue({
           if (this.inputValue.text.length < 1){
             this.setAlert("Name must not be blank!"); return
           }
-          const m = board.save()
+          const m = board.save(true, this.inputValue.text)
           if (m){ this.setAlert(m); return}
-          board.name = this.inputValue.text
           this.callback("Board Name: "+board.name)
           this.setAlert("The world was saved"); break
         case "pickBombs":
@@ -114,11 +111,7 @@ var popup = new Vue({
             this.setAlert(msg)
           else {this.close()}; break
         case "load":
-          if (this.selected.type === "custom")
-            board = new Board(JSON.parse(localStorage["board"+this.selected.name]))
-          else
-            board = new Board(JSON.parse(JSON.stringify(gameBoards[this.selected.id])))
-          world.resize(board.cols, board.rows)
+          editor.loadBoard(this.selected)
           this.callback("Board Name: "+board.name)
           this.close(); break
         case "newBoard":
@@ -213,17 +206,6 @@ var popup = new Vue({
         world.noKeys = true
         noLoop()
       }
-    },
-
-    download(url, name){
-      $(window).scrollTop(0).scrollLeft(0)
-      this.show = true
-      this.title = url
-      this.actionTitle = name
-      this.type = "download"
-      this.size = "popup-center"
-      world.noKeys = true
-      noLoop()
     },
 
     dumpMenu(){
@@ -329,13 +311,14 @@ var popup = new Vue({
 
     setInput(title, actionTitle, type){
       $(window).scrollTop(0).scrollLeft(0)
-      this.title = title
-      this.actionTitle = actionTitle
+      this.title = title // header text
+      this.actionTitle = actionTitle // flag for popup.action() 
       this.size = type === "getSize" || actionTitle === "callback" ? "popup-center" : "popup-tiny"
       this.type = type
       this.show = true
-      if (["input", "getSize", "pickBombs"].includes(type)){
-        this.inputValue = this.type === "input" ? {text: ""} : 
+      if (["input", "getSize", "pickBombs", "download"].includes(type)){
+        this.inputValue = type === "input" ? {text: ""} : 
+          type === "download" ? {type: "custom", level: 10, name: board.name} :
           {cols: Math.floor((window.innerWidth)/25), 
           rows: Math.floor((window.innerHeight)/25)}
         setTimeout(() => $("#inputOne").focus(), 0)

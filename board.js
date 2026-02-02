@@ -11,6 +11,7 @@ class Board {
     this.progress = false 
     this.version = 5
     this.wemoMins = 120
+    this.revealCount = this.cols*this.rows
     
 
     if (arguments.length === 1 && typeof a === "object"){//loading a game, to play or to edit
@@ -53,11 +54,7 @@ class Board {
     else if (arguments.length === 3){// creating a new game on editor
       this.cols = a
       this.rows = b
-      this.type = "custom"
-      this.level = 10
-      this.playtime = 0
       this.createdAt = helpers.compactDateTime()
-      this.modifedAt = null
 
       for (let x = 0; x<this.cols; x++){
         this.cells.push([])
@@ -93,12 +90,11 @@ class Board {
   }
 
   // saving a game on the builder. Called from editbar.saveBoard
-  save(){ 
-    if (!this.name)
+  save(rename, newName){ 
+    if (!this.name && !rename)
       return "no name!"
-    let stars = []
+    let starCount = 0
     let starsGood = true
-    this.revealCount = this.cols*this.rows
     for (let i = 0; i < this.cols; i++){
       for (let j = 0; j< this.rows; j++){
         let cell = this.cells[i][j]
@@ -124,7 +120,7 @@ class Board {
           break
         case "star":
           if (cell.id == null){starsGood = false}
-          stars.push(cell.id)
+          starCount++
           break
         case "pit":
           if (!cell.pair) {
@@ -134,17 +130,19 @@ class Board {
         }
       }
     }
-    if (stars.length < 2){
+    if (this.stars.length < 2){
       return "You can't save a world without at least 2 stars!"
     }
-    if (this.stars.length !== stars.length || !starsGood){
+    if (this.stars.length !== starCount || !starsGood){
       return "You must edit the stars before saving!"
     }
+    if (rename){this.name = newName}
     this.playtime = 0 // will reset playtime if you edit a world
+    this.modifedAt = helpers.compactDateTime()
     this.type = "custom"
     this.level = 10
-    this.modifedAt = helpers.compactDateTime()
     this.gameVersion = version
+    editor.unSaved = false
     localStorage.setItem("board"+this.name, JSON.stringify(this))
     return false
   }

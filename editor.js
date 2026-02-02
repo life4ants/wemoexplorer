@@ -5,6 +5,7 @@ let editor = {
   type: "water",
   tool: "brush",
   undoList: [],
+  unSaved: false,
 
   mousePressed(){
     let x = Math.floor(mouseX/25)
@@ -15,6 +16,7 @@ let editor = {
         if (board.cells[x][y].type !== "water"){
           board.startX = x
           board.startY = y
+          this.unSaved = true
           if (test){console.log(board.cells[x][y])}
         }
       }
@@ -92,6 +94,7 @@ let editor = {
   },
 
   changeTile(x,y, tile, type){
+    this.unSaved = true
     if (board.cells[x][y].type === "pit" && board.cells[x][y].pair){
       let a = board.cells[x][y].pair.x
       let b = board.cells[x][y].pair.y
@@ -169,6 +172,17 @@ let editor = {
     board = new Board(cols, rows, fillType)
     world.resize(cols, rows)
     this.undoList = []
+    this.unSaved = true
+  },
+
+  loadBoard(b){
+    if (b.type === "custom")
+      board = new Board(JSON.parse(localStorage["board"+b.name]))
+    else
+      board = new Board(JSON.parse(JSON.stringify(gameBoards[b.id])))
+    world.resize(board.cols, board.rows)
+    this.undoList = []
+    this.unSaved = false
   },
 
   resizeWorld(cols, rows){
@@ -198,6 +212,7 @@ let editor = {
     this.undoList = []
     board.startX = board.startX < cols ? board.startX : cols-1
     board.startY = board.startY < rows ? board.startY : rows-1
+    board.revealCount = board.cols*board.rows
   },
 
   treeFill(){
