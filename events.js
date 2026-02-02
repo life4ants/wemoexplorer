@@ -61,7 +61,7 @@ function mousePressed(){
   }
   let offset = ["edit", "starEdit"].includes(game.mode) ? 0 : topbarHeight
   if (game.mode === "welcome" || popup.show || world.noKeys ||
-      mouseX < 0 || mouseX > board.cols*25 ||
+      winMouseX < world.leftOffset || mouseX > board.cols*25 ||
       mouseY < offset || mouseY > board.rows*25+offset){return}
   switch(game.mode){
     case "play": board.clicker(); break
