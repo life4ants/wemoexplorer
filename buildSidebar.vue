@@ -22,19 +22,21 @@
 module.exports = {
 	data(){
 		return {
-      types: {
-        raft: {name:"A Raft", rules: "Must be on a beach with water next to it." },
-        steppingStones: {name: "Stepping Stones", rules: "Must be in a straight section of river"},
-        campsite: {name: "A Campsite", rules: "Must be on a cleared section of land"}
-      },
-      buildType: null
+      
 		}
 	},
 	props: [
 		"toggleBuildMode"
 	],
-	mounted(){
-    this.buildType = this.types[builder.item.name]
+  computed: {
+  	buildType(){
+      let types = {
+          raft: {name:"A Raft", rules: "Must be on a beach with water next to it." },
+          steppingStones: {name: "Stepping Stones", rules: "Must be in a straight section of river"},
+          campsite: {name: "A Campsite", rules: "Must be on a cleared section of land"}
+        }
+       return types[builder.item.name]
+    }
   },
   methods: {
 
