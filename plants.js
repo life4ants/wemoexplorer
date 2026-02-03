@@ -1,7 +1,7 @@
 let plants = {
 	berryTime: 100,
-	appleTime: 120,
-  veggieTime: 150,
+	appleTime: 150,
+  veggieTime: 180,
 	grassTime: 180,
 	mushroomTime: 1440,
 	sproutTime: 180,

@@ -40,7 +40,7 @@ class Board {
               break
             case "veggies":
             case "longGrass":
-              cell.growtime = floor(random(30))
+              cell.growtime = floor(random(90))
             }
             
           }
@@ -235,6 +235,12 @@ class Board {
     let snakeSpots = list.sandpit ?? []
     for (let i = 0; i<snakeSpots.length; i++){
       this.snakes.push(new Snake(snakeSpots[i]))
+    }
+    for (let i = 0;  i < list.root.length; i++){
+      let cell = board.cells[list.root[i].x][list.root[i].y]
+      if (cell.growtype === "mushroom"){
+        cell.growtime = floor(random(150, 1200))
+      }
     }
   }
 
