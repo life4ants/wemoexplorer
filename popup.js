@@ -364,9 +364,14 @@ var popup = new Vue({
       loop()
     },
 
-    setAlert(content){
-      this.show = true
-      this.title = content
+    setAlert(content, add){
+      if (this.show && add){
+        this.title += "\n"+content
+      }
+      else {
+        this.show = true
+        this.title = content
+      }
       this.type = "alert"
       this.size = content.length > 27 ? "popup-center" : "popup-tiny"
       world.noKeys = true

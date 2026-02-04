@@ -4,6 +4,7 @@ let tutorial = {
 	xbound: 9,
 	ybound: 9,
 	level: 0,
+	completed: [],
 	req: {up: true, down: true, right: true, left: true, count: 4},
 	questData: [
 	[
@@ -81,7 +82,7 @@ let tutorial = {
 				text: "Build a raft along the beach. You will need logs and long grass."
 			},
 			{ 
-				title: "Explore the world",
+				title: "Explore the World",
 				text: "Find all the stars to uncover the world."
 			},
 			{
@@ -104,16 +105,36 @@ let tutorial = {
 		],
 		[
 			{
+				title: "Build a Stone Ax",
+				text: "This is always needed in order to chop trees and get logs and sticks to build other things with."
+			},
+			{
+				title: "Build Stepping Stones",
+				text: "Build stepping stones across the river."
+			},
+			{
 				title: "Build a raft",
 				text: "Build a raft along the beach. You will need logs and long grass."
 			},
 			{
-				title: "Pick Veggies",
-				text: "Build a basket and pick veggies in it."
+				title: "Explore the World",
+				text: "Find all the stars to uncover the world."
 			},
 			{
-				title: "Explore the world",
-				text: "Find all the stars to uncover the world."
+				title: "Eat a Mushroom",
+				text: "Mushrooms give you 1000 health to counter snake bites. You grab them to your backpack. You can eat them by pressing M, or by pressing E if there is nothing else to eat."
+			},
+			{
+				title: "Build a Bone Shovel",
+				text: "Build a Bone Shovel. You will need a bone, a stick, and one long grass."
+			},
+			{
+				title: "Find Clay",
+				text: "Find clay and dig it up by pressing G."
+			},
+			{
+				title: "Build a Campsite",
+				text: "Find a clear spot for a campsite. You will need logs, sticks, clay and long grass."
 			},
 			{
 				title: "All Done!",
@@ -122,20 +143,52 @@ let tutorial = {
 		],
 		[
 			{
-				title: "Build Stepping Stones",
-				text: "Build stepping stones across the river."
+				title: "Build a Stone Ax",
+				text: "Build a Stone Ax. This is always the first step."
 			},
 			{
 				title: "Build a Shovel",
 				text: "Build a Bone Shovel with a bone, stick, and long grass"
 			},
 			{
-				title: "Explore the world",
+				title: "Build a Basket",
+				text: "Build a basket. You will need 6 long grass."
+			},
+			{
+				title: "Explore the World",
 				text: "Find all the stars to uncover the world."
 			},
 			{
-				title: "Build a campsite",
+				title: "Build a Campsite",
 				text: "Find a clear spot for a campsite. You will need clay, long grass, sticks, and logs."
+			},
+			{
+				title: "Build a Clay Pot",
+				text: "Build a clay pot. You will need to take clay to your campsite and feed the fire there."
+			},
+			{
+				title: "Fill the Clay Pot with Water.",
+				text: "Drop your basket in the campsite by pressing D, then get your claypot by pressing G. Go to a river and get water by pressing G. You will need 4 units to cook stew."
+			},
+			{
+				title: "Gather Veggies",
+				text: "Drop the clay pot back in your campsite, then get the basket and gather at least 8 veggies."
+			},
+			{
+				title: "Build a Bow",
+				text: "Build a bow. You will need a stick and 2 long grass, but first you will have to drop your shovel in the campsite."
+			},
+			{
+				title: "Build Arrows",
+				text: "Build a bow. You will need 2 sticks, 2 rocks and 4 long grass, and your Ax."
+			},
+			{
+				title: "Shoot a Rabbit",
+				text: "Face a rabbit with arrows in your packback and a bow in your toolbelt, then press T to shoot the arrow."
+			},
+			{
+				title: "Cook Stew",
+				text: "Go to your campsite and light a fire. Press K to get the cooking menu, then follow the instructions there."
 			},
 			{
 				title: "All Done!",
@@ -148,30 +201,32 @@ let tutorial = {
 		this.active = true
 		this.step = 0
 		this.level = board.level
-		for (let q of this.questData[this.level]){
-			q.completed = false
-		}
-		if (board.progress){
-			if (toolbelt.tools.findIndex((e) => e === "stoneAx" || e === "steelAx") !== -1)
-				this.checkAction("stoneAx")
-			if (toolbelt.getContainer("basket"))
-				this.checkAction("basket")
-			if (board.revealCount <= 0)
-				this.checkAction("stars")
-			if (board.wemoMins > 1560)
-				this.checkAction("night")
-			if (board.vehicles.length > 0)
-				this.checkAction("raft")
-			let basket = toolbelt.getContainer("basket")
-			if (basket && basket.includesItems(["berries", "apples"]))
-				this.checkAction("berries")
-		}
 		this.revealCount = board.revealCount
 		if (this.level === 0){
 			this.req = {up: true, down: true, right: true, left: true, count: 4}
 			this.xbound = 9
 			this.ybound = 9
 		}
+		if (board.questList){
+			for (let i = 0; i < board.questList.length; i++){
+				this.questData[this.level][i].completed = board.questList[i]
+			}
+			while (this.questData[this.level][this.step].completed)
+			this.step++
+		}
+		else {
+			for (let i = 0; i < this.questData[this.level].length; i++){
+				this.questData[this.level][i].completed = false
+			}
+		}
+	},
+
+	export(){
+		let output = []
+		for (let i = 0; i < this.questData[this.level].length; i++){
+			output.push(this.questData[this.level][i].completed)
+		}
+		return output
 	},
 
 	keyHandler(keyCode){ //only called for level 0
@@ -213,14 +268,19 @@ let tutorial = {
 	checkAction(type){
 		switch (type){
 		case "stars":
-			if (this.level === 0 && this.step === 2) {this.next()}
-			else if (this.level <4) {this.complete(2)}
+			switch(this.level){
+			case 0: if (this.step === 2) {this.next()}
+				break
+			case 1: this.complete(2); break
+			case 2:
+			case 3: this.complete(3)
+			}
 			return
 		case "eat": if (this.level === 0 && this.step === 3){this.next()} return
 		case "firepit": if (this.level === 0 && this.step === 7){this.next()} return
 		case "stoneAx": 
 			if (this.level === 0 && this.step === 8) {this.next()} 
-			else if (this.level === 1){this.complete(0)}
+			else if (this.level < 4){this.complete(0)}
 			return
 		case "chop": 
 			if (this.level === 0 && this.step === 9) {this.next()}
@@ -233,29 +293,55 @@ let tutorial = {
 	    return
 	  case "basket":
 	  	if (this.level === 1) {this.complete(3)}
+	  	else if (this.level === 3) {this.complete(2)}
 	  	return
-		case "berries":
-		case "apples":
+		case "fruit":
 			if (this.level === 1) {this.complete(4)}
 			return
 		case "night":
 			if (this.level === 1) {this.complete(5)}
 			return
 		case "raft":
-			if (this.level === 2) {this.complete(0)}
+			if (this.level === 2) {this.complete(2)}
 			else if (this.level === 1) {this.complete(1)}
 			return
-		case "veggies":
-			if (this.level === 2) {this.complete(1)}
-			return
 		case "steppingStones":
-			if (this.level === 3) {this.complete(0)}
+			if (this.level === 2) {this.complete(1)}
 			return
 		case "boneShovel":
 			if (this.level === 3) {this.complete(1)}
+			else if (this.level === 2) {this.complete(5)}
 			return
 		case "campsite":
-			if (this.level === 3) {this.complete(3)}
+			if (this.level === 3) {this.complete(4)}
+			else if (this.level === 2) {this.complete(7)}
+			return
+		case "mushroom":
+			if (this.level === 2) {this.complete(4)}
+			return
+		case "clay":
+			if (this.level === 2) {this.complete(6)}
+			return
+		case "claypot":
+			if (this.level === 3) {this.complete(5)}
+			return
+		case "water":
+			if (this.level === 3) {this.complete(6)}
+			return
+		case "veggies":
+			if (this.level === 3) {this.complete(7)}
+			return
+		case "bow":
+			if (this.level === 3) {this.complete(8)}
+			return
+		case "arrows":
+			if (this.level === 3) {this.complete(9)}
+			return
+		case "shoot":
+			if (this.level === 3) {this.complete(10)}
+			return
+		case "stew":
+			if (this.level === 3) {this.complete(11)}
 			return
 		}
 	},

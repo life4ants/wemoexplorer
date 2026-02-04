@@ -134,9 +134,7 @@ let actions = {
     }
     // build a bow:
     else if (["bow"].includes(item.name)){
-      let msg = "Your bow is done being built, and has been added to your toolbelt."
-      let needed = ["stick", "longGrass"]
-      let ar = backpack.includesItems(needed)
+      let ar = backpack.includesItems(["stick", "longGrass"])
       if (ar.length === 2 && ar[1].quantity >= 2){
         if (toolbelt.tools.length < toolbelt.maxTools){
           man.isAnimated = true
@@ -144,7 +142,8 @@ let actions = {
             toolbelt.addItem("tool", "bow")
             backpack.removeItem("stick", 1)
             backpack.removeItem("longGrass", 2)
-            popup.setAlert(msg)
+            popup.setAlert("Your bow is done being built, and has been added to your toolbelt.")
+            tutorial.checkAction("bow")
           }}
         }
         else
@@ -165,9 +164,7 @@ let actions = {
     }
     // make some arrows:
     else if ("arrows" === item.name){
-      let msg = "Your arrows are now in your backpack"
-      let needed = ["stick", "longGrass", "rock"]
-      let ar = backpack.includesItems(needed)
+      let ar = backpack.includesItems(["stick", "longGrass", "rock"])
       if (ar.length === 3 && ar[0].quantity >= 2 && ar[1].quantity >= 4 && ar[2].quantity >= 2){
         man.isAnimated = true
         man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
@@ -175,7 +172,8 @@ let actions = {
           backpack.removeItem("longGrass", 4)
           backpack.removeItem("rock", 2)
           backpack.addItem("arrow", 5)
-          popup.setAlert(msg)
+          popup.setAlert("Your arrows are now in your backpack")
+          tutorial.checkAction("arrows")
         }}
       }
       else
@@ -316,6 +314,8 @@ let actions = {
     man.energy = min(man.energy+e, 3005)
     if (board.level === 0)
       tutorial.checkAction("eat")
+    else if (kind === "mushrooms")
+      tutorial.checkAction("mushroom")
     if (man.energy > 3000)
       popup.setAlert("You are full. Stop eating!")
   },
@@ -496,7 +496,7 @@ let actions = {
       if (basket && basket.addItem("apples")){
         let p = Math.floor(Math.random()*cell.apples.length)
         cell.apples.splice(p, 1)
-        tutorial.checkAction("apples")
+        tutorial.checkAction("fruit")
       }
     }
     else if ("berryBush" === cell.type && cell.berries.length > 0){
@@ -504,7 +504,7 @@ let actions = {
       if (basket && basket.addItem("berries")){
         let p = Math.floor(Math.random()*cell.berries.length)
         cell.berries.splice(p, 1)
-        tutorial.checkAction("berries")
+        tutorial.checkAction("fruit")
       }
     }
     //gather veggies:
@@ -544,6 +544,7 @@ let actions = {
         }
         man.energy = toolbelt.tools[id] === "boneShovel" ? man.energy-200 : man.energy-100
         sounds.play("dig")
+        tutorial.checkAction("clay")
       }
     }
     //gather water:
@@ -551,7 +552,8 @@ let actions = {
       let pot = toolbelt.getContainer("claypot")
       if (pot){
         pot.addItem("water")
-        sounds.play("water")
+        //sounds.play("water")
+        tutorial.checkAction("water")
       }
     }
   },
@@ -566,9 +568,10 @@ let actions = {
     }
     else if (backpack.removeItem("arrow", 1)){
       let id = toolbelt.tools.findIndex((e) => e === "bow")
-      if (id >= 0){
+      if (id !== -1){
         board.arrows = board.arrows || []
         board.arrows.push(new Projectile("arrow", x+12,y+1,man.index))
+        tutorial.checkAction("shoot")
       }
     }
   }

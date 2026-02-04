@@ -77,6 +77,9 @@ class Board {
     for (let i of list){
       output[i] = this[i]
     }
+    if (tutorial.active){
+      output.questList = tutorial.export()
+    }
     for (let r of this.rabbits){
       output.rabbits.push(r.export())
     }
@@ -142,6 +145,7 @@ class Board {
     this.type = "custom"
     this.level = 10
     this.gameVersion = version
+    this.revealCount = this.cols*board.rows
     editor.unSaved = false
     localStorage.setItem("board"+this.name, JSON.stringify(this))
     return false

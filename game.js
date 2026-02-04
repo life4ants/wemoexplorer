@@ -263,7 +263,7 @@ var game = new Vue({
     },
 
     finishLevel(){
-      tutorial.active = false
+      board.gameOver = true
       let level = this.currentPlayer.unlockedLevel
       if (level <= board.level){
         this.currentPlayer.unlockedLevel = board.level+1
@@ -275,7 +275,7 @@ var game = new Vue({
       fetch(`https://api.counterapi.dev/v2/andys-games/world${board.level}/down`)
         .catch(error => console.error('Error:', error));
       if (board.level > 0){
-        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou finished the level in "+(floor(board.wemoMins/15)/4-2)+" wemo hours."), 0)
+        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou finished the level in "+(round(board.wemoMins/60)-2)+" wemo hours.", true), 0)
       }
     }
   }

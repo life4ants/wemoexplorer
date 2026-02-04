@@ -61,6 +61,7 @@ class Campsite {
           this.action = () => {
             this.containers.push(new Backpack({type:"claypot"}))
             popup.setAlert("Your Clay Pot is now available to grab from your campsite")
+            tutorial.checkAction("claypot")
           }
           return false
         }
@@ -89,6 +90,7 @@ class Campsite {
             this.containers[w].items.water.quantity = 0
             this.containers[w].items.rabbitStew.quantity = 8
             popup.setAlert("Your stew is done!")
+            tutorial.checkAction("stew")
           }
         }
         return false

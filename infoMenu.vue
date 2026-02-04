@@ -128,9 +128,10 @@
 			</div>
     </div>
     <div v-else-if="type === 'welcome'" class="modal-body">
-    	<p v-if="level === 0">This tutorial will teach you how to use the game controls. Read the how to play manual for more information.</p>
+    	<p v-if="level === 0">This tutorial will teach you how to use the game controls. Read the How To Play manual for more information.</p>
     	<p v-else-if="level === 1">Welcome to level one. Now you have freedom to do the quests in any order. Press start to see your first quest.</p>
-	    <p v-else-if="level > 1">Press start to see your first quest.</p>
+    	<p v-else-if="level === 2">Welcome to level two. This level introduces snakes. They spawn from sandpits, and can only move on sand and beach. Stay away from snakes, because they can bit you and cause you to lose health. Press start to see your first quest.</p>
+	    <p v-else-if="level > 2">Press start to see your first quest.</p>
     </div>
     <div v-else-if="type === 'tutorial'" class="modal-body">
     	<p v-if="level === 0">Step {{step+1}}: {{bodyText}}</p>
@@ -181,7 +182,7 @@
 		},
 		methods: {
 			start(){
-				tutorial.start()
+				this.step = 0
 				popup.type = "tutorial"
 				this.updateText()
 			},

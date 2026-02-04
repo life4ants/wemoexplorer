@@ -498,7 +498,6 @@ let starEditor = {
   },
 
   saveStars(){ //fills board.stars.cells list
-    board.revealCount = board.cols*board.rows
     for (let s of board.stars){
       s.cells = []
     }
