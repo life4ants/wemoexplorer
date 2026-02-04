@@ -136,7 +136,9 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
-         {version: "1.8.0", date: "Feb 2, 2026", value: 10800,
+        {version: "1.8.1", date: "Feb 3, 2026", value: 10801,
+        items: ["New worlds for levels 2 and 3", "mushrooms grow the first day"]},
+        {version: "1.8.0", date: "Feb 2, 2026", value: 10800,
         items: ["Star Editor", "Download as default", "Show message when taking teleports"]},
         {version: "1.7.8", date: "Jan 29, 2026", value: 10708,
         items: ["Push boulders holding shift"]},
