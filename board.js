@@ -11,7 +11,6 @@ class Board {
     this.progress = false 
     this.version = 5
     this.wemoMins = 120
-    this.revealCount = this.cols*this.rows
     
 
     if (arguments.length === 1 && typeof a === "object"){//loading a game, to play or to edit
@@ -54,6 +53,7 @@ class Board {
     else if (arguments.length === 3){// creating a new game on editor
       this.cols = a
       this.rows = b
+      this.revealCount = this.cols*this.rows
       this.createdAt = helpers.compactDateTime()
 
       for (let x = 0; x<this.cols; x++){
@@ -236,8 +236,9 @@ class Board {
     for (let i = 0; i<snakeSpots.length; i++){
       this.snakes.push(new Snake(snakeSpots[i]))
     }
-    for (let i = 0;  i < list.root.length; i++){
-      let cell = board.cells[list.root[i].x][list.root[i].y]
+    let mushrooms = list.root ?? []
+    for (let i = 0; i < mushrooms.length; i++){
+      let cell = board.cells[mushrooms[i].x][mushrooms[i].y]
       if (cell.growtype === "mushroom"){
         cell.growtime = floor(random(150, 1200))
       }
