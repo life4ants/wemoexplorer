@@ -102,6 +102,12 @@ var popup = new Vue({
           if (this.inputValue.text.length < 1){
             this.setAlert("Name must not be blank!"); return
           }
+          for (let g of gameBoards){
+            if (g.name === this.inputValue.text){
+              this.setAlert("Name must not be the same as a default world!")
+              return
+            }
+          }
           const m = board.save(true, this.inputValue.text)
           if (m){ this.setAlert(m); return}
           this.callback("Board Name: "+board.name)

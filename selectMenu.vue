@@ -75,6 +75,9 @@
           for (let g of Object.keys(localStorage)){
             if (g === "board" + w.name){dupname = true}
           }
+          for (let g of gameBoards){
+            if (g.name === w.name){dupname = true}
+          }
           if (dupname || w.save()){// board.save returns true with error message, so world was not saved
             board = w
             world.resize(board.cols, board.rows)
