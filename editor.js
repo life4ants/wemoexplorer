@@ -6,6 +6,7 @@ let editor = {
   tool: "brush",
   undoList: [],
   unSaved: false,
+  selection: {point1: {}, point2: {}, cells: []},
 
   mousePressed(){
     let x = Math.floor(mouseX/25)
@@ -56,21 +57,34 @@ let editor = {
       let cell = board.cells[x][y]
       this.floodFill(x, y, cell.tile, cell.type, this.tile, this.type)
     }
+    else if (this.tool === "selection"){
+      x = Math.round(mouseX/25)
+      y = Math.round(mouseY/25)
+      this.selection.point1 = {x, y}
+      this.selection.point2 = {x, y}
+    }
   },
 
   mouseDragged(){
-    let x = Math.floor(mouseX/25)
-    let y = Math.floor(mouseY/25)
-    let id = x+"_"+y
     if (["start", "pit0", "pit1", "star"].includes(this.type))
       return
-    if (!this.path.includes(id)){
-      this.path.push(id)
-      this.addUndo(x,y)
-      if (this.type === "auto")
-        this.changeTile(x,y, "cross", "cross")
-      else
-        this.changeTile(x,y, this.tile, this.type)
+    if (this.tool === "brush"){
+      let x = Math.floor(mouseX/25)
+      let y = Math.floor(mouseY/25)
+      let id = x+"_"+y
+      if (!this.path.includes(id)){
+        this.path.push(id)
+        this.addUndo(x,y)
+        if (this.type === "auto")
+          this.changeTile(x,y, "cross", "cross")
+        else
+          this.changeTile(x,y, this.tile, this.type)
+      }
+    }
+    else if (this.tool === "selection"){
+      let x = Math.round(mouseX/25)
+      let y = Math.round(mouseY/25)
+      this.selection.point2 = {x,y}
     }
   },
 
@@ -87,10 +101,25 @@ let editor = {
       stroke(0)
       strokeWeight(1)
       noFill()
+      rectMode(CENTER)
       rect(mouseX,mouseY, 25, 25)
+      rectMode(CORNER)
     }
-    else
+    else if (this.tool === "floodFill")
       image(tiles[this.tool], mouseX-13, mouseY-13, 26,26)
+    else if (this.tool === "selection" && this.selection.point1.x != null){
+      drawingContext.setLineDash([5,5])
+      stroke(128)
+      strokeWeight(2)
+      noFill()
+      rectMode(CORNERS)
+      rect( this.selection.point1.x*25, 
+            this.selection.point1.y*25, 
+            this.selection.point2.x*25,
+            this.selection.point2.y*25)
+      rectMode(CORNER)
+      drawingContext.setLineDash([])
+    }
   },
 
   changeTile(x,y, tile, type){
@@ -500,6 +529,10 @@ let starEditor = {
   saveStars(){ //fills board.stars.cells list
     for (let s of board.stars){
       s.cells = []
+    }
+    for (var i = board.teleports.length - 1; i >= 0; i--) {
+      if (board.cells[board.teleports[i].a.x][board.teleports[i].a.y].type !== "pit")
+        board.teleports.splice(i, 1)
     }
     for (let i = 0; i < board.cols; i++){
       for (let j = 0; j< board.rows; j++){

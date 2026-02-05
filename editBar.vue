@@ -31,7 +31,7 @@
       {{boardName}}
       </div>
       <div class="editbar-top">
-        <button @click= 'undo'>Undo</button>
+        <button @click= 'undo' style="float: left">Undo</button>
         <div class="layer-buttons">
           <span :class = "{activelayer: set === 1}" class="layer-button"
             @click="() => changeSet(1)">Set 1</span>
@@ -44,7 +44,12 @@
           @click="() => changeTool(pic.id)">
         </div>
       </div>
-      <div class="editbar-bottom">
+      <div v-if="tool === 'selection'" class="editbar-bottom">
+        <button @click="() => runSelection('cut')">Cut</button>
+        <button @click="() => runSelection('copy')">Copy</button>
+        <button @click="() => runSelection('paste')">Paste</button>
+      </div>
+      <div v-else class="editbar-bottom">
         <div v-if = 'set === 1' class="tilebox">
           <img v-for="pic in tiles1" :key="pic.id" :src="pic.src"
           height="25" width="25" class="tile" :class="{selected: selected === pic.id}" 
@@ -160,7 +165,8 @@ module.exports = {
       ],
       tools: [
         { id: "floodFill", src: "images/floodFill.png"},
-        { id: "brush",     src: "images/brush.png"}
+        { id: "brush",     src: "images/brush.png"},
+        { id: "selection", src: "images/selection.png"}
       ],
       selected: "water",
       set: 1, 
@@ -203,7 +209,46 @@ module.exports = {
     changeTool(id){
       if (id === "floodFill" && ["auto", "start", "pit0", "pit1", "star"].includes(editor.type))
         return
+      let cursor = id === "selection" ? "crosshair" : "none"
+      $("#defaultCanvas0").css("cursor", cursor)
+      if (id === "selection"){
+        let e = viewport.screenEdges()
+        editor.selection.point1 = {x: e.left, y: e.top}
+        editor.selection.point2 = {x: e.left+1, y: e.top+1}
+      }
       editor.tool = this.tool = id
+    },
+
+    runSelection(type){
+      let startx = min(editor.selection.point1.x, editor.selection.point2.x)
+      let endx = max(editor.selection.point1.x, editor.selection.point2.x)
+      let starty = min(editor.selection.point1.y, editor.selection.point2.y)
+      let endy = max(editor.selection.point1.y, editor.selection.point2.y)
+      switch(type){
+      case "cut":
+      case "copy":
+        editor.selection.cells = []
+        for (let i = startx; i < endx; i++) {
+          editor.selection.cells.push([])
+          for (let j = starty; j < endy; j++){
+            let cell = board.cells[i][j].type === "pit" ? {type: "grass", tile: "grass"} : board.cells[i][j]
+            editor.selection.cells[i-startx].push(cell)
+            if (type === "cut")
+              board.cells[i][j] = {tile: "blank", type: "blank"}
+          }
+        }
+        break
+      case "paste":
+        endx = min(startx+editor.selection.cells.length, board.cols)
+        endy = min(starty+editor.selection.cells[0].length, board.rows)
+        for (let i = startx; i < endx; i++) {
+          for (let j = starty; j < endy; j++){
+            board.cells[i][j] = editor.selection.cells[i-startx][j-starty]
+          }
+        }
+        editor.selection.point1 = {x: startx, y: starty}
+        editor.selection.point2 = {x: endx, y: endy}
+      }
     },
 
     newBoard(){

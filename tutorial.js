@@ -268,12 +268,13 @@ let tutorial = {
 	checkAction(type){
 		switch (type){
 		case "stars":
-			switch(this.level){
+			switch(board.level){
 			case 0: if (this.step === 2) {this.next()}
 				break
 			case 1: this.complete(2); break
 			case 2:
-			case 3: this.complete(3)
+			case 3: this.complete(3); break
+			case 10: game.finishLevel()
 			}
 			return
 		case "eat": if (this.level === 0 && this.step === 3){this.next()} return

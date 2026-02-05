@@ -168,9 +168,7 @@ class Board {
 
     if (game.mode === "edit"){
       image(tiles.playerIcon, this.startX*25, this.startY*25)
-      rectMode(CENTER)
       editor.showMouse()
-      rectMode(CORNER)
       if (this.teleports){
         stroke(255,0,0)
         strokeWeight(2)
@@ -284,9 +282,13 @@ class Board {
   showCell(x,y, cell, revealed){
     let offset = ["edit", "starEdit"].includes(game.mode) ? 0 : topbarHeight
     if (!revealed && game.mode !== "edit"){
-      if (game.mode === "starEdit" && (cell.type === "star" || 
-        starEditor.matrix[x][y] === starEditor.selected.id)){
+      if (game.mode === "starEdit" && starEditor.matrix[x][y] === starEditor.selected.id){
         //continue to show the cell
+      }
+      else if (game.mode === "starEdit" && cell.type === "star"){
+        image(tiles["clouds"], x*25, y*25+offset)
+        image(tiles["star"], x*25, y*25+offset)
+        return
       }
       else {
         image(tiles["clouds"], x*25, y*25+offset)

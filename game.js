@@ -265,7 +265,7 @@ var game = new Vue({
     finishLevel(){
       board.gameOver = true
       let level = this.currentPlayer.unlockedLevel
-      if (level <= board.level){
+      if (board.type === "default" && board.level >= level){
         this.currentPlayer.unlockedLevel = board.level+1
         let p = JSON.parse(localStorage.wemoPlayers)
         p[game.currentPlayer.index] = game.currentPlayer
