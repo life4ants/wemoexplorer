@@ -1,2 +1,4 @@
-yucpic/
 notes.txt
+.parcel-cache/
+package-lock.json
+package.json

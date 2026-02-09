@@ -29,10 +29,10 @@ var game = new Vue({
     </div>
     `,
   components: {
-    'welcome-menu': httpVueLoader('welcome.vue'),
-    'edit-bar': httpVueLoader('editBar.vue'),
-    'play-box': httpVueLoader('play.vue'),
-    'build-sidebar': httpVueLoader('buildSidebar.vue')
+    'welcome-menu': httpVueLoader('modules/welcome.vue'),
+    'edit-bar': httpVueLoader('modules/editBar.vue'),
+    'play-box': httpVueLoader('modules/play.vue'),
+    'build-sidebar': httpVueLoader('modules/buildSidebar.vue')
   },
   data: {
     mode: "loading",

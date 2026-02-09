@@ -64,10 +64,10 @@ var popup = new Vue({
     </div>
     `,
   components: {
-    'alert-menu': httpVueLoader('alertMenu.vue'),
-    'build-menu': httpVueLoader('buildMenu.vue'),
-    'info-menu': httpVueLoader('infoMenu.vue'),
-    'select-menu': httpVueLoader('selectMenu.vue')
+    'alert-menu': httpVueLoader('modules/alertMenu.vue'),
+    'build-menu': httpVueLoader('modules/buildMenu.vue'),
+    'info-menu': httpVueLoader('modules/infoMenu.vue'),
+    'select-menu': httpVueLoader('modules/selectMenu.vue')
   },
   data(){
     return {
