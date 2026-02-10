@@ -2,7 +2,10 @@
   <div class="modal" id="popup-lg">
     <div class="modal-dialog" >
       <div class="modal-content" id="grow">
-        <div class="modal-header">
+        <div class="modal-header horizonal">
+          <a href="/">
+          <img src="../../images/logo.png" class="logo">
+        </a>
           <h1>Wemo Explorer</h1>
         </div>
         <div v-if="page === 'pickPlayer'" class="modal-body">
@@ -88,7 +91,7 @@
               </div>
             </div>
           </div>
-          <h6 class="left-header">Custom Worlds:</h6>
+          <h6 v-if="customWorlds.length > 0" class="left-header">Custom Worlds:</h6>
           <div v-if="deleteMode" class="button-tiles">
             <div v-for="(item, id) in customWorlds" class="button-tiles-content">
               {{item.name}}
@@ -225,7 +228,10 @@ module.exports = {
     newPlayer(){
       if (this.name.length > 0){
         let level = typeof test === "undefined" ? 0 : 4
-        this.players.push({name: this.name, unlockedLevel: level, games: [], character: 0})
+        this.players.push({
+          name: this.name, unlockedLevel: level, games: [], character: 0,
+          userId: crypto.randomUUID(), verified: false, createdAt: helpers.compactDateTime()
+        })
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
         this.pickPlayer(this.players.length-1)
@@ -351,6 +357,11 @@ module.exports = {
 }
 </script>
 <style>
+  .logo {
+    height: 40px;
+    margin-right: 30px;
+  }
+
   .whatsNew {
   margin-top: 15px;
   background-color: #ddd;
@@ -375,6 +386,9 @@ module.exports = {
 }
 
 @media (min-width:  550px){
+  .logo {
+    height: 55px;
+  }
   .center h5 {
     display: inline;
     margin-right: 20px;
