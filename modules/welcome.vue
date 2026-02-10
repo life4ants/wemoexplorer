@@ -87,7 +87,7 @@
                 <div v-else style="width: 80px"></div>
               </div>
               <div class="button-tiles-flexbox">
-                <span>Times finished: {{item.completes}}</span>
+                <!-- <span>leave as placeholder</span> -->
               </div>
             </div>
           </div>
@@ -139,6 +139,8 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
+        {version: "1.8.3", date: "Feb 10, 2026", value: 10803,
+        items: ["in progress"]},
         {version: "1.8.1", date: "Feb 3, 2026", value: 10801,
         items: ["New worlds for levels 2 and 3", "mushrooms grow the first day"]},
         {version: "1.8.0", date: "Feb 2, 2026", value: 10800,
@@ -226,11 +228,12 @@ module.exports = {
     },
 
     newPlayer(){
-      if (this.name.length > 0){
+      let name = this.name.trim()
+      if (name.length > 0){
         let level = typeof test === "undefined" ? 0 : 4
         this.players.push({
-          name: this.name, unlockedLevel: level, games: [], character: 0,
-          userId: crypto.randomUUID(), verified: false, createdAt: helpers.compactDateTime()
+          name: name, unlockedLevel: level, games: [], character: 0,
+          userId: crypto.randomUUID(), verified: false, createdAt: new Date().toISOString()
         })
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""
@@ -288,14 +291,7 @@ module.exports = {
       //make the default worlds:
       let defaultWorlds = []
       for (let i = 0; i < gameBoards.length; i++){
-        fetch(`https://api.counterapi.dev/v2/andys-games/world${i}`)
-          .then(response => response.json())
-          .then(result => {
-            this.worlds[i].playtime = result.data.up_count
-            this.worlds[i].completes = result.data.down_count
-          })
-          .catch(error => console.error('Error:', error));
-        defaultWorlds.push({name: gameBoards[i].name, level: i, savedGame: false, playtime: "~", completes: "~"})
+        defaultWorlds.push({name: gameBoards[i].name, level: i, savedGame: false})
       }
       //get custom worlds:
       let saved = Object.keys(localStorage)

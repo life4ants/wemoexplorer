@@ -46,7 +46,6 @@ var game = new Vue({
     musicOn: false
   },
   mounted(){
-    let deleteProgress = true // change this to delete players saved progress
     let resetLevel = true // change this to force people to do the tutorial again
     this.lastVisit = Number(localStorage.wemoUpToDate ?? 1012011)
 
@@ -57,26 +56,27 @@ var game = new Vue({
       localStorage.setItem("wemoUpToDate", version)
       return
     }
-    if (this.lastVisit > 260125){ // old date format or no record
-      deleteProgress = true; resetLevel = true
-      this.lastVisit = 10706
-    }
-    if (deleteProgress){
-      let s = Object.keys(localStorage)
-      for (let i = 0; i < s.length; i++){
-        if (s[i].substr(0,8) === "wemoGame"){
-          delete localStorage[s[i]]
-        }
+    let s = Object.keys(localStorage)
+    for (let i = 0; i < s.length; i++){
+      if (s[i].substr(0,8) === "wemoGame"){
+        delete localStorage[s[i]]
       }
     }
-    if (resetLevel){
-      let players = JSON.parse(localStorage.wemoPlayers || "[]")
-      let newPlayers = []
-      for (let i=0; i<players.length; i++){
-        newPlayers.push({name: players[i].name, unlockedLevel: 2, games: [], character: 0})
-      }
-      localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
+    let players = JSON.parse(localStorage.wemoPlayers || "[]")
+    let newPlayers = []
+    for (let i=0; i<players.length; i++){
+      newPlayers.push({
+        name: players[i].name, 
+        unlockedLevel: resetLevel ? 0 : players[i].unlockedLevel, 
+        games: [], 
+        character: players[i].character,
+        userId: players[i].userId ?? crypto.randomUUID(),
+        verified: false,
+        createdAt: players[i].createdAt ?? new Date().toISOString()
+      })
     }
+    localStorage.setItem("wemoPlayers", JSON.stringify(newPlayers))
+    
     localStorage.setItem("wemoUpToDate", version)
   },
   computed:{
@@ -113,6 +113,7 @@ var game = new Vue({
             p[this.currentPlayer.index] = this.currentPlayer
             localStorage.setItem("wemoPlayers", JSON.stringify(p))
           }
+          this.postGame("failed")
         }
         else if (board.level > 0)
           this.saveGame()
@@ -153,6 +154,7 @@ var game = new Vue({
       switch(type){
         case "default":
           b = JSON.parse(JSON.stringify(gameBoards[index]))
+          b.sessionId = crypto.randomUUID()
           break
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
@@ -225,6 +227,50 @@ var game = new Vue({
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
         Object.assign({man: man.export(), backpack: backpack.export(), toolbelt: toolbelt.export()}, board.export())
       ))
+      if (board.type === "default")
+        this.postGame("inProgress")
+    },
+
+    async postGame(status){
+      const payload = {
+        userId: this.currentPlayer.userId,
+        sessionId: board.sessionId,
+        status: status,
+        level: board.level,
+        game_name: board.name,
+        game_time: board.wemoMins-120
+      }
+
+      // Only send user creation data the first time
+      if (!this.currentPlayer.verified) {
+        payload.name = this.currentPlayer.name
+        payload.createdAt = this.currentPlayer.createdAt
+      }
+      try {
+        const response = await fetch('/api/games', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          console.log(response)
+          throw new Error(`post error! Response:`);
+        }
+
+        // Success → mark as synced (so we don't send name/createdAt again)
+        this.currentPlayer.verified = true;
+
+        // Update localStorage
+         let p = JSON.parse(localStorage.wemoPlayers)
+        p[this.currentPlayer.index] = this.currentPlayer
+        localStorage.setItem("wemoPlayers", JSON.stringify(p))
+
+        console.log("Game session saved" + (!payload.name ? " (user already synced)" : " + user created"));
+
+      } catch (err) {
+        console.error("Failed to save session:", err);
+      }
     },
 
     pauseGame(){
@@ -272,11 +318,10 @@ var game = new Vue({
         localStorage.setItem("wemoPlayers", JSON.stringify(p)) 
       }
       sounds.play("win")
-      fetch(`https://api.counterapi.dev/v2/andys-games/world${board.level}/down`)
-        .catch(error => console.error('Error:', error));
-      if (board.level > 0){
-        setTimeout(popup.setAlert("ROH RAH RAY! You won!!\nYou finished the level in "+(round(board.wemoMins/60)-2)+" wemo hours.", true), 0)
-      }
+      if (board.level < 2)
+        popup.queueTutorial = true
+      popup.setAlert("ROH RAH RAY! You won!!\nYou finished the level in "+(round(board.wemoMins/60)-2)+" wemo hours.")
+      this.postGame("completed")
     }
   }
 })

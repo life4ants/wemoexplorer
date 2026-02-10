@@ -6,15 +6,10 @@
       this.increment()
       this.updateObjects()
     }
-    if (frameCount%437 === 0 && board.level > 0){
-      game.saveGame()
-    }
-    if (frameCount%720 === 360){ //every 60 secounds starting at 30 secounds
-      if (board.type === "default" && !Vue.config.devtools){
-        fetch(`https://api.counterapi.dev/v2/andys-games/world${board.level}/up`)
-            .catch(error => console.error('Error:', error));
-      }
-      else if (board.type === "custom"){
+    if (frameCount%720 === 361){ //every 60 secounds starting at 30 secounds
+      if (board.level > 0)
+        game.saveGame()
+      if (board.type === "custom"){
         g = JSON.parse(localStorage["board"+board.name])
         g.playtime++ 
         localStorage.setItem("board"+board.name, JSON.stringify(g))
@@ -24,7 +19,7 @@
 
   increment(){
     let newMins = Math.floor((Date.now() - this.startTime)/250)
-    if (newMins - board.wemoMins > 5)
+    if (newMins - board.wemoMins > 2)
       this.resume()
     else
       board.wemoMins = newMins

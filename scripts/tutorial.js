@@ -260,6 +260,7 @@ let tutorial = {
 		case 4: if (backpack.includesItem("rock")){this.next()} return
 		case 5: if (backpack.weight > 210){this.next()} return
 		case 6: if (backpack.weight === 0){this.next()} return
+		case 8: if (toolbelt.tools.findIndex((e) => e === "stoneAx") !== -1){this.next()} return
 		case 10: if (backpack.includesItem("log")){this.next()} return
 		case 11: if (backpack.includesItem("longGrass")){this.next()} return
 		}
@@ -350,7 +351,12 @@ let tutorial = {
 	next(){
 		this.questData[this.level][this.step].completed = true
 		this.step++
-		popup.setInfo("tutorial")
+		if (popup.show){
+			popup.queueTutorial = true
+			console.log("queueing tutorial")
+		}
+		else
+			popup.setInfo("tutorial")
 	},
 
 	complete(step){

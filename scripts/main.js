@@ -1,7 +1,7 @@
 let gameBoards = []
 const topbarHeight = 55
-const version = 10801 // update this with each version publication
-const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle"]
+const version = 10803 // update this with each version publication
+const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle", "blank"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit", "root"]
@@ -388,5 +388,16 @@ let world = {
       max(cols*25,window.innerWidth), 
       max(rows*25+offset, window.innerHeight))
   }
+}
+
+// Polyfill for crypto.randomUUID() – safe fallback for Firefox & older browsers
+if (!crypto.randomUUID) {
+  crypto.randomUUID = function randomUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  };
 }
 

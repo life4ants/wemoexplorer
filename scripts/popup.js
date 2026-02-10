@@ -80,6 +80,7 @@ var popup = new Vue({
       showOptions: [],
       selectId: null,
       inputValue: {},
+      queueTutorial: false,
       callback: null // for sending the name of the board back to editbar vue object
     }
   },
@@ -334,6 +335,7 @@ var popup = new Vue({
     },
 
     setInfo(type){
+      this.queueTutorial = false
       $(window).scrollTop(0).scrollLeft(0)
       this.size = type === "manual" ? "popup-lg" : "popup-center"
       this.type = type
@@ -358,20 +360,19 @@ var popup = new Vue({
     },
 
     close(){
+      if (this.queueTutorial){
+        this.setInfo("tutorial")
+        return
+      }
       this.show = false
       this.type = ""
       world.noKeys = false
       loop()
     },
 
-    setAlert(content, add){
-      if (this.show && add){
-        this.title += "\n"+content
-      }
-      else {
-        this.show = true
-        this.title = content
-      }
+    setAlert(content){
+      this.show = true
+      this.title = content
       this.type = "alert"
       this.size = content.length > 27 ? "popup-center" : "popup-tiny"
       world.noKeys = true

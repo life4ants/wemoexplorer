@@ -72,7 +72,7 @@ class Board {
     let list = [
       "teleports", "stars", "fires", "cells", "progress",
       "version", "wemoMins", "type", "level", "name", "revealCount", "startX", "startY",
-      "cols", "rows", "vehicles", "createdAt", "modifiedAt", "gameVersion"
+      "cols", "rows", "vehicles", "createdAt", "modifiedAt", "gameVersion", "sessionId"
     ]
     for (let i of list){
       output[i] = this[i]
