@@ -158,6 +158,8 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
+        {version: "1.9.1", date: "Feb 11, 2026", value: 10901,
+        items: ["Teleports with no where to go no longer trap you", "Fling sound effect"]},
         {version: "1.9.0", date: "Feb 10, 2026", value: 10900,
         items: ["High Score page", "4 new worlds"]},
         {version: "1.8.1", date: "Feb 3, 2026", value: 10801,

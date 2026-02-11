@@ -83,7 +83,7 @@ var game = new Vue({
         games: [], 
         character: players[i].character,
         userId: players[i].userId ?? helpers.randomId(),
-        verified: false,
+        verified: player[i].verified ?? false,
         createdAt: players[i].createdAt ?? new Date().toISOString()
       })
     }
