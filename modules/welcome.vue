@@ -158,8 +158,8 @@ module.exports = {
       deleteMode: false,
       pageViews: "loading",
       history: [
-        {version: "1.8.3", date: "Feb 10, 2026", value: 10803,
-        items: ["in progress"]},
+        {version: "1.9.0", date: "Feb 10, 2026", value: 10900,
+        items: ["High Score page", "4 new worlds"]},
         {version: "1.8.1", date: "Feb 3, 2026", value: 10801,
         items: ["New worlds for levels 2 and 3", "mushrooms grow the first day"]},
         {version: "1.8.0", date: "Feb 2, 2026", value: 10800,

@@ -1,6 +1,6 @@
 let gameBoards = []
 const topbarHeight = 55
-const version = 10803 // update this with each version publication
+const version = 10900 // update this with each version publication
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle", "blank"]
 const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile", "mushroom"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]

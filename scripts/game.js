@@ -51,14 +51,14 @@ var game = new Vue({
         sounds.files.music.pause()
         sounds.files.sleep.pause()
       }
-      else if (!this.paused){
-        if (typeof man !== "undefined" && man.isSleeping)
+      else if (["play", "build"].includes(this.mode) && !this.paused){
+        if (man.isSleeping)
           sounds.files.sleep.play()
         if (this.musicOn)
           sounds.files.music.play()
       }
     })
-    let resetLevel = true // change this to force people to do the tutorial again
+    let resetLevel = false // change this to force people to do the tutorial again
     this.lastVisit = Number(localStorage.wemoUpToDate ?? 1012011)
 
     if (this.lastVisit === version)
@@ -205,7 +205,7 @@ var game = new Vue({
       viewport.update(true)
       frameRate(world.frameRate)
       loop()
-      if (board.level < 4){
+      if (board.type === "default"){
         tutorial.start()
         if (board.progress) {popup.setInfo("tutorial")}
         else {popup.setInfo("welcome")}
