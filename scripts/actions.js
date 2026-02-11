@@ -389,6 +389,7 @@ let actions = {
           break
         }
       }
+      sounds.play("fling")
       return
     }
     let cell = board.cells[man.x][man.y]
@@ -397,6 +398,7 @@ let actions = {
       let list = fireValue === 0 ? ["longGrass"] : ["log", "stick", "longGrass"]
       let items = backpack.includesItems(list)
       if (items.length > 0){
+        sounds.play("fling")
         fireValue = items[0].type === "log" ? Math.min(fireValue+122, 240) :
             items[0].type === "stick" ? Math.min(fireValue+70, 240) : 
             items[0].type === "longGrass" && fireValue === 0 ? 20 : Math.min(fireValue+10,240)
@@ -552,7 +554,6 @@ let actions = {
       let pot = toolbelt.getContainer("claypot")
       if (pot){
         pot.addItem("water")
-        //sounds.play("water")
         tutorial.checkAction("water")
       }
     }

@@ -122,7 +122,18 @@ class Man {
       let cell = board.cells[this.x][this.y]
       let newCell = board.cells[this.x+x][this.y+y]
       if (["water","rockEdge","construction"].some(v => v === newCell.type || v === newCell.tile.replace(/\d+$/, "")) ||
-        ("firepit" === newCell.type && board.fires[newCell.id].value > 0)){return}
+        ("firepit" === newCell.type && board.fires[newCell.id].value > 0)){
+        //can't move, try teleport
+        if (cell.type === "pit" && cell.pair){
+          this.x = cell.pair.x
+          this.y = cell.pair.y
+          msgs.following.msg = "You found a teleport!"
+          msgs.following.frames = 24
+          sounds.play("pit")
+        }
+        this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
+        return
+      }
       if (newCell.tile.replace(/\d+$/, "") === "river" && newCell.type !== "steppingStones"){return}
       if (["boulder"].includes(newCell.type)){
         if (keyIsDown(SHIFT) && helpers.withinBounds(this.x+x*2, this.y+y*2)){
@@ -156,6 +167,7 @@ class Man {
         this.y = newCell.pair.y
         msgs.following.msg = "You found a teleport!"
         msgs.following.frames = 24
+        sounds.play("pit")
       }
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()

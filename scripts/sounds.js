@@ -25,11 +25,12 @@ let sounds = {
     chop: new Audio("sounds/chop.mp3"),
     dig: new Audio("sounds/dig.mp3"),
     eat: new Audio("sounds/eat.mp3"),
+    fling: new Audio("sounds/grab.mp3"),
     lose: new Audio("sounds/lose.mp3"),
     music: music,
     sleep: new Audio("sounds/sleeping.mp3"),
+    pit: new Audio("sounds/pitShort.mp3"),
     vomit: new Audio("sounds/vomit.mp3"),
-    water: new Audio("sounds/water.wav"),
     walk1: new Audio("sounds/walk1.mp3"),
     walk2: new Audio("sounds/walk2.mp3"),
     win: new Audio("sounds/win.mp3")
