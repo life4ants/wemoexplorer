@@ -165,11 +165,12 @@ var game = new Vue({
           b = JSON.parse(JSON.stringify(gameBoards[index]))
           b.sessionId = helpers.randomId()
           break
-        case "resume":
-          b = JSON.parse(localStorage["wemoGame"+index])
-          break
         case "custom":
           b = JSON.parse(localStorage["board"+index])
+          b.sessionId = helpers.randomId()
+          break
+        case "resume":
+          b = JSON.parse(localStorage["wemoGame"+index])
       }
       man = new Man(player.character, b.startX, b.startY)
       backpack = new Backpack(b.backpack ?? {type:"backpack"})
@@ -237,8 +238,7 @@ var game = new Vue({
       localStorage.setItem("wemoGame"+gameId, JSON.stringify(
         Object.assign({man: man.export(), backpack: backpack.export(), toolbelt: toolbelt.export()}, board.export())
       ))
-      if (board.type === "default")
-        this.postGame("inProgress")
+      this.postGame("inProgress")
     },
 
     async postGame(status){
@@ -265,20 +265,24 @@ var game = new Vue({
         });
 
         if (!response.ok) {
-          console.log(response)
-          throw new Error(`post error! Response:`);
+          // Try to read error message from server
+          let errorDetail = '';
+          try {
+            const errBody = await response.json();
+            errorDetail = errBody.error || errBody.message || `status ${response.status}`;
+          } catch {
+            errorDetail = await response.text().catch(() => `status ${response.status}`);
+          }
+          throw new Error(`POST failed: ${errorDetail}`);
         }
 
-        // Success → mark as synced (so we don't send name/createdAt again)
-        this.currentPlayer.verified = true;
-
-        // Update localStorage
-         let p = JSON.parse(localStorage.wemoPlayers)
-        p[this.currentPlayer.index] = this.currentPlayer
-        localStorage.setItem("wemoPlayers", JSON.stringify(p))
-
+        if (!this.currentPlayer.verified){
+          this.currentPlayer.verified = true;
+          let p = JSON.parse(localStorage.wemoPlayers)
+          p[this.currentPlayer.index] = this.currentPlayer
+          localStorage.setItem("wemoPlayers", JSON.stringify(p))
+        }
         console.log("Game session saved" + (!payload.name ? " (user already synced)" : " + user created"));
-
       } catch (err) {
         console.error("Failed to save session:", err);
       }

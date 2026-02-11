@@ -272,7 +272,8 @@ module.exports = {
       }
       for (let k in this.highScores){
         for (let i = 0; i < this.highScores[k].length; i++){
-          const date = helpers.toLocalFromUtcString(this.highScores[k][i].played_at, true)
+          const date = new Date(this.highScores[k][i].played_at+"Z").toLocaleString(
+              'en-US', { dateStyle: 'medium', timeStyle: 'short' })
           this.highScores[k][i].played_at = date
           const minutes = helpers.formatedWemoMins(this.highScores[k][i].game_time)
           this.highScores[k][i].game_time = minutes

@@ -120,16 +120,6 @@ let helpers = {
     });
   },
 
-  toLocalFromUtcString(utcStr, verbose) {
-    // If the string has no timezone → append Z so it's parsed as UTC
-    if (!utcStr.includes('Z') && !utcStr.includes('+') && !utcStr.includes('-')) {
-      utcStr = utcStr + 'Z';
-    }
-    if (verbose)
-      return new Date(utcStr).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
-    return new Date(utcStr).toLocaleString()
-  },
-
   formatedWemoMins(num){
     if (!num) return '0m Wemo Time';
     const days = Math.floor(num / 1440);
