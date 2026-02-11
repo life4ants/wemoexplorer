@@ -125,7 +125,6 @@ var game = new Vue({
             p[this.currentPlayer.index] = this.currentPlayer
             localStorage.setItem("wemoPlayers", JSON.stringify(p))
           }
-          this.postGame("failed")
         }
         else if (board.level > 0)
           this.saveGame()
@@ -186,7 +185,6 @@ var game = new Vue({
       world.leftOffset = 52
       topbar.health = man.health
       topbar.energy = man.energy
-      world.noKeys = false
       timer.setTime(board.wemoMins)
       world.noNight = board.level < 1
       if (man.isSleeping)

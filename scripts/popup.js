@@ -186,7 +186,6 @@ var popup = new Vue({
         this.size = "popup-center"
         this.show = true
         setTimeout(() => $(".build-menu").scrollTop(0), 0)
-        world.noKeys = true
         noLoop()
       }
     },
@@ -210,7 +209,6 @@ var popup = new Vue({
         this.selectId = 0
         this.show = true
         setTimeout(() => $(".build-menu").scrollTop(0), 0)
-        world.noKeys = true
         noLoop()
       }
     },
@@ -312,7 +310,6 @@ var popup = new Vue({
       this.selected = items[0]
       this.selectId = 0
       this.show = true
-      world.noKeys = true
       noLoop()
     },
 
@@ -330,7 +327,6 @@ var popup = new Vue({
           rows: Math.floor((window.innerHeight)/25)}
         setTimeout(() => $("#inputOne").focus(), 0)
       }
-      world.noKeys = true
       noLoop()
     },
 
@@ -340,7 +336,6 @@ var popup = new Vue({
       this.size = type === "manual" ? "popup-lg" : "popup-center"
       this.type = type
       this.show = true
-      world.noKeys = true
       noLoop()
     },
 
@@ -350,8 +345,8 @@ var popup = new Vue({
       this.title = "Game Over!!"
       this.size = "popup-center"
       this.type = "gameOver"
-      world.noKeys = true
       sounds.play("lose")
+      game.postGame("failed")
       noLoop()
     },
 
@@ -366,7 +361,6 @@ var popup = new Vue({
       }
       this.show = false
       this.type = ""
-      world.noKeys = false
       loop()
     },
 
@@ -375,7 +369,6 @@ var popup = new Vue({
       this.title = content
       this.type = "alert"
       this.size = content.length > 27 ? "popup-center" : "popup-tiny"
-      world.noKeys = true
       noLoop()
     },
 

@@ -58,10 +58,10 @@ let editor = {
       this.floodFill(x, y, cell.tile, cell.type, this.tile, this.type)
     }
     else if (this.tool === "selection"){
-      x = Math.round(mouseX/25)
-      y = Math.round(mouseY/25)
+      x = Math.floor(mouseX/25)
+      y = Math.floor(mouseY/25)
       this.selection.point1 = {x, y}
-      this.selection.point2 = {x, y}
+      this.selection.point2 = {x: x+1, y: y+1}
     }
   },
 

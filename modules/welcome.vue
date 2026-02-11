@@ -8,6 +8,7 @@
         </a>
           <h1>Wemo Explorer</h1>
         </div>
+        <!-- PICK PLAYER -->
         <div v-if="page === 'pickPlayer'" class="modal-body">
           <div class="center whatsNew">
             <h5>Current version: {{history[0].version}}</h5>
@@ -46,12 +47,16 @@
             <span>Views since Dec 13, 2025: {{viewCount}}</span>
           </div>
         </div>
+
+        <!-- NEW PLAYER -->
         <div v-else-if="page === 'newPlayer'" class="modal-body center">
           <h5>What is your name?</h5>
           <input type="text" v-model="name" placeholder="enter name" class="player-name" id="inputOne">
           <button class="button-primary" id="etr" @click="newPlayer">Start</button>
           <button v-if="players.length > 0" id="esc" @click="page = 'pickPlayer'">Cancel</button>
         </div>
+
+        <!-- HISTORY -->
         <div v-else-if="page === 'history'" class="modal-body">
           <div class="links">
             <a @click="page = 'pickPlayer'">back</a>
@@ -66,7 +71,21 @@
             </ul>
           </div>
         </div>
-        <div v-else class="modal-body">
+
+        <!-- HIGH SCORES -->
+        <div v-else-if="page === 'highScores'" class="modal-body">
+          <h4>High Scores for {{worlds[selected].name}}:</h4>
+          <div v-for="h in highScores[selected]" class="flex-around">
+            <h6>{{h.player_name}}</h6>
+            <h6>{{h.played_at}}</h6>
+            <h6>{{h.game_time}}</h6>
+          </div>
+          <br>
+          <button @click="exitHighScores">Back</button>
+        </div>
+
+        <!-- PICK GAME -->
+        <div v-else-if="page === 'pickGame'" class="modal-body">
           <div class="links">
             <a @click="signout">not {{currentPlayer.name}}? sign out</a>
           </div>
@@ -86,8 +105,8 @@
                 <button v-if="item.savedGame" @click="() => pickGame('resume', item.gameId, id)">Resume</button>
                 <div v-else style="width: 80px"></div>
               </div>
-              <div class="button-tiles-flexbox">
-                <!-- <span>leave as placeholder</span> -->
+              <div class="button-tiles-flexbox links">
+                <a v-if="highScores[id]" @click="() => showHighScores(id)">High Scores</a>
               </div>
             </div>
           </div>
@@ -192,7 +211,8 @@ module.exports = {
           "Items on the build menu unlock based on level",
           "Pits are now teleports"]},
       ],
-      whatsNew: []
+      whatsNew: [],
+      highScores:{},
     }
   },
   props: [
@@ -200,6 +220,7 @@ module.exports = {
   ],
   mounted(){
     setTimeout(() => $("#grow").addClass("large"), 0)
+    this.loadHighScores()
     if (localStorage.wemoPlayers)
       this.players = JSON.parse(localStorage.wemoPlayers)
     if (this.players.length === 0){
@@ -227,10 +248,51 @@ module.exports = {
       setTimeout(() => $("#inputOne").focus(), 0)
     },
 
+    async loadHighScores(){
+      try {
+        const response = await fetch('/api/games/highscores');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (!data.success) {
+          console.error('Server error:', data.error);
+          showErrorMessage(data.error || 'Failed to load high scores');
+          return;
+        }
+
+        // data.highscores is an object like { "1": [...], "2": [...], ... }
+        this.highScores = data.highscores;
+
+      } catch (err) {
+        console.error('Failed to fetch highscores:', err);
+        showErrorMessage('Could not load high scores – check your connection');
+        return
+      }
+      for (let k in this.highScores){
+        for (let i = 0; i < this.highScores[k].length; i++){
+          const date = helpers.toLocalFromUtcString(this.highScores[k][i].played_at, true)
+          this.highScores[k][i].played_at = date
+          const minutes = helpers.formatedWemoMins(this.highScores[k][i].game_time)
+          this.highScores[k][i].game_time = minutes
+        }
+      }
+    },
+
+    showHighScores(level){
+      this.page = "highScores"
+      this.selected = level
+    },
+
+    exitHighScores(){
+      this.page = "pickGame"
+    },
+
     newPlayer(){
       let name = this.name.trim()
       if (name.length > 0){
-        let level = typeof test === "undefined" ? 0 : 4
+        let level = typeof test === "undefined" ? 0 : 8
         this.players.push({
           name: name, unlockedLevel: level, games: [], character: 0,
           userId: helpers.randomId(), verified: false, createdAt: new Date().toISOString()

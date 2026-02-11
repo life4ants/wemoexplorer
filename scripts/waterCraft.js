@@ -42,7 +42,7 @@ class WaterCraft {
       let newCell = board.cells[this.x+x][this.y+y]
       
       if (["water", "river", "steppingStones"].includes(newCell.type) ||
-          ["grassBeach", "beach", "star"].includes(newCell.type) &&
+          ["grassBeach", "beach", "star", "flag"].includes(newCell.type) &&
            ["water", "river"].includes(cell.type)
         ) {
 
@@ -53,6 +53,8 @@ class WaterCraft {
         man.energy -= 2
         if (newCell.type === "star")
           board.claimStar(this.x, this.y, newCell)
+        if (newCell.type === "flag")
+          tutorial.checkAction("flag")
       }
     }
   }

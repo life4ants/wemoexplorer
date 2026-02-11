@@ -105,7 +105,7 @@ module.exports = {
     },
 
   	moveAction(keyCode){//responds to mobile buttons for moving
-      if (!world.noKeys && !this.paused && !man.isAnimated){
+      if (!popup.show && !this.paused && !man.isAnimated){
         keyHandler(keyCode)
       }
     },

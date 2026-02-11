@@ -118,5 +118,26 @@ let helpers = {
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
+  },
+
+  toLocalFromUtcString(utcStr, verbose) {
+    // If the string has no timezone → append Z so it's parsed as UTC
+    if (!utcStr.includes('Z') && !utcStr.includes('+') && !utcStr.includes('-')) {
+      utcStr = utcStr + 'Z';
+    }
+    if (verbose)
+      return new Date(utcStr).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+    return new Date(utcStr).toLocaleString()
+  },
+
+  formatedWemoMins(num){
+    if (!num) return '0m Wemo Time';
+    const days = Math.floor(num / 1440);
+    const hrs = Math.floor((num % 1440) / 60);
+    const mins = Math.floor(num % 60);
+
+    if (days > 0) return `${days}d ${hrs}h ${mins}m Wemo Time`;
+    if (hrs > 0) return `${hrs}h ${mins}m Wemo Time`;
+    return `${mins}m Wemo Time`;
   }
 }

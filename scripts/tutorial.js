@@ -194,13 +194,27 @@ let tutorial = {
 				title: "All Done!",
 				text: "Congratulations, you unlocked level 4!"
 			}
+		],
+		[
+			{
+				title: "Explore the World",
+				text: "Find all the stars to uncover the world."
+			},
+			{
+				title: "Find the Flag",
+				text: "Find the yellow flag to finish this level"
+			},
+			{
+				title: "All Done!",
+				text: "Congratulations, you unlocked level 5!"
+			}
 		]
 	],
 
 	start(){
 		this.active = true
 		this.step = 0
-		this.level = board.level
+		this.level = min(board.level, 4)
 		this.revealCount = board.revealCount
 		if (this.level === 0){
 			this.req = {up: true, down: true, right: true, left: true, count: 4}
@@ -269,13 +283,13 @@ let tutorial = {
 	checkAction(type){
 		switch (type){
 		case "stars":
-			switch(board.level){
+			switch(this.level){
 			case 0: if (this.step === 2) {this.next()}
 				break
 			case 1: this.complete(2); break
 			case 2:
 			case 3: this.complete(3); break
-			case 10: game.finishLevel()
+			case 4: this.complete(0)
 			}
 			return
 		case "eat": if (this.level === 0 && this.step === 3){this.next()} return
@@ -345,6 +359,8 @@ let tutorial = {
 		case "stew":
 			if (this.level === 3) {this.complete(11)}
 			return
+		case "flag":
+			if (this.level === 4){this.complete(1)}
 		}
 	},
 

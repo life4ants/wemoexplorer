@@ -159,9 +159,10 @@ class Man {
       }
       this.index = x > 0 ? 0 : x < 0 ? 1 : y < 0 ? 2 : 3
       this.fireCheck()
-      if (newCell.type === "star"){
+      if (newCell.type === "star")
         board.claimStar(this.x, this.y, newCell)
-      }
+      if (newCell.type === "flag")
+        tutorial.checkAction("flag")
     }
   }
 

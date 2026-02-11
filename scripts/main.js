@@ -308,7 +308,7 @@ function preload(){
   tiles.rock = tiles.rock1
 
   //load the worlds:
-  for (let i = 0; i<4; i++){
+  for (let i = 0; i<8; i++){
     $.getJSON(`worlds/${i}.json`, function(data){
       gameBoards[i] = data
     })
@@ -378,7 +378,6 @@ $("#board").contextmenu(function(e) {
 let world = {
   topOffset: 0,
   leftOffset: 0,
-  noKeys: false,
   frameRate: 12,
   noNight: false,
   growtime: 360,

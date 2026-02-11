@@ -1,5 +1,5 @@
 function keyPressed(){
-  if (game.mode === "play" && !game.paused && !world.noKeys && !man.isAnimated){
+  if (game.mode === "play" && !game.paused && !popup.show && !man.isAnimated){
     keyHandler(keyCode, key)
   }
   else if (["dumpMenu", "build"].includes(popup.type)){
@@ -60,7 +60,7 @@ function mousePressed(){
     return
   }
   let offset = ["edit", "starEdit"].includes(game.mode) ? 0 : topbarHeight
-  if (game.mode === "welcome" || popup.show || world.noKeys ||
+  if (game.mode === "welcome" || popup.show || 
       winMouseX < world.leftOffset || mouseX > board.cols*25 ||
       mouseY < offset || mouseY > board.rows*25+offset){return}
   switch(game.mode){
@@ -82,7 +82,7 @@ function mousePressed(){
 }
 
 function mouseDragged(){
-  if (mouseX < 0 || mouseX >= width || mouseY < 0 || mouseY >= height)
+  if (mouseX < 0 || mouseX >= width || mouseY < 0 || mouseY >= height || popup.show)
     return
   if (game.mode === "edit" && winMouseY > world.topOffset)
     editor.mouseDragged()

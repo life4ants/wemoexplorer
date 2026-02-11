@@ -7,7 +7,7 @@
       this.updateObjects()
     }
     if (frameCount%720 === 361){ //every 60 secounds starting at 30 secounds
-      if (board.level > 0)
+      if (board.level > 0 && !board.gameOver)
         game.saveGame()
       if (board.type === "custom"){
         g = JSON.parse(localStorage["board"+board.name])
@@ -66,8 +66,8 @@
       for(let j=0; j<board.rows; j++){
         let cell = board.cells[i][j]
         switch(cell.type){
-        case "berryTree": plants.addApple(cell); break
-        case "berryBush": plants.addBerry(cell); break
+        case "berryTree": try{plants.addApple(cell)} catch(e){console.error(e,i,j)}; break
+        case "berryBush": try{plants.addBerry(cell)} catch(e){console.error(e,i,j)}; break
         case "root":
           cell.growtime++
           switch(cell.growtype){
