@@ -110,6 +110,7 @@ module.exports = {
         { id: "beachEdge3", src: "images/beachEdge3.png", type: "beachEdge"},
         { id: "beachEdge4", src: "images/beachEdge4.png", type: "beachEdge"},
         { id: "pit", src: "images/pit.png", type: "pit0"},
+        { id: "flag", src: "images/flag.png", type: "flag"},
       ],
       tiles2: [
         { id: "beach", src: "images/beachX.png", type: "auto"},

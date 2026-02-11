@@ -2,12 +2,13 @@ let gameBoards = []
 const topbarHeight = 55
 const version = 10803 // update this with each version publication
 const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle", "blank"]
-const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile"]
+const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile", "mushroom"]
 const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]
 const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit", "root"]
 const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
-const seeThru = ["log", "bone", "steppingStones", "stick", "cactus", "berryBush", "star", "mushroom", "boulder", "palm"]
-const stackable = ["water", "beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle", "sandpit", "river", "root", "stump"]
+const seeThru = ["log", "bone", "steppingStones", "stick", "cactus", "berryBush", "star", "mushroom", "boulder", "palm", "flag"]
+const stackable = //tiles boulders are allowed on, and see thru types can be put on in editor
+  ["water", "beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle", "sandpit", "river", "root", "stump", "blank"]
 const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
 const options = {
   build: [
@@ -190,6 +191,7 @@ function preload(){
     ],
     firepit: loadImage("images/firepit.png"),
     firepitOutlined: loadImage("images/firepitOutlined.png"),
+    flag: loadImage("images/flag.png"),
     floodFill: loadImage("images/floodFill.png"),
     grab: loadImage("images/grab.png"),
     grass: loadImage("images/grass.png"),
@@ -390,14 +392,4 @@ let world = {
   }
 }
 
-// Polyfill for crypto.randomUUID() – safe fallback for Firefox & older browsers
-if (!crypto.randomUUID) {
-  crypto.randomUUID = function randomUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  };
-}
 

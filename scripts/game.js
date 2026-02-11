@@ -24,7 +24,7 @@ var game = new Vue({
       </play-box>
       
       <build-sidebar v-if="mode === 'build'"
-        :toggleBuildMode="toggleBuildMode">
+        :toggleBuildMode="toggleBuildMode" :isMobile="isMobile">
       </build-sidebar>
     </div>
     `,
@@ -46,6 +46,18 @@ var game = new Vue({
     musicOn: false
   },
   mounted(){
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden){
+        sounds.files.music.pause()
+        sounds.files.sleep.pause()
+      }
+      else if (!this.paused){
+        if (typeof man !== "undefined" && man.isSleeping)
+          sounds.files.sleep.play()
+        if (this.musicOn)
+          sounds.files.music.play()
+      }
+    })
     let resetLevel = true // change this to force people to do the tutorial again
     this.lastVisit = Number(localStorage.wemoUpToDate ?? 1012011)
 
@@ -70,7 +82,7 @@ var game = new Vue({
         unlockedLevel: resetLevel ? 0 : players[i].unlockedLevel, 
         games: [], 
         character: players[i].character,
-        userId: players[i].userId ?? crypto.randomUUID(),
+        userId: players[i].userId ?? helpers.randomId(),
         verified: false,
         createdAt: players[i].createdAt ?? new Date().toISOString()
       })
@@ -123,9 +135,7 @@ var game = new Vue({
       noLoop()
       this.started = false
       this.paused = false
-      this.musicOn = false
       sounds.files.music.pause()
-      sounds.files.music.currentTime = 0
       sounds.files['sleep'].pause()
       popup.show = false
       world.topOffset = 0
@@ -154,7 +164,7 @@ var game = new Vue({
       switch(type){
         case "default":
           b = JSON.parse(JSON.stringify(gameBoards[index]))
-          b.sessionId = crypto.randomUUID()
+          b.sessionId = helpers.randomId()
           break
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
@@ -180,7 +190,9 @@ var game = new Vue({
       timer.setTime(board.wemoMins)
       world.noNight = board.level < 1
       if (man.isSleeping)
-        sounds.files['sleep'].play()
+        sounds.files.sleep.play()
+      if (this.musicOn)
+        sounds.files.music.play()
       if (!board.progress && board.level > 1)
         board.addAnimals()
       $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
@@ -235,6 +247,7 @@ var game = new Vue({
       const payload = {
         userId: this.currentPlayer.userId,
         sessionId: board.sessionId,
+        isMobile: game.isMobile,
         status: status,
         level: board.level,
         game_name: board.name,

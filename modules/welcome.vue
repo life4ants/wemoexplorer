@@ -233,7 +233,7 @@ module.exports = {
         let level = typeof test === "undefined" ? 0 : 4
         this.players.push({
           name: name, unlockedLevel: level, games: [], character: 0,
-          userId: crypto.randomUUID(), verified: false, createdAt: new Date().toISOString()
+          userId: helpers.randomId(), verified: false, createdAt: new Date().toISOString()
         })
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
         this.name = ""

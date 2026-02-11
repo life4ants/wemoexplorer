@@ -13,6 +13,7 @@
       <p class="slide-right">You are building:</p>
       <p class="center"><b>{{buildType.name}}</b></p>
       <p class="slide-right">{{buildType.rules}}</p>
+      <button v-if="isMobile" style="margin-left: 20px" @click="build" id="esc">Build</button>
       <button style="margin-left: 20px" @click="toggleBuildMode" id="esc">Cancel</button>
     </div>
   </div>
@@ -26,7 +27,7 @@ module.exports = {
 		}
 	},
 	props: [
-		"toggleBuildMode"
+		"toggleBuildMode", "isMobile"
 	],
   computed: {
   	buildType(){
@@ -39,7 +40,9 @@ module.exports = {
     }
   },
   methods: {
-
+    build(){
+      builder.clicker()
+    }
 	}
 }
 </script>
