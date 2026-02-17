@@ -1,25 +1,47 @@
 let sounds = {
   odd: true,
   files: {},
+  musicVolume: 0.4,
+  musicOn: false,
 
   initialize(){
-    let music = new Audio("sounds/music3.mp3")
+    const music = new Audio("sounds/music3.mp3")
+    music.crossOrigin = 'anonymous'
+    music.loop = true
     music.addEventListener('loadedmetadata', () => {
-      const t = Math.random() * music.duration
-      music.currentTime = t
-      music.loop = true
+      music.currentTime = Math.random() * music.duration
     });
 
-    // let audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-    // let gainNode = audioCtx.createGain()
-    // gainNode.gain.value = 0.6
-    // let source = audioCtx.createMediaElementSource(music)
-    // source.connect(gainNode);
-    // gainNode.connect(audioCtx.destination);
+    let audioCtx = null
+    let gainNode = null
 
-    // this.setMusicVolume = function(v) {
-    //   gainNode.gain.value = v
-    // }
+    const ensureAudioContext = () => {
+      if (audioCtx) return
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+      const source = audioCtx.createMediaElementSource(music)
+      gainNode = audioCtx.createGain()
+      source.connect(gainNode)
+      gainNode.connect(audioCtx.destination)
+      gainNode.gain.value = this.musicVolume
+    }
+
+
+    this.setMusic = function(on) {
+      ensureAudioContext()
+      if (audioCtx.state === 'suspended') audioCtx.resume()
+      if (on) {
+        music.play()
+      } else {
+        music.pause()
+      }
+      this.musicOn = on
+    }
+
+    this.setMusicVolume = function(v) {
+      this.musicVolume = v
+      if (gainNode) gainNode.gain.value = this.musicVolume
+    }
+   
     
     this.files = {
     chop: new Audio("sounds/chop.mp3"),
@@ -27,7 +49,6 @@ let sounds = {
     eat: new Audio("sounds/eat.mp3"),
     fling: new Audio("sounds/grab.mp3"),
     lose: new Audio("sounds/lose.mp3"),
-    music: music,
     sleep: new Audio("sounds/sleeping.mp3"),
     pit: new Audio("sounds/pitShort.mp3"),
     vomit: new Audio("sounds/vomit.mp3"),

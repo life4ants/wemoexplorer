@@ -31,7 +31,7 @@
               <i class="fa fa-music fa-lg"></i>
             </div>
             <input class="vertical-slider" type="range" 
-                id="volumeSlider" v-model.number="volume"
+                id="volumeSlider" :value="volume" @input="setVolume"
                 min="0" max="0.6" step="0.01" @keydown="blockArrows">
           </div>
           <div class="musicIcon" v-else style="right: 4px">
@@ -72,20 +72,20 @@ module.exports = {
       volume: 0.4
 		}
 	},
-  watch:{
-    volume(){
-      sounds.files.music.volume = this.volume
-    }
-  },
   methods: {
     disableCanvas(){
       window._UIevent = true
     },
 
+    setVolume(e){
+      this.volume = parseFloat(e.target.value)
+      sounds.setMusicVolume(this.volume)
+    },
+
     blockArrows(e) {
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        console.log(e.key)
         e.preventDefault();
+        $("#volumeSlider").blur()
       }
     },
 

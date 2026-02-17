@@ -48,14 +48,14 @@ var game = new Vue({
   mounted(){
     document.addEventListener("visibilitychange", () => {
       if (document.hidden){
-        sounds.files.music.pause()
+        sounds.setMusic(false)
         sounds.files.sleep.pause()
       }
       else if (["play", "build"].includes(this.mode) && !this.paused){
         if (man.isSleeping)
           sounds.files.sleep.play()
         if (this.musicOn)
-          sounds.files.music.play()
+          sounds.setMusic(true)
       }
     })
     let resetLevel = false // change this to force people to do the tutorial again
@@ -83,7 +83,7 @@ var game = new Vue({
         games: [], 
         character: players[i].character,
         userId: players[i].userId ?? helpers.randomId(),
-        verified: player[i].verified ?? false,
+        verified: players[i].verified ?? false,
         createdAt: players[i].createdAt ?? new Date().toISOString()
       })
     }
@@ -103,14 +103,8 @@ var game = new Vue({
     },
 
     setMusic(){
-      if (this.musicOn){
-        sounds.files.music.pause()
-        this.musicOn = false
-      }
-      else {
-        sounds.files.music.play()
-        this.musicOn = true
-      }
+      this.musicOn = !this.musicOn
+      sounds.setMusic(this.musicOn)
     },
 
     exit() {
@@ -134,7 +128,7 @@ var game = new Vue({
       noLoop()
       this.started = false
       this.paused = false
-      sounds.files.music.pause()
+      sounds.setMusic(false)
       sounds.files['sleep'].pause()
       popup.show = false
       world.topOffset = 0
@@ -191,7 +185,7 @@ var game = new Vue({
       if (man.isSleeping)
         sounds.files.sleep.play()
       if (this.musicOn)
-        sounds.files.music.play()
+        sounds.setMusic(true)
       if (!board.progress && board.level > 1)
         board.addAnimals()
       $(window).scrollTop(0).scrollLeft(0) // unknown if necessary 
@@ -296,7 +290,7 @@ var game = new Vue({
           if (man.isSleeping)
             sounds.files.sleep.play()
           if (this.musicOn)
-            sounds.files.music.play()
+            sounds.setMusic(true)
           popup.close()
         }
         else {
@@ -305,7 +299,7 @@ var game = new Vue({
           popup.show = true
           this.paused = true
           sounds.files.sleep.pause()
-          sounds.files.music.pause()
+          sounds.setMusic(false)
           noLoop()
         }
       }
