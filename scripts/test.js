@@ -1,4 +1,15 @@
-let test = {
+import { board, man, active } from './state.js'
+import { topbarHeight } from './config.js'
+import { game } from './game.js'
+import { viewport } from './viewport.js'
+import { helpers } from './helpers.js'
+import { timer } from './timer.js'
+import { WaterCraft } from './waterCraft.js'
+import { Campsite } from './campsite.js'
+import { Backpack } from './backpack.js'
+import { Toolbelt } from './toolbelt.js'
+
+export let test = {
   clickInfo: "cell",
   counts: {
     blocks: {},

@@ -1,4 +1,9 @@
-class WaterCraft {
+import { board, active, man, tiles, world } from './state.js'
+import { topbarHeight } from './config.js'
+import { helpers } from './helpers.js'
+import { tutorial } from './tutorial.js'
+
+export class WaterCraft {
   constructor(obj){
     this.x = obj.x
     this.y = obj.y

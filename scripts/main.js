@@ -1,110 +1,39 @@
-let gameBoards = []
-const topbarHeight = 55
-const version = 10901 // update this with each version publication
-const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle", "blank"]
-const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile", "mushroom"]
-const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]
-const buildable = ["sand", "grass", "beachEdge", "stump", "longGrass", "rockMiddle", "firepit", "root"]
-const fordable = ["river5","river6","river7","river8","river9","river10","river11","river12","river17","river18"]
-const seeThru = ["log", "bone", "steppingStones", "stick", "cactus", "berryBush", "star", "mushroom", "boulder", "palm", "flag"]
-const stackable = //tiles boulders are allowed on, and see thru types can be put on in editor
-  ["water", "beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "rockMiddle", "sandpit", "river", "root", "stump", "blank"]
-const nonWalkable = ["water", "river", "rockEdge", "firepit", "pit", "sandpit", "campsite", "construction"]
-const options = {
-  build: [
-    {name: "firepit", src: "images/firepitIcon.png", title: "Firepit", level: 0,
-        time: 15, energy: 200,
-        resources: "none",
-        dist: "A bonfire to spend the night next to",
-        inst: "Go to the spot where you want to build a firepit, then click build." },
+// Entry point — single <script type="module"> replaces all individual script tags
 
-    {name: "stoneAx", src: "images/stoneAx.png", title: "Stone Ax", level: 0,
-        time: 15, energy: 100,
-        resources: "1 stick, 1 long grass, 1 rock",
-        dist: "A primitive ax for chopping trees and other things",
-        inst: "Gather the needed resources in your backpack, then click build."},
+import { tiles, gameBoards, world, man, board, setMsgs } from './state.js'
+import { topbarHeight, dumpable, grabable } from './config.js'
+import { sounds } from './sounds.js'
+import { helpers } from './helpers.js'
+import { timer } from './timer.js'
+import { viewport } from './viewport.js'
+import { topbar } from './topbar.js'
+import { builder } from './builder.js'
+import { tutorial } from './tutorial.js'
+import { test } from './test.js'
+import { Board } from './board.js'
+import { popup } from './popup.js'
+import { game } from './game.js'
+import { editor, starEditor } from './editor.js'
+import { msgs } from './message.js'
+import { keyPressed, keyHandler, mousePressed, mouseDragged,
+         mouseReleased, windowResized, touchStarted } from './events.js'
 
-    {name: "basket", src: "images/basket.png", title: "Basket", level: 1,
-        time: 20, energy: 50,
-        resources: "6 long grass",
-        dist: "For gathering berries and veggies in",
-        inst: "Gather 6 long grass in your backpack, then click build."},
+// Initialize state
+setMsgs(msgs)
 
-    {name: "raft", src: "images/raft0.png", title: "Raft", level: 1,
-        time: 0, energy: 400,
-        resources: "8 logs, 8 long grass",
-        dist: "For exploring water",
-        inst: "Click build to select a location."},
-
-    {name: "steppingStones", src: "images/steppingStonesIcon.png", title: "Stepping Stones", level: 2,
-        time: 0, energy: 150,
-        resources: "3 rocks",
-        dist: "For crossing rivers",
-        inst: "Click build to select a location."},
-
-    {name: "boneShovel", src: "images/boneShovel.png", title: "Bone Shovel", level: 2,
-        time: 20, energy: 120,
-        resources: "1 stick, 1 long grass, 1 bone",
-        dist: "A primitive shovel for digging clay",
-        inst: "Gather the needed resources in your backpack, then click build."},
-
-    {name: "campsite", src: "images/campsite.png", title: "Campsite", level: 2,
-        time: 0, energy: 500,
-        resources: "5 logs, 10 sticks, 5 clay, 20 long grass",
-        dist: "A place to store tools, cook meals, and more!",
-        inst: "Click build to select a location."},
-
-    {name: "bow", src: "images/bow.png", title: "Bow", level: 3,
-        time: 30, energy: 80,
-        resources: "1 stick, 2 long grass",
-        dist: "For hunting",
-        inst: "Gather the needed resources in your backpack, then click build."},
-
-    {name: "arrows", src: "images/arrow.png", title: "Arrows", level: 3,
-        time: 25, energy: 200,
-        resources: "2 sticks, 4 long grass, 2 rocks",
-        dist: "Flint head arrows for hunting",
-        inst: "Makes 5 arrows. Gather the needed resources in your backpack, then click build. Must have an Ax with you."},
-
-    {name: "claypot", src: "images/claypot.png", title: "Clay Pot", level: 3,
-        time: 120, energy: 150,
-        resources: "2 clay",
-        dist: "For cooking food and carrying water",
-        inst: "Gather the clay in your backpack, go to a campsite, feed the fire enough to last 2 hours, then click build."},
-        
-    {name: "bomb", src: "images/bomb1.png", title: "Bomb", level: 4,
-        time: 5, energy: 400,
-        resources: "none",
-        dist: "For clearing away clouds",
-        inst: "Click build, then select how many bombs you want added to your backpack."}
-  ],
-  cook: [
-    {name: "rabbitStew", src: "images/veggyStew.png", title: "Rabbit Stew", active: true,
-        time: 40, benefits: "800 health, 400 energy", servings: 8,
-        resources: "4 units water, 8 veggies, 1 dead rabbit",
-        dist: "Nutritious Rabbit Stew",
-        inst: `Gather the water in a Clay Pot and put it in your campsite. Gather the veggies in a Basket. Have the rabbit in your backpack. 
-          Feed the fire to last 40 minutes, then click cook.` }
-  ],
-  resources: [ //used by popup.dumpMenu
-    {name: "arrow", src: "images/arrow.png"},
-    {name: "bomb", src: "images/bomb.png"},
-    {name: "bone", src: "images/bone.png"},
-    {name: "clay", src: "images/clay.png"},
-    {name: "log", src: "images/logs.png"},
-    {name: "longGrass", src: "images/longGrass.png"},
-    {name: "mushroom", src: "images/mushrooms.png"},
-    {name: "rabbitDead", src: "images/rabbitDead.png"},
-    {name: "rabbitLive", src: "images/rabbitLive.png"},
-    {name: "rock", src: "images/rocks.png"},
-    {name: "stick", src: "images/sticks.png"},
-  ]
+// Attach world.resize() here to avoid circular dep in state.js (needs game + topbarHeight)
+world.resize = function(cols, rows) {
+  let offset = game.mode === "play" ? topbarHeight : 0
+  resizeCanvas(
+    max(cols*25, window.innerWidth),
+    max(rows*25+offset, window.innerHeight))
 }
 
-function preload(){
+// p5.js callbacks (must be on window for p5 global mode)
+window.preload = function() {
   //console.timeLog("load", "preload started")
   document.getElementById("p5_loading").innerHTML = "Loading Images ..."
-  tiles = {
+  Object.assign(tiles, {
     apple: loadImage("images/apple.png"),
     apples: loadImage("images/apples.png"),
     arrow: loadImage("images/arrow.png"),
@@ -297,7 +226,7 @@ function preload(){
     veggies4: loadImage("images/veggies4.png"),
     water: loadImage("images/water.png"),
     z: loadImage("images/z's.png")
-  }
+  })
 
   document.getElementById("p5_loading").innerHTML = "Loading Sounds ..."
   sounds.initialize()
@@ -316,7 +245,7 @@ function preload(){
   //console.timeLog("load", "preload finished")
 }
 
-function setup(){
+window.setup = function() {
   //console.timeLog("load", "setup started")
   let cvs = createCanvas(window.innerWidth, window.innerHeight)
   cvs.parent("board")
@@ -337,7 +266,7 @@ function setup(){
   }
 }
 
-function draw(){
+window.draw = function() {
   background('green')
   if (game.started){
     board.display()
@@ -354,12 +283,10 @@ function draw(){
   }
 }
 
-function playLoop(){
+function playLoop() {
   timer.update()
   game.checkActive()
-  // move board:
   viewport.update(false)
-  //display:
   man.update()
   board.showNight()
   topbar.display()
@@ -368,27 +295,36 @@ function playLoop(){
     popup.gameOver()
 }
 
+// p5.js event callbacks
+window.keyPressed = keyPressed
+window.mousePressed = mousePressed
+window.mouseDragged = mouseDragged
+window.mouseReleased = mouseReleased
+window.windowResized = windowResized
+window.touchStarted = touchStarted
 
+// Globals needed by .vue files (httpVueLoader can't use ES imports)
+window.popup = popup
+window.game = game
+window.helpers = helpers
+window.sounds = sounds
+window.tutorial = tutorial
+window.editor = editor
+window.starEditor = starEditor
+window.viewport = viewport
+window.builder = builder
+window.gameBoards = gameBoards
+window.world = world
+window.dumpable = dumpable
+window.grabable = grabable
+window.Board = Board
+window.keyHandler = keyHandler
+if (Vue.config.devtools) {
+  window.test = test
+}
+
+// Prevent right-click context menu on game board
 $("#board").contextmenu(function(e) {
     e.preventDefault();
     e.stopPropagation();
 });
-
-
-let world = {
-  topOffset: 0,
-  leftOffset: 0,
-  frameRate: 12,
-  noNight: false,
-  growtime: 360,
-  nearMan: [],
-
-  resize(cols, rows){
-    let offset = game.mode === "play" ? topbarHeight : 0
-    resizeCanvas(
-      max(cols*25,window.innerWidth), 
-      max(rows*25+offset, window.innerHeight))
-  }
-}
-
-

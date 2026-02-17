@@ -1,4 +1,7 @@
-let plants = {
+import { tiles } from './state.js'
+import { topbarHeight } from './config.js'
+
+export let plants = {
 	berryTime: 100,
 	appleTime: 150,
   veggieTime: 180,

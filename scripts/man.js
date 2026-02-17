@@ -1,4 +1,13 @@
-class Man {
+import { board, active, man, backpack, toolbelt, tiles, world, msgs, setActive } from './state.js'
+import { topbarHeight, sleepable, stackable } from './config.js'
+import { timer } from './timer.js'
+import { helpers } from './helpers.js'
+import { popup } from './popup.js'
+import { sounds } from './sounds.js'
+import { tutorial } from './tutorial.js'
+import { game } from './game.js'
+
+export class Man {
   constructor(characterId, x, y){
     this.x = x
     this.y = y
@@ -228,7 +237,7 @@ class Man {
     else if (!this.isRiding) {
       let raftId = this.canMount(this.x, this.y)
       if (raftId !== null) {
-        active = board.vehicles[raftId]
+        setActive(board.vehicles[raftId])
         this.isRiding = true
         this.ridingId = raftId
         active.index = active.index === 4 ? 0 : 3
@@ -266,7 +275,7 @@ class Man {
       this.index = dir === 0 ? 2 : [1,2,3].includes(dir) ? 0 : 4 === dir ? 3 : 1
       this.isRiding = false
       active.index = [0,1].includes(active.index) ? 4 : 5
-      active = man
+      setActive(man)
       this.fireCheck()
       return true
     }

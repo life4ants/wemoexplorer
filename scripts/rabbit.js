@@ -1,4 +1,8 @@
-class Rabbit {
+import { board, active, man, tiles, world } from './state.js'
+import { topbarHeight, nonWalkable } from './config.js'
+import { helpers } from './helpers.js'
+
+export class Rabbit {
   constructor(pos){
     this.x = pos.x
     this.y = pos.y

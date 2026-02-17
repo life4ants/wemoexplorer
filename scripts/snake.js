@@ -1,4 +1,8 @@
-class Snake {
+import { board, active, man, tiles, world, msgs } from './state.js'
+import { topbarHeight } from './config.js'
+import { helpers } from './helpers.js'
+
+export class Snake {
 	constructor(cellPos){
     this.cellPos = cellPos // object with x and y
     this.pos = createVector(cellPos.x*25+12.5,cellPos.y*25+12.5) // pixel positions to center of snake

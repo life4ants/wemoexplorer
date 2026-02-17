@@ -1,4 +1,10 @@
-let tutorial = {
+import { board, man, backpack, toolbelt } from './state.js'
+import { game } from './game.js'
+import { popup } from './popup.js'
+import { viewport } from './viewport.js'
+import { bootstrapColors } from './message.js'
+
+export let tutorial = {
 	active: false,
 	step: 0,
 	xbound: 9,

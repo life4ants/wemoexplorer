@@ -1,4 +1,12 @@
-let builder = {
+import { board, man, active } from './state.js'
+import { topbarHeight, fordable, buildable } from './config.js'
+import { viewport } from './viewport.js'
+import { actions } from './actions.js'
+import { game } from './game.js'
+import { helpers } from './helpers.js'
+import { topbar } from './topbar.js'
+
+export let builder = {
   size: 1,
   x: 0,
   y: 0,

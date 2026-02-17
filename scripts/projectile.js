@@ -1,4 +1,8 @@
-class Projectile {
+import { board, tiles } from './state.js'
+import { topbarHeight } from './config.js'
+import { helpers } from './helpers.js'
+
+export class Projectile {
   constructor(type, x,y,dir){
     this.pos = createVector(x,y)
     let dx, dy

@@ -1,4 +1,6 @@
-class Backpack {
+import { popup } from './popup.js'
+
+export class Backpack {
   constructor(obj){
     this.weight = 0
     this.type = obj.type

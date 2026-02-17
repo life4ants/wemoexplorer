@@ -1,4 +1,8 @@
-let bootstrapColors = {
+import { man, board, active, world } from './state.js'
+import { topbarHeight } from './config.js'
+import { viewport } from './viewport.js'
+
+export let bootstrapColors = {
   primary: "#007bff",
   secondary: "#868e96",
   success: "#28a745",
@@ -9,7 +13,7 @@ let bootstrapColors = {
   dark: "#343a40"
 }
 
-class Message {
+export class Message {
   constructor(object){
     this.type = object.type
     this.fontSize = object.fontSize
@@ -89,7 +93,7 @@ let messageCreater = {
   }
 }
 
-let msgs = { //object that holds all messages and updates them in draw()
+export let msgs = { //object that holds all messages and updates them in draw()
   following: {msg: 'Testing', frames: 0, size: 20},
   color: bootstrapColors.danger,
   fontColor: bootstrapColors.light,

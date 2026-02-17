@@ -1,4 +1,9 @@
- let timer = {
+import { board, world } from './state.js'
+import { game } from './game.js'
+import { tutorial } from './tutorial.js'
+import { plants } from './plants.js'
+
+export let timer = {
   startTime: null,
 
   update(){
@@ -10,7 +15,7 @@
       if (board.level > 0 && !board.gameOver)
         game.saveGame()
       if (board.type === "custom"){
-        g = JSON.parse(localStorage["board"+board.name])
+        let g = JSON.parse(localStorage["board"+board.name])
         g.playtime++ 
         localStorage.setItem("board"+board.name, JSON.stringify(g))
       }

@@ -1,11 +1,16 @@
-let viewport = {
+import { board, active, world } from './state.js'
+import { topbarHeight } from './config.js'
+import { game } from './game.js'
+import { helpers } from './helpers.js'
+
+export let viewport = {
   boardLeft: $("#board").position().left,
   boardTop: $("#board").position().top,
   top: world.topOffset,
   left: world.leftOffset,
   bottom: window.innerHeight-world.topOffset,
   right: window.innerWidth-world.leftOffset,
-  width: this.right,
+  width: window.innerWidth - world.leftOffset,
 
   update(center){
     let position

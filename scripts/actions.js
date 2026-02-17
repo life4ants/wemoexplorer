@@ -1,4 +1,16 @@
-let actions = {
+import { board, man, active, backpack, toolbelt, world, msgs } from './state.js'
+import { topbarHeight } from './config.js'
+import { popup } from './popup.js'
+import { sounds } from './sounds.js'
+import { tutorial } from './tutorial.js'
+import { helpers } from './helpers.js'
+import { Rabbit } from './rabbit.js'
+import { WaterCraft } from './waterCraft.js'
+import { Campsite } from './campsite.js'
+import { Projectile } from './projectile.js'
+import { Backpack } from './backpack.js'
+
+export let actions = {
   addConstructionSite(item, cell){
     //build a campsite:
     if (item.name === "campsite"){
@@ -111,7 +123,7 @@ let actions = {
           man.isAnimated = true
           man.animation = {frame: 0, type: "building", end: world.frameRate*item.time/3, action: () => {
             toolbelt.addItem("tool", item.name)
-            for (type of needed){
+            for (let type of needed){
               backpack.removeItem(type, 1)
             }
             popup.setAlert(msg)

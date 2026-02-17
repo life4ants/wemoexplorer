@@ -1,4 +1,11 @@
-class Campsite { 
+import { board, backpack, toolbelt, tiles } from './state.js'
+import { topbarHeight } from './config.js'
+import { popup } from './popup.js'
+import { tutorial } from './tutorial.js'
+import { Backpack } from './backpack.js'
+import { bootstrapColors } from './message.js'
+
+export class Campsite { 
 	constructor(obj){
 		this.tools = obj.tools ?? []
 		this.containers = []

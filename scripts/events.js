@@ -1,4 +1,14 @@
-function keyPressed(){
+import { board, man, active, backpack, world } from './state.js'
+import { topbarHeight } from './config.js'
+import { game } from './game.js'
+import { popup } from './popup.js'
+import { actions } from './actions.js'
+import { editor, starEditor } from './editor.js'
+import { builder } from './builder.js'
+import { tutorial } from './tutorial.js'
+import { viewport } from './viewport.js'
+
+export function keyPressed(){
   if (game.mode === "play" && !game.paused && !popup.show && !man.isAnimated){
     keyHandler(keyCode, key)
   }
@@ -19,7 +29,7 @@ function keyPressed(){
   }
 }
 
-function keyHandler(keyCode, key){
+export function keyHandler(keyCode, key){
   switch(keyCode){
     case LEFT_ARROW:  active.move(-1, 0); break;
     case RIGHT_ARROW: active.move(1,0);   break;
@@ -39,7 +49,7 @@ function keyHandler(keyCode, key){
       if (board.cells[active.x][active.y].type === "campsite"){ popup.grabMenu("grab") }
       else { actions.grab() }
       break
-    case "M": 
+    case "M":
       if (backpack.removeItem("mushroom", 1)){
         actions.eatAction("mushrooms")
       }
@@ -54,13 +64,13 @@ function keyHandler(keyCode, key){
     tutorial.keyHandler(keyCode)
 }
 
-function mousePressed(){
+export function mousePressed(){
   if (window._UIevent){
     window._UIevent = false
     return
   }
   let offset = ["edit", "starEdit"].includes(game.mode) ? 0 : topbarHeight
-  if (game.mode === "welcome" || popup.show || 
+  if (game.mode === "welcome" || popup.show ||
       winMouseX < world.leftOffset || mouseX > board.cols*25 ||
       mouseY < offset || mouseY > board.rows*25+offset){return}
   switch(game.mode){
@@ -69,19 +79,19 @@ function mousePressed(){
     case "edit": editor.mousePressed(); break
     case "starEdit": starEditor.mousePressed(); break
   }
-  
-  if (typeof test !== "undefined" && game.mode === "play" && test.clickInfo){
+
+  if (typeof window.test !== "undefined" && game.mode === "play" && window.test.clickInfo){
     let y = Math.floor((mouseY-topbarHeight)/25)
     let x = Math.floor(mouseX/25)
     let cell = board.cells[x][y] || {}
-    if (test.clickInfo === "cell")
+    if (window.test.clickInfo === "cell")
       console.log(x,y,cell)
     else
       console.log(mouseX, mouseY)
   }
 }
 
-function mouseDragged(){
+export function mouseDragged(){
   if (mouseX < 0 || mouseX >= width || mouseY < 0 || mouseY >= height || popup.show)
     return
   if (game.mode === "edit" && winMouseY > world.topOffset)
@@ -90,18 +100,18 @@ function mouseDragged(){
     starEditor.mousePressed()
 }
 
-function mouseReleased(){
+export function mouseReleased(){
   if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height)
     return
   if (game.mode === "edit" && winMouseY > world.topOffset)
     editor.mouseReleased()
 }
 
-function windowResized(){
+export function windowResized(){
   if (game.mode === "play")
     viewport.update(true)
 }
 
-function touchStarted(e){
+export function touchStarted(e){
   window._UIevent = true
 }

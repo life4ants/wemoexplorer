@@ -1,4 +1,4 @@
-let sounds = {
+export let sounds = {
   odd: true,
   files: {},
   musicVolume: 0.4,

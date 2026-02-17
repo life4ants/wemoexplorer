@@ -1,4 +1,12 @@
-let topbar = {
+import { man, board, active, backpack, toolbelt, tiles, world } from './state.js'
+import { topbarHeight } from './config.js'
+import { viewport } from './viewport.js'
+import { helpers } from './helpers.js'
+import { tutorial } from './tutorial.js'
+import { timer } from './timer.js'
+import { game } from './game.js'
+
+export let topbar = {
   energy: 0,
   health: 0,
 

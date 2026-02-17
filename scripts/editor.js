@@ -1,4 +1,9 @@
-let editor = {
+import { board, world, tiles, gameBoards, setBoard } from './state.js'
+import { stackable, seeThru, version } from './config.js'
+import { helpers } from './helpers.js'
+import { Board } from './board.js'
+
+export let editor = {
   path: [],
   cell1: {},
   tile: "water",
@@ -18,7 +23,7 @@ let editor = {
           board.startX = x
           board.startY = y
           this.unSaved = true
-          if (test){console.log(board.cells[x][y])}
+          if (window.test){console.log(board.cells[x][y])}
         }
       }
       else if (this.type === "pit0"){
@@ -198,7 +203,7 @@ let editor = {
   },
 
   newWorld(cols, rows, fillType){
-    board = new Board(cols, rows, fillType)
+    setBoard(new Board(cols, rows, fillType))
     world.resize(cols, rows)
     this.undoList = []
     this.unSaved = true
@@ -206,9 +211,9 @@ let editor = {
 
   loadBoard(b){
     if (b.type === "custom")
-      board = new Board(JSON.parse(localStorage["board"+b.name]))
+      setBoard(new Board(JSON.parse(localStorage["board"+b.name])))
     else
-      board = new Board(JSON.parse(JSON.stringify(gameBoards[b.id])))
+      setBoard(new Board(JSON.parse(JSON.stringify(gameBoards[b.id]))))
     world.resize(board.cols, board.rows)
     this.undoList = []
     this.unSaved = false
@@ -471,7 +476,7 @@ let editor = {
   }
 }
 
-let starEditor = {
+export let starEditor = {
   selected: {id: 0},
   mode: "add",
   matrix: [],

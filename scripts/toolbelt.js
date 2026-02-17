@@ -1,4 +1,6 @@
-class Toolbelt {
+import { Backpack } from './backpack.js'
+
+export class Toolbelt {
   constructor(obj){
     this.tools = []
     this.containers = []

@@ -1,4 +1,19 @@
-class Board {
+import { man, active, board, tiles, world, gameBoards } from './state.js'
+import { topbarHeight, seeThru, version, stackable } from './config.js'
+import { viewport } from './viewport.js'
+import { editor, starEditor } from './editor.js'
+import { helpers } from './helpers.js'
+import { tutorial } from './tutorial.js'
+import { plants } from './plants.js'
+import { game } from './game.js'
+import { Rabbit } from './rabbit.js'
+import { Snake } from './snake.js'
+import { WaterCraft } from './waterCraft.js'
+import { Campsite } from './campsite.js'
+import { keyHandler } from './events.js'
+import { timer } from './timer.js'
+
+export class Board {
   constructor(a,b,fillType){
     this.buildings = []
     this.rabbits = []

@@ -1,4 +1,20 @@
-var game = new Vue({
+import { man, board, backpack, toolbelt, active, msgs, gameBoards, world,
+         setMan, setBoard, setBackpack, setToolbelt, setActive } from './state.js'
+import { version, topbarHeight } from './config.js'
+import { helpers } from './helpers.js'
+import { popup } from './popup.js'
+import { sounds } from './sounds.js'
+import { timer } from './timer.js'
+import { viewport } from './viewport.js'
+import { tutorial } from './tutorial.js'
+import { editor } from './editor.js'
+import { topbar } from './topbar.js'
+import { Man } from './man.js'
+import { Board } from './board.js'
+import { Backpack } from './backpack.js'
+import { Toolbelt } from './toolbelt.js'
+
+export var game = new Vue({
   el: '#game',
   template: `
     <div>
@@ -166,17 +182,17 @@ var game = new Vue({
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
       }
-      man = new Man(player.character, b.startX, b.startY)
-      backpack = new Backpack(b.backpack ?? {type:"backpack"})
+      setMan(new Man(player.character, b.startX, b.startY))
+      setBackpack(new Backpack(b.backpack ?? {type:"backpack"}))
       delete b.backpack
-      toolbelt = new Toolbelt(b.toolbelt)
+      setToolbelt(new Toolbelt(b.toolbelt))
       delete b.toolbelt
       if (b.man){
         man.import(b.man)
         delete b.man
       }
-      board = new Board(b)
-      active = man.isRiding ? board.vehicles[man.ridingId] : man
+      setBoard(new Board(b))
+      setActive(man.isRiding ? board.vehicles[man.ridingId] : man)
       world.leftOffset = 52
       topbar.health = man.health
       topbar.energy = man.energy

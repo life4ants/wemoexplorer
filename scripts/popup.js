@@ -1,4 +1,15 @@
-var popup = new Vue({
+import { board, man, active, backpack, toolbelt, gameBoards } from './state.js'
+import { options } from './config.js'
+import { game } from './game.js'
+import { actions } from './actions.js'
+import { editor } from './editor.js'
+import { helpers } from './helpers.js'
+import { sounds } from './sounds.js'
+import { Backpack } from './backpack.js'
+import { builder } from './builder.js'
+import { tutorial } from './tutorial.js'
+
+export var popup = new Vue({
   el: '#popup',
   template: `
     <div>

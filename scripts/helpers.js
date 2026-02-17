@@ -1,4 +1,7 @@
-let helpers = {
+import { board } from './state.js'
+import { nonWalkable } from './config.js'
+
+export let helpers = {
   ringList: [
     [{x:0,y:-1},{x:1,y:0},{x:0,y:1},{x:-1,y:0}],
     [{x:-1,y:-1},{x:1,y:-1},{x:1,y:1},{x:-1,y:-1}],
@@ -48,8 +51,8 @@ let helpers = {
   },
 
   canWalk(x,y){
-    if (tutorial.active && board.level === 0){
-      return x >= 0 && x < tutorial.xbound && y >= 0 && y < tutorial.ybound
+    if (window.tutorial && window.tutorial.active && board.level === 0){
+      return x >= 0 && x < window.tutorial.xbound && y >= 0 && y < window.tutorial.ybound
     }
     return x >= 0 && x < board.cols && y >= 0 && y < board.rows
   },
