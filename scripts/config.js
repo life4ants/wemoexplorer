@@ -1,5 +1,5 @@
 export const topbarHeight = 55
-export const version = 10901 // update this with each version publication
+export const version = 10902 // update this with each version publication
 export const dumpable = ["beach", "sand", "grass", "stump", "beachEdge", "grassBeach", "dock", "rockMiddle", "blank"]
 export const grabable = ["log", "stick", "rock", "longGrass", "clay", "bone", "logpile", "stickpile", "rockpile", "claypile", "bonepile", "arrowpile", "longGrasspile", "mushroom"]
 export const sleepable = ["beach", "sand", "grass", "beachEdge", "grassBeach", "dock", "longGrass", "rockMiddle", "campsite", "root"]

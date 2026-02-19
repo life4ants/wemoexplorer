@@ -156,7 +156,6 @@ module.exports = {
       customWorlds: [],
       name: "",
       deleteMode: false,
-      pageViews: "loading",
       history: [
         {version: "1.9.2", date: "Feb 18, 2026", value: 10902,
         items: ["Info on pushing boulders", "Can change music volume on mobile"]},
@@ -262,7 +261,6 @@ module.exports = {
 
         if (!data.success) {
           console.error('Server error:', data.error);
-          showErrorMessage(data.error || 'Failed to load high scores');
           return;
         }
 
@@ -271,7 +269,6 @@ module.exports = {
 
       } catch (err) {
         console.error('Failed to fetch highscores:', err);
-        showErrorMessage('Could not load high scores – check your connection');
         return
       }
       for (let k in this.highScores){
