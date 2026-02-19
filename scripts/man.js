@@ -34,7 +34,7 @@ export class Man {
 
   export(){
     let list = [
-    "x", "y", "characterId", "energy", "health", "stepCount", "isRiding", 
+    "x", "y", "energy", "health", "stepCount", "isRiding", 
     "ridingId", "isNextToFire", "fireId", "isSleeping", "canSleep"]
     let output = {}
     for (let key of list){
@@ -151,6 +151,7 @@ export class Man {
             board.cells[this.x+x*2][this.y+y*2] = {type: "boulder", tile: boulderCell.tile, revealed: boulderCell.revealed}
             newCell.type = newCell.tile.replace(/\d+$/, "")
             this.energy -= 50
+            tutorial.checkAction("boulder")
           }
           else
             return

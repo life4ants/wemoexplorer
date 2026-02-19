@@ -143,6 +143,10 @@ export let tutorial = {
 				text: "Find a clear spot for a campsite. You will need logs, sticks, clay and long grass."
 			},
 			{
+				title: "Push A Boulder",
+				text: "Push a boulder by holding SHIFT and pressing the arrow keys."
+			},
+			{
 				title: "All Done!",
 				text: "Congratulations, you unlocked level 3!"
 			}
@@ -212,7 +216,7 @@ export let tutorial = {
 			},
 			{
 				title: "All Done!",
-				text: "Congratulations, you unlocked level 5!"
+				text: "Congratulations, you unlocked the next level!"
 			}
 		]
 	],
@@ -364,6 +368,9 @@ export let tutorial = {
 			return
 		case "stew":
 			if (this.level === 3) {this.complete(11)}
+			return
+		case "boulder":
+			if (this.level === 2){this.complete(8)}
 			return
 		case "flag":
 			if (this.level === 4){this.complete(1)}

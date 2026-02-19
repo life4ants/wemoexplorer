@@ -13,7 +13,8 @@
 			    <span class="acc-icon">+</span>
 			  </h6>
 			  <div class="acc-panel" style="height: 126px;">
-			    <p>Movement is accomplished using the arrow keys. On mobile, tap the translucent buttons on the sides of the screen, or tap on the board.</p>
+			    <p>Movement is accomplished using the arrow keys. On mobile, tap the translucent buttons on the sides of the screen.</p>
+			    <p>Hold SHIFT and use arrows to push a boulder.</p>
 			    <p>You can click on a campsite to see what items are in it, or on a construction site to see what is needed to complete.</p>
 			  </div>
 			  <h6 class="acc-header" id="acc-sidebar" @click="() => showPanel('sidebar')">
