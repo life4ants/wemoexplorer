@@ -13,7 +13,7 @@ export let tutorial = {
 	completed: [],
 	req: {up: true, down: true, right: true, left: true, count: 4},
 	questData: [
-	[
+		[
 			{
 				title: "Learn to Walk", 
 				text: "Use the arrow keys to move around. Walk all four directions to continue.",
@@ -84,14 +84,6 @@ export let tutorial = {
 				text: "Build a stone Ax. You will need one stick, one rock, and one long grass."
 			},
 			{
-				title: "Build a raft",
-				text: "Build a raft along the beach. You will need logs and long grass."
-			},
-			{ 
-				title: "Explore the World",
-				text: "Find all the stars to uncover the world."
-			},
-			{
 				title: "Build a basket",
 				text: "Build a basket. You will need 6 long grass."
 			},
@@ -103,6 +95,14 @@ export let tutorial = {
 			{
 				title: "Survive a Night",
 				text: "When night comes, build a fire and sleep next to it."
+			},
+			{
+				title: "Build a raft",
+				text: "Build a raft along the beach. You will need logs and long grass."
+			},
+			{ 
+				title: "Explore the World",
+				text: "Find all the stars to uncover the world."
 			},
 			{
 				title: "All Done!",
@@ -296,7 +296,7 @@ export let tutorial = {
 			switch(this.level){
 			case 0: if (this.step === 2) {this.next()}
 				break
-			case 1: this.complete(2); break
+			case 1: this.complete(5); break
 			case 2:
 			case 3: this.complete(3); break
 			case 4: this.complete(0)
@@ -318,18 +318,18 @@ export let tutorial = {
 	    }
 	    return
 	  case "basket":
-	  	if (this.level === 1) {this.complete(3)}
+	  	if (this.level === 1) {this.complete(1)}
 	  	else if (this.level === 3) {this.complete(2)}
 	  	return
 		case "fruit":
-			if (this.level === 1) {this.complete(4)}
+			if (this.level === 1) {this.complete(2)}
 			return
 		case "night":
-			if (this.level === 1) {this.complete(5)}
+			if (this.level === 1) {this.complete(3)}
 			return
 		case "raft":
 			if (this.level === 2) {this.complete(2)}
-			else if (this.level === 1) {this.complete(1)}
+			else if (this.level === 1) {this.complete(4)}
 			return
 		case "steppingStones":
 			if (this.level === 2) {this.complete(1)}
@@ -393,6 +393,7 @@ export let tutorial = {
 		if (this.step === lastStep)
 			return
 		this.questData[this.level][step].completed = true
+		this.step = 0
 		while (this.questData[this.level][this.step].completed)
 			this.step++
 		if (this.step === lastStep)

@@ -376,6 +376,7 @@ module.exports = {
         if (savedGames[i].type === "default"){
           defaultWorlds[savedGames[i].level].savedGame = true
           defaultWorlds[savedGames[i].level].gameId = savedGames[i].id
+          defaultWorlds[savedGames[i].level].sessionId = savedGames[i].sessionId
         }
         else {
           let index = customWorlds.findIndex((e) => e.name === savedGames[i].name)
@@ -388,6 +389,7 @@ module.exports = {
           }
           customWorlds[index].savedGame = true
           customWorlds[index].gameId = savedGames[i].id
+          customWorlds[index].sessionId = savedGames[i].sessionId
         }
       }
       this.customWorlds = customWorlds
@@ -402,7 +404,8 @@ module.exports = {
       this.currentPlayer.character = this.selected
       if (type === "default" && this.worlds[id].savedGame ||
           type === "custom" && this.customWorlds[id].savedGame){
-        popup.callback = () => this.startGame(type, this.currentPlayer, name)
+        let sessionId = type === "default" ? this.worlds[id].sessionId : this.customWorlds[id].sessionId
+        popup.callback = () => this.startGame(type, this.currentPlayer, name, sessionId)
         popup.setInput("Delete your process and restart the level?", "callback", "yesno")
       }
       else {

@@ -3,6 +3,9 @@
 <!-- Header -->
 		<div class="modal-header">
       <h5>{{title}}</h5>
+			<button v-if="type === 'manual'" type="button" class="close-button" 
+				aria-label="Close" @click="close">×
+			</button>
     </div>
 
 <!-- Body -->
@@ -129,34 +132,38 @@
 			</div>
     </div>
     <div v-else-if="type === 'welcome'" class="modal-body">
-    	<p v-if="level === 0">This tutorial will teach you how to use the game controls. Read the How To Play manual for more information.</p>
-    	<p v-else-if="level === 1">Welcome to level one. Now you have freedom to do the quests in any order. Press start to see your first quest.</p>
+    	<p v-if="level === 0">Press How To Play to see the detailed manual on all the game controls.
+    		<br>
+    		Press Start to begin the tutorial, which will walk you through the basic game controls.</p>
+    	<p v-else-if="level === 1">Welcome to level one. You will need to build a fire and survive a night to complete this level. 
+    		<br>
+    	The active quest will appear on the top bar, but there will be no popup when you complete it. To see quest details after you close this popup, press the question mark button on the side bar. You can page through all the quests and do them in any order.</p>
     	<p v-else-if="level === 2">Welcome to level two. This level introduces snakes. They spawn from sandpits, and can only move on sand and beach. Stay away from snakes, because they can bit you and cause you to lose health. Press start to see your first quest.</p>
 	    <p v-else-if="level > 2">Press start to see your first quest.</p>
     </div>
     <div v-else-if="type === 'tutorial'" class="modal-body">
-    	<p v-if="level === 0">Step {{step+1}}: {{bodyText}}</p>
-    	<p v-else>{{bodyText}}</p>
+    	<p>Step {{step+1}}: {{bodyText}}</p>
     	<p v-if="completed">COMPLETED</p>
     </div>
  <!-- Footer -->
     <div v-if="'tutorial' === type" class="modal-footer">
     	<button type="button" @click="back">Back</button>
     	<button v-if="showNext" type="button" @click="next">Next</button>
-    	<button type="button" id="etr" @click="close">Ok</button>
+    	<button type="button" id="etr" @click="close">Close</button>
     </div>
     <div v-else-if="'welcome' === type" class="modal-footer">
       <button type="button" @click="manual">How to Play</button>
       <button type="button" @click="start">Start</button>
+      <button v-if="level > 0" type="button" @click="close">Close</button>
     </div>
     <div v-else class="modal-footer">
-      <button type="button" id="etr" @click="close">Ok</button>
+      <button type="button" id="etr" @click="close">Close</button>
     </div>
 	</div>
 </template>
 <script>
 	module.exports = {
-		props: ['type', 'close'],
+		props: ['type', 'closePopup'],
 		data(){
 			return {
 				step: 0,
@@ -174,12 +181,12 @@
 		},
 		mounted(){
 			this.level = board.level
+			this.step = tutorial.step
 			if (this.type === "tutorial"){
-				this.step = tutorial.step
 				this.updateText()
 			}
 			else
-				this.title = this.type === "manual" ? "How to Play" : "Welcome to Wemo"
+				this.title = this.type === "manual" ? "How to Play" : "Welcome to Wemo Explorer"
 		},
 		methods: {
 			start(){
@@ -188,7 +195,13 @@
 				this.updateText()
 			},
 
+			close(){
+				tutorial.step = this.step
+				this.closePopup()
+			},
+
 			manual(){
+				this.title = "How to Play"
 				popup.setInfo("manual")
 			},
 
@@ -202,8 +215,10 @@
 					this.step--
 					this.updateText()
 				}
-				else
+				else{
+					this.title = "Welcome to Wemo Explorer"
 					popup.setInfo("welcome")
+				}
 			},
 			updateText(){
 				let data = tutorial.getData(this.level, this.step)
@@ -278,5 +293,22 @@
 
 	.acc-panel p {
 	  margin: 10px 0;
+	}
+
+	.close-button {
+	  position: absolute;
+	  top: 10px;
+	  left: 10px;
+	  width: 32px;
+	  padding: 0;
+	  font-size: 24px;
+	  border: none;
+	  color: #333;
+	  opacity: 0.7;
+	  transition: opacity 0.2s ease;
+	}
+
+	.close-button:hover {
+	  opacity: 1;
 	}
 </style>

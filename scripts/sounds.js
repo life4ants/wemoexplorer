@@ -74,7 +74,7 @@ export let sounds = {
       this.odd = !this.odd
     }
     else if (['win', 'lose'].includes(file)){
-      this.files.music.pause()
+      this.setMusic(false)
       this.files[file].play()
     }
     else {

@@ -168,16 +168,16 @@ export var game = new Vue({
       loop()
     },
 
-    startGame(type, player, index){
+    startGame(type, player, index, sessionId){
       let b
       switch(type){
         case "default":
           b = JSON.parse(JSON.stringify(gameBoards[index]))
-          b.sessionId = helpers.randomId()
+          b.sessionId = sessionId ?? helpers.randomId()
           break
         case "custom":
           b = JSON.parse(localStorage["board"+index])
-          b.sessionId = helpers.randomId()
+          b.sessionId = sessionId ?? helpers.randomId()
           break
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
@@ -236,7 +236,7 @@ export var game = new Vue({
             gameId = n > gameId ? n : gameId
           }
         }
-        this.currentPlayer.games.push({level: board.level, id: gameId, name: board.name, type: board.type})
+        this.currentPlayer.games.push({level: board.level, id: gameId, name: board.name, type: board.type, sessionId: board.sessionId})
         let p = JSON.parse(localStorage.wemoPlayers)
         p[this.currentPlayer.index] = this.currentPlayer
         localStorage.setItem("wemoPlayers", JSON.stringify(p))
@@ -259,7 +259,7 @@ export var game = new Vue({
         status: status,
         level: board.level,
         game_name: board.name,
-        game_time: board.wemoMins-120
+        game_time: board.level === 1 ? board.wemoMins-300 : board.wemoMins-120
       }
 
       // Only send user creation data the first time
