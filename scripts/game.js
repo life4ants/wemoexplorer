@@ -75,6 +75,7 @@ export var game = new Vue({
       }
     })
     let resetLevel = false // change this to force people to do the tutorial again
+    let reloadPlayers = true // change this to change all players to unverified
     this.lastVisit = Number(localStorage.wemoUpToDate ?? 1012011)
 
     if (this.lastVisit === version)
@@ -99,7 +100,7 @@ export var game = new Vue({
         games: [], 
         character: players[i].character,
         userId: players[i].userId ?? helpers.randomId(),
-        verified: players[i].verified ?? false,
+        verified: reloadPlayers ? false : players[i].verified ?? false,
         createdAt: players[i].createdAt ?? new Date().toISOString()
       })
     }
@@ -264,7 +265,7 @@ export var game = new Vue({
 
       // Only send user creation data the first time
       if (!this.currentPlayer.verified) {
-        payload.name = this.currentPlayer.name
+        payload.player_name = this.currentPlayer.name
         payload.createdAt = this.currentPlayer.createdAt
       }
       try {

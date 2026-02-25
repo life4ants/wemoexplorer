@@ -51,7 +51,7 @@
         <!-- NEW PLAYER -->
         <div v-else-if="page === 'newPlayer'" class="modal-body center">
           <h5>What is your name?</h5>
-          <input type="text" v-model="name" placeholder="enter name" class="player-name" id="inputOne">
+          <input type="text" v-model="name" placeholder="enter name" maxlength="25" class="player-name" id="inputOne">
           <button class="button-primary" id="etr" @click="newPlayer">Start</button>
           <button v-if="players.length > 0" id="esc" @click="page = 'pickPlayer'">Cancel</button>
         </div>
@@ -75,10 +75,10 @@
         <!-- HIGH SCORES -->
         <div v-else-if="page === 'highScores'" class="modal-body">
           <h4>High Scores for {{worlds[selected].name}}:</h4>
-          <div v-for="h in highScores[selected]" class="flex-around">
-            <h6>{{h.player_name}}</h6>
-            <h6>{{h.played_at}}</h6>
-            <h6>{{h.game_time}}</h6>
+          <div v-for="h in highScores[selected]" class="high-scores">
+            <h6 class="high-scores-name">{{h.player_name}}</h6>
+            <h6 class="high-scores-date">{{h.played_at}}</h6>
+            <h6 class="high-scores-time">{{h.game_time}}</h6>
           </div>
           <br>
           <button @click="exitHighScores">Back</button>
@@ -157,6 +157,8 @@ module.exports = {
       name: "",
       deleteMode: false,
       history: [
+        {version: "1.9.4", date: "Feb 24, 2026", value: 10904,
+          items: ["Length limit for player name", "Adjust high scores page"]},
         {version: "1.9.3", date: "Feb 23, 2026", value: 10903,
           items: ["Rearange quests for level one", "Change welcome text for level one"]},
         {version: "1.9.2", date: "Feb 18, 2026", value: 10902,
@@ -169,7 +171,7 @@ module.exports = {
           items: ["New worlds for levels 2 and 3", "mushrooms grow the first day"]},
         {version: "1.8.0", date: "Feb 2, 2026", value: 10800,
           items: ["Star Editor", "Download as default", "Show message when taking teleports"]},
-        {version: "1.7.8", date: "Jan 29, 2026", value: 10708,
+        {version: "1.7.8", date: "Jan 30, 2026", value: 10708,
           items: ["Push boulders holding shift"]},
         {version: "1.7.7", date: "Jan 29, 2026", value: 10707,
           items: ["New Level 1 world"]},
@@ -294,7 +296,7 @@ module.exports = {
     },
 
     newPlayer(){
-      let name = this.name.trim()
+      let name = this.name.trim().slice(0, 25)
       if (name.length > 0){
         let level = typeof test === "undefined" ? 0 : 8
         this.players.push({
@@ -432,6 +434,30 @@ module.exports = {
   background-color: #ddd;
   border-radius: 10px;
   padding: 5px 10px;
+}
+
+.high-scores {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 5px;
+}
+.high-scores h6 {
+  margin: 0 5px;
+  overflow: hidden;
+}
+
+.high-scores-name {
+  width: 24%;
+}
+
+.high-scores-date {
+  width: 38%;
+}
+
+.high-scores-time {
+  width: 38%;
 }
 
 .center {
