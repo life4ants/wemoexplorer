@@ -163,7 +163,7 @@
 </template>
 <script>
 	module.exports = {
-		props: ['type', 'closePopup'],
+		props: ['type', 'close'],
 		data(){
 			return {
 				step: 0,
@@ -193,11 +193,6 @@
 				this.step = 0
 				popup.type = "tutorial"
 				this.updateText()
-			},
-
-			close(){
-				tutorial.step = this.step
-				this.closePopup()
 			},
 
 			manual(){

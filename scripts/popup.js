@@ -37,7 +37,7 @@ export var popup = new Vue({
 
           <info-menu v-else-if="['manual', 'tutorial', 'welcome'].includes(type)" 
             :type="type"
-            :closePopup="close"
+            :close="close"
           ></info-menu>
 
           <select-menu v-else-if="['input', 'getSize', 'pickBombs', 'fileUpload', 'download'].includes(type)" 

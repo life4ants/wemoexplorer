@@ -393,7 +393,6 @@ export let tutorial = {
 		if (this.step === lastStep)
 			return
 		this.questData[this.level][step].completed = true
-		this.step = 0
 		while (this.questData[this.level][this.step].completed)
 			this.step++
 		if (this.step === lastStep)
