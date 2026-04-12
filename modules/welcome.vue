@@ -156,6 +156,8 @@ module.exports = {
       name: "",
       deleteMode: false,
       history: [
+        {version: "1.9.5", date: "April 11, 2026", value: 10905,
+          items: ["bug fixes", "admin error page"]},
         {version: "1.9.4", date: "Feb 24, 2026", value: 10904,
           items: ["Length limit for player name", "Adjust high scores page"]},
         {version: "1.9.3", date: "Feb 23, 2026", value: 10903,
