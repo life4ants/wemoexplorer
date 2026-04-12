@@ -44,7 +44,6 @@
           <div class="links">
             <a v-if="players.length > 0" @click="deleteMode = !deleteMode">{{deleteMode ? 'done deleting' : 'delete players'}}</a>
             <a @click="page = 'history'">version history</a>
-            <span>Views since Dec 13, 2025: {{viewCount}}</span>
           </div>
         </div>
 
@@ -223,7 +222,7 @@ module.exports = {
     }
   },
   props: [
-    'startGame', 'edit', 'player', 'lastVisit', 'viewCount'
+    'startGame', 'edit', 'player', 'lastVisit'
   ],
   mounted(){
     setTimeout(() => $("#grow").addClass("large"), 0)
@@ -314,6 +313,7 @@ module.exports = {
       p.index = id   // player not created with an index, must get one somehow
       this.selected = p.character || 0
       this.currentPlayer = p
+      window.__wemoCurrentPlayer = p
       this.matchWorlds()
       this.page = 'pickGame'
     },
@@ -405,7 +405,7 @@ module.exports = {
         this.players[this.currentPlayer.index].character = this.selected
         localStorage.setItem("wemoPlayers", JSON.stringify(this.players))
       }
-      this.currentPlayer.character = this.selected
+      this.currentPlayer.character = this.selected < 2 ? this.selected : 0
       if (type === "default" && this.worlds[id].savedGame ||
           type === "custom" && this.customWorlds[id].savedGame){
         let sessionId = type === "default" ? this.worlds[id].sessionId : this.customWorlds[id].sessionId

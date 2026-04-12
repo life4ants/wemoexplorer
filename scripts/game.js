@@ -22,8 +22,7 @@ export var game = new Vue({
         :startGame="startGame"
         :player="currentPlayer" 
         :edit="edit" 
-        :lastVisit="lastVisit"
-        :viewCount="viewCount">
+        :lastVisit="lastVisit">
       </welcome-menu>
 
       <edit-bar v-if="['edit', 'starEdit'].includes(mode)" :exit="exit" :mode="mode">
@@ -52,7 +51,6 @@ export var game = new Vue({
   },
   data: {
     mode: "loading",
-    viewCount: 0,
     started: false,
     paused: false,
     autoCenter: false,
@@ -183,7 +181,7 @@ export var game = new Vue({
         case "resume":
           b = JSON.parse(localStorage["wemoGame"+index])
       }
-      setMan(new Man(player.character, b.startX, b.startY))
+      setMan(new Man(player.character ?? 0, b.startX, b.startY))
       setBackpack(new Backpack(b.backpack ?? {type:"backpack"}))
       delete b.backpack
       setToolbelt(new Toolbelt(b.toolbelt))
@@ -193,6 +191,7 @@ export var game = new Vue({
         delete b.man
       }
       setBoard(new Board(b))
+      board.initializeObjects()
       setActive(man.isRiding ? board.vehicles[man.ridingId] : man)
       world.leftOffset = 52
       topbar.health = man.health

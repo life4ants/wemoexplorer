@@ -63,7 +63,6 @@ export class Board {
         delete this.berryBushes
         this.version = 5
       }
-      this.initializeObjects()
     }
     else if (arguments.length === 3){// creating a new game on editor
       this.cols = a

@@ -18,6 +18,18 @@ import { msgs } from './message.js'
 import { keyPressed, keyHandler, mousePressed, mouseDragged,
          mouseReleased, windowResized, touchStarted } from './events.js'
 
+// Forward Vue errors to the error logger
+Vue.config.errorHandler = function(err) {
+  if (window.__sendError) {
+    window.__sendError({
+      message: err.message || String(err),
+      source: 'Vue.errorHandler',
+      stack: err.stack || null
+    });
+  }
+  console.error(err);
+};
+
 // Initialize state
 setMsgs(msgs)
 
@@ -256,14 +268,6 @@ window.setup = function() {
   frameRate(world.frameRate)
   // console.timeLog("load", "setup finished")
   // console.timeEnd("load")
-  if (!Vue.config.devtools){
-    fetch(' https://api.counterapi.dev/v2/andys-games/wemo/up')
-      .then(response => response.json())
-      .then(result => {
-        game.viewCount = result.data.up_count
-      })
-      .catch(error => console.error('Error:', error));
-  }
 }
 
 window.draw = function() {

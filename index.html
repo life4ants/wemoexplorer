@@ -2,6 +2,61 @@
 <html>
   <head>
     <script type="text/javascript">console.time("load") </script>
+    <script>
+    (function() {
+      var errorCount = 0;
+      var MAX_ERRORS = 10;
+
+      window.__sendError = sendError;
+      function sendError(data) {
+        if (++errorCount > MAX_ERRORS) return;
+        var player = window.__wemoCurrentPlayer;
+        var userId = player && player.userId ? player.userId : null;
+        data.userId = userId;
+        data.userAgent = navigator.userAgent;
+        data.url = location.href;
+        fetch('/api/errors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        }).catch(function() {});
+      }
+
+      window.addEventListener('error', function(event) {
+        sendError({
+          message: String(event.message),
+          source: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+          stack: event.error && event.error.stack ? event.error.stack : null
+        });
+      });
+
+      window.addEventListener('unhandledrejection', function(event) {
+        var reason = event.reason;
+        sendError({
+          message: reason instanceof Error ? reason.message : String(reason),
+          source: 'unhandledrejection',
+          stack: reason instanceof Error ? reason.stack : null
+        });
+      });
+
+      var origConsoleError = console.error;
+      console.error = function() {
+        origConsoleError.apply(console, arguments);
+        for (var i = 0; i < arguments.length; i++) {
+          if (arguments[i] instanceof Error) {
+            sendError({
+              message: arguments[i].message,
+              source: 'console.error',
+              stack: arguments[i].stack || null
+            });
+            return;
+          }
+        }
+      };
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
